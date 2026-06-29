@@ -14,3 +14,10 @@
 تم نقل ملخص دردشة مشروع **مساعد الحياة - Life Assistant MVP** إلى:
 
 - [docs/life-assistant-chat-handoff.md](docs/life-assistant-chat-handoff.md)
+
+## كتيب مرزوق بن حويد العضياني
+
+تم نقل ودمج محتوى محادثة مشروع **كتيب مرزوق بن حويد بن وازع العضياني رحمه الله** إلى:
+
+- [docs/marzouq-book/README.md](docs/marzouq-book/README.md)
+- [docs/marzouq-book/chat-log.md](docs/marzouq-book/chat-log.md)
