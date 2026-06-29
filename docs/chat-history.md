@@ -268,7 +268,11 @@ Git LFS is required for large generated artifacts:
 - PDF files.
 - ZIP files.
 
+<<<<<<< HEAD
 The local repository includes:
+=======
+The repository includes:
+>>>>>>> a051559 (Add Codex chat work log)
 
 ```text
 .gitattributes
@@ -288,3 +292,7 @@ This avoids committing browser cookies, caches, and temporary extraction state t
 ## Privacy Note
 
 The session included a WhatsApp phone number. It is intentionally not included in this project log because it is personal contact information and is not needed for the technical repository.
+<<<<<<< HEAD
+=======
+
+>>>>>>> a051559 (Add Codex chat work log)

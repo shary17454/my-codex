@@ -1,6 +1,7 @@
 # OS and editor files
 .DS_Store
 Thumbs.db
+desktop.ini
 *.swp
 *.tmp
 
@@ -16,7 +17,7 @@ data/raw_text/
 data/extracted/
 __pycache__/
 .pycache-check/
-*.pyc
+*.py[cod]
 
 # Flutter/Dart generated files
 **/.dart_tool/
@@ -35,7 +36,7 @@ ios/**/DerivedData/
 **/.gradle/
 **/local.properties
 
-# Build outputs and archives generated during this session
+# Build outputs and archives generated during local sessions
 outputs/
 build/
 **/*.xcarchive/
@@ -43,10 +44,6 @@ build/
 **/*.dSYM/
 **/ArchiveIntermediates/
 **/ModuleCache.noindex/
-**/Intermediates.noindex/
-
-
-
 
 # SQLite sidecar files
 data/*.sqlite-shm
