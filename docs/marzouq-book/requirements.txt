@@ -1,0 +1,5 @@
+reportlab
+arabic-reshaper
+python-bidi
+python-docx
+Pillow
