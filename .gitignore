@@ -1,0 +1,31 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Local Codex/session state
+.codex/
+.agents/
+tmp/
+work/
+
+# Flutter/Dart generated files
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/build/
+**/ephemeral/
+
+# Native dependency folders and generated caches
+**/Pods/
+**/DerivedData/
+**/.gradle/
+**/local.properties
+
+# Build outputs and archives generated during this session
+outputs/
+
+# Logs
+*.log
