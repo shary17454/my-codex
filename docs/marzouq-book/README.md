@@ -13,6 +13,12 @@
 - إصلاح خطأ تداخل تذييل الصفحات مع الزخرفة السفلية.
 - إرسال النسخ النهائية إلى بريد المستخدم بعد كل تحديث.
 
+## ملفات هذا المجلد
+
+- [chat-log.md](chat-log.md): سجل منظم لمحتوى المحادثة ومراحل العمل.
+- [artifacts.md](artifacts.md): بيان الملفات النهائية PDF/Word/JPG وحالتها وطريقة رفعها لاحقا.
+- [requirements.txt](requirements.txt): حزم Python المطلوبة لإعادة التوليد.
+
 ## الملفات المحلية الأصلية
 
 في بيئة Codex التي أُنشئ فيها العمل، كانت الملفات النهائية محفوظة في:
@@ -29,19 +35,12 @@
 
 ## إعادة البناء
 
-لإعادة توليد PDF وWord محليا، يلزم Python والحزم التالية:
-
-- `reportlab`
-- `arabic-reshaper`
-- `python-bidi`
-- `python-docx`
-- `Pillow`
-
-كما يلزم خط Tahoma على Windows أو تعديل مسار الخطوط في السكربت.
+لإعادة توليد PDF وWord محليا، يلزم Python والحزم الموجودة في [requirements.txt](requirements.txt)، كما يلزم خط Tahoma على Windows أو تعديل مسار الخطوط في السكربت.
 
 الأوامر:
 
 ```powershell
+pip install -r docs/marzouq-book/requirements.txt
 python create_marzouq_pdf.py
 python create_marzouq_docx.py
 ```
