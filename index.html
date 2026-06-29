@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ركّبها</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">نموذج MVP</p>
+          <h1>ركّبها</h1>
+        </div>
+        <button class="icon-button" id="favoritesShortcut" type="button" aria-label="المفضلة">♡</button>
+      </header>
+
+      <main id="app" class="screen"></main>
+
+      <nav class="tabbar" aria-label="التنقل الرئيسي">
+        <button class="tab active" data-route="home" type="button">الرئيسية</button>
+        <button class="tab" data-route="search" type="button">البحث</button>
+        <button class="tab" data-route="favorites" type="button">المفضلة</button>
+        <button class="tab" data-route="account" type="button">الحساب</button>
+      </nav>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
