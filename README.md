@@ -8,3 +8,9 @@
 - تجربة GitHub و Codex.
 - تشغيل المهام السحابية بدون لابتوب.
 - حفظ الملفات والمشاريع لاستخدامها لاحقاً.
+
+## مساعد الحياة
+
+تم نقل ملخص دردشة مشروع **مساعد الحياة - Life Assistant MVP** إلى:
+
+- [docs/life-assistant-chat-handoff.md](docs/life-assistant-chat-handoff.md)
