@@ -3,6 +3,8 @@
 Thumbs.db
 *.swp
 *.tmp
+.idea/
+*.iml
 
 # Local Codex/session state
 .codex/
