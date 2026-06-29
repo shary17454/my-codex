@@ -1,0 +1,39 @@
+{
+  "vehicle": "Nissan Patrol",
+  "model_year": 2026,
+  "market_focus": "Middle East",
+  "body_style": "Full-size SUV",
+  "drivetrain": "4WD",
+  "transmission": "9-speed automatic",
+  "engines": [
+    {
+      "name": "3.8L V6",
+      "aspiration": "Naturally aspirated",
+      "power_hp": 316,
+      "torque_nm": 386
+    },
+    {
+      "name": "3.5L V6 twin-turbo",
+      "aspiration": "Twin turbocharged",
+      "power_hp": 425,
+      "torque_nm": 700
+    },
+    {
+      "name": "3.5L V6 twin-turbo NISMO tune",
+      "aspiration": "Twin turbocharged",
+      "power_hp": 495,
+      "torque_nm": 700,
+      "note": "NISMO output announced for Middle East markets"
+    }
+  ],
+  "selected_features": [
+    "Adaptive air suspension on selected grades",
+    "Multiple drive modes for road and off-road conditions",
+    "Large connected display system on selected grades",
+    "Advanced driver-assistance features depending on grade and market"
+  ],
+  "data_notes": [
+    "Specifications vary by country, grade, and production date.",
+    "Use official Nissan or local dealer documents for final purchase and service decisions."
+  ]
+}
