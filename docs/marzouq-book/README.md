@@ -8,40 +8,29 @@
 - إضافة غلاف، مقدمة، فهرس، وصورة المرحوم.
 - تقسيم الكتيب إلى أبواب: إهداء، المقدمة، ما ثبت في المصادر، مولده ونشأته، أشعاره، مناقبه، قصص ومواقف، وفاته، الخاتمة، وصفحات للتوثيق.
 - تحويل الكتيب إلى نسخة Word قابلة للتعديل.
-- تحسين الصورة الأصلية محليا مع الحفاظ على ملامحها ومحتواها.
-- إضافة تصميم فاخر: غلاف ذهبي/عاجي، إطارات زخرفية، وترويسات داخلية.
+- تحسين الصورة الأصلية محلياً مع الحفاظ على ملامحها ومحتواها.
+- إضافة تصميم فخم: غلاف ذهبي/عاجي، إطارات زخرفية، وترويسات داخلية.
 - إصلاح خطأ تداخل تذييل الصفحات مع الزخرفة السفلية.
-- إرسال النسخ النهائية إلى بريد المستخدم بعد كل تحديث.
 
-## الملفات المحلية الأصلية
+## الملفات داخل هذا المجلد
 
-في بيئة Codex التي أُنشئ فيها العمل، كانت الملفات النهائية محفوظة في:
+- [chat-log.md](chat-log.md): سجل منظم لمحتوى المحادثة ومراحل العمل.
+- [full-chat-transcript.md](full-chat-transcript.md): أرشيف أوسع للمحادثة وطلبات المستخدم والنتائج.
+- [artifacts.md](artifacts.md): روابط ملفات PDF وWord والصورة النهائية.
+- [requirements.txt](requirements.txt): حزم Python المطلوبة لإعادة التوليد.
 
-- `output/pdf/marzouq_bin_huwaid_al_odhayani_book.pdf`
-- `output/word/marzouq_bin_huwaid_al_odhayani_book_editable.docx`
-- `output/pdf/marzouq_photo_enhanced.jpg`
-- `create_marzouq_pdf.py`
-- `create_marzouq_docx.py`
+## التحميل المباشر
 
-## ملاحظة عن الملفات الثنائية
-
-تعذر استخدام `git clone` و`git push` مباشرة من بيئة العمل بسبب فشل الاتصال بمنفذ GitHub 443. لذلك تم نقل المحتوى النصي وسجل العمل عبر GitHub API. يمكن رفع ملفات PDF وDOCX والصورة النهائية لاحقا من الجهاز المحلي أو عبر اتصال Git مباشر.
+- [نسخة PDF النهائية](../../artifacts/marzouq-book/marzouq_bin_huwaid_al_odhayani_book.pdf)
+- [نسخة Word قابلة للتعديل](../../artifacts/marzouq-book/marzouq_bin_huwaid_al_odhayani_book_editable.docx)
+- [الصورة المحسنة](../../artifacts/marzouq-book/marzouq_photo_enhanced.jpg)
 
 ## إعادة البناء
 
-لإعادة توليد PDF وWord محليا، يلزم Python والحزم التالية:
-
-- `reportlab`
-- `arabic-reshaper`
-- `python-bidi`
-- `python-docx`
-- `Pillow`
-
-كما يلزم خط Tahoma على Windows أو تعديل مسار الخطوط في السكربت.
-
-الأوامر:
+لإعادة توليد PDF وWord محلياً، يلزم Python والحزم الموجودة في [requirements.txt](requirements.txt)، كما يلزم خط Tahoma على Windows أو تعديل مسار الخطوط في السكربت.
 
 ```powershell
+pip install -r docs/marzouq-book/requirements.txt
 python create_marzouq_pdf.py
 python create_marzouq_docx.py
 ```
