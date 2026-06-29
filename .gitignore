@@ -1,11 +1,45 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Local Codex/session state
+.codex/
+.agents/
+tmp/
+work/
+
+# Python/local generated files
 vendor/
 data/raw_text/
 data/extracted/
 __pycache__/
-.DS_Store
 .pycache-check/
+*.pyc
+
+# Flutter/Dart generated files
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/build/
+**/ephemeral/
+
+# Native dependency folders and generated caches
+**/Pods/
+**/DerivedData/
+ios/**/DerivedData/
+**/.gradle/
+**/local.properties
+
+# Build outputs and archives generated during this session
+outputs/
 build/
+
+# SQLite sidecar files
 data/*.sqlite-shm
 data/*.sqlite-wal
-ios/**/DerivedData/
-*.pyc
+
+# Logs
+*.log
