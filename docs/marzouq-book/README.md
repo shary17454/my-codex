@@ -15,6 +15,7 @@
 ## الملفات داخل هذا المجلد
 
 - [chat-log.md](chat-log.md): سجل منظم لمحتوى المحادثة ومراحل العمل.
+- [full-chat-transcript.md](full-chat-transcript.md): أرشيف أوسع للمحادثة وطلبات المستخدم والنتائج.
 - [artifacts.md](artifacts.md): روابط ملفات PDF وWord والصورة النهائية.
 - [requirements.txt](requirements.txt): حزم Python المطلوبة لإعادة التوليد.
 
