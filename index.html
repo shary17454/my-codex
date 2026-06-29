@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>بطل الدروب</title>
+    <meta name="theme-color" content="#152522">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="بطل الدروب">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <link rel="icon" href="assets/icons/icon-192.png">
+    <link rel="stylesheet" href="styles.css?v=hierarchy-1">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="التنقل الرئيسي">
+        <div class="brand">
+          <div class="brand-mark" data-i18n="brandMark">بد</div>
+          <div>
+            <strong data-i18n="appName">بطل الدروب</strong>
+            <span data-i18n="brandSubtitle">كتالوج قطع الباترول Y60</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item active" type="button"><span class="nav-icon">⌕</span><span data-i18n="navCatalog">الكتالوج</span></button>
+          <button class="nav-item" type="button"><span class="nav-icon">□</span><span data-i18n="navDiagrams">الرسومات</span></button>
+          <button class="nav-item" type="button"><span class="nav-icon">﷼</span><span data-i18n="navPrices">الأسعار</span></button>
+          <button class="nav-item" type="button"><span class="nav-icon">⚙</span><span data-i18n="navMaintenance">الصيانة</span></button>
+          <button class="nav-item" type="button"><span class="nav-icon">◇</span><span data-i18n="navCommunity">المجتمع</span></button>
+        </nav>
+
+        <div class="sidebar-panel">
+          <span class="panel-label" data-i18n="dataStatus">حالة البيانات</span>
+          <strong data-i18n="dataTitle">قاعدة Y60 مدمجة</strong>
+          <p data-i18n="dataText">بيانات مدققة من كتالوجات PDF، محفوظة في قاعدة SQLite وجاهزة للبحث والاستعراض.</p>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" data-i18n="eyebrow">بطل الدروب لقطع نيسان باترول</p>
+            <h1 data-i18n="headline">اعرف رقم القطعة، توافقها، مصادرها، وحالة تدقيقها من مكان واحد</h1>
+            <div class="hero-badges" aria-label="مزايا التطبيق">
+              <span data-i18n="heroBadgeData">قاعدة مدققة</span>
+              <span data-i18n="heroBadgeOffline">جاهز للمتصفح و iOS</span>
+              <span data-i18n="heroBadgeLang">عربي / English</span>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <button class="language-toggle" id="languageToggle" type="button" aria-label="Switch language">English</button>
+            <div class="currency-switch" role="group" aria-label="اختيار العملة">
+              <button class="currency-option active" type="button" data-currency="SAR" data-i18n="currencySar">ريال</button>
+              <button class="currency-option" type="button" data-currency="USD" data-i18n="currencyUsd">دولار</button>
+            </div>
+            <button class="primary-action" id="wishlistButton" type="button"><span data-i18n="wishlist">قائمة الرغبات</span> <span id="wishlistCount">0</span></button>
+            <div class="overflow-menu">
+              <button class="menu-toggle" id="menuToggle" type="button" aria-label="فتح القائمة" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+              <nav class="menu-panel" id="menuPanel" aria-label="قائمة التطبيق">
+                <button type="button" data-menu-target="home" data-i18n="menuHome">الرئيسية</button>
+                <button type="button" data-menu-target="parts" data-i18n="menuParts">القطع</button>
+                <button type="button" data-menu-target="faults" data-i18n="menuFaults">الأعطال الشائعة</button>
+                <button type="button" data-menu-target="catalogs" data-i18n="menuCatalogs">الكتالوجات</button>
+                <button type="button" data-menu-target="prices" data-i18n="menuPrices">الأسعار</button>
+                <button type="button" data-menu-target="wishlist" data-i18n="menuWishlist">قائمة الرغبات</button>
+                <button type="button" data-menu-target="contact" data-i18n="menuContact">تواصل معنا</button>
+              </nav>
+            </div>
+          </div>
+        </header>
+
+        <section class="search-band" aria-label="البحث والفلترة">
+          <div class="search-box">
+            <label for="searchInput" data-i18n="smartSearch">بحث ذكي</label>
+            <input id="searchInput" type="search" placeholder="رقم القطعة، الاسم، القسم، أو VIN" data-i18n-placeholder="searchPlaceholder">
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">
+              <strong data-i18n="generationFilterTitle">اختر جيل الباترول</strong>
+              <span data-i18n="generationFilterHint">الجيل يحدد قاعدة البيانات المناسبة</span>
+            </div>
+            <div class="model-row" role="group" aria-label="اختيار جيل الباترول">
+              <button class="model-chip active" data-model="Y60" type="button">Y60</button>
+              <button class="model-chip" data-model="Y61" type="button">Y61</button>
+              <button class="model-chip" data-model="Y62" type="button">Y62</button>
+              <button class="model-chip" data-model="Y63" type="button">Y63</button>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-title">
+              <strong data-i18n="categoryFilterTitle">أقسام القطع</strong>
+              <span data-i18n="categoryFilterHint">اختر القسم للدخول إلى صفحة قطعه</span>
+            </div>
+            <div class="category-grid" role="group" aria-label="أقسام القطع">
+              <button class="category-card active" data-filter="all" type="button"><span>⌕</span><strong data-i18n="filterAll">الكل</strong></button>
+              <button class="category-card" data-filter="engine" type="button"><span>⚙</span><strong data-i18n="catEngine">محرك</strong></button>
+              <button class="category-card" data-filter="cooling" type="button"><span>❄</span><strong data-i18n="catCooling">تبريد</strong></button>
+              <button class="category-card" data-filter="electrical" type="button"><span>↯</span><strong data-i18n="catElectrical">كهرباء</strong></button>
+              <button class="category-card" data-filter="body" type="button"><span>▦</span><strong data-i18n="catBody">هيكل</strong></button>
+              <button class="category-card" data-filter="brake" type="button"><span>◎</span><strong data-i18n="catBrake">فرامل</strong></button>
+              <button class="category-card" data-filter="suspension" type="button"><span>⌁</span><strong data-i18n="catSuspension">تعليق</strong></button>
+              <button class="category-card" data-filter="fuel" type="button"><span>◈</span><strong data-i18n="catFuel">وقود</strong></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-grid" aria-label="إحصائيات سريعة">
+          <article>
+            <span data-i18n="statParts">قطع مفهرسة</span>
+            <strong>12,480</strong>
+          </article>
+          <article>
+            <span data-i18n="statSources">مصادر PDF</span>
+            <strong>38</strong>
+          </article>
+          <article>
+            <span data-i18n="statReview">تحتاج مراجعة</span>
+            <strong>214</strong>
+          </article>
+          <article>
+            <span data-i18n="statRecords">سجلات مستخرجة</span>
+            <strong>8,920</strong>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <div class="parts-panel">
+            <div class="section-heading">
+              <h2 id="partsPageTitle" data-i18n="resultsTitle">نتائج القطع</h2>
+              <span id="resultCount"></span>
+            </div>
+            <div class="parts-list" id="partsList"></div>
+          </div>
+
+          <aside class="detail-panel" id="detailPanel" aria-live="polite"></aside>
+        </section>
+
+        <section class="generations-section" aria-label="أجيال نيسان باترول">
+          <div class="section-heading">
+            <h2 data-i18n="generationsTitle">أجيال الباترول</h2>
+            <span data-i18n="generationsSubtitle">اختر الجيل المناسب لقاعدة القطع</span>
+          </div>
+          <div class="generation-grid">
+            <article class="generation-card">
+              <img src="assets/models/patrol-y60.jpg" alt="نيسان باترول Y60" loading="lazy">
+              <div>
+                <span>1988 - 1997</span>
+                <h3>Y60</h3>
+                <p data-i18n="generationY60">الجيل الكلاسيكي المربع، أساس قاعدة البيانات الحالية.</p>
+              </div>
+            </article>
+            <article class="generation-card">
+              <img src="assets/models/patrol-y61.jpg" alt="نيسان باترول Y61" loading="lazy">
+              <div>
+                <span>1997 - 2016</span>
+                <h3>Y61</h3>
+                <p data-i18n="generationY61">جيل السفاري المعروف بقوة الاعتماد وكثرة الاستخدام في الخليج.</p>
+              </div>
+            </article>
+            <article class="generation-card">
+              <img src="assets/models/patrol-y62.jpg?v=y62-1" alt="نيسان باترول Y62" loading="lazy">
+              <div>
+                <span>2010 - 2024</span>
+                <h3>Y62</h3>
+                <p data-i18n="generationY62">جيل فاخر كبير الحجم مع أنظمة حديثة وقاعدة قطع مختلفة.</p>
+              </div>
+            </article>
+            <article class="generation-card">
+              <img src="assets/models/patrol-y63.webp" alt="نيسان باترول Y63 الجديد" loading="lazy">
+              <div>
+                <span>2025+</span>
+                <h3>Y63</h3>
+                <p data-i18n="generationY63">الجيل الجديد بواجهة عمودية وشبك كبير وإضاءة C مميزة.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <nav class="app-dock" aria-label="تنقل التطبيق">
+        <button class="dock-item active" type="button" data-menu-target="home">
+          <span>⌂</span>
+          <strong data-i18n="menuHome">الرئيسية</strong>
+        </button>
+        <button class="dock-item" type="button" data-menu-target="parts">
+          <span>⌕</span>
+          <strong data-i18n="menuParts">القطع</strong>
+        </button>
+        <button class="dock-item" type="button" data-menu-target="prices">
+          <span>﷼</span>
+          <strong data-i18n="menuPrices">الأسعار</strong>
+        </button>
+        <button class="dock-item" type="button" data-menu-target="more">
+          <span>•••</span>
+          <strong data-i18n="menuMore">المزيد</strong>
+        </button>
+      </nav>
+    </div>
+
+    <script src="app.js?v=hierarchy-1"></script>
+  </body>
+</html>

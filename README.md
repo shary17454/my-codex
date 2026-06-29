@@ -1,0 +1,50 @@
+# Batal Al-Droob
+
+**Batal Al-Droob** is a bilingual Arabic/English Nissan Patrol parts catalog app focused first on the Y60 generation, with the UI structure prepared for Y61, Y62, and Y63.
+
+## Current Scope
+
+- Browser app with Arabic-first UI and English toggle.
+- Nissan Patrol generation selector: Y60, Y61, Y62, Y63.
+- Internal parts sections: engine, cooling, electrical, body, brakes, suspension, and fuel.
+- Y60 parts database extracted from supplied PDF catalogs and stored in SQLite and JSON.
+- Saudi Riyal and US Dollar price display.
+- iOS WebView wrapper prepared under `ios/BatalAlDroob`.
+- App Store metadata and review notes prepared under `app-store`.
+
+## Main Files
+
+- `index.html`, `styles.css`, `app.js`: web app UI and behavior.
+- `server.py`: local web server and SQLite API.
+- `data/app_database.sqlite`: app database.
+- `data/y60_app_catalog.json`: browser fallback catalog data.
+- `scripts/`: extraction, audit, build, and sync tools.
+- `ios/BatalAlDroob/`: iOS wrapper project.
+
+## Run Locally
+
+```bash
+python3 server.py
+```
+
+Open:
+
+```text
+http://localhost:5005/?v=hierarchy-2
+```
+
+On a phone connected to the same network, use the Mac IP address shown by `ifconfig`, for example:
+
+```text
+http://172.20.10.3:5005/?v=hierarchy-2
+```
+
+## Data Status
+
+- Y60: integrated and searchable.
+- Y61: UI slot and extraction script started, but full integration requires readable Y61 PDF/FAST/EPC source files.
+- Y62/Y63: UI generation cards prepared with images; detailed parts databases are not integrated yet.
+
+## Notes
+
+Large local-only dependencies and build outputs are ignored by `.gitignore`. The database and app assets are intended to be committed.

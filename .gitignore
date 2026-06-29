@@ -1,0 +1,11 @@
+vendor/
+data/raw_text/
+data/extracted/
+__pycache__/
+.DS_Store
+.pycache-check/
+build/
+data/*.sqlite-shm
+data/*.sqlite-wal
+ios/**/DerivedData/
+*.pyc
