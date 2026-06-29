@@ -1,6 +1,8 @@
 # my-codex
 
-مستودع شخصي لتجميع مشاريع وتجارب Codex وربطها مع GitHub، وفيه حالياً ملفات مشروع **Nissan Patrol Safari Y60 / Patrol Hub** وملفات دردشات التوثيق.
+مستودع شخصي لتجميع مشاريع وتجارب Codex وربطها مع GitHub.
+
+يضم حالياً ملفات مشروع **Nissan Patrol Safari Y60 / Patrol Hub**، تطبيق iPhone أولي، تطبيق Flutter للويب وويندوز، وملفات توثيق للدردشات والملاحظات.
 
 ## Patrol Hub / Safari Y60
 
@@ -12,6 +14,7 @@
 - بحث برقم القطعة أو الاسم العربي أو الاسم الإنجليزي.
 - تصنيف حسب النظام: المحرك، القير والدبل، الكهرباء، التكييف، الداخلية، البدي، وغيرها.
 - صفحات تفاصيل للنتائج مرتبطة بصفحات PDF الأصلية.
+- واجهة ويب ثابتة بديلة تحت `patrol-hub-redesign/`.
 
 ## الملفات المهمة
 
@@ -21,6 +24,7 @@
 - بيانات القطع لتطبيق iPhone: `SafariY60Parts/Resources/parts_seed.json`
 - كتالوجات Y60: `flutter_y60_catalog/assets/catalog/pdfs/`
 - فهارس البحث والأقسام: `flutter_y60_catalog/assets/catalog/search/`
+- واجهة الويب البديلة: `patrol-hub-redesign/`
 - أدوات توليد البيانات: `tools/`
 - وثيقة المتطلبات: `PRODUCT_REQUIREMENTS_AR.md`
 
@@ -52,7 +56,10 @@ C:\src\flutter\bin\flutter.bat build web --release
 
 تم حفظ ملفات توثيق ومخرجات محادثات داخل:
 
-- `docs/`
+- `docs/chat-history.md`
+- `docs/chat-transcript-2026-06-29.md`
+- `docs/life-assistant-chat-handoff.md`
+- `docs/patrol-hub-chat-handoff.md`
 - `nissan-patrol/`
 
 هذه الملفات تستخدم كمرجع لمتابعة العمل لاحقاً بدون فقدان سياق المشروع.
