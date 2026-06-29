@@ -1,33 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'localization/app_localizations.dart';
-import 'localization/supported_locales.dart';
+import '../shared/theme/app_theme.dart';
 import 'router/app_router.dart';
-import 'theme/app_theme.dart';
 
-class KnowBeforeYouBuyApp extends ConsumerWidget {
-  const KnowBeforeYouBuyApp({super.key});
+class PriceDetectorApp extends ConsumerWidget {
+  const PriceDetectorApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'اعرف قبل تشتري',
+      title: '\u0643\u0627\u0634\u0641 \u0627\u0644\u0623\u0633\u0639\u0627\u0631',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
       routerConfig: router,
-      supportedLocales: SupportedLocales.values,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
     );
   }
 }

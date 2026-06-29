@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../app/localization/app_localizations.dart';
-import '../../../../app/router/route_names.dart';
-import '../../../../core/utils/responsive.dart';
-import '../../application/providers/auth_provider.dart';
+import '../providers/auth_providers.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
+
+  static const routeName = 'login';
+  static const routePath = '/login';
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  var _isLoading = false;
 
   @override
   void dispose() {
@@ -27,117 +28,120 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final authState = ref.watch(authControllerProvider);
-    final isLoading = authState.isLoading;
-
-    ref.listen(authControllerProvider, (previous, next) {
-      next.whenOrNull(
-        data: (user) {
-          if (user != null) {
-            context.goNamed(RouteNames.home);
-          }
-        },
-        error: (error, stackTrace) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error.toString())),
-          );
-        },
-      );
-    });
-
-    return Scaffold(
-      appBar: AppBar(),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: Responsive.maxContentWidth(context),
-            ),
-            child: ListView(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            '\u062a\u0633\u062c\u064a\u0644 '
+            '\u0627\u0644\u062f\u062e\u0648\u0644',
+          ),
+        ),
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
-              children: [
-                Text(
-                  l10n.loginTitle,
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.loginSubtitle,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 32),
-                OutlinedButton.icon(
-                  onPressed: isLoading
-                      ? null
-                      : () => ref
-                          .read(authControllerProvider.notifier)
-                          .signInWithGoogle(),
-                  icon: const Icon(Icons.g_mobiledata),
-                  label: Text(l10n.google),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: isLoading
-                      ? null
-                      : () => ref
-                          .read(authControllerProvider.notifier)
-                          .signInWithApple(),
-                  icon: const Icon(Icons.apple),
-                  label: Text(l10n.apple),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: l10n.emailAddress,
-                    prefixIcon: const Icon(Icons.mail_outline),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        '\u0643\u0627\u0634\u0641 '
+                        '\u0627\u0644\u0623\u0633\u0639\u0627\u0631',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: '\u0627\u0644\u0628\u0631\u064a\u062f '
+                              '\u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return '\u0623\u062f\u062e\u0644 '
+                                '\u0627\u0644\u0628\u0631\u064a\u062f '
+                                '\u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        textInputAction: TextInputAction.done,
+                        decoration: const InputDecoration(
+                          labelText: '\u0643\u0644\u0645\u0629 '
+                              '\u0627\u0644\u0645\u0631\u0648\u0631',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return '\u0623\u062f\u062e\u0644 '
+                                '\u0643\u0644\u0645\u0629 '
+                                '\u0627\u0644\u0645\u0631\u0648\u0631';
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (_) => _submit(),
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton(
+                        onPressed: _isLoading ? null : _submit,
+                        child: _isLoading
+                            ? const SizedBox.square(
+                                dimension: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                '\u062f\u062e\u0648\u0644',
+                              ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    labelText: l10n.password,
-                    prefixIcon: const Icon(Icons.lock_outline),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                FilledButton.icon(
-                  onPressed: isLoading
-                      ? null
-                      : () => ref
-                          .read(authControllerProvider.notifier)
-                          .signInWithEmail(
-                            email: _emailController.text,
-                            password: _passwordController.text,
-                          ),
-                  icon: isLoading
-                      ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.login),
-                  label: Text(l10n.signIn),
-                ),
-                const SizedBox(height: 24),
-                TextButton(
-                  onPressed: isLoading
-                      ? null
-                      : () => ref
-                          .read(authControllerProvider.notifier)
-                          .continueAsPreview(),
-                  child: Text(l10n.skipForNow),
-                ),
-              ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await ref.read(authRepositoryProvider).signIn(
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString())),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 }

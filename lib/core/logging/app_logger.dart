@@ -1,12 +1,15 @@
 import 'package:logger/logger.dart';
 
 class AppLogger {
-  AppLogger._();
+  AppLogger({Logger? logger}) : _logger = logger ?? Logger();
 
-  static final Logger instance = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
-    ),
-  );
+  final Logger _logger;
+
+  void debug(String message) => _logger.d(message);
+
+  void info(String message) => _logger.i(message);
+
+  void error(String message, {Object? error, StackTrace? stackTrace}) {
+    _logger.e(message, error: error, stackTrace: stackTrace);
+  }
 }

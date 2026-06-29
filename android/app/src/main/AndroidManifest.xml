@@ -2,7 +2,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:label="know_before_you_buy"
+        android:label="price_detector"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

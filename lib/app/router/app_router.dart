@@ -1,60 +1,60 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/application/providers/auth_provider.dart';
-import '../../features/camera_scan/presentation/screens/camera_screen.dart';
+import '../../features/capture/presentation/screens/capture_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/product_analysis/domain/entities/product_report.dart';
-import '../../features/product_analysis/presentation/screens/product_report_screen.dart';
-import '../../features/welcome/presentation/screens/welcome_screen.dart';
-import 'route_names.dart';
+import '../../features/ocr/domain/entities/ocr_result.dart';
+import '../../features/ocr/presentation/screens/ocr_result_screen.dart';
+import '../../features/search_history/presentation/screens/search_history_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authControllerProvider);
-  final isSignedIn = authState.hasValue && authState.value != null;
+  final authState = ref.watch(authStateProvider);
+  final isLoggedIn = authState.asData?.value != null;
 
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: LoginScreen.routePath,
     redirect: (context, state) {
-      final location = state.matchedLocation;
-      final isPublicRoute = location == '/' || location == '/login';
+      final isLoggingIn = state.matchedLocation == LoginScreen.routePath;
 
-      if (!isSignedIn && !isPublicRoute) {
-        return '/login';
+      if (!isLoggedIn && !isLoggingIn) {
+        return LoginScreen.routePath;
       }
-      if (isSignedIn && isPublicRoute) {
-        return '/home';
+
+      if (isLoggedIn && isLoggingIn) {
+        return HomeScreen.routePath;
       }
+
       return null;
     },
     routes: [
       GoRoute(
-        path: '/',
-        name: RouteNames.welcome,
-        builder: (context, state) => const WelcomeScreen(),
-      ),
-      GoRoute(
-        path: '/login',
-        name: RouteNames.login,
+        path: LoginScreen.routePath,
+        name: LoginScreen.routeName,
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
-        path: '/home',
-        name: RouteNames.home,
+        path: HomeScreen.routePath,
+        name: HomeScreen.routeName,
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
-        path: '/camera',
-        name: RouteNames.camera,
-        builder: (context, state) => const CameraScreen(),
+        path: CaptureScreen.routePath,
+        name: CaptureScreen.routeName,
+        builder: (context, state) => const CaptureScreen(),
       ),
       GoRoute(
-        path: '/report',
-        name: RouteNames.report,
+        path: OcrResultScreen.routePath,
+        name: OcrResultScreen.routeName,
         builder: (context, state) {
-          return ProductReportScreen(report: state.extra as ProductReport?);
+          return OcrResultScreen(result: state.extra as OcrResult?);
         },
+      ),
+      GoRoute(
+        path: SearchHistoryScreen.routePath,
+        name: SearchHistoryScreen.routeName,
+        builder: (context, state) => const SearchHistoryScreen(),
       ),
     ],
   );

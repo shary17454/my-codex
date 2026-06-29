@@ -1,74 +1,47 @@
 # my-codex
 
-مستودع شخصي لتجميع مشاريع وتجارب Codex وربطها مع GitHub.
+Personal repository for Codex projects, experiments, generated artifacts, and chat handoff notes.
 
-يضم حالياً ملفات مشروع **Nissan Patrol Safari Y60 / Patrol Hub**، تطبيق iPhone أولي، تطبيق Flutter للويب وويندوز، وملفات توثيق للدردشات والملاحظات.
+## Price Detector MVP
 
-## Patrol Hub / Safari Y60
+This repository now includes the Flutter MVP built in this chat: `price_detector`, an app named "Kashif Al-Asaar" / "Price Detector".
 
-المشروع الحالي يضم:
+Implemented scope:
 
-- تطبيق Flutter قابل للتشغيل على الويب وويندوز ومجهز لاحقاً لأندرويد و iOS.
-- تطبيق SwiftUI أولي لإدارة قطع `Nissan Patrol Safari Y60`.
-- فهارس كتالوجات Y60 وملفات PDF الأصلية.
-- بحث برقم القطعة أو الاسم العربي أو الاسم الإنجليزي.
-- تصنيف حسب النظام: المحرك، القير والدبل، الكهرباء، التكييف، الداخلية، البدي، وغيرها.
-- صفحات تفاصيل للنتائج مرتبطة بصفحات PDF الأصلية.
-- واجهة ويب ثابتة بديلة تحت `patrol-hub-redesign/`.
+- Flutter app using Clean Architecture and feature-first structure.
+- Riverpod dependency injection and GoRouter navigation.
+- Login flow with an in-memory MVP auth repository and Firebase Auth implementation ready for wiring.
+- Camera capture screen.
+- Google ML Kit OCR repository and OCR text parser.
+- Mock market price data source.
+- Price analysis result screen.
+- Price status classification: excellent, fair, high, overpriced.
+- Purchase recommendation: buy now, wait, do not buy.
+- Fake discount detection when previous price data exists.
+- Search history saved locally with Hive.
+- Unit and widget tests for OCR parsing, price analysis, result UI, and history UI.
 
-## الملفات المهمة
-
-- تطبيق Flutter: `flutter_y60_catalog/`
-- تطبيق SwiftUI: `SafariY60Parts/`
-- مشروع Xcode: `SafariY60Parts.xcodeproj`
-- بيانات القطع لتطبيق iPhone: `SafariY60Parts/Resources/parts_seed.json`
-- كتالوجات Y60: `flutter_y60_catalog/assets/catalog/pdfs/`
-- فهارس البحث والأقسام: `flutter_y60_catalog/assets/catalog/search/`
-- واجهة الويب البديلة: `patrol-hub-redesign/`
-- أدوات توليد البيانات: `tools/`
-- وثيقة المتطلبات: `PRODUCT_REQUIREMENTS_AR.md`
-
-## تشغيل Flutter
+Run checks:
 
 ```powershell
-cd flutter_y60_catalog
-C:\src\flutter\bin\flutter.bat run -d windows
+C:\src\flutter\bin\flutter.bat analyze
+C:\src\flutter\bin\flutter.bat test
+C:\src\flutter\bin\flutter.bat build apk --debug
 ```
 
-لبناء نسخة الويب:
+Debug APK output:
 
-```powershell
-cd flutter_y60_catalog
-C:\src\flutter\bin\flutter.bat build web --release
+```text
+build\app\outputs\flutter-apk\app-debug.apk
 ```
 
-## تشغيل تطبيق iPhone
+## Existing Repository Content
 
-1. افتح `SafariY60Parts.xcodeproj` على جهاز macOS فيه Xcode.
-2. اختر iPhone Simulator أو جهاز iPhone فعلي.
-3. شغّل التطبيق.
+The remote repository already contained other projects and documentation. This merge keeps that history and content while adding the current Flutter MVP.
 
-## تحديث بيانات القطع
+Existing content includes:
 
-إذا تغيّر مصدر بيانات القطع، شغّل أداة التوليد المناسبة من مجلد `tools/` ثم أعد بناء التطبيق.
-
-## توثيق الدردشات
-
-تم حفظ ملفات توثيق ومخرجات محادثات داخل:
-
-- `docs/chat-history.md`
-- `docs/chat-transcript-2026-06-29.md`
-- `docs/life-assistant-chat-handoff.md`
-- `docs/patrol-hub-chat-handoff.md`
-- `nissan-patrol/`
-
-## كتيب مرزوق بن حويد العضياني
-
-تم نقل ودمج محتوى محادثة مشروع **كتيب مرزوق بن حويد بن وازع العضياني رحمه الله** إلى:
-
-- `docs/marzouq-book/README.md`
-- `docs/marzouq-book/chat-log.md`
-- `docs/marzouq-book/artifacts.md`
-- `docs/marzouq-book/requirements.txt`
-
-هذه الملفات تستخدم كمرجع لمتابعة العمل لاحقاً بدون فقدان سياق المشروع.
+- Patrol Hub / Safari Y60 related files.
+- SwiftUI and Flutter catalog projects.
+- Documentation and chat archive files under `docs/`.
+- Generated PDFs, scripts, and supporting artifacts.

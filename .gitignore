@@ -3,8 +3,9 @@
 Thumbs.db
 *.swp
 *.tmp
-*.iml
-.idea/
+*.class
+*.log
+*.pyc
 
 # Local Codex/session state
 .codex/
@@ -12,12 +13,26 @@ Thumbs.db
 tmp/
 work/
 
-# Flutter/Dart generated files
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Flutter/Dart/Pub generated files
+**/doc/api/
+**/ios/Flutter/.last_build_id
 **/.dart_tool/
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
 **/.packages
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
 **/build/
+coverage/
 **/ephemeral/
 
 # Native dependency folders and generated caches
@@ -26,13 +41,14 @@ work/
 **/.gradle/
 **/local.properties
 
-# Build outputs and archives generated during this session
+# Build outputs and archives generated during sessions
 outputs/
 
-# Logs
-*.log
-
-# Flutter release/debug artifacts
+# Symbolication and obfuscation outputs
 app.*.symbols
 app.*.map.json
-/coverage/
+
+# Android Studio build artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release

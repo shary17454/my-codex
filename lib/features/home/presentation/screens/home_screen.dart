@@ -2,100 +2,71 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/localization/app_localizations.dart';
-import '../../../../app/router/route_names.dart';
-import '../../../../core/utils/responsive.dart';
-import '../../../auth/application/providers/auth_provider.dart';
-import '../../../product_analysis/application/providers/product_analysis_provider.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../capture/presentation/screens/capture_screen.dart';
+import '../../../search_history/presentation/screens/search_history_screen.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(
-      () => ref.read(productAnalysisControllerProvider.notifier).loadLatest(),
-    );
-  }
+  static const routeName = 'home';
+  static const routePath = '/';
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final latestReportState = ref.watch(productAnalysisControllerProvider);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.homeTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.signOut,
-            onPressed: () => ref
-                .read(authControllerProvider.notifier)
-                .signOut(),
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: Responsive.maxContentWidth(context),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(AppConstants.appName),
+          actions: [
+            IconButton(
+              tooltip: '\u062a\u0633\u062c\u064a\u0644 '
+                  '\u0627\u0644\u062e\u0631\u0648\u062c',
+              onPressed: () => ref.read(authRepositoryProvider).signOut(),
+              icon: const Icon(Icons.logout),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.shopping_bag_outlined,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            l10n.homeSubtitle,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (latestReportState.hasValue &&
-                      latestReportState.value != null)
-                    Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.history),
-                        title: Text(l10n.lastReport),
-                        subtitle: Text(latestReportState.value!.productName),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => context.goNamed(
-                          RouteNames.report,
-                          extra: latestReportState.value,
-                        ),
-                      ),
-                    ),
-                  const Spacer(),
-                  FilledButton.icon(
-                    onPressed: () => context.goNamed(RouteNames.camera),
-                    icon: const Icon(Icons.photo_camera_outlined),
-                    label: Text(l10n.scanProduct),
-                  ),
-                ],
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                '\u0627\u0644\u0635\u0641\u062d\u0629 '
+                '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-            ),
+              const SizedBox(height: 12),
+              Text(
+                '\u062c\u0627\u0647\u0632 \u0644\u0628\u062f\u0621 '
+                '\u0628\u0646\u0627\u0621 MVP \u0639\u0644\u0649 '
+                '\u0645\u0631\u0627\u062d\u0644.',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const Spacer(),
+              FilledButton.icon(
+                onPressed: () => context.goNamed(CaptureScreen.routeName),
+                icon: const Icon(Icons.camera_alt_outlined),
+                label: const Text(
+                  '\u062a\u0635\u0648\u064a\u0631 '
+                  '\u0641\u0627\u062a\u0648\u0631\u0629 \u0623\u0648 '
+                  '\u0645\u0646\u062a\u062c',
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => context.goNamed(SearchHistoryScreen.routeName),
+                icon: const Icon(Icons.history),
+                label: const Text(
+                  '\u0633\u062c\u0644 '
+                  '\u0639\u0645\u0644\u064a\u0627\u062a '
+                  '\u0627\u0644\u0628\u062d\u062b',
+                ),
+              ),
+            ],
           ),
         ),
       ),

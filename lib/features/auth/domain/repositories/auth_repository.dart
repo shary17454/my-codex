@@ -1,16 +1,9 @@
 import '../entities/app_user.dart';
 
 abstract interface class AuthRepository {
-  AppUser? get currentUser;
+  Stream<AppUser?> watchAuthState();
 
-  Future<AppUser> signInWithGoogle();
-
-  Future<AppUser> signInWithApple();
-
-  Future<AppUser> signInWithEmail({
-    required String email,
-    required String password,
-  });
+  Future<void> signIn({required String email, required String password});
 
   Future<void> signOut();
 }
