@@ -14,3 +14,10 @@
 تم نقل ملخص دردشة مشروع **مساعد الحياة - Life Assistant MVP** إلى:
 
 - [docs/life-assistant-chat-handoff.md](docs/life-assistant-chat-handoff.md)
+
+## Patrol Hub
+
+تم نقل ودمج محتوى دردشة إعادة تصميم **Patrol Hub** إلى:
+
+- [docs/patrol-hub-chat-handoff.md](docs/patrol-hub-chat-handoff.md)
+- [patrol-hub-redesign/index.html](patrol-hub-redesign/index.html)
