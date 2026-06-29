@@ -45,3 +45,19 @@ Existing content includes:
 - SwiftUI and Flutter catalog projects.
 - Documentation and chat archive files under `docs/`.
 - Generated PDFs, scripts, and supporting artifacts.
+
+## Saher 2030 MVP
+
+This repository also includes the Arabic web MVP prepared in the current Codex chat for **ساهر 2030 - أمان الطرق الذكية** under:
+
+```text
+saher-2030-mvp/
+```
+
+The MVP includes:
+
+- RTL Arabic smart road safety dashboard.
+- Operational indicators for critical cases, high risks, readiness, and response time.
+- Visual smart-roads risk map asset.
+- Smart incident list with severity filtering.
+- Case analysis, risk scoring, response priority, readiness indicators, and workflow timeline.
