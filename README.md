@@ -62,4 +62,11 @@ C:\src\flutter\bin\flutter.bat build web --release
 - `docs/patrol-hub-chat-handoff.md`
 - `nissan-patrol/`
 
+## كتيب مرزوق بن حويد العضياني
+
+تم نقل ودمج محتوى محادثة مشروع **كتيب مرزوق بن حويد بن وازع العضياني رحمه الله** إلى:
+
+- `docs/marzouq-book/README.md`
+- `docs/marzouq-book/chat-log.md`
+
 هذه الملفات تستخدم كمرجع لمتابعة العمل لاحقاً بدون فقدان سياق المشروع.
