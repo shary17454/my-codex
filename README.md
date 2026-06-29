@@ -21,3 +21,10 @@
 
 - [docs/patrol-hub-chat-handoff.md](docs/patrol-hub-chat-handoff.md)
 - [patrol-hub-redesign/index.html](patrol-hub-redesign/index.html)
+
+## كتيب مرزوق بن حويد العضياني
+
+تم نقل ودمج محتوى محادثة مشروع **كتيب مرزوق بن حويد بن وازع العضياني رحمه الله** إلى:
+
+- [docs/marzouq-book/README.md](docs/marzouq-book/README.md)
+- [docs/marzouq-book/chat-log.md](docs/marzouq-book/chat-log.md)
