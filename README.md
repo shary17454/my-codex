@@ -68,5 +68,7 @@ C:\src\flutter\bin\flutter.bat build web --release
 
 - `docs/marzouq-book/README.md`
 - `docs/marzouq-book/chat-log.md`
+- `docs/marzouq-book/artifacts.md`
+- `docs/marzouq-book/requirements.txt`
 
 هذه الملفات تستخدم كمرجع لمتابعة العمل لاحقاً بدون فقدان سياق المشروع.
