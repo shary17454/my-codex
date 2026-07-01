@@ -1,4 +1,5 @@
 let catalog = { parts: [], sources: [] };
+let catalogSearchIndex = { entries: [], stats: [] };
 let parts = [];
 let activeFilter = "all";
 let activeModel = "Y60";
@@ -6,6 +7,7 @@ let selectedPartId = null;
 let currentLang = localStorage.getItem("batalLang") || "ar";
 let currentCurrency = localStorage.getItem("batalCurrency") || "SAR";
 let visibleLimit = 60;
+let searchDebounceTimer = null;
 const wishlist = new Set();
 
 const fallbackParts = [
@@ -45,6 +47,7 @@ const translations = {
     navPrices: "الأسعار",
     navMaintenance: "الصيانة",
     navCommunity: "المجتمع",
+    navVision: "الرؤية العالمية",
     dataStatus: "حالة البيانات",
     dataTitle: "قاعدة Y60 مدمجة",
     dataText: "بيانات مدققة من كتالوجات PDF، محفوظة في قاعدة SQLite وجاهزة للبحث والاستعراض.",
@@ -60,7 +63,9 @@ const translations = {
     menuParts: "القطع",
     menuFaults: "الأعطال الشائعة",
     menuCatalogs: "الكتالوجات",
+    menuSourceIntake: "مصادر الفهرسة",
     menuPrices: "الأسعار",
+    menuVision: "الرؤية العالمية",
     menuWishlist: "قائمة الرغبات",
     menuContact: "تواصل معنا",
     menuMore: "المزيد",
@@ -90,6 +95,40 @@ const translations = {
     statSources: "مصادر PDF",
     statReview: "تحتاج مراجعة",
     statRecords: "سجلات مستخرجة",
+    statCatalogPages: "صفحات كتالوج",
+    sourceIntakeTitle: "مصادر الفهرسة الجديدة",
+    sourceIntakeSubtitle: "تم فحص ملفات PDF الجديدة بالبصمة وعدد الصفحات قبل دمجها في التطبيق",
+    sourceReady: "جاهز للفهرسة",
+    sourceReview: "مراجعة قبل الدمج",
+    sourceArchive: "أرشيف تحقق",
+    sourceDuplicate: "مكرر",
+    sourceHelper: "مصدر مساعد",
+    sourceY62Text: "كتالوج جديد من 1,275 صفحة. يضاف كخيار Y62 مستقل مع فهرس بحث خاص به.",
+    sourceY60Text: "ملفات سنوات Y60 الجديدة أقصر من ملفات التطبيق الحالية؛ تحفظ للمقارنة ولا تستبدل القاعدة المفهرسة مباشرة.",
+    sourceCombinedText: "ملف مجمع من 5,281 صفحة يستخدم للتحقق من الصفحات الناقصة ومراجعة الفهارس.",
+    sourceWgyText: "ملف بطاقة السيارة مطابق للموجود داخل التطبيق، لذلك لا ينسخ مرة ثانية.",
+    sourcePartsouqText: "ملفات قصيرة تصلح كمرجع تصميم أو فهرسة مساعدة، وليست بديلة عن كتالوجات OEM.",
+    visionTitle: "المزايا التي تجعل تطبيق الباترول مرجعًا عالميًا",
+    visionSubtitle: "خارطة تطوير معتمدة لقاعدة القطع، الأسعار، الصيانة، المجتمع، والذكاء الاصطناعي",
+    visionDatabaseTitle: "قاعدة بيانات احترافية",
+    visionDatabaseText: "رسومات أصلية، OEM، أسماء متعددة اللغات، وصف وظيفة القطعة، موقعها، صورها، والأبعاد عند توفرها.",
+    visionFitmentTitle: "توافق القطع",
+    visionFitmentText: "معرفة السيارات المطابقة والفروقات بين Y60 وY61 وY62 حسب السنة والمحرك والقير والفئة.",
+    visionSearchTitle: "البحث الذكي",
+    visionSearchText: "بحث برقم القطعة، الاسم، العربية، الإنجليزية، VIN، والقسم الفني.",
+    visionPricesTitle: "مقارنة الأسعار",
+    visionPricesText: "السعر، العملة، الشحن، مدة التوصيل، الدولة، وحالة القطعة من عدة متاجر.",
+    visionTypeTitle: "تصنيف نوع القطعة",
+    visionTypeText: "OEM، مصنع أصلي، إعادة تصنيع عالية الجودة، بديل تجاري، مستعملة أصلية، وNOS.",
+    visionRarityTitle: "مؤشر الندرة",
+    visionRarityText: "متوفرة بكثرة، محدودة، نادرة، أو موقوفة الإنتاج NLA.",
+    visionMaintenanceTitle: "الصيانة والشروحات",
+    visionMaintenanceText: "أعراض التلف، العمر الافتراضي، القطع المصاحبة، عزم الربط، الأدوات، ودرجة الصعوبة.",
+    visionCommunityTitle: "المجتمع والمتاجر",
+    visionCommunityText: "تقييمات، تجارب ملاك، مشاريع ترميم، متاجر عالمية وخليجية، تشاليح، وبائعون موثقون.",
+    visionAiTitle: "الذكاء الاصطناعي والإحصائيات",
+    visionAiText: "معرفة القطعة من صورة، اقتراح البدائل، تشخيص الأعطال، وأكثر القطع طلبًا وندرة.",
+    visionGoal: "الهدف النهائي: أن يجد مالك نيسان باترول كل ما يحتاجه عن أي قطعة في مكان واحد دون التنقل بين عشرات المواقع والمتاجر.",
     resultsTitle: "نتائج القطع",
     partsPageAll: "كل قطع",
     partsPageCategory: "قطع",
@@ -97,6 +136,8 @@ const translations = {
     resultSingular: "نتيجة",
     resultPlural: "نتيجة",
     oem: "OEM",
+    catalogPage: "صفحة كتالوج",
+    openPdf: "فتح PDF الأصلي",
     records: "سجل",
     confidence: "ثقة",
     sources: "مصادر",
@@ -161,6 +202,7 @@ const translations = {
     navPrices: "Prices",
     navMaintenance: "Maintenance",
     navCommunity: "Community",
+    navVision: "Global Vision",
     dataStatus: "Data Status",
     dataTitle: "Integrated Y60 Database",
     dataText: "Audited PDF catalog data stored in SQLite and ready for search and browsing.",
@@ -176,7 +218,9 @@ const translations = {
     menuParts: "Parts",
     menuFaults: "Common Faults",
     menuCatalogs: "Catalogs",
+    menuSourceIntake: "Indexing Sources",
     menuPrices: "Prices",
+    menuVision: "Global Vision",
     menuWishlist: "Wishlist",
     menuContact: "Contact Us",
     menuMore: "More",
@@ -206,6 +250,40 @@ const translations = {
     statSources: "PDF Sources",
     statReview: "Need Review",
     statRecords: "Extracted Records",
+    statCatalogPages: "Catalog Pages",
+    sourceIntakeTitle: "New Indexing Sources",
+    sourceIntakeSubtitle: "New PDF files were checked by fingerprint and page count before app integration",
+    sourceReady: "Ready to index",
+    sourceReview: "Review before merge",
+    sourceArchive: "Verification archive",
+    sourceDuplicate: "Duplicate",
+    sourceHelper: "Helper source",
+    sourceY62Text: "A new 1,275-page catalog. It should be added as a separate Y62 option with its own search index.",
+    sourceY60Text: "The new Y60 yearly files are shorter than the app's current files, so they stay as comparison sources instead of replacing the indexed database.",
+    sourceCombinedText: "A 5,281-page combined archive for checking missing pages and validating indexes.",
+    sourceWgyText: "The vehicle profile file matches the copy already inside the app, so it should not be copied again.",
+    sourcePartsouqText: "Short files useful for layout or helper indexing, not replacements for OEM catalogs.",
+    visionTitle: "Features that make the Patrol app a global reference",
+    visionSubtitle: "Approved roadmap for parts data, prices, maintenance, community, and AI",
+    visionDatabaseTitle: "Professional database",
+    visionDatabaseText: "Original diagrams, OEM numbers, multilingual names, function descriptions, location, photos, and dimensions when available.",
+    visionFitmentTitle: "Part fitment",
+    visionFitmentText: "Matching vehicles and differences across Y60, Y61, and future Y62 by year, engine, transmission, and trim.",
+    visionSearchTitle: "Smart search",
+    visionSearchText: "Search by part number, name, Arabic, English, VIN, and technical section.",
+    visionPricesTitle: "Price comparison",
+    visionPricesText: "Price, currency, shipping, delivery time, country, and part condition from multiple stores.",
+    visionTypeTitle: "Part type classification",
+    visionTypeText: "OEM, OEM manufacturer, high quality reproduction, aftermarket, used original, and NOS.",
+    visionRarityTitle: "Rarity indicator",
+    visionRarityText: "Widely available, limited stock, rare, or no longer available NLA.",
+    visionMaintenanceTitle: "Maintenance and guides",
+    visionMaintenanceText: "Failure symptoms, service life, related parts, torque specs, tools, and difficulty level.",
+    visionCommunityTitle: "Community and stores",
+    visionCommunityText: "Ratings, owner experiences, restoration projects, global and Gulf stores, salvage yards, and verified sellers.",
+    visionAiTitle: "AI and statistics",
+    visionAiText: "Identify parts from images, suggest alternatives, diagnose faults, and show most requested or rare parts.",
+    visionGoal: "Final goal: let every Nissan Patrol owner find everything about any part in one place without jumping across dozens of sites and stores.",
     resultsTitle: "Part Results",
     partsPageAll: "All parts for",
     partsPageCategory: "Parts for",
@@ -213,6 +291,8 @@ const translations = {
     resultSingular: "result",
     resultPlural: "results",
     oem: "OEM",
+    catalogPage: "Catalog Page",
+    openPdf: "Open Original PDF",
     records: "records",
     confidence: "confidence",
     sources: "sources",
@@ -398,6 +478,74 @@ function categoryLabel(part) {
   return t(categoryKeys[part.category] || "catGeneral");
 }
 
+function sectionToCategory(sectionId) {
+  const map = {
+    vehicle: "general",
+    engine: "engine",
+    transmission: "suspension",
+    drivetrain: "suspension",
+    brakes: "brake",
+    body: "body",
+    interior: "interior",
+    electrical: "electrical",
+    hvac: "cooling",
+    general: "general"
+  };
+  return map[sectionId] || "general";
+}
+
+function catalogEntryToPart(entry) {
+  const keywords = Array.isArray(entry.keywords) ? entry.keywords : [];
+  return {
+    part_number: `CAT-${entry.id}`,
+    name_ar: entry.titleAr || entry.titleEn || entry.id,
+    name_en: entry.titleEn || entry.titleAr || entry.id,
+    model: "Y60",
+    years: entry.year ? [String(entry.year)] : [],
+    engines: keywords.filter((word) => /^(TB42S|TB42E|TD42|RD28T|RB30S|FS5R50A)$/i.test(word)).slice(0, 4),
+    date_ranges: [],
+    category: sectionToCategory(entry.sectionId),
+    category_ar: entry.sectionTitleAr || entry.sectionId || "عام",
+    occurrence_count: 1,
+    source_count: 1,
+    weighted_source_score: 1,
+    confidence: 82,
+    audit_status: "verified",
+    rarity: "موثق",
+    record_type: "catalog_page",
+    catalog_id: entry.id,
+    source_pdf_path: entry.sourcePdfPath,
+    page_number: entry.pageNumber,
+    keywords,
+    snippet: entry.snippet || "",
+    query_text: entry.queryText || "",
+    evidence: [{
+      source_id: entry.sourcePdfPath?.split("/").pop() || "catalog",
+      year: entry.year || "Y60",
+      page: entry.pageNumber ?? 0,
+      context: entry.snippet || entry.subtitleAr || entry.titleAr || ""
+    }]
+  };
+}
+
+function pdfHref(sourcePath) {
+  if (!sourcePath) return "";
+  if (!sourcePath.startsWith("assets/catalog/")) return sourcePath;
+  if (window.location.protocol === "file:" || window.location.pathname.includes("/Web/")) {
+    return sourcePath.replace(/^assets\/catalog\//, "catalog/");
+  }
+  return `flutter_y60_catalog/${sourcePath}`;
+}
+
+function mergeCatalogEntries(baseParts, index) {
+  const entries = Array.isArray(index?.entries) ? index.entries : [];
+  const existing = new Set(baseParts.map((part) => part.part_number));
+  const catalogPageParts = entries
+    .map(catalogEntryToPart)
+    .filter((part) => !existing.has(part.part_number));
+  return [...baseParts, ...catalogPageParts];
+}
+
 function applyLanguage() {
   document.documentElement.lang = currentLang;
   document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
@@ -424,7 +572,18 @@ function updateCurrencyButtons() {
 }
 
 function normalize(value) {
-  return String(value || "").toLowerCase().trim();
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u064B-\u065F\u0670]/g, "")
+    .replace(/[أإآٱ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/ؤ/g, "و")
+    .replace(/ئ/g, "ي")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function translatedPartName(name) {
@@ -476,7 +635,8 @@ function matchesFilter(part) {
 }
 
 function matchesSearch(part, query) {
-  if (!query) return true;
+  const normalizedQuery = normalize(query);
+  if (!normalizedQuery || normalizedQuery.length < 2) return true;
   const haystack = [
     part.part_number,
     part.name_ar,
@@ -485,9 +645,12 @@ function matchesSearch(part, query) {
     part.category_ar,
     part.model,
     yearsLabel(part),
+    part.keywords?.join(" "),
+    part.snippet,
+    part.query_text,
     evidenceText(part)
   ].join(" ");
-  return normalize(haystack).includes(normalize(query));
+  return normalize(haystack).includes(normalizedQuery);
 }
 
 function rarityClass(part) {
@@ -551,7 +714,7 @@ function renderParts() {
       <div class="part-main">
         <h3>${displayName(part)}</h3>
         ${originalNameLine(part)}
-        <div class="meta-line">${t("oem")} ${part.part_number} · ${part.model}</div>
+        <div class="meta-line">${part.record_type === "catalog_page" ? t("catalogPage") : t("oem")} ${part.record_type === "catalog_page" ? `#${part.page_number}` : part.part_number} · ${part.model}</div>
         <div class="compatibility">${yearsLabel(part)} · ${enginesLabel(part)} · ${part.occurrence_count.toLocaleString("en-US")} ${t("records")}</div>
         <div class="badge-row">
           <span class="badge ${typeClass(part)}">${categoryLabel(part)}</span>
@@ -600,7 +763,7 @@ function renderDetails() {
   detailPanel.innerHTML = `
     <div class="detail-title">
       <h2>${displayName(part)}</h2>
-      <span class="meta-line">${t("oem")} ${part.part_number} · ${part.model}</span>
+      <span class="meta-line">${part.record_type === "catalog_page" ? t("catalogPage") : t("oem")} ${part.record_type === "catalog_page" ? `#${part.page_number}` : part.part_number} · ${part.model}</span>
       <div class="badge-row">
         <span class="badge ${typeClass(part)}">${categoryLabel(part)}</span>
         <span class="badge ${rarityClass(part)}">${localizedValue(part.rarity)}</span>
@@ -651,6 +814,7 @@ function renderDetails() {
           </div>
         `).join("")}
       </div>
+      ${part.source_pdf_path ? `<a class="pdf-link" href="${pdfHref(part.source_pdf_path)}" target="_blank" rel="noopener">${t("openPdf")} · ${t("page")} ${part.page_number}</a>` : ""}
     </div>
 
     <div class="detail-section">
@@ -692,9 +856,23 @@ function updateStats() {
   const cards = document.querySelectorAll(".stats-grid article strong");
   if (cards.length < 4) return;
   cards[0].textContent = catalog.part_count?.toLocaleString("en-US") || parts.length.toLocaleString("en-US");
-  cards[1].textContent = catalog.source_count?.toLocaleString("en-US") || "0";
+  cards[1].textContent = (catalogSearchIndex.stats?.length || catalog.source_count || 0).toLocaleString("en-US");
   cards[2].textContent = parts.filter((part) => (part.confidence || 0) < 70).length.toLocaleString("en-US");
-  cards[3].textContent = parts.reduce((sum, part) => sum + part.occurrence_count, 0).toLocaleString("en-US");
+  cards[3].textContent = (catalogSearchIndex.entries?.length || parts.reduce((sum, part) => sum + part.occurrence_count, 0)).toLocaleString("en-US");
+}
+
+async function fetchFirstJson(paths) {
+  let lastError = null;
+  for (const path of paths) {
+    try {
+      const response = await fetch(path);
+      if (response.ok) return response.json();
+      lastError = new Error(`${path}: HTTP ${response.status}`);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("No JSON paths provided");
 }
 
 async function loadCatalog() {
@@ -705,7 +883,17 @@ async function loadCatalog() {
     }
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     catalog = await response.json();
-    parts = catalog.parts;
+    const baseParts = Array.isArray(catalog.parts) ? catalog.parts : [];
+    try {
+      catalogSearchIndex = await fetchFirstJson([
+        "catalog/search/catalog_search_index.json",
+        "flutter_y60_catalog/assets/catalog/search/catalog_search_index.json"
+      ]);
+    } catch (indexError) {
+      catalogSearchIndex = { entries: [], stats: [] };
+      console.warn("Catalog page index unavailable", indexError);
+    }
+    parts = mergeCatalogEntries(baseParts, catalogSearchIndex);
   } catch (error) {
     catalog = { parts: fallbackParts, sources: [] };
     parts = fallbackParts;
@@ -760,8 +948,11 @@ document.querySelectorAll(".category-card").forEach((card) => {
 });
 
 searchInput.addEventListener("input", () => {
-  visibleLimit = 60;
-  renderParts();
+  window.clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = window.setTimeout(() => {
+    visibleLimit = 60;
+    renderParts();
+  }, 280);
 });
 
 languageToggle?.addEventListener("click", () => {
@@ -815,7 +1006,9 @@ function navigateMenuTarget(target) {
     parts: ".parts-panel",
     faults: '[data-section="faults"]',
     catalogs: '[data-section="catalogs"]',
+    "source-intake": '[data-section="source-intake"]',
     prices: '[data-section="prices"]',
+    vision: '[data-section="vision"]',
     wishlist: ".detail-actions",
     contact: '[data-section="contact"]'
   };
@@ -844,7 +1037,7 @@ document.addEventListener("pointerdown", (event) => {
 loadCatalog();
 applyLanguage();
 
-if ("serviceWorker" in navigator) {
+if ("serviceWorker" in navigator && ["http:", "https:"].includes(window.location.protocol)) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("service-worker.js").catch(() => {});
   });
