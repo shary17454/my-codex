@@ -17,6 +17,7 @@ Features:
 - Categories for engine, cooling, electrical, body, brake, suspension, fuel, and more.
 - Audit status and confidence score for records.
 - Wishlist for saved parts.
+- In-App Purchase to unlock protected catalog pages and part-number details.
 - Useful for Nissan Patrol Y60 owners, maintenance, and restoration projects.
 
 Note: This app is an informational reference. Always verify part numbers before purchase or installation.
@@ -30,8 +31,11 @@ Search thousands of Nissan Patrol Y60 parts in one place.
 ## Suggested Category
 Reference or Utilities
 
+## In-App Purchase
+The app includes an In-App Purchase for unlocking protected catalog pages and part-number details.
+
 ## Privacy Policy URL
-Use the hosted HTTPS URL for privacy.html.
+https://github.com/shary17454/my-codex/blob/main/docs/privacy.html
 
 ## Support URL
-Use the hosted HTTPS URL for support.html.
+https://github.com/shary17454/my-codex/blob/main/docs/support.html
