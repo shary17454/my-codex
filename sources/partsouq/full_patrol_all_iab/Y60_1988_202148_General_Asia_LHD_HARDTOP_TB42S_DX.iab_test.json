@@ -1,0 +1,717 @@
+{
+  "extract_id": "Y60_1988_202148",
+  "market": "General/Asia (LHD)",
+  "detected_generation": "Y60",
+  "source_row": {
+    "cells": [
+      "SAFARI",
+      "HARDTOP",
+      "TB42S",
+      "DX",
+      "General/Asia (LHD)",
+      "Y60",
+      "08.1987",
+      "09.1999",
+      ""
+    ],
+    "raw_text": "SAFARI | HARDTOP | TB42S | DX | General/Asia (LHD) | Y60 | 08.1987 | 09.1999 | ",
+    "vid": "202148",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE7Dx50ZG4_RE1wfEAVKWN3V1BOPzA9PC4BMnp8T1tHQ0FCBxA8Vnh8eElfRlcRDAY7MlxPT0ldRC4oK21IdCxsaS03cAVgOFdELCUoLT8PCgA9OlwsJSgtPg8aGiskLyw9V0JZcnJiKz1QSDwqIy1yaB08WC0iKSo4UhcbDCskLywxV10iFnwfJSgtZ30qNS1yDgNbSUIsJSgtYCN8eCkqVjg5KiMtcjskfyo1Ljg8Iy1yMzBgbC00KSpIQXIjAAAAAF5qOPk%3D%24&vid=202148&q="
+  },
+  "category": {
+    "extract_id": "Y60_1988_202148",
+    "detected_generation": "Y60",
+    "year": "1988",
+    "market": "General/Asia (LHD)",
+    "model_filter": "SAFARI",
+    "year_filter": "1988",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE7Dx50ZG4_RE1wfEAVKWN3V1BOPzA9PC4BMnp8T1tHQ0FCBxA8Vnh8eElfRlcRDAY7MlxPT0ldRC4oK21IdCxsaS03cAVgOFdELCUoLT8PCgA9OlwsJSgtPg8aGiskLyw9V0JZcnJiKz1QSDwqIy1yaB08WC0iKSo4UhcbDCskLywxV10iFnwfJSgtZ30qNS1yDgNbSUIsJSgtYCN8eCkqVjg5KiMtcjskfyo1Ljg8Iy1yMzBgbC00KSpIQXIjAAAAAF5qOPk%3D%24&vid=202148&q=",
+    "vid": "202148",
+    "raw_text": "SAFARI | HARDTOP | TB42S | DX | General/Asia (LHD) | Y60 | 08.1987 | 09.1999 | ",
+    "cells": [
+      "SAFARI",
+      "HARDTOP",
+      "TB42S",
+      "DX",
+      "General/Asia (LHD)",
+      "Y60",
+      "08.1987",
+      "09.1999",
+      ""
+    ],
+    "source_file": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\navigation\\patrol_general_asia_lhd_incremental_discovery.json",
+    "body_style": "HARDTOP",
+    "engine": "TB42S",
+    "grade_or_frame": "DX",
+    "detail_status": "pending"
+  },
+  "started_at": "2026-06-30T00:43:31.087Z",
+  "source_vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE7Dx50ZG4_RE1wfEAVKWN3V1BOPzA9PC4BMnp8T1tHQ0FCBxA8Vnh8eElfRlcRDAY7MlxPT0ldRC4oK21IdCxsaS03cAVgOFdELCUoLT8PCgA9OlwsJSgtPg8aGiskLyw9V0JZcnJiKz1QSDwqIy1yaB08WC0iKSo4UhcbDCskLywxV10iFnwfJSgtZ30qNS1yDgNbSUIsJSgtYCN8eCkqVjg5KiMtcjskfyo1Ljg8Iy1yMzBgbC00KSpIQXIjAAAAAF5qOPk%3D%24&vid=202148&q=",
+  "vehicle_page": {
+    "groups": [
+      {
+        "cid": "",
+        "cname": "",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE7Dx50ZG4_RE1wfEAVKWN3V1BOPzA9PC4BMnp8T1tHQ0FCBxA8Vnh8eElfRlcRDAY7MlxPT0ldRC4oK21IdCxsaS03cAVgOFdELCUoLT8PCgA9OlwsJSgtPg8aGiskLyw9V0JZcnJiKz1QSDwqIy1yaB08WC0iKSo4UhcbDCskLywxV10iFnwfJSgtZ30qNS1yDgNbSUIsJSgtYCN8eCkqVjg5KiMtcjskfyo1Ljg8Iy1yMzBgbC00KSpIQXIjAAAAAF5qOPk%3D%24&vid=202148&cid=&q=",
+        "text": "CATEGORIES"
+      },
+      {
+        "cid": "2",
+        "cname": "FUEL & ENGINE CONTROL",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFqXk8lNT9uFRwhLRFEeDImBgEfbmFsbX9QYystHgoWEhATVkFtByktKRgOFwZAXVdqYw0eHhgMFX9sejwZJX0se2R-Qi0_ejQ5PHpjBX5DLU4lJyg2PBklfmRuMWJ5BX1pBhV-LS8xagYKHWxrDX4tLzFrBhoHenV-fjVQXgx7cn96bAEaNC0_eHtoAG0JfHAhLSQHHhsRenV-fjlQQXcffAJ0eXw1dS0peHsOHgoYE34tLzE1KnxleHsHajEtP3h7Ozkue2R8MDs_eHszLTE9fGYhLVQUeyMAAAAANX7lBQ%3D%3D%24&vid=202148&cid=2&cname=FUEL+%26+ENGINE+CONTROL&q=",
+        "text": "FUEL & ENGINE CONTROL"
+      },
+      {
+        "cid": "3",
+        "cname": "EXHAUST & COOLING",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEpHQxmdnwtVl9iblIHO3FlRUJcLSIvLjwTIGhuXUlVUVNQFQIuRGpualtNVEUDHhQpIE5dXVtPVjwvOX9aZj5vOCc9AW58OXd6fzkgRj0Bbg1mZGt1f1pmPSctciE6Rj4qRVY9bmxyKUVJXi8oTj1ubHIoRVlEOTY9PXYTHU84MTw5L0JZd258OzgrQy5KPzNibmdEXVhSOTY9PXoTAjRcP0E3Oj92Nm5qOzhNXUlbUD1ubHJ2aT8mOzhEKXJufDs4eHptOCc_c3h8OzhwbnJ-PyVibhdXOGAAAAAAPxob8A%3D%3D%24&vid=202148&cid=3&cname=EXHAUST+%26+COOLING&q=",
+        "text": "EXHAUST & COOLING"
+      },
+      {
+        "cid": "4",
+        "cname": "ENGINE ELECTRICAL",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwF4TF03Jy18Bw4zPwNWaiA0FBMNfHN-f21CcTk_DBgEAAIBRFN_FTs_OwocBRRST0V4cR8MDAoeB21-aC4LN28-aXZsUD8taCYrLmhxF2xXP1w3NTokLgs3bHZ8I3BrF297FAdsPz0jeBQYD355H2w_PSN5FAgVaGdsbCdCTB5pYG1ofhMIJj8taml6En8bbmIzPzYVDAkDaGdsbCtCU2UNbhBma24nZz87amkcDBgKAWw_PSMnOG53amkVeCM_LWppKSs8aXZuIiktamkhPyMvbnQzP0YGaTEAAAAAceiL4w%3D%3D%24&vid=202148&cid=4&cname=ENGINE+ELECTRICAL&q=",
+        "text": "ENGINE ELECTRICAL"
+      },
+      {
+        "cid": "5",
+        "cname": "BODY ELECTRICAL",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHZ7fyWhozdpq-SnqL3y4GVtbKs3dLf3szj0JierbmloaOg5fLetJqemqu9pLXz7uTZ0L6trau_pszfyY-qls6fyNfN8Z6MyYeKj8nQts33nv2WlJuFj6qWzdfdgtHKts7atabNnpyC2bW5rt_Yvs2enILYtam0ycbNzYbj7b_IwczJ37Kph56My8jbs966z8OSnpe0raiiycbNzYrj8sSsz7HHys-Gxp6ay8i9rbmroM2enIKGmc_Wy8i02YKejMvIiIqdyNfPg4iMy8iAnoKOz9WSnuenyJAAAAAAIwWX0Q%3D%3D%24&vid=202148&cid=5&cname=BODY+ELECTRICAL&q=",
+        "text": "BODY ELECTRICAL"
+      },
+      {
+        "cid": "6",
+        "cname": "POWER TRAIN",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFzR1Y8LCZ3DAU4NAhdYSs_HxgGd3h1dGZJejI0BxMPCwkKT1h0HjA0MAEXDh9ZRE5zehQHBwEVDGZ1YyUAPGQ1Yn1nWzQmYy0gJWN6HGdeNFc8PjEvJQA8Z313KHtgHGRwHwxnNDYocx8TBHVyFGc0NihyHwMeY2xnZyxJRxVia2ZjdRgDLTQmYWJxGXQQZWk4ND0eBwIIY2xnZyBJWG4GZRttYGUsbDQwYWIXBxMBCmc0NigsM2V8YWIecyg0JmFiIiA3Yn1lKSImYWIqNCgkZX84NE0NYjoAAAAA-k60gw%3D%3D%24&vid=202148&cid=6&cname=POWER+TRAIN&q=",
+        "text": "POWER TRAIN"
+      },
+      {
+        "cid": "7",
+        "cname": "AXLE & SUSPENSION",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwELPy5EVF4PdH1ATHAlGVNHZ2B-DwANDB4xAkpMf2t3c3FyNyAMZkhMSHlvdmchPDYLAmx_f3ltdB4NG114RBxNGgUfI0xeG1VYXRsCZB8nTC9ERklXXXhEHwUPUAMYZBwIZ3QfTE5QC2drfA0KbB9MTlAKZ3tmGxQfH1QxP20aEx4bDWB7VUxeGRoJYQxoHRFATEVmf3pwGxQfH1gxIBZ-HWMVGB1UFExIGRpvf2t5ch9MTlBUSx0EGRpmC1BMXhkaWlhPGgUdUVpeGRpSTFBcHQdATDV1GkIAAAAAAkL6fA%3D%3D%24&vid=202148&cid=7&cname=AXLE+%26+SUSPENSION&q=",
+        "text": "AXLE & SUSPENSION"
+      },
+      {
+        "cid": "8",
+        "cname": "BRAKE",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFHc2IIGBJDODEMADxpVR8LKywyQ0xBQFJ9TgYAMyc7Pz0-e2xAKgQABDUjOittcHpHTiAzMzUhOFJBVxE0CFABVklTbwASVxkUEVdOKFNkAGMICgUbETQIU0lDHE9UKFBEKzhTAAIcRysnMEFGIFMAAhxGKzcqV1hTUxh9cyFWX1JXQSw3GQASVVZFLUAkUV0MAAkqMzY8V1hTUxR9bFoyUS9ZVFEYWAAEVVYjMyc1PlMAAhwYB1FIVVYqRxwAElVWFhQDVklRHRYSVVYeABwQUUsMAHk5Vg4AAAAASQoe4w%3D%3D%24&vid=202148&cid=8&cname=BRAKE&q=",
+        "text": "BRAKE"
+      },
+      {
+        "cid": "9",
+        "cname": "STEERING",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHq3s-ltb_ulZyhrZHE-LKmhoGf7uHs7f_Q46utnoqWkpCT1sHth6mtqZiOl4bA3dfq442enpiMlf_s-ryZpf2s--T-wq2_-rS5vPrjhf7Irc6lp6i2vJml_uTuseL5hf3phpX-ra-x6oaKnezrjf6tr7HrhpqH-vX-_rXQ3oz78v_67IGatK2_-PvogO2J_PChraSHnpuR-vX-_rnQwfef_IL0-fy19a2p-PuOnoqYk_6tr7G1qvzl-PuH6rGtv_j7u7mu--T8sLu_-PuzrbG9_OahrdSU-6MAAAAAdaYiaA%3D%3D%24&vid=202148&cid=9&cname=STEERING&q=",
+        "text": "STEERING"
+      },
+      {
+        "cid": "10",
+        "cname": "BODY(FRONT,ROOF & FLOOR)",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEVITBaSkARamNeUm47B01ZeX5gER4TEgAvHFRSYXVpbW9sKT4SeFZSVmdxaHk_IigVHHJhYWdzagATBUNmWgJTBBsBPVJABUtGQwUcegE0UjFaWFdJQ2ZaARsRTh0GegIWeWoBUlBOFXl1YhMUcgFSUE4UeWV4BQoBAUovIXMEDQAFE35lS1JABwQXfxJ2Aw9eUlt4YWRuBQoBAUYvPghgA30LBgNKClJWBwRxYXVnbAFSUE5KVQMaBwR4FU5SQAcEREZRBBsDT0RABwRMUk5CAxleUitrBFwAAAAAvaeWFw%3D%3D%24&vid=202148&cid=10&cname=BODY%28FRONT%2CROOF+%26+FLOOR%29&q=",
+        "text": "BODY(FRONT,ROOF & FLOOR)"
+      },
+      {
+        "cid": "11",
+        "cname": "BODY(SIDE & REAR)",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFPe2oAEBpLMDkECDRhXRcDIyQ6S0RJSFp1Rg4IOy8zNzU2c2RIIgwIDD0rMiNleHJPRig7Oz0pMFpJXxk8AFgJXkFbZwgaXxEcGV9GIFtvCGsAAg0TGTwAW0FLFEdcIFhMIzBbCAoUTyMvOElOKFsIChROIz8iX1BbWxB1eyleV1pfSSQ_EQgaXV5NJUgsWVUECAEiOz40X1BbWxx1ZFI6WSdRXFkQUAgMXV4rOy89NlsIChQQD1lAXV4iTxQIGl1eHhwLXkFZFR4aXV4WCBQYWUMECHExXgYAAAAAT4Uu-g%3D%3D%24&vid=202148&cid=11&cname=BODY%28SIDE+%26+REAR%29&q=",
+        "text": "BODY(SIDE & REAR)"
+      },
+      {
+        "cid": "12",
+        "cname": "SEAT & SEAT BELT",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwH0wNG7q6Hwi4K_s4_a5qy4mJ-B8P_y8-HO_bWzgJSIjI6NyN_zmbezt4aQiZjew8n0_ZOAgIaSi-Hy5KKHu-Oy5frg3LOh5KqnouT9m-DTs9C7ubaoooe74Prwr_znm-P3mIvgs7Gv9JiUg_L1k-Czsa_1mISZ5Ovg4KvOwJLl7OHk8p-EqrOh5uX2nvOX4u6_s7qZgIWP5Ovg4KfO3-mB4pzq5-Kr67O35uWQgJSGjeCzsa-rtOL75uWZ9K-zoeblpaew5frirqWh5uWts6-j4vi_s8qK5b0AAAAApK9hPw%3D%3D%24&vid=202148&cid=12&cname=SEAT+%26+SEAT+BELT&q=",
+        "text": "SEAT & SEAT BELT"
+      },
+      {
+        "cid": "13",
+        "cname": "BODY(BACK DOOR & REAR BODY)",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEbLz5URE4fZG1QXGA1CUNXd3BuHxAdHA4hElpcb3tnY2FiJzAcdlhcWGl_ZncxLCYbEnxvb2l9ZA4dC01oVAxdChUPM1xOC0VITQsSdA89XD9UVllHTWhUDxUfQBMIdAwYd2QPXF5AG3d7bB0afA9cXkAad2t2CwQPD0QhL30KAw4LHXBrRVxOCQoZcRx4DQFQXFV2b2pgCwQPD0ghMAZuDXMFCA1EBFxYCQp_b3tpYg9cXkBEWw0UCQp2G0BcTgkKSkhfChUNQUpOCQpCXEBMDRdQXCVlClIAAAAAVsai7A%3D%3D%24&vid=202148&cid=13&cname=BODY%28BACK+DOOR+%26+REAR+BODY%29&q=",
+        "text": "BODY(BACK DOOR & REAR BODY)"
+      },
+      {
+        "cid": "14",
+        "cname": "MISCELLANEOUS",
+        "href": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGsmInj8_mo09rn69eCvvTgwMfZqKeqq7mWpe3r2MzQ1NbVkIerwe_r797I0cCGm5GspcvY2N7K07mqvPrf47vqvaK4hOv5vPL_-rylw7iJ64jj4e7w-t_juKKo96S_w7uvwNO46-n3rMDM26qty7jr6fetwNzBvLO4uPOWmMq9tLm8qsfc8uv5vr2uxqvPurbn6-LB2N3XvLO4uP-Wh7HZusSyv7rzs-vvvr3I2Mze1bjr6ffz7Lqjvr3BrPfr-b69_f_ovaK69v35vr316_f7uqDn65LSveUAAAAA5NvaDg%3D%3D%24&vid=202148&cid=14&cname=MISCELLANEOUS&q=",
+        "text": "MISCELLANEOUS"
+      }
+    ],
+    "tables": [
+      {
+        "headers": [
+          "Brand",
+          "Name",
+          "Body Style",
+          "Engine",
+          "Vehicle Grade",
+          "Market",
+          "Model",
+          "Model Year From",
+          "Model Year To",
+          ""
+        ],
+        "idx": 0,
+        "rows": [
+          [
+            "Brand",
+            "Name",
+            "Body Style",
+            "Engine",
+            "Vehicle Grade",
+            "Market",
+            "Model",
+            "Model Year From",
+            "Model Year To",
+            ""
+          ],
+          [
+            "NISSAN",
+            "SAFARI",
+            "HARDTOP",
+            "TB42S",
+            "DX",
+            "General/Asia (LHD)",
+            "Y60",
+            "08.1987",
+            "09.1999",
+            ""
+          ]
+        ]
+      },
+      {
+        "headers": [],
+        "idx": 1,
+        "rows": [
+          [
+            "ENGINE MECHANICAL"
+          ],
+          [
+            "FUEL & ENGINE CONTROL"
+          ],
+          [
+            "EXHAUST & COOLING"
+          ],
+          [
+            "ENGINE ELECTRICAL"
+          ],
+          [
+            "BODY ELECTRICAL"
+          ],
+          [
+            "POWER TRAIN"
+          ],
+          [
+            "AXLE & SUSPENSION"
+          ],
+          [
+            "BRAKE"
+          ],
+          [
+            "STEERING"
+          ],
+          [
+            "BODY(FRONT,ROOF & FLOOR)"
+          ],
+          [
+            "BODY(SIDE & REAR)"
+          ],
+          [
+            "SEAT & SEAT BELT"
+          ],
+          [
+            "BODY(BACK DOOR & REAR BODY)"
+          ],
+          [
+            "MISCELLANEOUS"
+          ]
+        ]
+      }
+    ],
+    "body": "USD AFN Afghan afghani ALL Albanian lek DZD Algerian dinar EUR European euro AOA Angolan kwanza XCD East Caribbean dollar ARS Argentine peso AMD Armenian dram AWG Aruban florin AUD Australian dollar AZN Azerbaijani manat BSD Bahamian dollar BHD Bahraini dinar BDT Bangladeshi taka BBD Barbadian dolla"
+  },
+  "units": [
+    {
+      "cid": "1",
+      "diagram_alt": "ENGINE ASSEMBLY | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "diagram_image_url": "https://partsouq.com/assets/tesseract/assets/global/NISSAN201809/source/GL/B9_201508_192_100_100_A01.gif",
+      "group_text": "CATEGORIES",
+      "part_rows": [
+        {
+          "applicable_models": "Vehicle Grade",
+          "part_name_en": "Name",
+          "part_number": "Brand",
+          "quantity": "Engine",
+          "raw_cells": "[Circular]",
+          "reference_code": "Body Style",
+          "specifications": "Market | Model"
+        },
+        {
+          "applicable_models": "DX",
+          "part_name_en": "SAFARI",
+          "part_number": "NISSAN",
+          "quantity": "TB42S",
+          "raw_cells": "[Circular]",
+          "reference_code": "HARDTOP",
+          "specifications": "General/Asia (LHD) | Y60"
+        }
+      ],
+      "plate_code": "ENGINE ASSEMBLY | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "plate_title_en": "ENGINE ASSEMBLY | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "tables": [
+        {
+          "headers": [
+            "Brand",
+            "Name",
+            "Body Style",
+            "Engine",
+            "Vehicle Grade",
+            "Market",
+            "Model",
+            "Model Year From",
+            "Model Year To",
+            ""
+          ],
+          "idx": 0,
+          "rows": [
+            [
+              "Brand",
+              "Name",
+              "Body Style",
+              "Engine",
+              "Vehicle Grade",
+              "Market",
+              "Model",
+              "Model Year From",
+              "Model Year To",
+              ""
+            ],
+            [
+              "NISSAN",
+              "SAFARI",
+              "HARDTOP",
+              "TB42S",
+              "DX",
+              "General/Asia (LHD)",
+              "Y60",
+              "08.1987",
+              "09.1999",
+              ""
+            ]
+          ]
+        },
+        {
+          "headers": [
+            "Number",
+            "Name",
+            "Code",
+            "Quantity",
+            "Applicable Models",
+            "Specification",
+            "Range"
+          ],
+          "idx": 1,
+          "rows": [
+            [
+              "Number",
+              "Name",
+              "Code",
+              "Quantity",
+              "Applicable Models",
+              "Specification",
+              "Range"
+            ],
+            [
+              "1000104JA0",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "(K+HK+W+HW+T).GEN.TB42S",
+              "",
+              "08.1987 - 10.1991"
+            ],
+            [
+              "1000104JA1",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "*(K+HK+W+HW+T).GEN.TB42S +*T.A.TB42S",
+              "F/COLD",
+              "08.1987 - 10.1991"
+            ],
+            [
+              "1000104JA2",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "*(K+HK+W+HW+T).GEN.TB42S +*T.A.TB42S",
+              "F/TROP",
+              "08.1987 - 10.1991"
+            ],
+            [
+              "1000104JA3",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "*(K+HK+W+HW+T).GEN.TB42S +*T.A.TB42S",
+              "W/OIL COOLER F/TROP",
+              "08.1987 - 10.1991"
+            ],
+            [
+              "1000133JA0",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "(GEN.2S/L+GEN.2S/S+GEN.2S/B).TB42S",
+              "",
+              "08.1993 - 12.1993"
+            ],
+            [
+              "1000133JA1",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "*GEN.TB42S",
+              "F/COLD",
+              "10.1991 - 09.1994"
+            ],
+            [
+              "1000133JA2",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "*GEN.TB42S",
+              "F/HOT",
+              "08.1993 - 09.1994"
+            ],
+            [
+              "1000133JA3",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "*GEN.TB42S",
+              "F/AIR CON",
+              "10.1991 - 08.1993"
+            ],
+            [
+              "1000136JA1",
+              "ENGINE ASSY",
+              "10001",
+              "01",
+              "(K+W+HW).TB42S.(DX+AD+GR).MT.F5",
+              "F/AIR CON",
+              "08.1993 - 12.1993"
+            ]
+          ]
+        }
+      ],
+      "uid": "257122",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwFFcWAKGhBBOjMOAj5rVx0JKS4wQU5DQlB_TAQCMSU5PT88eW5CKAYCBjchOClvcnhFTCIxMTcjOlBDVRM2ClIDVEtRbQIQVRsWE1VMKlFvAmEKCAQZEzYKUUNJWFVMR0NBWlMeSUMeTVQwUltUBBAMGh5GRkFQNkZAUVNeSh4SMQtVExBRFABnVUcuO1VaUVEcf2g1QkMjVVpRUR1_eC9UXVBVQi4-egIQV1RELzFDU18OAgooQyFSW1ZTRHFneTlUXVBVTi4hAWYeKlpRUh4CU0kOAmw2JDA9VVpRUUNTHk1WUylBRlNfDgJZEQBTSldHRV8OAlEFHxVSTVZTNGICQQAAAAAfkvEi%24&vid=202148&cid=1&uid=257122&q="
+    },
+    {
+      "cid": "1",
+      "diagram_alt": "BARE & SHORT ENGINE | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "diagram_image_url": "https://partsouq.com/assets/tesseract/assets/global/NISSAN201809/source/GL/B9_201508_192_101_101_A01.gif",
+      "group_text": "CATEGORIES",
+      "part_rows": [
+        {
+          "applicable_models": "Vehicle Grade",
+          "part_name_en": "Name",
+          "part_number": "Brand",
+          "quantity": "Engine",
+          "raw_cells": "[Circular]",
+          "reference_code": "Body Style",
+          "specifications": "Market | Model"
+        },
+        {
+          "applicable_models": "DX",
+          "part_name_en": "SAFARI",
+          "part_number": "NISSAN",
+          "quantity": "TB42S",
+          "raw_cells": "[Circular]",
+          "reference_code": "HARDTOP",
+          "specifications": "General/Asia (LHD) | Y60"
+        }
+      ],
+      "plate_code": "BARE & SHORT ENGINE | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "plate_title_en": "BARE & SHORT ENGINE | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "tables": [
+        {
+          "headers": [
+            "Brand",
+            "Name",
+            "Body Style",
+            "Engine",
+            "Vehicle Grade",
+            "Market",
+            "Model",
+            "Model Year From",
+            "Model Year To",
+            ""
+          ],
+          "idx": 0,
+          "rows": [
+            [
+              "Brand",
+              "Name",
+              "Body Style",
+              "Engine",
+              "Vehicle Grade",
+              "Market",
+              "Model",
+              "Model Year From",
+              "Model Year To",
+              ""
+            ],
+            [
+              "NISSAN",
+              "SAFARI",
+              "HARDTOP",
+              "TB42S",
+              "DX",
+              "General/Asia (LHD)",
+              "Y60",
+              "08.1987",
+              "09.1999",
+              ""
+            ]
+          ]
+        },
+        {
+          "headers": [
+            "Number",
+            "Name",
+            "Code",
+            "Quantity",
+            "Applicable Models",
+            "Specification",
+            "Range"
+          ],
+          "idx": 1,
+          "rows": [
+            [
+              "Number",
+              "Name",
+              "Code",
+              "Quantity",
+              "Applicable Models",
+              "Specification",
+              "Range"
+            ],
+            [
+              "1010203JA0",
+              "ENGINE ASSY-BARE",
+              "10102",
+              "01",
+              "TB42S",
+              "",
+              "08.1987 - 10.1991"
+            ],
+            [
+              "1010203JA1",
+              "ENGINE ASSY-BARE",
+              "10102",
+              "01",
+              "*TB42S",
+              "F/OIL COOLER",
+              "10.1991 - 08.1993"
+            ],
+            [
+              "1010236JA0",
+              "ENGINE ASSY-BARE",
+              "10102",
+              "01",
+              "TB42S",
+              "",
+              "10.1991 - 08.1993"
+            ],
+            [
+              "1010236JA2",
+              "ENGINE ASSY-BARE",
+              "10102",
+              "01",
+              "(K+W).GEN.TB42S +HW.TB42S",
+              "",
+              "07.1997 - ..."
+            ],
+            [
+              "1010236JA3",
+              "ENGINE ASSY-BARE",
+              "10102",
+              "01",
+              "*(K+W).GEN.TB42S +HW.TB42S",
+              "W/OIL COOLER",
+              "07.1997 - ..."
+            ],
+            [
+              "1010303JA0",
+              "ENGINE ASSY-SHORT",
+              "10103",
+              "01",
+              "(K+W).GEN.TB42S +HW.TB42S",
+              "",
+              "07.1997 - ..."
+            ],
+            [
+              "1010303JA1",
+              "ENGINE ASSY-SHORT",
+              "10103",
+              "01",
+              "*(K+W).GEN.TB42S +HW.TB42S",
+              "W/OIL COOLER",
+              "07.1997 - ..."
+            ]
+          ]
+        }
+      ],
+      "uid": "257125",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwF-SlsxISt6AQg1OQVQbCYyEhULenV4eWtEdz85Ch4CBgQHQlV5Ez05PQwaAxJUSUN-dxkKCgwYAWt4bigNMWk4b3BqVjkrbiAtKG53EWpUOVoxMz8iKA0xanhyY253fHh6YWglcngldm8LaWBvPys3ISV9fXtrDX17amhlcSUpCjBuKCtqLztcbnwVAG5hamonRFMOeXgYbmFqaiZEQxRvZmtueRUFQTkrbG9_FAp4aGQ1OTETeBppYG1of0pcQgJvZmtudRUaOl0lEWFqaSU5aHI1OVcNHwsGbmFqanhoJXZtaBJ6fWhkNTliKjtocWx8fmQ1OWo-JC5pdm1oD1k5egAAAAADwQdp%24&vid=202148&cid=1&uid=257125&q="
+    },
+    {
+      "cid": "1",
+      "diagram_alt": "ENGINE GASKET KIT | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "diagram_image_url": "https://partsouq.com/assets/tesseract/assets/global/NISSAN201809/source/GL/B9_201508_192_102_102_A01.gif",
+      "group_text": "CATEGORIES",
+      "part_rows": [
+        {
+          "applicable_models": "Vehicle Grade",
+          "part_name_en": "Name",
+          "part_number": "Brand",
+          "quantity": "Engine",
+          "raw_cells": "[Circular]",
+          "reference_code": "Body Style",
+          "specifications": "Market | Model"
+        },
+        {
+          "applicable_models": "DX",
+          "part_name_en": "SAFARI",
+          "part_number": "NISSAN",
+          "quantity": "TB42S",
+          "raw_cells": "[Circular]",
+          "reference_code": "HARDTOP",
+          "specifications": "General/Asia (LHD) | Y60"
+        }
+      ],
+      "plate_code": "ENGINE GASKET KIT | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "plate_title_en": "ENGINE GASKET KIT | Nissan SAFARI 08.1987 09.1999 | Parts Catalogs | PartSouq",
+      "tables": [
+        {
+          "headers": [
+            "Brand",
+            "Name",
+            "Body Style",
+            "Engine",
+            "Vehicle Grade",
+            "Market",
+            "Model",
+            "Model Year From",
+            "Model Year To",
+            ""
+          ],
+          "idx": 0,
+          "rows": [
+            [
+              "Brand",
+              "Name",
+              "Body Style",
+              "Engine",
+              "Vehicle Grade",
+              "Market",
+              "Model",
+              "Model Year From",
+              "Model Year To",
+              ""
+            ],
+            [
+              "NISSAN",
+              "SAFARI",
+              "HARDTOP",
+              "TB42S",
+              "DX",
+              "General/Asia (LHD)",
+              "Y60",
+              "08.1987",
+              "09.1999",
+              ""
+            ]
+          ]
+        },
+        {
+          "headers": [
+            "Number",
+            "Name",
+            "Code",
+            "Quantity",
+            "Applicable Models",
+            "Range"
+          ],
+          "idx": 1,
+          "rows": [
+            [
+              "Number",
+              "Name",
+              "Code",
+              "Quantity",
+              "Applicable Models",
+              "Range"
+            ],
+            [
+              "1010103J25",
+              "GASKET KIT-ENGINE,REPAIR",
+              "11011K",
+              "01",
+              "TB42S",
+              "08.1987 - 10.1991"
+            ],
+            [
+              "1010135J25",
+              "GASKET KIT-ENGINE,REPAIR",
+              "11011K",
+              "01",
+              "TB42S",
+              "10.1991 - 08.1993"
+            ],
+            [
+              "1010135J26",
+              "GASKET KIT-ENGINE,REPAIR",
+              "11011K",
+              "01",
+              "(K+W+HV+T).GEN.TB42S +HW.TB42S",
+              "09.1994 - 11.1994"
+            ],
+            [
+              "1010135J28",
+              "GASKET KIT-ENGINE,REPAIR",
+              "11011K",
+              "01",
+              "(K+W+T).GEN.TB42S +HW.TB42S",
+              "07.1995 - ..."
+            ],
+            [
+              "1104203J25",
+              "GASKET KIT-VALVE REGRIND",
+              "11042K",
+              "01",
+              "TB42S",
+              "08.1987 - 10.1991"
+            ],
+            [
+              "1104203J26",
+              "GASKET KIT-VALVE REGRIND",
+              "11042K",
+              "01",
+              "(K+W+HV+T).GEN.TB42S +HW.TB42S",
+              "09.1994 - 11.1994"
+            ]
+          ]
+        }
+      ],
+      "uid": "257128",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwEhFQRufnQlXldqZloPM3ltTUpUJSonJjQbKGBmVUFdWVtYHQomTGJmYlNFXE0LFhwhKEZVVVNHXjQnMXdSbjZnMC81CWZ0MX9ydzEoTjULZgVubGB9d1JuNSctPDEoIyclPjd6LSd6KTBUNj8wYHRofnoiIic0UiIkNTc6Lnp2VW8xd3Q1cGQDMSNKXzE-NTV4GwxRJidHMT41NXkbHEswOTQxJkpaHmZ0MzAgS1UnNztqZm5MJ0U2PzI3IBUDHV0wOTQxKkpFZQJ6Tj41NnpmNy1qZghSQFRZMT41NSc3eikyN00lIjc7amY9dWQ3LjMjITtqZjVhe3E2KTI3UAZmJQAAAACCiC4t%24&vid=202148&cid=1&uid=257128&q="
+    }
+  ],
+  "failures": [],
+  "group_failures": [],
+  "extraction_notes": [
+    "in_app_browser_navigation_extraction",
+    "limited_test_extraction"
+  ],
+  "extracted_at": "2026-06-30T00:43:39.938Z"
+}

@@ -1,0 +1,44 @@
+{
+  "source": "https://partsouq.com/en/catalog/genuine/locate?c=Nissan",
+  "captured_at": "2026-06-30",
+  "status": "verified_opened_in_codex_in_app_browser",
+  "notes": [
+    "Links were collected from the visible PartSouq Nissan genuine catalog locate page.",
+    "This file is a navigation source index only. It is not a complete EPC extraction.",
+    "Catalog completeness still requires per-market model selection, per-vehicle catalog extraction, and plate-level validation."
+  ],
+  "markets": [
+    {
+      "market": "Australia (RHD)",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Australia+%28RHD%29&ssd=%24%2AKwGp8PqQqgAAAABYM_9R%24"
+    },
+    {
+      "market": "Canada",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Canada&ssd=%24%2AKwGYwcuhmAAAAAA7h7kA%24"
+    },
+    {
+      "market": "Europe (LHD)",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Europe+%28LHD%29&ssd=%24%2AKwH6o6nD-wAAAABii6AB%24"
+    },
+    {
+      "market": "Europe (RHD)",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Europe+%28RHD%29&ssd=%24%2AKwFYAQthXgAAAABlmHGN%24"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=General%2FAsia+%28LHD%29&ssd=%24%2AKwFRCAJoVgAAAADIWDbz%24"
+    },
+    {
+      "market": "General/Asia (RHD)",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=General%2FAsia+%28RHD%29&ssd=%24%2AKwHKk5nzzgAAAAA_Pk_g%24"
+    },
+    {
+      "market": "Japan",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Japan&ssd=%24%2AKwGt9P6UqAAAAABaOmTy%24"
+    },
+    {
+      "market": "USA",
+      "url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=USA&ssd=%24%2AKwFcBQ9lVgAAAACHRAMw%24"
+    }
+  ]
+}

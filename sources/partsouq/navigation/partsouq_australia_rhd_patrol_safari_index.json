@@ -1,0 +1,42 @@
+{
+  "captured_at": "2026-06-29T23:04:41.568Z",
+  "market": "Australia (RHD)",
+  "rows": [
+    {
+      "cells": [
+        "SAFARI",
+        "WAGON 2 ROW",
+        "VK56VD",
+        "UPPER",
+        "Australia (RHD)",
+        "Y62",
+        "11.2012",
+        "07.2013"
+      ],
+      "detected_generation": "Y62",
+      "market": "Australia (RHD)",
+      "raw_text": "SAFARI | WAGON 2 ROW | VK56VD | UPPER | Australia (RHD) | Y62 | 11.2012 | 07.2013",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEKPi8yC29HWm5-TW8vPlJGZmF_DgEMDR8wA0tNfmp2cnBzNiENZ0lNSXhud2YgPTcKA21-fnhsdR8ZGlx5RR1dWBwGQTRRCWYMbXduHBBBTUFnb3UKDm96Hk1PUQtmf2h8GxIcQ1ssbWluemobEhxDWiwPeGodZRUeHggbUQIZHG95a39xQ0NTGlRNHQIZHGVXXVEUGRxaXk8cBkFdXxgbU01RXRwGQU0yahtDAAAAACkYIUM%3D%24&vid=189494&q=",
+      "vid": "189494"
+    },
+    {
+      "cells": [
+        "SAFARI",
+        "WAGON 2 ROW",
+        "VK56VD",
+        "BASE",
+        "Australia (RHD)",
+        "Y62",
+        "11.2012",
+        "07.2013"
+      ],
+      "detected_generation": "Y62",
+      "market": "Australia (RHD)",
+      "raw_text": "SAFARI | WAGON 2 ROW | VK56VD | BASE | Australia (RHD) | Y62 | 11.2012 | 07.2013",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFoXE1HYi8ObDk2DzN1XDAkBAMdbGNub31SYSkvHAgUEBIRVENvBSsvKxoMFQRCX1VoYQ8cHBoOF317eD4bJ38_On5kI1YzawRuDxUMfnIjLyMFDRdobA0YfC8tM2kEHQoeeXB-ITlOGBoPGHh3fHw2UiYbD34Adnt-N3cvK3p5DBwIGhF8Ly0zNyh-Z3p5BWgxLz16eTk7LHlmfjIhMXg2LjQ-eWZ-IUxDeCYAAAAA9jVKPg%3D%3D%24&vid=189480&q=",
+      "vid": "189480"
+    }
+  ],
+  "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Australia+%28RHD%29&ssd=%24%2AKwGp8PqQqgAAAABYM_9R%24",
+  "title": "Australia (RHD) | Nissan Parts Catalogs | PartSouq"
+}

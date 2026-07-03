@@ -1,0 +1,651 @@
+{
+  "source": "PartSouq Nissan market pick pages",
+  "captured_at": "2026-06-30T00:15:52.834Z",
+  "scope": [
+    "PRE_Y60",
+    "Y60",
+    "Y61",
+    "Y62",
+    "Y63"
+  ],
+  "markets": [
+    {
+      "market": "Australia (RHD)",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Australia+%28RHD%29&ssd=%24%2AKwGp8PqQqgAAAABYM_9R%24",
+      "title": "Australia (RHD) | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 107,
+      "matching_rows": 2
+    },
+    {
+      "market": "Canada",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Canada&ssd=%24%2AKwGYwcuhmAAAAAA7h7kA%24",
+      "title": "Canada | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 107,
+      "matching_rows": 3
+    },
+    {
+      "market": "Europe (LHD)",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Europe+%28LHD%29&ssd=%24%2AKwH6o6nD-wAAAABii6AB%24",
+      "title": "Europe (LHD) | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 107,
+      "matching_rows": 3
+    },
+    {
+      "market": "Europe (RHD)",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Europe+%28RHD%29&ssd=%24%2AKwFYAQthXgAAAABlmHGN%24",
+      "title": "Europe (RHD) | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 106,
+      "matching_rows": 0
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=General%2FAsia+%28LHD%29&ssd=%24%2AKwFRCAJoVgAAAADIWDbz%24",
+      "title": "General/Asia (LHD) | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 109,
+      "matching_rows": 23
+    },
+    {
+      "market": "General/Asia (RHD)",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=General%2FAsia+%28RHD%29&ssd=%24%2AKwHKk5nzzgAAAAA_Pk_g%24",
+      "title": "General/Asia (RHD) | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 108,
+      "matching_rows": 1
+    },
+    {
+      "market": "Japan",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Japan&ssd=%24%2AKwGt9P6UqAAAAABaOmTy%24",
+      "title": "Japan | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 105,
+      "matching_rows": 0
+    },
+    {
+      "market": "USA",
+      "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=USA&ssd=%24%2AKwFcBQ9lVgAAAACHRAMw%24",
+      "title": "USA | Nissan Parts Catalogs | PartSouq",
+      "total_rows": 106,
+      "matching_rows": 0
+    }
+  ],
+  "rows": [
+    {
+      "market": "Australia (RHD)",
+      "cells": [
+        "SAFARI",
+        "WAGON 2 ROW",
+        "VK56VD",
+        "UPPER",
+        "Australia (RHD)",
+        "Y62",
+        "11.2012",
+        "07.2013",
+        ""
+      ],
+      "raw_text": "SAFARI | WAGON 2 ROW | VK56VD | UPPER | Australia (RHD) | Y62 | 11.2012 | 07.2013 | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEKPi8yC29HWm5-TW8vPlJGZmF_DgEMDR8wA0tNfmp2cnBzNiENZ0lNSXhud2YgPTcKA21-fnhsdR8ZGlx5RR1dWBwGQTRRCWYMbXduHBBBTUFnb3UKDm96Hk1PUQtmf2h8GxIcQ1ssbWluemobEhxDWiwPeGodZRUeHggbUQIZHG95a39xQ0NTGlRNHQIZHGVXXVEUGRxaXk8cBkFdXxgbU01RXRwGQU0yahtDAAAAACkYIUM%3D%24&vid=189494&q=",
+      "vid": "189494"
+    },
+    {
+      "market": "Australia (RHD)",
+      "cells": [
+        "SAFARI",
+        "WAGON 2 ROW",
+        "VK56VD",
+        "BASE",
+        "Australia (RHD)",
+        "Y62",
+        "11.2012",
+        "07.2013",
+        ""
+      ],
+      "raw_text": "SAFARI | WAGON 2 ROW | VK56VD | BASE | Australia (RHD) | Y62 | 11.2012 | 07.2013 | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFoXE1HYi8ObDk2DzN1XDAkBAMdbGNub31SYSkvHAgUEBIRVENvBSsvKxoMFQRCX1VoYQ8cHBoOF317eD4bJ38_On5kI1YzawRuDxUMfnIjLyMFDRdobA0YfC8tM2kEHQoeeXB-ITlOGBoPGHh3fHw2UiYbD34Adnt-N3cvK3p5DBwIGhF8Ly0zNyh-Z3p5BWgxLz16eTk7LHlmfjIhMXg2LjQ-eWZ-IUxDeCYAAAAA9jVKPg%3D%3D%24&vid=189480&q=",
+      "vid": "189480"
+    },
+    {
+      "market": "Canada",
+      "cells": [
+        "ARMADA",
+        "WAGON 3 ROW",
+        "VK56VD",
+        "SL",
+        "Canada",
+        "Y62",
+        "06.2016",
+        "WHEEL DRIVE:4WD",
+        ""
+      ],
+      "raw_text": "ARMADA | WAGON 3 ROW | VK56VD | SL | Canada | Y62 | 06.2016 | WHEEL DRIVE:4WD | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFHc2JLNCMxNQ9GJRVEZx8LKywyQ0xBQFJ9TgYAMyc7Pz0-e2xAKgQABDUjOittcHpHTjIgODU3MFJUVxE0CFAQFVFLDHkcRCtAIDojUV0MAAwqIjhHQyI3UwACHEYrMiUxVl9RDhZhJjhRXlVWRi4bY2pXKV9SVx0HUxYCHCU1ITM4Vl9RDk9NV05TUCxCQVMAAhwQEgVQT1RAXQwAUwcdF1BPVFEybQBDAAAAAKf405g%3D%24&vid=190748&q=",
+      "vid": "190748"
+    },
+    {
+      "market": "Canada",
+      "cells": [
+        "ARMADA",
+        "WAGON 3 ROW",
+        "VK56VD",
+        "PLATINUM CP GRADE",
+        "Canada",
+        "Y62",
+        "06.2016",
+        "WHEEL DRIVE:4WD",
+        ""
+      ],
+      "raw_text": "ARMADA | WAGON 3 ROW | VK56VD | PLATINUM CP GRADE | Canada | Y62 | 06.2016 | WHEEL DRIVE:4WD | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGEsKGY_Obx8_70hsSkjtzI6O_xgI-Cg5G-jcXD8OT4_P79uK-D6cfDx_bg-eius7mEjfHj-_b085GXlNL3y5PT1pKIz7rfh-iD4_ngkp7Pw8_p4fuEgOH0kMPB34Xo8ebylZySzdWi5vvk8uaVnJLN1KKB9uST65uQkIaV34yXkuH35fH_zc3dlNrDk4yXkuvZ09-al5LU0MGSiM_T0ZaV3cPf05KIz8O-95XNAAAAAJTXXig%3D%24&vid=190742&q=",
+      "vid": "190742"
+    },
+    {
+      "market": "Canada",
+      "cells": [
+        "ARMADA",
+        "WAGON 3 ROW",
+        "VK56VD",
+        "PLATINUM GRADE",
+        "Canada",
+        "Y62",
+        "06.2016",
+        "WHEEL DRIVE:4WD",
+        ""
+      ],
+      "raw_text": "ARMADA | WAGON 3 ROW | VK56VD | PLATINUM GRADE | Canada | Y62 | 06.2016 | WHEEL DRIVE:4WD | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwH6zt-u_KqJlbiAiqbp7KK2lpGP_vH8_e_A87u9jpqGgoCDxtH9l7m9uYieh5bQzcf684-dhYiKje_p6qyJte2tqOz2scSh-Zb9nYee7OCxvbGXn4X6_p-K7r2_ofuWj5iM6-Lss6vcmIWa7eTp7PnOqMKc65Pj6OunuLOlo-qZj52JhOzgsb3uu-v07-qQ-P6zs6PqrKi56vPu_b2_oaW7p6vq8-7u0t6htQAAAACxsCLA%24&vid=190740&q=",
+      "vid": "190740"
+    },
+    {
+      "market": "Europe (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "SE",
+        "Europe (LHD)",
+        "Y62",
+        "11.2014",
+        "WHEEL DRIVE:4WD; AREA:RUSSIA",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | SE | Europe (LHD) | Y62 | 11.2014 | WHEEL DRIVE:4WD; AREA:RUSSIA | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFtWUgnKDc6CDM4DxJwbzUhAQYYaWZranhXZCwqGQ0RFRcUUUZqAC4qLh8JEAFHWlBtZAkZCwwWF3h-fTseIno6P3thJlM2bgFrChAJe3cmKiYACBJtaQgdeSooNmwBGA8bfHV7JDxLDQsKenN-e25ZW1F9cnl6aQFuGlIqSXN-ezErfGN7JFhVDR8UenN-ezZ1Ki5_fABubXx1eyRtcil8Y3htcnl5a3p9O3xjeH0bFXl7AAAAAK7b3PM%3D%24&vid=189493&q=",
+      "vid": "189493"
+    },
+    {
+      "market": "Europe (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "LE",
+        "Europe (LHD)",
+        "Y62",
+        "03.2010",
+        "10.2012",
+        "WHEEL DRIVE:4WD; AREA:RUSSIA",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | LE | Europe (LHD) | Y62 | 03.2010 | 10.2012 | WHEEL DRIVE:4WD; AREA:RUSSIA | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGFsaCXhc6A5NDX3fWF0N3J6e7wgY6DgpC_jMTC8eX5_f_8ua6C6MbCxvfh-OmvsriFjOHx4-T-_5CWldP2ypLS15OJzrvehumD4vjhk5_Ows7o4PqFgeD1kcLA3oTp8OfzlJ2TzNSj5ePikpuWk4axrLmVmpGSgemG8rrCoZuWk9nDlIuTzLC95ff8kpuWk96dwsaXlOiGhZSdk8yFmsGUi5CGmpGRg5KV05SLkJXz_ZGTAAAAAJ2CEbo%3D%24&vid=189492&q=",
+      "vid": "189492"
+    },
+    {
+      "market": "Europe (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "SE",
+        "Europe (LHD)",
+        "Y62",
+        "10.2013",
+        "11.2014",
+        "WHEEL DRIVE:4WD",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | SE | Europe (LHD) | Y62 | 10.2013 | 11.2014 | WHEEL DRIVE:4WD | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFfa3p_XDMRK1wZAw17VQcTMzQqW1RZWEplVh4YKz8jJyUmY3RYMhwYHC07IjN1aGJfVjsrOT4kJUpMTwksEEgIDUlTFGEEXDNZOCI7SUUUGBQyOiBfWzovSxgaBF4zKj0pTkdJFg95PilJRk1OXTYDe3JPMUdKTwUfSw4aBD0tOSsgTkdJFldVT1ZLSDRaWUsYGgQICh1IV0xZRRQYSx8FD0hXTEkseBhbAAAAALYrM-0%3D%24&vid=189495&q=",
+      "vid": "189495"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "SE",
+        "General/Asia (LHD)",
+        "Y62",
+        "01.2010",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "5AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | SE | General/Asia (LHD) | Y62 | 01.2010 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 5AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEHMyIafwYFd2VxfAYcUl9La2xyAwwBABI9DkZAc2d7f31-OywAakRARHVjemstMDoHDmNzYWZ8fRIUF1F0SBBQVRELTDlcBGsBYHpjER1MQExqYngHA3B2E0BCXAZrcmVxFh8RTlYhcndwEBkUEQQzMTsXGBMQA2sGcDhAIxkUEVtBFgkRTjI_Z3V-EBkUEVwfQEQVFmoEBxYfEU4HGEMWCRIHGBMTARAXURYJEhdzfxMRAAAAAHBXx2o%3D%24&vid=189471&q=",
+      "vid": "189471"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "SE",
+        "General/Asia (LHD)",
+        "Y62",
+        "01.2010",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | SE | General/Asia (LHD) | Y62 | 01.2010 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFKfm9kGSEEKCIaOwtvSBIGJiE_TkFMTV9wQwsNPio2MjAzdmFNJwkNCTguNyZgfXdKQy4-LCsxMF9ZWhw5BV0dGFxGAXQRSSZMLTcuXFABDQEnLzVKTi86Xg0PEUsmPyg8W1JcAxtsPzo9XVRZXEl-fHZaVV5dTiZJPXUNblRZXBYMW0RcA39yKjgzXVRZXBFSDQlYWydJSltSXANKVQ5bRF9JVV5eTF1aHFtEX1o-Ml5cAAAAADq4UKg%3D%24&vid=189487&q=",
+      "vid": "189487"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "LE",
+        "General/Asia (LHD)",
+        "Y62",
+        "01.2010",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | LE | General/Asia (LHD) | Y62 | 01.2010 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEOOiscXkpISQ4Lfm0WMlZCYmV7CgUICRs0B09Jem5ydnR3MiUJY01JTXxqc2IkOTMOB2p6aG91dBsdHlh9QRlZXBgCRTBVDWIIaXNqGBRFSUVja3EOCmt-GklLVQ9ie2x4HxYYR18oe355GRAdGA06JzIeERoZCmINeTFJKhAdGFJIHwAYRzs2bnx3GRAdGFUWSU0cH2MNDh8WGEcOEUofABsIERoaCBkeWB8AGx56dhoYAAAAAJ-Mv4Q%3D%24&vid=189482&q=",
+      "vid": "189482"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "SE",
+        "General/Asia (LHD)",
+        "Y62",
+        "01.2010",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        "5AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | SE | General/Asia (LHD) | Y62 | 01.2010 | WHEEL DRIVE:4WD; AREA:GOM | 5AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFzR1YnBREiEQMRJQFHRys_HxgGd3h1dGZJejI0BxMPCwkKT1h0HjA0MAEXDh9ZRE5zehcHFRIICWZgYyUAPGQkIWV_OE0ocB91FA4XZWk4NDgeFgxzdwQCZzQ2KHIfBhEFYmtlOiJVBg8KZG1gZXBHRU9jbGdkdx9yBEw0V21gZS81Yn1lOkZLEwEKZG1gZShrNDBhYh5wc2JrZTpzbDdifWZybGdndWRjJWJ9ZmMHC2dlAAAAAIiKgsc%3D%24&vid=189476&q=",
+      "vid": "189476"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "SE",
+        "General/Asia (LHD)",
+        "Y62",
+        "06.2011",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "6MT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | SE | General/Asia (LHD) | Y62 | 06.2011 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 6MT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHM-OnjtZigjK-wm63G4JSAoKe5yMfKy9n2xY2LuKywtLa18OfLoY-Lj76osaDm-_HMxai4qq23ttnf3Jq_g9ubntrAh_KXz6DKq7Go2taHi4ehqbPMyLu92IuJl82gua663dTahZ3quby729Lf2s_4-vDc09jbyKDOt_OL6NLf2pCK3cLahfn0rL6129Lf2pfUi4_e3aHPzN3U2oXM04jdwtnG09jYytvcmt3C2dy4tNjaAAAAAARawI8%3D%24&vid=189472&q=",
+      "vid": "189472"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "XE",
+        "General/Asia (LHD)",
+        "Y62",
+        "06.2011",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "6MT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | XE | General/Asia (LHD) | Y62 | 06.2011 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 6MT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFiVkcqFD8HYTsFNDskTjouDgkXZmlkZXdYayMlFgIeGhgbXkllDyElIRAGHw5IVV9iawYWBAMZGHdxcjQRLXU1MHRuKVw5YQ5kBR8GdHgpJSkPBx1iZhUTdiUnOWMOFwAUc3p0KzNEFxIVdXxxdGFWX15yfXZ1Zg5gGV0lRnxxdD4kc2x0K1daAhAbdXxxdDl6JSFwcw9hYnN6dCtifSZzbHdnfXZ2ZHVyNHNsd3IWGnZ0AAAAAFNnQls%3D%24&vid=189474&q=",
+      "vid": "189474"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "PREMIUM",
+        "General/Asia (LHD)",
+        "Y62",
+        "09.2012",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | PREMIUM | General/Asia (LHD) | Y62 | 09.2012 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEhFQQfeEpRXVthLSMyDXltTUpUJSonJjQbKGBmVUFdWVtYHQomTGJmYlNFXE0LFhwhKEVVR0BaWzQyMXdSbjZ2czctah96Ik0nRlxFNztqZmpMRF4hJURRNWZkeiBNVENXMDk3aHAHVFFWNj8yNyIVFApWX1xBXjA5N2hyByRTQTZOPjU1IzB6KTI3RFJAVFpoaHgxf2Y2KTI3Tnx2ej8yN3F1ZDctanVuPzI3eWF7cTVwZHpUXjdpAAAAANLWD0w%3D%24&vid=189485&q=",
+      "vid": "189485"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "LE",
+        "General/Asia (LHD)",
+        "Y62",
+        "09.2012",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "5AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | LE | General/Asia (LHD) | Y62 | 09.2012 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 5AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGiloe28eTYpKPkydabtPruzsnXpqmkpbeYq-Pl1sLe2tjbnomlz-Hl4dDG386IlZ-iq8bWxMPZ2LexsvTR7bX18LSu6Zz5oc6kxd_GtLjp5enPx92iptXTtuXn-aPO18DUs7q06_OE19LVtbyxtKGWi56yvba1ps6j1Z3lhryxtP7ks6y065eawtDbtbyxtPm65eGws8-horO6tOuiveazrLehpbq066qp-fW0rbCz0djrugAAAACbTGQ8%24&vid=189467&q=",
+      "vid": "189467"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "XE",
+        "General/Asia (LHD)",
+        "Y62",
+        "09.2012",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        "6MT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | XE | General/Asia (LHD) | Y62 | 09.2012 | WHEEL DRIVE:4WD; AREA:GOM | 6MT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwECNidDAHpHXkp5fnA5KlpObml3BgkEBRc4C0NFdmJ-enh7PikFb0FFQXBmf24oNT8CC2Z2ZGN5eBcRElRxTRVVUBQOSTxZAW4EZX9mFBhJRUlvZ30CBnVzFkVHWQNud2B0ExoUS1Mkd357FRwRFAE2Pz4SHRYVBm4AeT1FJhwRFF5EEwwUSzc6YnB7FRwRFFkaRUEQE28BAhMaFEsCHUYTDBcBAxoUSwoJWVUUDRATcXhLGgAAAAAvbxbF%24&vid=189479&q=",
+      "vid": "189479"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "XE",
+        "General/Asia (LHD)",
+        "Y62",
+        "09.2012",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        "5AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | XE | General/Asia (LHD) | Y62 | 09.2012 | WHEEL DRIVE:4WD; AREA:GOM | 5AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFkUEFYIzgFPyAnaDo_MTwoCA8RYG9iY3FebSUjEAQYHB4dWE9jCScjJxYAGQhOU1lkbQAQAgUfHnF3dDIXK3MzNnJoL1o_ZwhiAxkAcn4vIy8JARtkYBMVcCMhP2UIEQYSdXxyLTVCERgdc3p3cmdQWVh0e3BzYAhlE1sjQHp3cjgidWpyLVFcBBYdc3p3cj98Iyd2dQlnZHV8ci1keyB1anFnZnxyLWxvPzNya3Z1Fx4tfAAAAAANZvIi%24&vid=189478&q=",
+      "vid": "189478"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "SE",
+        "General/Asia (LHD)",
+        "Y62",
+        "09.2012",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | SE | General/Asia (LHD) | Y62 | 09.2012 | WHEEL DRIVE:4WD; AREA:GOM | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFDd2ZrCRkhIBVHGkVnEhsPLyg2R0hFRFZ5SgIENyM_Ozk6f2hELgAEADEnPi9pdH5DSic3JSI4OVZQUxUwDFQUEVVPCH0YQC9FJD4nVVkIBAguJjxDRyYzVwQGGEIvNiE1UltVChJlNj86VF1QVUB3dX9TXFdURy9ANHwEZ11QVR8FUk1VCnZ7IzE6VF1QVRhbBABRUi5AQ1JbVQpDXAdSTVZAQ1tVCktIGBRVTFFSMDkKWwAAAAClKUrH%24&vid=189490&q=",
+      "vid": "189490"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "PREMIUM C GRADE",
+        "General/Asia (LHD)",
+        "Y62",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | PREMIUM C GRADE | General/Asia (LHD) | Y62 | 10.2013 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHr387wrL23iJWzloXK5bOnh4Ce7-Dt7P7R4qqsn4uXk5GS18DshqisqJmPlofB3Nbr4o-fjYqQkf74-72YpPy8uf3noNWw6IftjJaP_fGgrKCGjpTr746b_6yusOqHnomd-vP9orrNnpuc_PX4_ejf3sD2m_3y-frpgrfPxvuF8_77sav_uq6wiZmNn5T68_2i4-H74v_8gO7t_6yusLy-qfzj-O3srK6wtKq2uvvi___HwrCkAAAAAKQ4fMA%3D%24&vid=189483&q=",
+      "vid": "189483"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "PREMIUM C GRADE",
+        "General/Asia (LHD)",
+        "Y62",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "5AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | PREMIUM C GRADE | General/Asia (LHD) | Y62 | 10.2013 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 5AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFHc2JUJBMEXzsWERN_bx8LKywyQ0xBQFJ9TgYAMyc7Pz0-e2xAKgQABDUjOittcHpHTiMzISY8PVJUVxE0CFAQFVFLDHkcRCtBIDojUV0MAAwqIjhHQzA2UwACHEYrMiUxVl9RDhZhMjcwUFlUUURzcmxaN1FeVVZFLhljalcpX1JXHQdTFgIcJTUhMzhWX1EOT01XTlNQLEJBUwACHBASBVBPVEFDAAIcGAYaFldOU1NrbhwIAAAAAH1Rncc%3D%24&vid=189469&q=",
+      "vid": "189469"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "PREMIUM M GRADE",
+        "General/Asia (LHD)",
+        "Y62",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | PREMIUM M GRADE | General/Asia (LHD) | Y62 | 10.2013 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFBdWRAOD9YHhBHOCJIYRkNLSo0RUpHRlR7SAAGNSE9OTs4fWpGLAIGAjMlPC1rdnxBSCU1JyA6O1RSURcyDlYWE1dNCn8aQi1HJjwlV1sKBgosJD5BRSQxVQYEGkAtNCM3UFlXCBBnNDE2Vl9SV0J1dGpcP1dYU1BDKB1lbFEvWVRRGwFVEAQaIzMnNT5QWVcISUtRSFVWKkRHVQYEGhYUA1ZJUkdEBgQaHgAcEFFIVVVtaBoOAAAAAG5jIxI%3D%24&vid=189484&q=",
+      "vid": "189484"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "XE",
+        "General/Asia (LHD)",
+        "Y62",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "5AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | XE | General/Asia (LHD) | Y62 | 10.2013 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 5AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGQpLW518bHx9DI5pOtvMjc_PvllJuWl4WqmdHX5PDs6OrprLuX_dPX0-L07fy6p62QmfTk9vHr6oWDgMbj34fHwoac267Lk_yW9-30horb19v99e-QlOfhhNfVy5H85fLmgYiG2cG25eDnh46DhpOkrayAj4SHlPyR56_XtI6DhszWgZ6G2aWo8OLph46DhsuI19OCgf2TkIGIhtmQj9SBnoWTm4iG2Ziby8eGn4KB4-rZiAAAAAD5vkgE%24&vid=189473&q=",
+      "vid": "189473"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "PREMIUM",
+        "General/Asia (LHD)",
+        "Y62",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        "5AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | PREMIUM | General/Asia (LHD) | Y62 | 10.2013 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | 5AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwESJjdbF0IeZHR7SVE3EEpefnlnFhkUFQcoG1NVZnJuamhrLjkVf1FVUWB2b344JS8SG3ZmdHNpaAcBAkRhXQVFQAQeWSxJEX4UdW92BAhZVVl_d20SFmVjBlVXSRN-Z3BkAwoEW0M0Z2JlBQwBBBEmJzllbG9ybQMKBFtBNBVgcgV9DQYGEANJGgEEd2FzZ2lbW0sCTFUFGgEEfU9FSQwBBEJGVwQeWUVbDAEESlJIQgZDV0lnbQRaAAAAAKenO38%3D%24&vid=189470&q=",
+      "vid": "189470"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "UPPER",
+        "General/Asia (LHD)",
+        "Y62",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:PRC",
+        "7AT",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | UPPER | General/Asia (LHD) | Y62 | 10.2013 | WHEEL DRIVE:4WD; AREA:PRC | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGsmIm7q9zUyMnP_s-AhPTgwMfZqKeqq7mWpe3r2MzQ1NbVkIerwe_r797I0cCGm5GspcjYys3X1rm_vPrf47v7_rqg55L3r8Cqy9HIurbn6-fBydOsqMncuOvp963A2c7avbS65f2Kzs3bu7K_uq-YnIXO2sq7sr-6rJj-lMq9xbW-vfHu5fP1vM_Zy9_Surbn67jtvaK5vMauqOXl9bz6_u-8pbir_uX1vPLq8Pq9orrljpm84gAAAACluTyF%24&vid=189491&q=",
+      "vid": "189491"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "PREMIUM",
+        "General/Asia (LHD)",
+        "Y62",
+        "01.2010",
+        "06.2011",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | PREMIUM | General/Asia (LHD) | Y62 | 01.2010 | 06.2011 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFabn9tXlk4CBs9CAlXSAIWNjEvXlFcXU9gUxsdLjomIiAjZnFdNxkdGSg-JzZwbWdaUz4uPDshIE9JSgwpFU0NCExWEWQBWTZcPSc-TEARHRE3PyVaXj8qTh0fAVs2LzgsS0JMEwt8LyotTURJTFlub3EtJCc6JUtCTBMJfF8oOk01RU5OWEsBUklMPyk7LyETEwNKBB1NUklMNQcNAURJTAoOH0xWEQkPSEsDHQENTFYRHWQkSxMAAAAAugJp0A%3D%3D%24&vid=189486&q=",
+      "vid": "189486"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "LE",
+        "General/Asia (LHD)",
+        "Y62",
+        "01.2010",
+        "06.2011",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | LE | General/Asia (LHD) | Y62 | 01.2010 | 06.2011 | WHEEL DRIVE:4WD; AREA:GOM | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFbb350WiAoATMmFxh2ZwMXNzAuX1BdXE5hUhocLzsnIyEiZ3BcNhgcGCk_JjdxbGZbUj8vPTogIU5ISw0oFEwMCU1XEGUAWDddPCY_TUEQHBA2PiRbXywqTxweAFo3LjktSkNNEgp9LiciTEVITVhvcmdLRE9MXzdaLGQcf0VITQcdSlVNEm5jOykiTEVITQBDHBhJSjZYW0pDTRJbRB9KVU5cRE9PXUxLDUpVTksvI09NAAAAAKbC6Sw%3D%24&vid=189475&q=",
+      "vid": "189475"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "SE",
+        "General/Asia (LHD)",
+        "Y62",
+        "06.2011",
+        "09.2012",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | SE | General/Asia (LHD) | Y62 | 06.2011 | 09.2012 | WHEEL DRIVE:4WD; AREA:GOM | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGEsKG53PT5iPzQ59_XitzI6O_xgI-Cg5G-jcXD8OT4_P79uK-D6cfDx_bg-eius7mEjeDw4uX__pGXlNL3y5PT1pKIz7rfh-iC4_ngkp7Pw8_p4fuEgPP1kMPB34Xo8ebylZySzdWi8fj9k5qXkoewsriUm5CTgOiG_7vDoJqXktjClYqSzbG85Pb9k5qXkt-cw8eWlemHhJWcks2Em8CVipGPm5CQgpOU0pWKkZTw_JCSAAAAAD4aPTA%3D%24&vid=189477&q=",
+      "vid": "189477"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "LE",
+        "General/Asia (LHD)",
+        "Y62",
+        "06.2011",
+        "09.2012",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | LE | General/Asia (LHD) | Y62 | 06.2011 | 09.2012 | WHEEL DRIVE:4WD; AREA:GOM | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFoXE0nPy9obDQEGC9KfjAkBAMdbGNub31SYSkvHAgUEBIRVENvBSsvKxoMFQRCX1VoYQwcDgkTEn17eD4bJ38_On5kI1YzawRuDxUMfnIjLyMFDRdobA0YfC8tM2kEHQoeeXB-ITlOHRQRf3Z7fmtcQVR4d3x_bARrH1cvTHZ7fjQueWZ-IV1QCBoRf3Z7fjNwLyt6eQVraHlwfiFodyx5Zn1ra3B-IWBjMz9-Z3p5GxIhcAAAAACcbDRm%24&vid=189488&q=",
+      "vid": "189488"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56VD",
+        "PREMIUM",
+        "General/Asia (LHD)",
+        "Y62",
+        "09.2012",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:GOM",
+        ""
+      ],
+      "raw_text": "PATROL | VK56VD | PREMIUM | General/Asia (LHD) | Y62 | 09.2012 | 10.2013 | WHEEL DRIVE:4WD; AREA:GOM | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFHc2JtGTM1ODo6IBlzex8LKywyQ0xBQFJ9TgYAMyc7Pz0-e2xAKgQABDUjOittcHpHTiMzISY8PVJUVxE0CFAQFVFLDHkcRCtBIDojUV0MAAwqIjhHQyI3UwACHEYrMiUxVl9RDhZhMjs-UFlUUURzcmwwOTonOFZfUQ4UYUI1J1AoWFNTRVYcT1RRIjQmMjwODh5XGQBQT1RRKBoQHFlUURcTAlFLDBMJWVRRHwcdF1MWAhwyOFEPAAAAAJbXj2A%3D%24&vid=189489&q=",
+      "vid": "189489"
+    },
+    {
+      "market": "General/Asia (LHD)",
+      "cells": [
+        "PATROL",
+        "VK56DE",
+        "LE",
+        "General/Asia (LHD)",
+        "Y62",
+        "09.2012",
+        "10.2013",
+        "WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST",
+        ""
+      ],
+      "raw_text": "PATROL | VK56DE | LE | General/Asia (LHD) | Y62 | 09.2012 | 10.2013 | WHEEL DRIVE:4WD; AREA:MIDDLE AND NEAR EAST | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGBtaSXxITMjd_xzNyPodnN7er0hYqHhpS7iMDG9eH9-fv4vaqG7MLGwvPl_O2rtryBiOX15-D6-5SSkdfyzpbW05eNyr_agu2H5vzll5vKxsrs5P6BhfbwlcbE2oDt9OP3kJmXyNCn9PH2lp-Sl4K1qL2RnpWWhe2D-r7GpZ-Sl93HkI-XyLS54fP4lp-Sl9qZxsKTkOyCgZCZl8iBnsWQj5SCh5mXyImK2taXjpOQ8vvImQAAAAB5NTBs%24&vid=189468&q=",
+      "vid": "189468"
+    },
+    {
+      "market": "General/Asia (RHD)",
+      "cells": [
+        "SAFARI",
+        "VK56VD",
+        "BASE",
+        "General/Asia (RHD)",
+        "Y62",
+        "11.2012",
+        "WHEEL DRIVE:4WD",
+        "7AT",
+        ""
+      ],
+      "raw_text": "SAFARI | VK56VD | BASE | General/Asia (RHD) | Y62 | 11.2012 | WHEEL DRIVE:4WD | 7AT | ",
+      "detected_generation": "Y62",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFzR1ZwJAYKMhsVfwJrVys_HxgGd3h1dGZJejI0BxMPCwkKT1h0HjA0MAEXDh9ZRE5zehQHBwEVDGZgYyUAPGQkIWV_OE0ocB91FA4XZWk4NDgeFgxzdxYDZzQ2KHIfBhEFYmtlOiJVAwEUA2NsZ2ctST0AFGUbbWBlLGw0MGFiFwcTAQpnNDYoLDNlfGFiHnMqNCZhYiIgN2J9ZSk6KmMtNS8lYn1lOlFYYz0AAAAA19aHiw%3D%3D%24&vid=189481&q=",
+      "vid": "189481"
+    }
+  ],
+  "notes": [
+    "Read-only collection from visible PartSouq pick pages. Detail EPC plate extraction still must be performed per vehicle URL.",
+    "No fabricated part numbers or diagrams. Missing rows are Verification Required."
+  ]
+}

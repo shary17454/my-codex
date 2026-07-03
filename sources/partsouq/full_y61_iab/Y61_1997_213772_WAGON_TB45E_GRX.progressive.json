@@ -1,0 +1,53 @@
+{
+  "extract_id": "Y61_1997_213772",
+  "detected_generation": "Y61",
+  "source_row": {
+    "﻿market": "General/Asia (LHD)",
+    "model_filter": "SAFARI",
+    "year_filter": "1997",
+    "detected_generation": "Y61",
+    "year_applicability_status": "applies",
+    "vid": "213772",
+    "raw_text": "SAFARI | WAGON | TB45E | GRX | General/Asia (LHD) | Y61 | 08.1997 | 05.2001 | ",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFrX05RFjsTPQkvZnBiTzMnBwAeb2BtbH5RYiosHwsXExESV0BsBigsKBkPFgdBXFZrYgwfHxkNFH54ez0YJHw8OX1nIFUwaAcIfHV4fW9fWlBtbRp8dXh9bl9DV3t0f3xtB2wOL10wdXh9awYfDQUiIjJ7bgATDXoCcSAsey16ZX57CB4PQUMwdXh9Myp6ZX0iVyRoenN-ez05KyI0Mmhtc357NS00ZCwoeXoYEnslAAAAAE9RIT4%3D%24&vid=213772&q=",
+    "source_file": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\navigation\\patrol_general_asia_lhd_incremental_discovery.json"
+  },
+  "category": {
+    "extract_id": "Y61_1997_213772",
+    "detected_generation": "Y61",
+    "year": "1997",
+    "market": "",
+    "model_filter": "SAFARI",
+    "year_filter": "1997",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFrX05RFjsTPQkvZnBiTzMnBwAeb2BtbH5RYiosHwsXExESV0BsBigsKBkPFgdBXFZrYgwfHxkNFH54ez0YJHw8OX1nIFUwaAcIfHV4fW9fWlBtbRp8dXh9bl9DV3t0f3xtB2wOL10wdXh9awYfDQUiIjJ7bgATDXoCcSAsey16ZX57CB4PQUMwdXh9Myp6ZX0iVyRoenN-ez05KyI0Mmhtc357NS00ZCwoeXoYEnslAAAAAE9RIT4%3D%24&vid=213772&q=",
+    "vid": "213772",
+    "raw_text": "SAFARI | WAGON | TB45E | GRX | General/Asia (LHD) | Y61 | 08.1997 | 05.2001 | ",
+    "cells": [
+      "SAFARI",
+      "WAGON",
+      "TB45E",
+      "GRX",
+      "General/Asia (LHD)",
+      "Y61",
+      "08.1997",
+      "05.2001"
+    ],
+    "body_style": "WAGON",
+    "engine": "TB45E",
+    "grade_or_frame": "GRX",
+    "production_from": "08.1997",
+    "production_to": "05.2001"
+  },
+  "started_at": "2026-07-03T06:06:35.892Z",
+  "source_vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFrX05RFjsTPQkvZnBiTzMnBwAeb2BtbH5RYiosHwsXExESV0BsBigsKBkPFgdBXFZrYgwfHxkNFH54ez0YJHw8OX1nIFUwaAcIfHV4fW9fWlBtbRp8dXh9bl9DV3t0f3xtB2wOL10wdXh9awYfDQUiIjJ7bgATDXoCcSAsey16ZX57CB4PQUMwdXh9Myp6ZX0iVyRoenN-ez05KyI0Mmhtc357NS00ZCwoeXoYEnslAAAAAE9RIT4%3D%24&vid=213772&q=",
+  "vehicle_page": {
+    "title": "Just a moment...",
+    "url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24*KwFrX05RFjsTPQkvZnBiTzMnBwAeb2BtbH5RYiosHwsXExESV0BsBigsKBkPFgdBXFZrYgwfHxkNFH54ez0YJHw8OX1nIFUwaAcIfHV4fW9fWlBtbRp8dXh9bl9DV3t0f3xtB2wOL10wdXh9awYfDQUiIjJ7bgATDXoCcSAsey16ZX57CB4PQUMwdXh9Myp6ZX0iVyRoenN-ez05KyI0Mmhtc357NS00ZCwoeXoYEnslAAAAAE9RIT4%3D%24&vid=213772&q=&__cf_chl_rt_tk=PcVSXZKvH9RRBl6HEaH43pJ9bFiceamawBxzFtNmtfQ-1783058798-1.0.1.1-0Gnl1SSxF4fkiyVyRqGyraGZbaopyqQzxrnhmx32LJg"
+  },
+  "discovered_units": [],
+  "units": [],
+  "failures": [],
+  "group_failures": [],
+  "discovery_complete": true,
+  "complete": false
+}

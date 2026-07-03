@@ -1,0 +1,383 @@
+{
+  "output_dir": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named",
+  "files": 42,
+  "results": [
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201206_General_Asia_LHD_HIGH_ROOF_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201206_General_Asia_LHD_HIGH_ROOF_TB42S_STD.pdf",
+      "plates": 213,
+      "parts": 5307,
+      "diagrams": 213,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201207_General_Asia_LHD_HIGH_ROOF_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201207_General_Asia_LHD_HIGH_ROOF_TB42S_STD.pdf",
+      "plates": 261,
+      "parts": 9531,
+      "diagrams": 261,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201209_General_Asia_LHD_HIGH_ROOF_TD42_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201209_General_Asia_LHD_HIGH_ROOF_TD42_STD.pdf",
+      "plates": 258,
+      "parts": 6770,
+      "diagrams": 257,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf",
+      "plates": 232,
+      "parts": 8076,
+      "diagrams": 226,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf",
+      "plates": 216,
+      "parts": 8680,
+      "diagrams": 206,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf",
+      "plates": 227,
+      "parts": 7900,
+      "diagrams": 227,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf",
+      "plates": 253,
+      "parts": 8463,
+      "diagrams": 253,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf",
+      "plates": 55,
+      "parts": 1726,
+      "diagrams": 55,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf",
+      "plates": 255,
+      "parts": 6745,
+      "diagrams": 253,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.pdf",
+      "plates": 261,
+      "parts": 11130,
+      "diagrams": 257,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201356_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201356_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf",
+      "plates": 70,
+      "parts": 2306,
+      "diagrams": 70,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_201358_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_201358_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf",
+      "plates": 264,
+      "parts": 7124,
+      "diagrams": 264,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.pdf",
+      "plates": 251,
+      "parts": 8434,
+      "diagrams": 251,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.pdf",
+      "plates": 250,
+      "parts": 9947,
+      "diagrams": 250,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.pdf",
+      "plates": 259,
+      "parts": 8004,
+      "diagrams": 259,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.pdf",
+      "plates": 261,
+      "parts": 6971,
+      "diagrams": 261,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.pdf",
+      "plates": 276,
+      "parts": 10299,
+      "diagrams": 276,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.pdf",
+      "plates": 259,
+      "parts": 7490,
+      "diagrams": 259,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.pdf",
+      "plates": 270,
+      "parts": 11018,
+      "diagrams": 263,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.pdf",
+      "plates": 240,
+      "parts": 5820,
+      "diagrams": 223,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_209840_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_209840_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf",
+      "plates": 242,
+      "parts": 5841,
+      "diagrams": 242,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_209843_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_209843_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf",
+      "plates": 241,
+      "parts": 5902,
+      "diagrams": 241,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_209846_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_209846_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf",
+      "plates": 253,
+      "parts": 6635,
+      "diagrams": 253,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_all_iab\\Y60_1988_209849_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1988_Y60_1988_209849_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf",
+      "plates": 242,
+      "parts": 7048,
+      "diagrams": 242,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y61_iab\\Y61_1997_213768_General_Asia_LHD_WAGON_TB45E_GRX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y61_1997_Y61_1997_213768_General_Asia_LHD_WAGON_TB45E_GRX.pdf",
+      "plates": 417,
+      "parts": 16042,
+      "diagrams": 417,
+      "verification_required": 2,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y61_iab\\Y61_1997_213772_General_Asia_LHD_WAGON_TB45E_GRX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y61_1997_Y61_1997_213772_General_Asia_LHD_WAGON_TB45E_GRX.pdf",
+      "plates": 417,
+      "parts": 16042,
+      "diagrams": 417,
+      "verification_required": 2
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\03c0edcc0762_Australia_RHD_WAGON_TD42_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_03c0edcc0762_Australia_RHD_WAGON_TD42_STD.pdf",
+      "plates": 250,
+      "parts": 9082,
+      "diagrams": 250,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\1a2cce93926e_Australia_RHD__PICKUP_A-CHASSIS_TD42_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1a2cce93926e_Australia_RHD_PICKUP_A-CHASSIS_TD42_STD.pdf",
+      "plates": 82,
+      "parts": 1318,
+      "diagrams": 38,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\1cc9750d3ef3_Australia_RHD__WAGON_RB30S_DX_3.0ST.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_1cc9750d3ef3_Australia_RHD_WAGON_RB30S_DX_3.0ST.pdf",
+      "plates": 112,
+      "parts": 3104,
+      "diagrams": 103,
+      "verification_required": 1,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\51e204eaf15f_Australia_RHD__PICKUP_A-CHASSIS_TB42S_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_51e204eaf15f_Australia_RHD_PICKUP_A-CHASSIS_TB42S_STD.pdf",
+      "plates": 121,
+      "parts": 1455,
+      "diagrams": 65,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\631ccb7b89bc_Australia_RHD__HARDTOP_TD42_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_631ccb7b89bc_Australia_RHD_HARDTOP_TD42_STD.pdf",
+      "plates": 166,
+      "parts": 4375,
+      "diagrams": 149,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\75473392c7ca_Australia_RHD__PICKUP_TB42S_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_75473392c7ca_Australia_RHD_PICKUP_TB42S_STD.pdf",
+      "plates": 171,
+      "parts": 3927,
+      "diagrams": 139,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\7c1844e0802d_Australia_RHD__HARDTOP_TD42_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_7c1844e0802d_Australia_RHD_HARDTOP_TD42_STD.pdf",
+      "plates": 225,
+      "parts": 5845,
+      "diagrams": 178,
+      "verification_required": 1,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\9454a4eac8ca_Australia_RHD__WAGON_TD42_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_9454a4eac8ca_Australia_RHD_WAGON_TD42_STD.pdf",
+      "plates": 94,
+      "parts": 2347,
+      "diagrams": 81,
+      "verification_required": 1,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.pdf",
+      "plates": 226,
+      "parts": 4741,
+      "diagrams": 224,
+      "verification_required": 3,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y60_d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf",
+      "plates": 20,
+      "parts": 600,
+      "diagrams": 20,
+      "verification_required": 20,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y60\\WGY60348567_General_Asia_LHD_WAGON_TB42S_SGL.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\WLGY60JFRC5_WGY60348567_General_Asia_LHD_WAGON_TB42S_SGL.pdf",
+      "plates": 170,
+      "parts": 3081,
+      "diagrams": 98,
+      "verification_required": 1,
+      "status": "existing"
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_patrol_safari\\General_Asia_LHD_189471_Y62_PATROL_VK56DE_SE_General_Asia_LHD.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\Y62_General_Asia_LHD_189471_General_Asia_LHD_VK56DE_SE_General_Asia_LHD.pdf",
+      "plates": 484,
+      "parts": 15077,
+      "diagrams": 466,
+      "verification_required": 0,
+      "status": "existing"
+    },
+    {
+      "source": "pre_y60_verified_placeholder",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\4w60_4w_series.pdf",
+      "plates": 0,
+      "parts": 0,
+      "diagrams": 0,
+      "verification_required": 1,
+      "status": "existing"
+    },
+    {
+      "source": "pre_y60_verified_placeholder",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\60_g60_series.pdf",
+      "plates": 0,
+      "parts": 0,
+      "diagrams": 0,
+      "verification_required": 1,
+      "status": "existing"
+    },
+    {
+      "source": "pre_y60_verified_placeholder",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\160_mq_mk_series.pdf",
+      "plates": 0,
+      "parts": 0,
+      "diagrams": 0,
+      "verification_required": 1,
+      "status": "existing"
+    },
+    {
+      "source": "pre_y60_verified_placeholder",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\deliverables\\translated_vehicle_pdfs_named\\260_series.pdf",
+      "plates": 0,
+      "parts": 0,
+      "diagrams": 0,
+      "verification_required": 1,
+      "status": "existing"
+    }
+  ]
+}

@@ -1,0 +1,240 @@
+[
+  {
+    "year": 1988,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1988.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1988.pdf",
+    "included_supplements": [
+      {
+        "extract_id": "b3d7b114a89a",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991
+        ],
+        "title": "Australia (RHD) / WAGON / RB30S / STD",
+        "units": 226,
+        "parts": 4741,
+        "failures": 3
+      },
+      {
+        "extract_id": "d074a6710cf6",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991,
+          1992,
+          1993
+        ],
+        "title": "Australia (RHD) / HARDTOP / TD42 / DX",
+        "units": 20,
+        "parts": 600,
+        "failures": 20
+      }
+    ],
+    "pages": 783,
+    "bytes": 13270628
+  },
+  {
+    "year": 1989,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1989.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1989.pdf",
+    "included_supplements": [
+      {
+        "extract_id": "b3d7b114a89a",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991
+        ],
+        "title": "Australia (RHD) / WAGON / RB30S / STD",
+        "units": 226,
+        "parts": 4741,
+        "failures": 3
+      },
+      {
+        "extract_id": "d074a6710cf6",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991,
+          1992,
+          1993
+        ],
+        "title": "Australia (RHD) / HARDTOP / TD42 / DX",
+        "units": 20,
+        "parts": 600,
+        "failures": 20
+      }
+    ],
+    "pages": 780,
+    "bytes": 13258006
+  },
+  {
+    "year": 1990,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1990.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1990.pdf",
+    "included_supplements": [
+      {
+        "extract_id": "b3d7b114a89a",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991
+        ],
+        "title": "Australia (RHD) / WAGON / RB30S / STD",
+        "units": 226,
+        "parts": 4741,
+        "failures": 3
+      },
+      {
+        "extract_id": "d074a6710cf6",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991,
+          1992,
+          1993
+        ],
+        "title": "Australia (RHD) / HARDTOP / TD42 / DX",
+        "units": 20,
+        "parts": 600,
+        "failures": 20
+      }
+    ],
+    "pages": 773,
+    "bytes": 13191187
+  },
+  {
+    "year": 1991,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1991.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1991.pdf",
+    "included_supplements": [
+      {
+        "extract_id": "b3d7b114a89a",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991
+        ],
+        "title": "Australia (RHD) / WAGON / RB30S / STD",
+        "units": 226,
+        "parts": 4741,
+        "failures": 3
+      },
+      {
+        "extract_id": "d074a6710cf6",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991,
+          1992,
+          1993
+        ],
+        "title": "Australia (RHD) / HARDTOP / TD42 / DX",
+        "units": 20,
+        "parts": 600,
+        "failures": 20
+      }
+    ],
+    "pages": 940,
+    "bytes": 14908088
+  },
+  {
+    "year": 1992,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1992.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1992.pdf",
+    "included_supplements": [
+      {
+        "extract_id": "d074a6710cf6",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991,
+          1992,
+          1993
+        ],
+        "title": "Australia (RHD) / HARDTOP / TD42 / DX",
+        "units": 20,
+        "parts": 600,
+        "failures": 20
+      }
+    ],
+    "pages": 637,
+    "bytes": 13711697
+  },
+  {
+    "year": 1993,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1993.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1993.pdf",
+    "included_supplements": [
+      {
+        "extract_id": "d074a6710cf6",
+        "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\available_missing_y60\\d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf",
+        "years": [
+          1988,
+          1989,
+          1990,
+          1991,
+          1992,
+          1993
+        ],
+        "title": "Australia (RHD) / HARDTOP / TD42 / DX",
+        "units": 20,
+        "parts": 600,
+        "failures": 20
+      }
+    ],
+    "pages": 633,
+    "bytes": 13676884
+  },
+  {
+    "year": 1994,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1994.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1994.pdf",
+    "included_supplements": [],
+    "pages": 457,
+    "bytes": 12036898
+  },
+  {
+    "year": 1995,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1995.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1995.pdf",
+    "included_supplements": [],
+    "pages": 447,
+    "bytes": 11767832
+  },
+  {
+    "year": 1996,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1996.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1996.pdf",
+    "included_supplements": [],
+    "pages": 440,
+    "bytes": 11682644
+  },
+  {
+    "year": 1997,
+    "base": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1997.pdf",
+    "output": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_available_missing\\Y60 1997.pdf",
+    "included_supplements": [],
+    "pages": 440,
+    "bytes": 11680813
+  }
+]

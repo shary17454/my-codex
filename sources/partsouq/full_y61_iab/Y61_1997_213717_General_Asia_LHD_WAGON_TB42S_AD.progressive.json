@@ -1,0 +1,181 @@
+{
+  "extract_id": "Y61_1997_213717",
+  "market": "General/Asia (LHD)",
+  "detected_generation": "Y61",
+  "source_row": {
+    "market": "General/Asia (LHD)",
+    "model_filter": "SAFARI",
+    "year_filter": "1997",
+    "detected_generation": "Y61",
+    "year_applicability_status": "applies",
+    "vid": "213717",
+    "raw_text": "SAFARI | WAGON | TB42S | AD | General/Asia (LHD) | Y61 | 08.1997 | 07.1999 | ",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEoHA0de3JtdUpSKHULFHBkRENdLCMuLz0SIWlvXEhUUFJRFAMvRWtva1pMVUQCHxUoIU9cXFpOVz07OH5bZz9_ej4kYxZzK0RLPzY7PiwcGRMuKU8_Njs-LRwAFDg3PD8uRC9NbAtzNjs-KEVaWDxvbXMsRFFJOEYwPmEkJTghPD9KWk5fDm99OjlxbjghPDwae2A4Nzw_f31qPHltZTY7PnBocng8eW1zXVc-YAAAAAAiABpT%24&vid=213717&q=",
+    "source_file": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\navigation\\patrol_general_asia_lhd_incremental_discovery.json"
+  },
+  "category": {
+    "extract_id": "Y61_1997_213717",
+    "detected_generation": "Y61",
+    "year": "1997",
+    "market": "General/Asia (LHD)",
+    "model_filter": "SAFARI",
+    "year_filter": "1997",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEoHA0de3JtdUpSKHULFHBkRENdLCMuLz0SIWlvXEhUUFJRFAMvRWtva1pMVUQCHxUoIU9cXFpOVz07OH5bZz9_ej4kYxZzK0RLPzY7PiwcGRMuKU8_Njs-LRwAFDg3PD8uRC9NbAtzNjs-KEVaWDxvbXMsRFFJOEYwPmEkJTghPD9KWk5fDm99OjlxbjghPDwae2A4Nzw_f31qPHltZTY7PnBocng8eW1zXVc-YAAAAAAiABpT%24&vid=213717&q=",
+    "vid": "213717",
+    "raw_text": "SAFARI | WAGON | TB42S | AD | General/Asia (LHD) | Y61 | 08.1997 | 07.1999 | ",
+    "cells": [
+      "SAFARI",
+      "WAGON",
+      "TB42S",
+      "AD",
+      "General/Asia (LHD)",
+      "Y61",
+      "08.1997",
+      "07.1999"
+    ],
+    "body_style": "WAGON",
+    "engine": "TB42S",
+    "grade_or_frame": "AD",
+    "production_from": "08.1997",
+    "production_to": "07.1999"
+  },
+  "started_at": "2026-07-03T06:14:32.946Z",
+  "source_vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEoHA0de3JtdUpSKHULFHBkRENdLCMuLz0SIWlvXEhUUFJRFAMvRWtva1pMVUQCHxUoIU9cXFpOVz07OH5bZz9_ej4kYxZzK0RLPzY7PiwcGRMuKU8_Njs-LRwAFDg3PD8uRC9NbAtzNjs-KEVaWDxvbXMsRFFJOEYwPmEkJTghPD9KWk5fDm99OjlxbjghPDwae2A4Nzw_f31qPHltZTY7PnBocng8eW1zXVc-YAAAAAAiABpT%24&vid=213717&q=",
+  "vehicle_page": {
+    "title": "ENGINE MECHANICAL | Nissan SAFARI 08.1997 07.1999 Parts Catalogs | PartSouq",
+    "url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEoHA0de3JtdUpSKHULFHBkRENdLCMuLz0SIWlvXEhUUFJRFAMvRWtva1pMVUQCHxUoIU9cXFpOVz07OH5bZz9_ej4kYxZzK0RLPzY7PiwcGRMuKU8_Njs-LRwAFDg3PD8uRC9NbAtzNjs-KEVaWDxvbXMsRFFJOEYwPmEkJTghPD9KWk5fDm99OjlxbjghPDwae2A4Nzw_f31qPHltZTY7PnBocng8eW1zXVc-YAAAAAAiABpT%24&vid=213717&q="
+  },
+  "discovered_units": [
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "101A 001",
+      "plate_title_en": "BARE & SHORT ENGINE",
+      "title": "101A 001: BARE & SHORT ENGINE",
+      "uid": "257600",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwEvGwoafHVqck1VL3IME3djQ0RaKyQpKDoVJm5oW09TV1VWEwQoQmxobF1LUkMFGBIvJkhbW11JUDopP3lcYDhpPiE7B2h6P3F8eT8mQDsFaAtgYm5zeVxgOykjMj8mLSkqMDl0Iyl0Jz5aODE-bnpmcHQsLCpbPSwrKGY3KGt1f1pmPn54ZnB2Rj4qRUo-NzlmeAlJXi8oTj43OWZ5CVBZOTY9Pi9Gdxl5Wz43Oj8pRFgAaHo9Pi1FUEg5RGhqdHRoOSA9PktYFgsbPzA7OHBvOSNkaA8rLTk2PT5-fzJobD0oNzo_cWlwIGhsPT5cVj9hAAAAAIkbfr4%3D%24&vid=213717&cid=1&uid=257600&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "102A 001",
+      "plate_title_en": "ENGINE GASKET KIT",
+      "title": "102A 001: ENGINE GASKET KIT",
+      "uid": "257608",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwF1QVBAJi8wKBcPdShWSS05GR4AcX5zcmBPfDQyARUJDQ8MSV5yGDYyNgcRCBlfQkh1fBIBAQcTCmBzZSMGOmIzZHthXTIgZSsmI2V8GmFfMlE6ODQpIwY6YXN5aGV8d3NwamMueXMufWQAYmtkNCA8Ki52dnMBZ3ZxcjxtcjEvJQA8ZCQiPCosHGRwHxBkbWM8IlMTBHVyFGRtYzwjUwoDY2xnZHUcLUMjAWRtYGVzHgJaMiBnZHcfChJjHjIwLi4yY3pnZBECTFFBZWphYio1Y3k-MlVxd2NsZ2QkJWgyNmdybWBlKzMqejI2Z2QGDGU7AAAAADHAmpw%3D%24&vid=213717&cid=1&uid=257608&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "110A 001",
+      "plate_title_en": "CYLINDER BLOCK & OIL PAN",
+      "title": "110A 001: CYLINDER BLOCK & OIL PAN",
+      "uid": "257619",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwHK_u__mZCPl6iwypfp9pKGpqG_zsHMzd_ww4uNvqq2srCz9uHNp4mNibiut6bg_ffKw62-vristd_M2py5hd2M28Te4o2f2pSZnNrDpd7gje6Fh4uWnLmF3szG19rDyMzP1dyRxsyRwtu_3dTbi5-DlZHJyM6-2MnOzYPSzY6Qmr-D25udg5WTo9vPoK_b0tyDneysu8rNq9vS3IOc7LW83NPY28qjkvycvtvS39rMob3ljZ_Y28igta3coY2PkZGN3MXY26698-7-2tXe3ZWK3MaBjerOyNzT2NubmteNidjN0t_alIyVxY2J2Nu5s9qEAAAAAM7iQiI%3D%24&vid=213717&cid=1&uid=257619&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "111A 001",
+      "plate_title_en": "CYLINDER HEAD & ROCKER COVER",
+      "title": "111A 001: CYLINDER HEAD & ROCKER COVER",
+      "uid": "257649",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwEBNSQ0UltEXGN7AVwiPVlNbWp0BQoHBhQ7CEBGdWF9eXt4PSoGbEJGQnNlfG0rNjwBCGZ1dXNnfhQHEVdyThZHEA8VKUZUEV9SVxEIbhUrRiVOTEBdV3JOFQcNHBEIAwcEHhdaDQdaCRB0Fh8QQFRIXloCAwR1EwIFBkgZBkVbUXRIEFBWSF5YaBAEa2QQGRdIVidncAEGYBAZF0hXJ353FxgTEAFoWTdXdRAZFBEHanYuRlQTEANrfmYXakZEWlpGFw4TEGV2OCU1ER4VFl5BFw1KRiEFAxcYExBQURxGQhMGGRQRX0deDkZCExByeBFPAAAAALiZTLI%3D%24&vid=213717&cid=1&uid=257649&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "112A 001",
+      "plate_title_en": "ENGINE & TRANSMISSION MOUNTING; ; GEN.TB45E+TB42S+TD42",
+      "title": "112A 001: ENGINE & TRANSMISSION MOUNTING; ; GEN.TB45E+TB42S+TD42",
+      "uid": "257664",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwG8iJmJ7-b54d7GvOGfgOTw0NfJuLe6u6mGtf37yNzAxMbFgJe70f_7_87YwdCWi4G8tdvIyM7aw6m6rOrP86v6rbKolPvprOLv6qy106iW-5jz8f3g6s_zqLqwoay1vrq5o6rnsLrntK3Jq6Kt_en14-e_vrrIrr-4u_Wku_jm7Mn1re3r9ePl1a251tmtpKr165razby73a2kqvXqmsPKqqWurbzV5IrqyK2kqay618uT--murb7Ww9uq1_v55-f7qrOurdjLhZiIrKOoq-P8qrD3-5y4vqqlrq3t7KH7_667pKms4vrjs_v_rq3PxazyAAAAAIjr5uw%3D%24&vid=213717&cid=1&uid=257664&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "117A 001",
+      "plate_title_en": "FAN,COMPRESSOR & POWER STEERING BELT",
+      "title": "117A 001: FAN,COMPRESSOR & POWER STEERING BELT",
+      "uid": "257674",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwG5jZyM6uP85NvDueSaheH11dLMvbK_vqyDsPj-zdnFwcPAhZK-1Pr--svdxNWTjoS5sN7Nzcvfxqy_qe_K9q7_qLetkf7sqefq76mw1q2T_p329Pjl78r2rb-1pKmwu7-8pq_itb_isajMrqeo-Ozw5uK6u7rNq7q9vvChvv3j6czwqOju8Obg0Ki809yooa_w7p_fyLm-2Kihr_Dvn8bPr6CrqLnQ4Y_vzaihrKm_0s6W_uyrqLvTxt6v0v784uL-r7arqN3OgJ2Nqaatrub5r7Xy_pm9u6-gq6jo6aT--qu-oayp5__mtv76q6jKwKn3AAAAAFYdjYs%3D%24&vid=213717&cid=1&uid=257674&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "118A 001",
+      "plate_title_en": "CRANKCASE VENTILATION",
+      "title": "118A 001: CRANKCASE VENTILATION",
+      "uid": "257686",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwEBNSQ0UltEXGN7AVwiPVlNbWp0BQoHBhQ7CEBGdWF9eXt4PSoGbEJGQnNlfG0rNjwBCGZ1dXNnfhQHEVdyThZHEA8VKUZUEV9SVxEIbhUrRiVOTEBdV3JOFQcNHBEIAwcEHhdaDQdaCRB0Fh8QQFRIXloCAw11EwIFBkgZBkVbUXRIEFBWSF5YaBAEa2QQGRdIVidncAEGYBAZF0hXJ353FxgTEAFoWTdXdRAZFBEHanYuRlQTEANrfmYXakZEWlpGFw4TEGV2OCU1ER4VFl5BFw1KRiEFAxcYExBQURxGQhMGGRQRX0deDkZCExByeBFPAAAAAOMlMY0%3D%24&vid=213717&cid=1&uid=257686&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "120A 001",
+      "plate_title_en": "PISTON,CRANKSHAFT & FLYWHEEL",
+      "title": "120A 001: PISTON,CRANKSHAFT & FLYWHEEL",
+      "uid": "257693",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwG8iJmJ7-b54d7GvOGfgOTw0NfJuLe6u6mGtf37yNzAxMbFgJe70f_7_87YwdCWi4G8tdvIyM7aw6m6rOrP86v6rbKolPvprOLv6qy106iW-5jz8f3g6s_zqLqwoay1vrq5o6rnsLrntK3Jq6Kt_en14-e_vbjIrr-4u_Wku_jm7Mn1re3r9ePl1a251tmtpKr165razby73a2kqvXqmsPKqqWurbzV5IrqyK2kqay618uT--murb7Ww9uq1_v55-f7qrOurdjLhZiIrKOoq-P8qrD3-5y4vqqlrq3t7KH7_667pKms4vrjs_v_rq3PxazyAAAAAKBaESI%3D%24&vid=213717&cid=1&uid=257693&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "130A 001",
+      "plate_title_en": "CAMSHAFT & VALVE MECHANISM",
+      "title": "130A 001: CAMSHAFT & VALVE MECHANISM",
+      "uid": "257711",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwHW4vPjhYyTi7Ss1ov16o6aur2j0t3Q0cPs35eRoraqrqyv6v3Ru5WRlaSyq7r84evW37GioqSwqcPQxoClmcGQx9jC_pGDxoiFgMbfucL8kfKZm5eKgKWZwtDay8bf1NDTycCN2tCN3sejwcjHl4OfiY3V1tKixNXS0Z_O0ZKMhqOfx4eBn4mPv8fTvLPHzsCfgfCwp9bRt8fOwJ-A8KmgwM_Ex9a_juCAosfOw8bQvaH5kYPEx9S8qbHAvZGTjY2RwNnEx7Kh7_LixsnCwYmWwNqdkfbS1MDPxMeHhsuRlcTRzsPGiJCJ2ZGVxMelr8aYAAAAANjke_g%3D%24&vid=213717&cid=1&uid=257711&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "135A 001",
+      "plate_title_en": "FRONT COVER,VACUUM PUMP & FITTING",
+      "title": "135A 001: FRONT COVER,VACUUM PUMP & FITTING",
+      "uid": "257727",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwEPOyo6XFVKUm11D1IsM1dDY2R6CwQJCBo1Bk5Ie29zd3V2MyQIYkxITH1rcmMlODIPBmh7e31pcBoJH1l8QBhJHgEbJ0haH1FcWR8GYBslSCtAQk5TWXxAGwkDEh8GDQkKEBlUAwlUBx56GBEeTlpGUFQMDw57HQwLCEYXCEtVX3pGHl5YRlBWZh4KZWoeFxlGWClpfg8Ibh4XGUZZKXB5GRYdHg9mVzlZex4XGh8JZHggSFodHg1lcGgZZEhKVFRIGQAdHmt4Nis7HxAbGFBPGQNESC8LDRkWHR5eXxJITB0IFxofUUlQAEhMHR58dh9BAAAAAC2u7bU%3D%24&vid=213717&cid=1&uid=257727&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "140A 001",
+      "plate_title_en": "MANIFOLD; INTAKE PARTS",
+      "title": "140A 001: MANIFOLD; INTAKE PARTS",
+      "uid": "257743",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwFmUkNTNTwjOwQcZjtFWj4qCg0TYm1gYXNcbychEgYaHhwfWk1hCyUhJRQCGwpMUVtmbwESEhQAGXNgdjAVKXEgd2hyTiEzdjg1MHZvCXJMIUIpKyc6MBUpcmBqe3ZvZGBjeXA9amA9bncTcXh3JzMvOT1lYWISdGViYS9-YSI8NhMvdzcxLzk_D3djDAN3fnAvMUAAF2ZhB3d-cC8wQBkQcH90d2YPPlAwEnd-c3ZgDRFJITN0d2QMGQFwDSEjPT0hcGl0dwIRX0JSdnlycTkmcGotIUZiZHB_dHc3NnshJXRhfnN2OCA5aSEldHcVH3YoAAAAAJVyig0%3D%24&vid=213717&cid=1&uid=257743&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "140A 002",
+      "plate_title_en": "MANIFOLD; EXHAUST PARTS",
+      "title": "140A 002: MANIFOLD; EXHAUST PARTS",
+      "uid": "257744",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwHc6Pnpj4aZgb6m3IH_4ISQsLep2Nfa28nm1Z2bqLygpKal4PfbsZ-bn664obD26-Hc1buoqK66o8nazIqvk8uazdLI9JuJzIKPiszVs8j2m_iTkZ2Aiq-TyNrQwczV3trZw8qH0NqH1M2py8LNnYmVg4ff29iozt_Y2JXE25iGjKmVzY2LlYOFtc3ZtrnNxMqVi_q6rdzbvc3EypWK-qOqysXOzdy1hOqKqM3Eyczat6vzm4nOzd62o7vKt5uZh4ebytPOzbir5fjozMPIy4OcytCXm_zY3srFzs2NjMGbn87bxMnMgpqD05ufzs2vpcySAAAAALsONpg%3D%24&vid=213717&cid=1&uid=257744&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "150A 001",
+      "plate_title_en": "LUBRICATING SYSTEM; OIL STRAINER",
+      "title": "150A 001: LUBRICATING SYSTEM; OIL STRAINER",
+      "uid": "257788",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwHY7P3ti4Kdhbqi2IX75ICUtLOt3NPe383i0ZmfrLikoKKh5PPftZufm6q8pbTy7-XY0b-srKq-p83eyI6rl8-eydbM8J-NyIaLjsjRt8zyn_yXlZmEjquXzN7UxcjR2t7dx86D1N6D0Mmtz8bJmY2Rh4Pb3tysytvc35HA35yCiK2RyYmPkYeBscndsr3JwM6Rj_6-qdjfucnAzpGO_qeuzsHKydixgO6OrMnAzcjes6_3n43Kydqyp7_Os5-dg4OfztfKybyv4fzsyMfMz4eYztSTn_jc2s7BysmJiMWfm8rfwM3Ihp6H15-bysmrociWAAAAAL4MF9U%3D%24&vid=213717&cid=1&uid=257788&q="
+    },
+    {
+      "cid": "1",
+      "group_text": "ENGINE MECHANICAL",
+      "plate_code": "150A 002",
+      "plate_title_en": "LUBRICATING SYSTEM; PUMP ASSY-OIL",
+      "title": "150A 002: LUBRICATING SYSTEM; PUMP ASSY-OIL",
+      "uid": "257789",
+      "unit_url": "https://partsouq.com/en/catalog/genuine/unit?c=Nissan&ssd=%24%2AKwEBNSQ0UltEXGN7AVwiPVlNbWp0BQoHBhQ7CEBGdWF9eXt4PSoGbEJGQnNlfG0rNjwBCGZ1dXNnfhQHEVdyThZHEA8VKUZUEV9SVxEIbhUrRiVOTEBdV3JOFQcNHBEIAwcEHhdaDQdaCRB0Fh8QQFRIXloCBwV1EwIFBUgZBkVbUXRIEFBWSF5YaBAEa2QQGRdIVidncAEGYBAZF0hXJ353FxgTEAFoWTdXdRAZFBEHanYuRlQTEANrfmYXakZEWlpGFw4TEGV2OCU1ER4VFl5BFw1KRiEFAxcYExBQURxGQhMGGRQRX0deDkZCExByeBFPAAAAAM7jW6w%3D%24&vid=213717&cid=1&uid=257789&q="
+    }
+  ],
+  "units": [],
+  "failures": [],
+  "group_failures": [],
+  "discovery_complete": false,
+  "complete": false
+}

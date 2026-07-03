@@ -1,0 +1,47 @@
+{
+  "market": "General/Asia (LHD)",
+  "detected_generation": "Y60",
+  "source_row": {
+    "cells": [
+      "SAFARI",
+      "HARDTOP",
+      "TB42S",
+      "DX",
+      "General/Asia (LHD)",
+      "Y60",
+      "08.1987",
+      "09.1999",
+      ""
+    ],
+    "raw_text": "SAFARI | HARDTOP | TB42S | DX | General/Asia (LHD) | Y60 | 08.1987 | 09.1999 | ",
+    "vid": "202148",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE7Dx50ZG4_RE1wfEAVKWN3V1BOPzA9PC4BMnp8T1tHQ0FCBxA8Vnh8eElfRlcRDAY7MlxPT0ldRC4oK21IdCxsaS03cAVgOFdELCUoLT8PCgA9OlwsJSgtPg8aGiskLyw9V0JZcnJiKz1QSDwqIy1yaB08WC0iKSo4UhcbDCskLywxV10iFnwfJSgtZ30qNS1yDgNbSUIsJSgtYCN8eCkqVjg5KiMtcjskfyo1Ljg8Iy1yMzBgbC00KSpIQXIjAAAAAF5qOPk%3D%24&vid=202148&q="
+  },
+  "category": {
+    "extract_id": "Y60_1988_202148",
+    "detected_generation": "Y60",
+    "year": "1988",
+    "market": "General/Asia (LHD)",
+    "model_filter": "SAFARI",
+    "year_filter": "1988",
+    "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE7Dx50ZG4_RE1wfEAVKWN3V1BOPzA9PC4BMnp8T1tHQ0FCBxA8Vnh8eElfRlcRDAY7MlxPT0ldRC4oK21IdCxsaS03cAVgOFdELCUoLT8PCgA9OlwsJSgtPg8aGiskLyw9V0JZcnJiKz1QSDwqIy1yaB08WC0iKSo4UhcbDCskLywxV10iFnwfJSgtZ30qNS1yDgNbSUIsJSgtYCN8eCkqVjg5KiMtcjskfyo1Ljg8Iy1yMzBgbC00KSpIQXIjAAAAAF5qOPk%3D%24&vid=202148&q=",
+    "vid": "202148",
+    "raw_text": "SAFARI | HARDTOP | TB42S | DX | General/Asia (LHD) | Y60 | 08.1987 | 09.1999 | ",
+    "cells": [
+      "SAFARI",
+      "HARDTOP",
+      "TB42S",
+      "DX",
+      "General/Asia (LHD)",
+      "Y60",
+      "08.1987",
+      "09.1999",
+      ""
+    ],
+    "source_file": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\navigation\\patrol_general_asia_lhd_incremental_discovery.json",
+    "body_style": "HARDTOP",
+    "engine": "TB42S",
+    "grade_or_frame": "DX",
+    "detail_status": "pending"
+  }
+}

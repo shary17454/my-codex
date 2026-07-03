@@ -1,0 +1,1157 @@
+[
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0001",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0001",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0001",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0001",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0002",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0002",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0002",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0002",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0003",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0003",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0003",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0003",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0004",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0004",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0004",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0004",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0005",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0005",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0005",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0005",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0006",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0006",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0006",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0006",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0007",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0007",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0007",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0007",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0008",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0008",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0008",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0008",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0009",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0009",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0009",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0009",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0010",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0010",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0010",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0010",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0011",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0011",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0011",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0011",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0012",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0012",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0012",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0012",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0013",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0013",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0013",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0013",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0014",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0014",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0014",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0014",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0015",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0015",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0015",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0015",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0016",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0016",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0016",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0016",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0017",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0017",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0017",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0017",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0018",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0018",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0018",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0018",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0019",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0019",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0019",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0019",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0020",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0020",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0020",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0020",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0021",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0021",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0021",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0021",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0022",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0022",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0022",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0022",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0023",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0023",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0023",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0023",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0024",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0024",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0024",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0024",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0025",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0025",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0025",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0025",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0026",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0026",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0026",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0026",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0027",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0027",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0027",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0027",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0028",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0028",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0028",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0028",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0029",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0029",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0029",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0029",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0030",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0030",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0030",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0030",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0031",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0031",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0031",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0031",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0032",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0032",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0032",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0032",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_part_number",
+    "record_id": "Y60-PART-0033",
+    "message_en": "missing_part_number requires official Nissan source verification.",
+    "message_ar": "missing_part_number يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_diagram",
+    "record_id": "Y60-PART-0033",
+    "message_en": "missing_diagram requires official Nissan source verification.",
+    "message_ar": "missing_diagram يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_vin",
+    "record_id": "Y60-PART-0033",
+    "message_en": "missing_vin requires official Nissan source verification.",
+    "message_ar": "missing_vin يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_source",
+    "record_id": "Y60-PART-0033",
+    "message_en": "missing_source requires official Nissan source verification.",
+    "message_ar": "missing_source يتطلب التحقق من مصدر رسمي من نيسان."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0001",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0002",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0003",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0004",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0005",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0006",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0007",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0008",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0009",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0010",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0011",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0012",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0013",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0014",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0015",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0016",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0017",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0018",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0019",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0020",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0021",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0022",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0023",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0024",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0025",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0026",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0027",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0028",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0029",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0030",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0031",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0032",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  },
+  {
+    "severity": "BLOCKER",
+    "check_id": "missing_original_epc_plate",
+    "record_id": "Y60-MISSING-EPC-0033",
+    "message_en": "Original Nissan EPC plate is unavailable and must be supplied from an official source.",
+    "message_ar": "لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي."
+  }
+]

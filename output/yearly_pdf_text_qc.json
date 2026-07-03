@@ -1,0 +1,122 @@
+[
+  {
+    "file": "Y60 1988.pdf",
+    "pages": 266,
+    "bytes": 8554440,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 119,
+    "pages_with_arabic": 266,
+    "replacement_note_pages": 100,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1989.pdf",
+    "pages": 262,
+    "bytes": 8476521,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 122,
+    "pages_with_arabic": 262,
+    "replacement_note_pages": 101,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1990.pdf",
+    "pages": 255,
+    "bytes": 8226863,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 122,
+    "pages_with_arabic": 255,
+    "replacement_note_pages": 101,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1991.pdf",
+    "pages": 401,
+    "bytes": 14788130,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 228,
+    "pages_with_arabic": 401,
+    "replacement_note_pages": 125,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1992.pdf",
+    "pages": 373,
+    "bytes": 13826533,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 216,
+    "pages_with_arabic": 373,
+    "replacement_note_pages": 123,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1993.pdf",
+    "pages": 370,
+    "bytes": 13681673,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 210,
+    "pages_with_arabic": 370,
+    "replacement_note_pages": 122,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1994.pdf",
+    "pages": 249,
+    "bytes": 8044550,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 120,
+    "pages_with_arabic": 249,
+    "replacement_note_pages": 104,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1995.pdf",
+    "pages": 234,
+    "bytes": 7543095,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 113,
+    "pages_with_arabic": 234,
+    "replacement_note_pages": 99,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1996.pdf",
+    "pages": 228,
+    "bytes": 7259470,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 110,
+    "pages_with_arabic": 228,
+    "replacement_note_pages": 98,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1997.pdf",
+    "pages": 228,
+    "bytes": 7239346,
+    "blank_count": 0,
+    "blank_pages": [],
+    "low_text_count": 0,
+    "pages_with_part_numbers": 110,
+    "pages_with_arabic": 228,
+    "replacement_note_pages": 98,
+    "status": "PASS"
+  }
+]

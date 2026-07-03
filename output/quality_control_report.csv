@@ -1,0 +1,166 @@
+﻿severity,check_id,record_id,message_en,message_ar
+BLOCKER,missing_part_number,Y60-PART-0001,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0001,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0001,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0001,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0002,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0002,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0002,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0002,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0003,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0003,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0003,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0003,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0004,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0004,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0004,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0004,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0005,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0005,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0005,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0005,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0006,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0006,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0006,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0006,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0007,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0007,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0007,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0007,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0008,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0008,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0008,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0008,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0009,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0009,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0009,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0009,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0010,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0010,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0010,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0010,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0011,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0011,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0011,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0011,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0012,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0012,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0012,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0012,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0013,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0013,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0013,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0013,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0014,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0014,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0014,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0014,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0015,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0015,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0015,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0015,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0016,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0016,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0016,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0016,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0017,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0017,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0017,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0017,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0018,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0018,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0018,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0018,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0019,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0019,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0019,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0019,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0020,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0020,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0020,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0020,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0021,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0021,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0021,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0021,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0022,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0022,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0022,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0022,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0023,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0023,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0023,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0023,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0024,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0024,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0024,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0024,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0025,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0025,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0025,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0025,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0026,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0026,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0026,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0026,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0027,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0027,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0027,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0027,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0028,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0028,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0028,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0028,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0029,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0029,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0029,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0029,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0030,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0030,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0030,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0030,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0031,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0031,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0031,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0031,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0032,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0032,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0032,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0032,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_part_number,Y60-PART-0033,missing_part_number requires official Nissan source verification.,missing_part_number يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_diagram,Y60-PART-0033,missing_diagram requires official Nissan source verification.,missing_diagram يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_vin,Y60-PART-0033,missing_vin requires official Nissan source verification.,missing_vin يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_source,Y60-PART-0033,missing_source requires official Nissan source verification.,missing_source يتطلب التحقق من مصدر رسمي من نيسان.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0001,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0002,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0003,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0004,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0005,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0006,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0007,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0008,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0009,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0010,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0011,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0012,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0013,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0014,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0015,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0016,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0017,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0018,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0019,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0020,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0021,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0022,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0023,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0024,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0025,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0026,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0027,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0028,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0029,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0030,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0031,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0032,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.
+BLOCKER,missing_original_epc_plate,Y60-MISSING-EPC-0033,Original Nissan EPC plate is unavailable and must be supplied from an official source.,لوحة Nissan EPC الأصلية غير متوفرة ويجب توفيرها من مصدر رسمي.

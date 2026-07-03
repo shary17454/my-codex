@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-07-02T19:02:55.190599+00:00",
+  "source_pdf_files_scanned": 78,
+  "candidate_pdf_files": 78,
+  "unique_pdf_files_delivered": 55,
+  "duplicate_or_less_complete_pdf_files_excluded": 23,
+  "delivered_by_generation": {
+    "Pre_Y60": 5,
+    "Reports": 1,
+    "Y60": 48,
+    "Y62": 1
+  },
+  "notes": [
+    "No source PDFs were deleted. Duplicates are excluded from the curated deliverable folder and listed in duplicate_pdfs.csv.",
+    "Completeness is limited to locally extracted/source-backed data. Missing generations or vehicles are marked Verification Required in coverage reports."
+  ]
+}

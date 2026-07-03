@@ -1,0 +1,112 @@
+[
+  {
+    "file": "Y60 1988.pdf",
+    "pages": 223,
+    "bytes": 8443239,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 176,
+    "pages_with_arabic": 223,
+    "verification_pages": 41,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1989.pdf",
+    "pages": 220,
+    "bytes": 8368117,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 181,
+    "pages_with_arabic": 220,
+    "verification_pages": 34,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1990.pdf",
+    "pages": 213,
+    "bytes": 8119056,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 181,
+    "pages_with_arabic": 213,
+    "verification_pages": 27,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1991.pdf",
+    "pages": 380,
+    "bytes": 14728708,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 330,
+    "pages_with_arabic": 380,
+    "verification_pages": 41,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1992.pdf",
+    "pages": 356,
+    "bytes": 13778670,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 320,
+    "pages_with_arabic": 356,
+    "verification_pages": 29,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1993.pdf",
+    "pages": 352,
+    "bytes": 13632163,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 312,
+    "pages_with_arabic": 352,
+    "verification_pages": 31,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1994.pdf",
+    "pages": 208,
+    "bytes": 7936509,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 183,
+    "pages_with_arabic": 208,
+    "verification_pages": 21,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1995.pdf",
+    "pages": 198,
+    "bytes": 7447268,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 176,
+    "pages_with_arabic": 198,
+    "verification_pages": 19,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1996.pdf",
+    "pages": 191,
+    "bytes": 7160077,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 170,
+    "pages_with_arabic": 191,
+    "verification_pages": 17,
+    "status": "PASS"
+  },
+  {
+    "file": "Y60 1997.pdf",
+    "pages": 191,
+    "bytes": 7139870,
+    "blank_count": 0,
+    "low_text_count": 0,
+    "pages_with_part_numbers": 170,
+    "pages_with_arabic": 191,
+    "verification_pages": 17,
+    "status": "PASS"
+  }
+]

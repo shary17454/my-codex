@@ -1,0 +1,129 @@
+{
+  "output_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\Y60_1988-1997_all_11_catalogs_combined.pdf",
+  "bytes": 131159414,
+  "sections": 11,
+  "total_pages": 5281,
+  "manifest": [
+    {
+      "order": 1,
+      "title_en": "Nissan Patrol / Safari Y60 - 1988",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1988",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1988.pdf",
+      "divider_pages": 1,
+      "source_pages": 472,
+      "section_start_page": 1,
+      "content_start_page": 2,
+      "section_end_page": 473
+    },
+    {
+      "order": 2,
+      "title_en": "Nissan Patrol / Safari Y60 - 1989",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1989",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1989.pdf",
+      "divider_pages": 1,
+      "source_pages": 469,
+      "section_start_page": 474,
+      "content_start_page": 475,
+      "section_end_page": 943
+    },
+    {
+      "order": 3,
+      "title_en": "Nissan Patrol / Safari Y60 - 1990",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1990",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1990.pdf",
+      "divider_pages": 1,
+      "source_pages": 462,
+      "section_start_page": 944,
+      "content_start_page": 945,
+      "section_end_page": 1406
+    },
+    {
+      "order": 4,
+      "title_en": "Nissan Patrol / Safari Y60 - 1991",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1991",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1991.pdf",
+      "divider_pages": 1,
+      "source_pages": 629,
+      "section_start_page": 1407,
+      "content_start_page": 1408,
+      "section_end_page": 2036
+    },
+    {
+      "order": 5,
+      "title_en": "Nissan Patrol / Safari Y60 - 1992",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1992",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1992.pdf",
+      "divider_pages": 1,
+      "source_pages": 605,
+      "section_start_page": 2037,
+      "content_start_page": 2038,
+      "section_end_page": 2642
+    },
+    {
+      "order": 6,
+      "title_en": "Nissan Patrol / Safari Y60 - 1993",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1993",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1993.pdf",
+      "divider_pages": 1,
+      "source_pages": 601,
+      "section_start_page": 2643,
+      "content_start_page": 2644,
+      "section_end_page": 3244
+    },
+    {
+      "order": 7,
+      "title_en": "Nissan Patrol / Safari Y60 - 1994",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1994",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1994.pdf",
+      "divider_pages": 1,
+      "source_pages": 457,
+      "section_start_page": 3245,
+      "content_start_page": 3246,
+      "section_end_page": 3702
+    },
+    {
+      "order": 8,
+      "title_en": "Nissan Patrol / Safari Y60 - 1995",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1995",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1995.pdf",
+      "divider_pages": 1,
+      "source_pages": 447,
+      "section_start_page": 3703,
+      "content_start_page": 3704,
+      "section_end_page": 4150
+    },
+    {
+      "order": 9,
+      "title_en": "Nissan Patrol / Safari Y60 - 1996",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1996",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1996.pdf",
+      "divider_pages": 1,
+      "source_pages": 440,
+      "section_start_page": 4151,
+      "content_start_page": 4152,
+      "section_end_page": 4591
+    },
+    {
+      "order": 10,
+      "title_en": "Nissan Patrol / Safari Y60 - 1997",
+      "title_ar": "نيسان باترول / سفاري Y60 - 1997",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\yearly_with_wgy60348567\\Y60 1997.pdf",
+      "divider_pages": 1,
+      "source_pages": 440,
+      "section_start_page": 4592,
+      "content_start_page": 4593,
+      "section_end_page": 5032
+    },
+    {
+      "order": 11,
+      "title_en": "WGY60348567 Detailed EPC Catalog",
+      "title_ar": "كتالوج EPC التفصيلي للمرجع WGY60348567",
+      "source_pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\output\\pdf\\full_y60\\WGY60348567_General_Asia_LHD_WAGON_TB42S_SGL.reportlab.pdf",
+      "divider_pages": 1,
+      "source_pages": 248,
+      "section_start_page": 5033,
+      "content_start_page": 5034,
+      "section_end_page": 5281
+    }
+  ]
+}

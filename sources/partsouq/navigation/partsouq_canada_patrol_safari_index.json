@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-06-29T23:03:41.661Z",
+  "market": "Canada",
+  "rows": [
+    {
+      "cells": [
+        "ARMADA",
+        "WAGON 3 ROW",
+        "VK56VD",
+        "SL",
+        "Canada",
+        "Y62",
+        "06.2016",
+        "WHEEL DRIVE:4WD"
+      ],
+      "detected_generation": "Y62",
+      "market": "Canada",
+      "raw_text": "ARMADA | WAGON 3 ROW | VK56VD | SL | Canada | Y62 | 06.2016 | WHEEL DRIVE:4WD",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFHc2JLNCMxNQ9GJRVEZx8LKywyQ0xBQFJ9TgYAMyc7Pz0-e2xAKgQABDUjOittcHpHTjIgODU3MFJUVxE0CFAQFVFLDHkcRCtAIDojUV0MAAwqIjhHQyI3UwACHEYrMiUxVl9RDhZhJjhRXlVWRi4bY2pXKV9SVx0HUxYCHCU1ITM4Vl9RDk9NV05TUCxCQVMAAhwQEgVQT1RAXQwAUwcdF1BPVFEybQBDAAAAAKf405g%3D%24&vid=190748&q=",
+      "vid": "190748"
+    },
+    {
+      "cells": [
+        "ARMADA",
+        "WAGON 3 ROW",
+        "VK56VD",
+        "PLATINUM CP GRADE",
+        "Canada",
+        "Y62",
+        "06.2016",
+        "WHEEL DRIVE:4WD"
+      ],
+      "detected_generation": "Y62",
+      "market": "Canada",
+      "raw_text": "ARMADA | WAGON 3 ROW | VK56VD | PLATINUM CP GRADE | Canada | Y62 | 06.2016 | WHEEL DRIVE:4WD",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGEsKGY_Obx8_70hsSkjtzI6O_xgI-Cg5G-jcXD8OT4_P79uK-D6cfDx_bg-eius7mEjfHj-_b085GXlNL3y5PT1pKIz7rfh-iD4_ngkp7Pw8_p4fuEgOH0kMPB34Xo8ebylZySzdWi5vvk8uaVnJLN1KKB9uST65uQkIaV34yXkuH35fH_zc3dlNrDk4yXkuvZ09-al5LU0MGSiM_T0ZaV3cPf05KIz8O-95XNAAAAAJTXXig%3D%24&vid=190742&q=",
+      "vid": "190742"
+    },
+    {
+      "cells": [
+        "ARMADA",
+        "WAGON 3 ROW",
+        "VK56VD",
+        "PLATINUM GRADE",
+        "Canada",
+        "Y62",
+        "06.2016",
+        "WHEEL DRIVE:4WD"
+      ],
+      "detected_generation": "Y62",
+      "market": "Canada",
+      "raw_text": "ARMADA | WAGON 3 ROW | VK56VD | PLATINUM GRADE | Canada | Y62 | 06.2016 | WHEEL DRIVE:4WD",
+      "vehicle_url": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwH6zt-u_KqJlbiAiqbp7KK2lpGP_vH8_e_A87u9jpqGgoCDxtH9l7m9uYieh5bQzcf684-dhYiKje_p6qyJte2tqOz2scSh-Zb9nYee7OCxvbGXn4X6_p-K7r2_ofuWj5iM6-Lss6vcmIWa7eTp7PnOqMKc65Pj6OunuLOlo-qZj52JhOzgsb3uu-v07-qQ-P6zs6PqrKi56vPu_b2_oaW7p6vq8-7u0t6htQAAAACxsCLA%24&vid=190740&q=",
+      "vid": "190740"
+    }
+  ],
+  "source_url": "https://partsouq.com/en/catalog/genuine/pick?c=Nissan&model=Canada&ssd=%24%2AKwGYwcuhmAAAAAA7h7kA%24",
+  "title": "Canada | Nissan Parts Catalogs | PartSouq"
+}
