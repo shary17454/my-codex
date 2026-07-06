@@ -159,7 +159,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ -n \"$TARGET_BUILD_DIR\" ] && [ -n \"$FULL_PRODUCT_NAME\" ]; then\n  /usr/bin/xattr -cr \"$TARGET_BUILD_DIR/$FULL_PRODUCT_NAME\" || true\nfi\n";
+			shellScript = "for product in \"$TARGET_BUILD_DIR/$FULL_PRODUCT_NAME\" \"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\" \"$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\" \"$DSTROOT/Applications/$FULL_PRODUCT_NAME\" \"$INSTALL_DIR/$FULL_PRODUCT_NAME\" \"$TARGET_TEMP_DIR/../InstallationBuildProductsLocation/Applications/$FULL_PRODUCT_NAME\"; do\n  if [ -e \"$product\" ]; then\n    /usr/bin/xattr -cr \"$product\" || true\n  fi\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
