@@ -1,0 +1,242 @@
+﻿<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ساهر 2030 | أمان الطرق الذكية</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="التنقل الرئيسي">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">2030</span>
+          <div>
+            <strong>ساهر 2030</strong>
+            <span>أمان الطرق الذكية</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <a class="active" href="#operations">لوحة العمليات</a>
+          <a href="#risk">مصفوفة المخاطر</a>
+          <a href="#readiness">جاهزية الجهات</a>
+          <a href="#workflow">دورة الحالة</a>
+        </nav>
+
+        <div class="command-status">
+          <span>مركز التحكم الوطني</span>
+          <strong>وضع مراقبة مباشر</strong>
+          <small>آخر تحديث 09:42 ص</small>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">MVP تشغيلي</p>
+            <h1>منظومة موحدة لتحليل البلاغات وتوقع مخاطر الطرق</h1>
+          </div>
+          <div class="top-actions" aria-label="أوامر سريعة">
+            <button class="icon-button" type="button" title="تحديث البيانات" aria-label="تحديث البيانات">⟳</button>
+            <button class="primary-button" type="button">فتح بلاغ جديد</button>
+          </div>
+        </header>
+
+        <section class="metric-grid" id="operations" aria-label="المؤشرات التشغيلية">
+          <article class="metric critical">
+            <span>الحالات الحرجة</span>
+            <strong>12</strong>
+            <small>+3 خلال آخر ساعة</small>
+          </article>
+          <article class="metric high">
+            <span>مخاطر عالية</span>
+            <strong>38</strong>
+            <small>72% موجهة للجهة المختصة</small>
+          </article>
+          <article class="metric ready">
+            <span>جاهزية الفرق</span>
+            <strong>86%</strong>
+            <small>متوسط وطني</small>
+          </article>
+          <article class="metric neutral">
+            <span>زمن الاستجابة</span>
+            <strong>11 د</strong>
+            <small>أقل من الهدف بـ 4 دقائق</small>
+          </article>
+        </section>
+
+        <section class="operations-layout">
+          <div class="map-panel" aria-label="خريطة المخاطر المباشرة">
+            <img src="assets/smart-roads-map.png" alt="خريطة تشغيلية لشبكة طرق ومؤشرات مخاطر">
+            <div class="map-overlay">
+              <div class="map-head">
+                <div>
+                  <p class="eyebrow">خريطة المخاطر</p>
+                  <h2>رصد مبكر للحوادث المحتملة</h2>
+                </div>
+                <span class="live-badge">مباشر</span>
+              </div>
+              <div class="map-pins" aria-hidden="true">
+                <span class="pin pin-critical"></span>
+                <span class="pin pin-high"></span>
+                <span class="pin pin-weather"></span>
+                <span class="pin pin-ready"></span>
+              </div>
+              <div class="map-summary">
+                <span>طريق سريع</span>
+                <strong>عاصفة غبار + ازدحام غير معتاد</strong>
+                <small>الأولوية المقترحة: حرجة | الجهة القائدة: أمن الطرق</small>
+              </div>
+            </div>
+          </div>
+
+          <section class="incident-panel" aria-label="البلاغات الذكية">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">البلاغات الذكية</p>
+                <h2>قائمة الحالات ذات الأولوية</h2>
+              </div>
+              <select id="severityFilter" aria-label="تصفية حسب مستوى الخطورة">
+                <option value="all">كل المستويات</option>
+                <option value="critical">حرجة</option>
+                <option value="high">عالية</option>
+                <option value="medium">متوسطة</option>
+              </select>
+            </div>
+
+            <div class="incident-list" id="incidentList"></div>
+          </section>
+        </section>
+
+        <section class="details-layout">
+          <article class="case-detail" aria-label="تفاصيل الحالة المختارة">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">تحليل الحالة</p>
+                <h2 id="caseTitle">تسرب حمولة خطرة على طريق سريع</h2>
+              </div>
+              <span class="score" id="riskScore">94</span>
+            </div>
+
+            <div class="detail-grid">
+              <div>
+                <span>تصنيف البلاغ</span>
+                <strong id="caseType">خطر مباشر</strong>
+              </div>
+              <div>
+                <span>الجهة القائدة</span>
+                <strong id="caseLead">الدفاع المدني</strong>
+              </div>
+              <div>
+                <span>الأثر المتوقع</span>
+                <strong id="caseImpact">مرتفع على الأرواح والحركة</strong>
+              </div>
+              <div>
+                <span>الإجراء المقترح</span>
+                <strong id="caseAction">إغلاق جزئي وتوجيه فرق متخصصة</strong>
+              </div>
+            </div>
+
+            <div class="priority-model" id="risk">
+              <div class="model-row">
+                <span>احتمالية الوقوع</span>
+                <meter min="0" max="100" value="88" id="probabilityMeter"></meter>
+                <strong id="probabilityValue">88%</strong>
+              </div>
+              <div class="model-row">
+                <span>حجم التأثير</span>
+                <meter min="0" max="100" value="96" id="impactMeter"></meter>
+                <strong id="impactValue">96%</strong>
+              </div>
+              <div class="model-row">
+                <span>حساسية الوقت</span>
+                <meter min="0" max="100" value="91" id="timeMeter"></meter>
+                <strong id="timeValue">91%</strong>
+              </div>
+            </div>
+          </article>
+
+          <section class="matrix-panel" aria-label="مصفوفة المخاطر">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">مصفوفة القرار</p>
+                <h2>احتمالية × تأثير</h2>
+              </div>
+            </div>
+            <div class="risk-matrix" aria-label="مصفوفة احتمالية وتأثير">
+              <span>منخفض</span><span>متوسط</span><span>عال</span><span>حرج</span>
+              <button class="cell low" type="button">عادي</button>
+              <button class="cell medium" type="button">متابعة</button>
+              <button class="cell high" type="button">استجابة</button>
+              <button class="cell critical active-cell" type="button">أزمة</button>
+              <button class="cell low" type="button">عادي</button>
+              <button class="cell medium" type="button">تحقق</button>
+              <button class="cell high" type="button">أولوية</button>
+              <button class="cell critical" type="button">حرج</button>
+              <button class="cell low" type="button">رصد</button>
+              <button class="cell medium" type="button">تنبيه</button>
+              <button class="cell high" type="button">توجيه</button>
+              <button class="cell high" type="button">عال</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="readiness-band" id="readiness" aria-label="جاهزية الجهات المشاركة">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">جاهزية تشغيلية</p>
+              <h2>قدرة الجهات على الاستجابة الآن</h2>
+            </div>
+          </div>
+          <div class="agency-grid">
+            <article class="agency">
+              <span>المرور</span>
+              <strong>91%</strong>
+              <meter min="0" max="100" value="91"></meter>
+            </article>
+            <article class="agency">
+              <span>أمن الطرق</span>
+              <strong>88%</strong>
+              <meter min="0" max="100" value="88"></meter>
+            </article>
+            <article class="agency">
+              <span>الإسعاف</span>
+              <strong>79%</strong>
+              <meter min="0" max="100" value="79"></meter>
+            </article>
+            <article class="agency">
+              <span>الدفاع المدني</span>
+              <strong>84%</strong>
+              <meter min="0" max="100" value="84"></meter>
+            </article>
+            <article class="agency">
+              <span>النقل والطرق</span>
+              <strong>76%</strong>
+              <meter min="0" max="100" value="76"></meter>
+            </article>
+          </div>
+        </section>
+
+        <section class="workflow" id="workflow" aria-label="دورة معالجة الحالة">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">دورة الحالة</p>
+              <h2>من البلاغ إلى تقييم الأداء</h2>
+            </div>
+          </div>
+          <ol class="timeline">
+            <li class="done">استقبال البلاغ أو رصد المؤشر</li>
+            <li class="done">التحقق من البيانات والسياق</li>
+            <li class="active">تصنيف البلاغ وتقييم الخطر</li>
+            <li>احتساب أولوية الاستجابة</li>
+            <li>توجيه الحالة ومتابعة التنفيذ</li>
+            <li>الإغلاق وتقييم أداء الجهات</li>
+          </ol>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
