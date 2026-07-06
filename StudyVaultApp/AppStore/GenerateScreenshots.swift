@@ -63,21 +63,14 @@ func save(_ image: NSImage, _ name: String) {
     guard let tiff = image.tiffRepresentation,
           let rep = NSBitmapImageRep(data: tiff),
           let data = rep.representation(using: .png, properties: [:]) else { return }
-    let fileURL = output.appendingPathComponent(name)
-    try? data.write(to: fileURL)
-
-    let resize = Process()
-    resize.executableURL = URL(fileURLWithPath: "/usr/bin/sips")
-    resize.arguments = ["-z", "\(Int(height))", "\(Int(width))", fileURL.path, "--out", fileURL.path]
-    try? resize.run()
-    resize.waitUntilExit()
+    try? data.write(to: output.appendingPathComponent(name))
 }
 
 func home() {
     let img = makeBase(color(2, 18, 28), color(6, 50, 58))
     img.lockFocus()
-    text("وش الراي", x: 150, y: 330, w: 980, h: 100, size: 84, weight: .black)
-    text("وش رأي الناس؟ قبل الشراء\nقارن بين خيارين أو أكثر بوضوح", x: 150, y: 455, w: 980, h: 120, size: 42, fill: color(210, 239, 235))
+    text("وش الرأي", x: 150, y: 330, w: 980, h: 100, size: 84, weight: .black)
+    text("اسأل الناس قبل الشراء\nقارن بين خيارين أو أكثر بوضوح", x: 150, y: 455, w: 980, h: 120, size: 42, fill: color(210, 239, 235))
     let stats = [("120", "عنصر معرفة"), ("0", "تصويت وهمي"), ("10", "خيارات مقارنة")]
     for (i, item) in stats.enumerated() {
         let x = CGFloat(150 + i * 341)
@@ -127,7 +120,7 @@ func compare() {
 func question() {
     let img = makeBase(color(11, 21, 28), color(27, 52, 44))
     img.lockFocus()
-    text("وش رأي الناس؟", x: 150, y: 330, w: 980, h: 100, size: 84, weight: .black)
+    text("اسأل الناس", x: 150, y: 330, w: 980, h: 100, size: 84, weight: .black)
     text("اكتب سؤالك، أضف الخيارات،\nواستقبل التصويتات والتعليقات", x: 150, y: 455, w: 980, h: 120, size: 42, fill: color(210, 239, 224))
     rounded(150, 650, 984, 540, 42, color(255, 255, 255, 0.14), stroke: color(255, 255, 255, 0.18))
     text("أشتري السيارة A أو B؟", x: 200, y: 725, w: 880, h: 70, size: 50, weight: .black)

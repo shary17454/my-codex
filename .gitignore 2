@@ -1,0 +1,97 @@
+<<<<<<< HEAD
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Local Codex/session state
+.codex/
+.agents/
+tmp/
+work/
+
+# Python/local generated files
+vendor/
+data/raw_text/
+data/extracted/
+__pycache__/
+.pycache-check/
+*.pyc
+
+# Flutter/Dart generated files
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/build/
+**/ephemeral/
+
+# Native dependency folders and generated caches
+**/Pods/
+**/DerivedData/
+ios/**/DerivedData/
+**/*.xcuserstate
+**/xcuserdata/
+**/.gradle/
+**/local.properties
+
+# Build outputs and archives generated during this session
+outputs/
+build/
+**/*.xcarchive/
+**/*.ipa
+**/*.dSYM/
+**/ArchiveIntermediates/
+**/ModuleCache.noindex/
+**/Intermediates.noindex/
+
+
+
+
+# SQLite sidecar files
+data/*.sqlite-shm
+data/*.sqlite-wal
+
+# Logs
+*.log
+
+# BatalAlDroob App Store build keeps searchable catalog data in-app.
+# Original PDF catalog packs stay outside the submitted app bundle.
+ios/BatalAlDroob/BatalAlDroob/Web/**/*.pdf
+=======
+# Xcode build output
+DerivedData/
+build/
+Archives/
+Exported/
+*.xcarchive/
+*.ipa
+*.dSYM/
+*.dSYM.zip
+
+# Local Xcode/user state
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+
+# Signing/private material
+*.mobileprovision
+*.provisionprofile
+AuthKey_*.p8
+*.cer
+*.p12
+
+# Packaged snapshots generated during development
+*.zip
+
+# macOS metadata
+.DS_Store
+._*
+
+# Node/local caches if added later
+node_modules/
+.env
+.env.*
+>>>>>>> a8e0148 (Save Rah Tafham app project)
