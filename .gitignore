@@ -1,0 +1,33 @@
+# Xcode build output
+DerivedData/
+build/
+Archives/
+Exported/
+*.xcarchive/
+*.ipa
+*.dSYM/
+*.dSYM.zip
+
+# Xcode local user state
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+
+# Signing/private material
+*.mobileprovision
+*.provisionprofile
+AuthKey_*.p8
+*.cer
+*.p12
+
+# Local/generated packages
+*.zip
+
+# macOS metadata
+.DS_Store
+._*
+
+# Environment and dependency caches
+.env
+.env.*
+node_modules/
