@@ -1,4 +1,4 @@
-const CACHE_NAME = "batal-droob-v12";
+const CACHE_NAME = "batal-droob-v22-backend-foundation";
 const APP_SHELL = [
   "/",
   "/index.html",

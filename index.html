@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
     <link rel="icon" href="assets/icons/icon-192.png">
-    <link rel="stylesheet" href="styles.css?v=hierarchy-1">
+    <link rel="stylesheet" href="styles.css?v=backend-foundation-22">
   </head>
   <body>
     <div class="app-shell">
@@ -31,6 +31,7 @@
           <button class="nav-item" type="button"><span class="nav-icon">﷼</span><span data-i18n="navPrices">الأسعار</span></button>
           <button class="nav-item" type="button"><span class="nav-icon">⚙</span><span data-i18n="navMaintenance">الصيانة</span></button>
           <button class="nav-item" type="button"><span class="nav-icon">◇</span><span data-i18n="navCommunity">المجتمع</span></button>
+          <button class="nav-item" type="button" data-menu-target="vision"><span class="nav-icon">◎</span><span data-i18n="navVision">الرؤية العالمية</span></button>
         </nav>
 
         <div class="sidebar-panel">
@@ -50,6 +51,21 @@
               <span data-i18n="heroBadgeOffline">جاهز للمتصفح و iOS</span>
               <span data-i18n="heroBadgeLang">عربي / English</span>
             </div>
+            <p class="independent-notice" data-i18n="independentNotice">بطل الدروب تطبيق مستقل. لا يتبع نيسان أو الوكيل الرسمي، وروابط المتاجر الخارجية للتسهيل فقط وليست اعتماداً رسمياً.</p>
+            <div class="hero-metrics" aria-label="مؤشرات التطبيق">
+              <article>
+                <strong>5,125</strong>
+                <span data-i18n="metricPartsLabel">قطعة موثقة</span>
+              </article>
+              <article>
+                <strong>100,574</strong>
+                <span data-i18n="metricRecordsLabel">سجل مستخرج</span>
+              </article>
+              <article>
+                <strong>1.0</strong>
+                <span data-i18n="metricBuildLabel">إصدار التطبيق</span>
+              </article>
+            </div>
           </div>
           <div class="topbar-actions">
             <button class="language-toggle" id="languageToggle" type="button" aria-label="Switch language">English</button>
@@ -67,9 +83,19 @@
               <nav class="menu-panel" id="menuPanel" aria-label="قائمة التطبيق">
                 <button type="button" data-menu-target="home" data-i18n="menuHome">الرئيسية</button>
                 <button type="button" data-menu-target="parts" data-i18n="menuParts">القطع</button>
+                <button type="button" data-menu-target="part-request" data-i18n="menuPartRequest">طلب قطعة</button>
                 <button type="button" data-menu-target="faults" data-i18n="menuFaults">الأعطال الشائعة</button>
                 <button type="button" data-menu-target="catalogs" data-i18n="menuCatalogs">الكتالوجات</button>
+                <button type="button" data-menu-target="ai-hub">الذكاء الاصطناعي</button>
+                <button type="button" data-menu-target="my-car">سيارتي</button>
+                <button type="button" data-menu-target="maintenance-log">سجل الصيانة</button>
+                <button type="button" data-menu-target="marketplace">السوق والورش</button>
+                <button type="button" data-menu-target="pro-tools">الأدوات الاحترافية</button>
+                <button type="button" data-menu-target="next-generation">الجيل القادم</button>
+                <button type="button" data-menu-target="shared-fitment" data-i18n="menuSharedFitment">القطع المشتركة</button>
+                <button type="button" data-menu-target="source-intake" data-i18n="menuSourceIntake">مصادر الفهرسة</button>
                 <button type="button" data-menu-target="prices" data-i18n="menuPrices">الأسعار</button>
+                <button type="button" data-menu-target="vision" data-i18n="menuVision">الرؤية العالمية</button>
                 <button type="button" data-menu-target="wishlist" data-i18n="menuWishlist">قائمة الرغبات</button>
                 <button type="button" data-menu-target="contact" data-i18n="menuContact">تواصل معنا</button>
               </nav>
@@ -81,6 +107,7 @@
           <div class="search-box">
             <label for="searchInput" data-i18n="smartSearch">بحث ذكي</label>
             <input id="searchInput" type="search" placeholder="رقم القطعة، الاسم، القسم، أو VIN" data-i18n-placeholder="searchPlaceholder">
+            <span class="search-hint" data-i18n="searchHint">التصفية فورية ومخففة لتقليل التقطيع أثناء الكتابة.</span>
           </div>
           <div class="filter-group">
             <div class="filter-title">
@@ -101,14 +128,14 @@
               <span data-i18n="categoryFilterHint">اختر القسم للدخول إلى صفحة قطعه</span>
             </div>
             <div class="category-grid" role="group" aria-label="أقسام القطع">
-              <button class="category-card active" data-filter="all" type="button"><span>⌕</span><strong data-i18n="filterAll">الكل</strong></button>
-              <button class="category-card" data-filter="engine" type="button"><span>⚙</span><strong data-i18n="catEngine">محرك</strong></button>
+              <button class="category-card active" data-filter="engine" type="button"><span>⚙</span><strong data-i18n="catEngine">محرك</strong></button>
               <button class="category-card" data-filter="cooling" type="button"><span>❄</span><strong data-i18n="catCooling">تبريد</strong></button>
               <button class="category-card" data-filter="electrical" type="button"><span>↯</span><strong data-i18n="catElectrical">كهرباء</strong></button>
               <button class="category-card" data-filter="body" type="button"><span>▦</span><strong data-i18n="catBody">هيكل</strong></button>
-              <button class="category-card" data-filter="brake" type="button"><span>◎</span><strong data-i18n="catBrake">فرامل</strong></button>
               <button class="category-card" data-filter="suspension" type="button"><span>⌁</span><strong data-i18n="catSuspension">تعليق</strong></button>
               <button class="category-card" data-filter="fuel" type="button"><span>◈</span><strong data-i18n="catFuel">وقود</strong></button>
+              <button class="category-card" data-filter="interior" type="button"><span>▣</span><strong data-i18n="catInterior">داخلية</strong></button>
+              <button class="category-card" data-filter="all" type="button"><span>□</span><strong data-i18n="catGeneral">عام</strong></button>
             </div>
           </div>
         </section>
@@ -116,20 +143,279 @@
         <section class="stats-grid" aria-label="إحصائيات سريعة">
           <article>
             <span data-i18n="statParts">قطع مفهرسة</span>
-            <strong>12,480</strong>
+            <strong>5,125</strong>
           </article>
           <article>
-            <span data-i18n="statSources">مصادر PDF</span>
-            <strong>38</strong>
+            <span data-i18n="statSources">ملفات PDF مفحوصة</span>
+            <strong>11</strong>
           </article>
           <article>
             <span data-i18n="statReview">تحتاج مراجعة</span>
-            <strong>214</strong>
+            <strong>52</strong>
           </article>
           <article>
-            <span data-i18n="statRecords">سجلات مستخرجة</span>
-            <strong>8,920</strong>
+            <span data-i18n="statCatalogPages">صفحات كتالوج</span>
+            <strong>5,271</strong>
           </article>
+        </section>
+
+        <section class="source-intake-section" data-section="source-intake" aria-label="مصادر الفهرسة الجديدة">
+          <div class="section-heading">
+            <h2 data-i18n="sourceIntakeTitle">مصادر الفهرسة الجديدة</h2>
+            <span data-i18n="sourceIntakeSubtitle">تم فحص ملفات PDF الجديدة بالبصمة وعدد الصفحات قبل دمجها في التطبيق</span>
+          </div>
+          <div class="source-intake-grid">
+            <article class="source-card ready">
+              <span data-i18n="sourceReady">جاهز للفهرسة</span>
+              <h3>Y62 2012</h3>
+              <p data-i18n="sourceY62Text">كتالوج جديد من 1,275 صفحة. يضاف كخيار Y62 مستقل مع فهرس بحث خاص به.</p>
+            </article>
+            <article class="source-card review">
+              <span data-i18n="sourceReview">مراجعة قبل الدمج</span>
+              <h3>Y60 1988-1997</h3>
+              <p data-i18n="sourceY60Text">ملفات سنوات Y60 الجديدة أقصر من ملفات التطبيق الحالية؛ تحفظ للمقارنة ولا تستبدل القاعدة المفهرسة مباشرة.</p>
+            </article>
+            <article class="source-card archive">
+              <span data-i18n="sourceArchive">أرشيف تحقق</span>
+              <h3>Y60 Combined</h3>
+              <p data-i18n="sourceCombinedText">ملف مجمع من 5,281 صفحة يستخدم للتحقق من الصفحات الناقصة ومراجعة الفهارس.</p>
+            </article>
+            <article class="source-card duplicate">
+              <span data-i18n="sourceDuplicate">مكرر</span>
+              <h3>WGY60348567</h3>
+              <p data-i18n="sourceWgyText">ملف بطاقة السيارة مطابق للموجود داخل التطبيق، لذلك لا ينسخ مرة ثانية.</p>
+            </article>
+            <article class="source-card helper">
+              <span data-i18n="sourceHelper">مصدر مساعد</span>
+              <h3>Partsouq</h3>
+              <p data-i18n="sourcePartsouqText">ملفات قصيرة تصلح كمرجع تصميم أو فهرسة مساعدة، وليست بديلة عن كتالوجات OEM.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="platform-section" data-section="ai-hub" aria-label="الذكاء الاصطناعي في بطل الدروب">
+          <div class="section-heading">
+            <h2>مركز الذكاء الاصطناعي</h2>
+            <span>واجهة تشغيلية جاهزة للتعرف على القطع، البحث بالوصف، تشخيص الأعطال، وتحليل الأصوات عند توصيل خدمة الذكاء الاصطناعي</span>
+          </div>
+          <div class="ai-workbench">
+            <article class="ai-card">
+              <span class="module-state ready">جاهز للربط</span>
+              <h3>التعرف على القطعة من الصورة</h3>
+              <p>اختر صورة قطعة من المعرض. يعرض التطبيق حالياً أقرب نتائج من قاعدة الكتالوج، وعند ربط AI يعرض اسم القطعة، رقم OEM، الجيل، التوافق، الصور المشابهة، الأسعار، والبدائل.</p>
+              <label class="file-drop">
+                <input id="aiImageInput" type="file" accept="image/*">
+                <strong>اختيار صورة قطعة</strong>
+                <small>الكاميرا أو المعرض</small>
+              </label>
+              <div class="ai-result" id="aiImageResult">لم يتم اختيار صورة بعد.</div>
+            </article>
+            <article class="ai-card">
+              <span class="module-state live">يعمل محلياً</span>
+              <h3>البحث بالوصف</h3>
+              <p>اكتب وصفاً مثل: أحتاج غطاء الرديتر، قطعة فوق الدينمو، تهريب زيت، أو القير ينفض. سيقترح التطبيق أقرب كلمات بحث وأقرب نتائج.</p>
+              <textarea id="descriptionSearchInput" rows="4" placeholder="اكتب وصف القطعة أو مكانها أو العطل..."></textarea>
+              <button class="secondary-action" type="button" id="descriptionSearchButton">تحليل الوصف والبحث</button>
+              <div class="ai-result" id="descriptionSearchResult">جاهز للتحليل.</div>
+            </article>
+            <article class="ai-card">
+              <span class="module-state planned">مرحلة لاحقة</span>
+              <h3>تحليل أصوات الأعطال</h3>
+              <p>واجهة مخصصة لتسجيل صوت السيارة وتحليل احتمالات مثل صوت بلف، كرسي ماكينة، جنزير، دفرنس، رولمان، سير، أو طرمبة ماء.</p>
+              <button class="secondary-action" type="button" id="soundDiagnosticButton">تجهيز تقرير صوتي تجريبي</button>
+              <div class="ai-result" id="soundDiagnosticResult">تحليل الصوت يحتاج ربط نموذج صوتي قبل التشغيل الفعلي.</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="platform-section" data-section="my-car" aria-label="ملف السيارة">
+          <div class="section-heading">
+            <h2>سيارتي</h2>
+            <span>ملف السيارة يجعل نتائج القطع والتوافق والصيانة مخصصة لرقم الهيكل والموديل والمحرك والقير</span>
+          </div>
+          <div class="owner-grid">
+            <form class="profile-form" id="vehicleProfileForm">
+              <label><span>رقم الهيكل VIN</span><input name="vin" placeholder="WGY60-348567"></label>
+              <label><span>الجيل</span><select name="generation"><option>Y60</option><option>Y61</option><option>Y62</option><option>Y63</option></select></label>
+              <label><span>السنة</span><input name="year" inputmode="numeric" placeholder="1992"></label>
+              <label><span>الفئة</span><input name="trim" placeholder="SGL / Safari / Super Safari"></label>
+              <label><span>المحرك</span><input name="engine" placeholder="TB42S"></label>
+              <label><span>القير</span><input name="transmission" placeholder="FS5R50A"></label>
+              <label><span>اللون</span><input name="color" placeholder="2L3 / AH3"></label>
+              <button class="request-submit" type="submit">حفظ ملف السيارة</button>
+            </form>
+            <article class="profile-summary" id="vehicleProfileSummary">
+              <h3>لا توجد سيارة محفوظة</h3>
+              <p>أضف بيانات سيارتك لربط البحث والتوافق والصيانة بها.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="platform-section" data-section="maintenance-log" aria-label="سجل الصيانة والتنبيهات">
+          <div class="section-heading">
+            <h2>سجل الصيانة والتنبيهات</h2>
+            <span>حفظ عمليات الصيانة، التكلفة، العداد، الورشة، ومواعيد التنبيه القادمة محلياً داخل الجهاز</span>
+          </div>
+          <div class="maintenance-layout">
+            <form class="profile-form" id="maintenanceForm">
+              <label><span>نوع الصيانة</span><input name="service" placeholder="زيت / فلتر / بواجي / بطارية / كفرات"></label>
+              <label><span>التاريخ</span><input name="date" type="date"></label>
+              <label><span>العداد</span><input name="odometer" inputmode="numeric" placeholder="250000"></label>
+              <label><span>التكلفة</span><input name="cost" inputmode="decimal" placeholder="350"></label>
+              <label><span>الورشة</span><input name="workshop" placeholder="اسم الورشة"></label>
+              <label><span>التنبيه القادم</span><input name="next" placeholder="بعد 5000 كم أو 3 أشهر"></label>
+              <button class="request-submit" type="submit">إضافة عملية صيانة</button>
+            </form>
+            <div class="maintenance-list" id="maintenanceList"></div>
+          </div>
+        </section>
+
+        <section class="platform-section" data-section="marketplace" aria-label="السوق والورش والمتاجر">
+          <div class="section-heading">
+            <h2>السوق والورش والمتاجر</h2>
+            <span>بنية جاهزة لسوق قطع الباترول، المزادات، التشاليح، الورش، وتقييم المتاجر</span>
+          </div>
+          <div class="market-grid">
+            <article><span>سوق قطع</span><h3>قطع جديدة ومستعملة وNOS</h3><p>إضافة الصور، السعر، الحالة، المدينة، ووسيلة التواصل مع البائع.</p></article>
+            <article><span>مزاد</span><h3>عروض ومزايدات</h3><p>بيع القطع النادرة بالمزاد مع سجل عروض واضح.</p></article>
+            <article><span>ورش</span><h3>دليل الورش</h3><p>تقييمات، صور، أوقات عمل، تخصص، وخدمات الصيانة.</p></article>
+            <article><span>تشاليح</span><h3>تشاليح موثوقة</h3><p>الموقع، الهاتف، التقييم، وأنواع السيارات المتوفرة.</p></article>
+            <article><span>متاجر</span><h3>تقييم المتاجر</h3><p>جودة القطع، سرعة الشحن، خدمة العملاء، والأسعار.</p></article>
+            <article><span>إشعارات</span><h3>أبلغني عند توفرها</h3><p>تنبيه عند توفر القطعة أو رجوعها أو انخفاض سعرها.</p></article>
+          </div>
+        </section>
+
+        <section class="platform-section" data-section="community" aria-label="مجتمع بطل الدروب">
+          <div class="section-heading">
+            <h2>مجتمع بطل الدروب</h2>
+            <span>منتدى وتجارب ملاك ومشاريع ترميم وتقييم قطع وخبراء</span>
+          </div>
+          <div class="community-grid">
+            <article><h3>اسأل الخبراء</h3><p>أسئلة يجيب عليها ميكانيكيون وكهربائيون وأصحاب خبرة.</p></article>
+            <article><h3>مشاريع الترميم</h3><p>صور ومراحل وتجارب ملاك الباترول في الترميم.</p></article>
+            <article><h3>تقييم القطع</h3><p>مراجعات، صور مستخدمين، والعمر الافتراضي الحقيقي للقطعة.</p></article>
+            <article><h3>معلومة اليوم</h3><p>معلومة يومية عن قطعة أو عطل أو تاريخ الباترول أو الصيانة.</p></article>
+          </div>
+        </section>
+
+        <section class="platform-section" data-section="pro-tools" aria-label="الأدوات الاحترافية">
+          <div class="section-heading">
+            <h2>الأدوات الاحترافية والمكافآت</h2>
+            <span>حاسبات ومقارنات ونقاط وشارات قابلة للتفعيل التدريجي</span>
+          </div>
+          <div class="tools-grid">
+            <article class="tool-card">
+              <h3>حاسبة الكفرات</h3>
+              <div class="tool-row">
+                <input id="tireOld" placeholder="المقاس الحالي 265/70R16">
+                <input id="tireNew" placeholder="المقاس الجديد 285/75R16">
+              </div>
+              <button class="secondary-action" type="button" id="tireCalcButton">احسب الفرق</button>
+              <p id="tireCalcResult">أدخل المقاسين لحساب نسبة اختلاف السرعة.</p>
+            </article>
+            <article class="tool-card">
+              <h3>مقارنة الأجيال</h3>
+              <p>Y60، Y61، Y62، Y63 حسب المحرك، القوة، العزم، القير، الدفرنس، الأنظمة، الأعطال، واستهلاك الوقود.</p>
+              <div class="generation-compare">
+                <span>Y60 كلاسيكي ميكانيكي</span>
+                <span>Y61 سفاري اعتمادي</span>
+                <span>Y62 فاخر حديث</span>
+                <span>Y63 الجيل الجديد</span>
+              </div>
+            </article>
+            <article class="tool-card">
+              <h3>النقاط والشارات</h3>
+              <p>يكسب المستخدم نقاطاً عند البحث، تقييم قطعة، كتابة مراجعة، إضافة صورة، أو الإجابة على سؤال.</p>
+              <div class="badges-preview">
+                <span>خبير باترول</span><span>ميكانيكي محترف</span><span>خبير Y60</span><span>جامع قطع</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="platform-section roadmap-section" data-section="roadmap" aria-label="خارطة التنفيذ">
+          <div class="section-heading">
+            <h2>خارطة التنفيذ المعتمدة</h2>
+            <span>ترتيب واضح للتنفيذ بدون خلط بين ما يعمل الآن وما يحتاج Backend أو AI أو App Store Products</span>
+          </div>
+          <div class="roadmap-grid">
+            <article><strong>المرحلة الأولى MVP</strong><p>تحسين التصميم، البحث الذكي، سيارتي، VIN، المخطط التفاعلي، توافق القطع، سجل الصيانة، تنبيهات الصيانة، الأسعار، المفضلة وسجل البحث.</p></article>
+            <article><strong>المرحلة الثانية</strong><p>المجتمع، تقييم الورش والمتاجر، سوق القطع، المزاد، إشعارات التوفر، سجل تغير الأسعار، مكتبة الفيديو، وقاعدة الأعطال.</p></article>
+            <article><strong>المرحلة الثالثة</strong><p>التعرف على القطع من الصور، تحليل الأصوات، المساعد الذكي، التوصيات، التحليلات، النقاط والشارات، وحاسبات المقاسات والرفع.</p></article>
+          </div>
+        </section>
+
+        <section class="platform-section next-generation-section" data-section="next-generation" aria-label="مزايا الجيل القادم">
+          <div class="section-heading">
+            <h2>الجيل القادم من بطل الدروب</h2>
+            <span>رؤية مستقبلية لتحويل التطبيق إلى نظام بيئي كامل لإدارة الباترول والقطع والصيانة والشراء والرحلات</span>
+          </div>
+
+          <div class="next-generation-hero">
+            <article>
+              <span class="module-state ready">داخل التطبيق الآن</span>
+              <h3>الملف الرقمي الكامل للسيارة</h3>
+              <p>ملف شامل يبدأ من VIN والمحرك والقير واللون، ويتوسع لاحقاً إلى الصيانات، القطع المستبدلة، الفواتير، الصور، الضمانات، الأعطال، التعديلات، وسجل الملاك عند توفر البيانات.</p>
+            </article>
+            <article>
+              <span class="module-state planned">مرحلة ثلاثية الأبعاد</span>
+              <h3>التوأم الرقمي للسيارة</h3>
+              <p>نموذج 3D للباترول يمكن تدويره والضغط على أجزائه لعرض القطع المرتبطة، حالة كل قطعة، آخر استبدال، والعمر الافتراضي المتبقي.</p>
+            </article>
+            <article>
+              <span class="module-state live">مرتبط بالفهرس</span>
+              <h3>مساعد باترول ذكي</h3>
+              <p>مساعد متخصص يجيب عن أرقام القطع، أسباب الأعطال، طرق الفك، أفضل البدائل، أصالة القطعة، والتوافق مع الموديلات الأخرى.</p>
+            </article>
+          </div>
+
+          <div class="next-feature-grid">
+            <article><strong>التنبؤ بالأعطال</strong><p>تحليل العداد، عمر القطع، تاريخ الصيانة، وموديل السيارة للتنبيه قبل تلف طرمبة ماء، مساعدات، سيور، أو بطارية.</p></article>
+            <article><strong>خرائط الرحلات البرية</strong><p>مواقع تخييم، كثبان، مسارات تطعيس، وقود، ورش قريبة، تشاليح، محلات قطع، نقاط إنقاذ، ومشاركة مواقع بين الأصدقاء.</p></article>
+            <article><strong>تجهيزات الرحلات</strong><p>قوائم تجهيز ذكية تشمل الماء، الوقود الإضافي، الونش، الكمبروسر، حبال السحب، عدة الإصلاح، الإسعافات، والبطارية الاحتياطية.</p></article>
+            <article><strong>مركز المشاريع</strong><p>ترميم كامل، تحويل ديزل، سوبر تشارجر، رفع السيارة، تركيب ونش، أو تعديل تعليق مع القطع والتكلفة والمدة والصعوبة.</p></article>
+            <article><strong>إدارة الميزانية</strong><p>إجمالي المصروفات، متوسط الصيانة السنوي، الوقود، التعديلات، الرحلات، وتقارير شهرية وسنوية.</p></article>
+            <article><strong>لوحة معلومات السيارة</strong><p>عدد القطع المستبدلة، اكتمال الصيانة، إجمالي الصرف، آخر صيانة، الصيانة القادمة، والقطع القريبة من نهاية عمرها.</p></article>
+            <article><strong>نظام الإنجازات</strong><p>شارات مثل خبير Y60، خبير Y61، خبير الرحلات، جامع القطع النادرة، محترف الصيانة، وأفضل مساهم.</p></article>
+            <article><strong>موسوعة الباترول</strong><p>تاريخ الأجيال، المواصفات، الإصدارات الخاصة، الصور النادرة، الكتالوجات القديمة، الإعلانات، وفروقات الأسواق.</p></article>
+            <article><strong>قاعدة بيانات التعديلات</strong><p>كل تعديل يعرض القطع المطلوبة، التكلفة، الوقت، التأثير على الأداء، المميزات، العيوب، تقييم المستخدمين، وأمثلة واقعية.</p></article>
+            <article><strong>مكتبة الأصوات</strong><p>أصوات أعطال معروفة يستطيع المستخدم مقارنتها بصوت سيارته قبل ربط نموذج التحليل الصوتي.</p></article>
+            <article><strong>مقارنة السيارات</strong><p>مقارنة Y60 وY61 وY62 وY63 حسب المحرك، العزم، الوزن، الدفع، الأعطال، أسعار القطع، الصيانة، الوقود، والقيمة السوقية.</p></article>
+            <article><strong>تقييم حالة السيارة</strong><p>درجة من 100 تعتمد على الصيانة، الأعطال، القطع المستبدلة، العمر، وعدد الكيلومترات مع تقرير واضح.</p></article>
+            <article><strong>سجل ملكية القطع</strong><p>لكل قطعة: تاريخ التركيب، مكان الشراء، السعر، الضمان، الفاتورة، والعمر المتوقع.</p></article>
+            <article><strong>QR لكل سيارة</strong><p>رمز QR يعرض بيانات السيارة، سجل الصيانة، التعديلات، القطع المركبة، ومعلومات التواصل الاختيارية.</p></article>
+            <article><strong>لوحة الورش والمتاجر</strong><p>إدارة المخزون، الطلبات، الأسعار، الحجوزات، العملاء، الرد على التقييمات، والإحصائيات.</p></article>
+            <article><strong>نظام الحجوزات</strong><p>حجز صيانة، فحص، تركيب، برمجة، وتغيير زيت مع تحديد التاريخ والوقت والدفع المسبق عند توفره.</p></article>
+            <article><strong>منصة تعليمية</strong><p>دورات ومقالات وفيديوهات واختبارات وشهادات في الصيانة، الكهرباء، الميكانيكا، التعديلات، والرحلات البرية.</p></article>
+            <article><strong>الإشعارات الذكية</strong><p>انخفاض سعر قطعة محفوظة، توفر قطعة نادرة، استدعاء مصنع، تذكير صيانة، رحلة قريبة، أو عرض متجر مناسب.</p></article>
+            <article><strong>واجهة شخصية</strong><p>تخصيص اللون، الخلفيات، صورة السيارة، ترتيب الأقسام، الاختصارات، والويدجت الرئيسية.</p></article>
+            <article><strong>منصة المطورين API</strong><p>ربط الورش والمتاجر والموردين لتحديث الأسعار والمخزون والطلبات لحظياً عند بناء Backend تجاري.</p></article>
+            <article><strong>تحليل البيانات</strong><p>إحصائيات مجهولة الهوية عن أكثر القطع طلباً، الأعطال انتشاراً، المدن نشاطاً، متوسط الأسعار، واتجاهات السوق.</p></article>
+          </div>
+
+          <div class="ecosystem-goal">
+            <strong>الرؤية النهائية</strong>
+            <p>بطل الدروب ليس تطبيق بحث عن قطع فقط، بل نظام بيئي يخدم مالك الباترول من الشراء إلى الصيانة والتعديلات والرحلات وبيع السيارة، مع الذكاء الاصطناعي والمجتمع والبيانات والخدمات الرقمية.</p>
+          </div>
+        </section>
+
+        <section class="vision-section" data-section="vision" aria-label="الرؤية العالمية">
+          <div class="section-heading">
+            <h2 data-i18n="visionTitle">المزايا التي تجعل تطبيق الباترول مرجعًا عالميًا</h2>
+            <span data-i18n="visionSubtitle">خارطة تطوير معتمدة لقاعدة القطع، الأسعار، الصيانة، المجتمع، والذكاء الاصطناعي</span>
+          </div>
+          <div class="vision-grid">
+            <article><span>01</span><h3 data-i18n="visionDatabaseTitle">قاعدة بيانات احترافية</h3><p data-i18n="visionDatabaseText">رسومات أصلية، OEM، أسماء متعددة اللغات، وصف وظيفة القطعة، موقعها، صورها، والأبعاد عند توفرها.</p></article>
+            <article><span>02</span><h3 data-i18n="visionFitmentTitle">توافق القطع</h3><p data-i18n="visionFitmentText">معرفة السيارات المطابقة والفروقات بين Y60 وY61 وY62 حسب السنة والمحرك والقير والفئة.</p></article>
+            <article><span>03</span><h3 data-i18n="visionSearchTitle">البحث الذكي</h3><p data-i18n="visionSearchText">بحث برقم القطعة، الاسم، العربية، الإنجليزية، VIN، والقسم الفني.</p></article>
+            <article><span>04</span><h3 data-i18n="visionPricesTitle">مقارنة الأسعار</h3><p data-i18n="visionPricesText">السعر، العملة، الشحن، مدة التوصيل، الدولة، وحالة القطعة من عدة متاجر.</p></article>
+            <article><span>05</span><h3 data-i18n="visionTypeTitle">تصنيف نوع القطعة</h3><p data-i18n="visionTypeText">OEM، مصنع أصلي، إعادة تصنيع عالية الجودة، بديل تجاري، مستعملة أصلية، وNOS.</p></article>
+            <article><span>06</span><h3 data-i18n="visionRarityTitle">مؤشر الندرة</h3><p data-i18n="visionRarityText">متوفرة بكثرة، محدودة، نادرة، أو موقوفة الإنتاج NLA.</p></article>
+            <article><span>07</span><h3 data-i18n="visionMaintenanceTitle">الصيانة والشروحات</h3><p data-i18n="visionMaintenanceText">أعراض التلف، العمر الافتراضي، القطع المصاحبة، عزم الربط، الأدوات، ودرجة الصعوبة.</p></article>
+            <article><span>08</span><h3 data-i18n="visionCommunityTitle">المجتمع والمتاجر</h3><p data-i18n="visionCommunityText">تقييمات، تجارب ملاك، مشاريع ترميم، متاجر عالمية وخليجية، تشاليح، وبائعون موثقون.</p></article>
+            <article><span>09</span><h3 data-i18n="visionAiTitle">الذكاء الاصطناعي والإحصائيات</h3><p data-i18n="visionAiText">معرفة القطعة من صورة، اقتراح البدائل، تشخيص الأعطال، وأكثر القطع طلبًا وندرة.</p></article>
+          </div>
+          <p class="vision-goal" data-i18n="visionGoal">الهدف النهائي: أن يجد مالك نيسان باترول كل ما يحتاجه عن أي قطعة في مكان واحد دون التنقل بين عشرات المواقع والمتاجر.</p>
         </section>
 
         <section class="content-grid">
@@ -150,32 +436,40 @@
             <span data-i18n="generationsSubtitle">اختر الجيل المناسب لقاعدة القطع</span>
           </div>
           <div class="generation-grid">
-            <article class="generation-card">
-              <img src="assets/models/patrol-y60.jpg" alt="نيسان باترول Y60" loading="lazy">
+            <article class="generation-card is-locked is-subscription" data-generation="Y60">
+              <img src="assets/models/patrol-y60.png?v=gen-2" alt="نيسان باترول Y60" loading="lazy">
+              <span class="generation-status locked" data-i18n="generationSubscription">اشتراك</span>
+              <span class="generation-lock" aria-hidden="true">🔒</span>
               <div>
                 <span>1988 - 1997</span>
                 <h3>Y60</h3>
                 <p data-i18n="generationY60">الجيل الكلاسيكي المربع، أساس قاعدة البيانات الحالية.</p>
               </div>
             </article>
-            <article class="generation-card">
-              <img src="assets/models/patrol-y61.jpg" alt="نيسان باترول Y61" loading="lazy">
+            <article class="generation-card is-locked" data-generation="Y61">
+              <img src="assets/models/patrol-y61.png?v=y61-desert-1" alt="نيسان باترول Y61" loading="lazy">
+              <span class="generation-status locked" data-i18n="generationSubscription">اشتراك</span>
+              <span class="generation-lock" aria-hidden="true">🔒</span>
               <div>
                 <span>1997 - 2016</span>
                 <h3>Y61</h3>
                 <p data-i18n="generationY61">جيل السفاري المعروف بقوة الاعتماد وكثرة الاستخدام في الخليج.</p>
               </div>
             </article>
-            <article class="generation-card">
-              <img src="assets/models/patrol-y62.jpg?v=y62-1" alt="نيسان باترول Y62" loading="lazy">
+            <article class="generation-card is-locked" data-generation="Y62">
+              <img src="assets/models/patrol-y62.png?v=gen-2" alt="نيسان باترول Y62" loading="lazy">
+              <span class="generation-status locked" data-i18n="generationSubscription">اشتراك</span>
+              <span class="generation-lock" aria-hidden="true">🔒</span>
               <div>
                 <span>2010 - 2024</span>
                 <h3>Y62</h3>
                 <p data-i18n="generationY62">جيل فاخر كبير الحجم مع أنظمة حديثة وقاعدة قطع مختلفة.</p>
               </div>
             </article>
-            <article class="generation-card">
-              <img src="assets/models/patrol-y63.webp" alt="نيسان باترول Y63 الجديد" loading="lazy">
+            <article class="generation-card is-locked" data-generation="Y63">
+              <img src="assets/models/patrol-y63.png?v=y63-real-1" alt="نيسان باترول Y63 الجديد" loading="lazy">
+              <span class="generation-status locked" data-i18n="generationSubscription">اشتراك</span>
+              <span class="generation-lock" aria-hidden="true">🔒</span>
               <div>
                 <span>2025+</span>
                 <h3>Y63</h3>
@@ -183,6 +477,128 @@
               </div>
             </article>
           </div>
+        </section>
+
+        <section class="part-request-section" data-section="part-request" aria-label="طلب قطعة">
+          <div class="section-heading">
+            <h2 data-i18n="partRequestTitle">طلب قطعة مدفوع</h2>
+            <span data-i18n="partRequestSubtitle">ادفع رسوم طلب رمزية، ثم جهز بيانات القطعة لإرسالها للمتاجر السعودية والخليجية والعالمية.</span>
+          </div>
+
+          <div class="request-plan-grid" role="group" aria-label="رسوم طلب القطعة">
+            <button class="request-plan active" type="button" data-request-plan="basic">
+              <span data-i18n="requestCustomerFeesTitle">رسوم العميل</span>
+              <strong>10 ر.س</strong>
+              <b data-i18n="requestBasicTitle">طلب عادي</b>
+              <small data-i18n="requestBasicText">تجهيز الطلب وإرساله للمتاجر المناسبة.</small>
+            </button>
+            <button class="request-plan" type="button" data-request-plan="urgent">
+              <span data-i18n="requestCustomerFeesTitle">رسوم العميل</span>
+              <strong>20 ر.س</strong>
+              <b data-i18n="requestUrgentTitle">طلب مستعجل</b>
+              <small data-i18n="requestUrgentText">أولوية أعلى وصياغة طلب جاهز للواتساب والبريد.</small>
+            </button>
+            <button class="request-plan" type="button" data-request-plan="rare">
+              <span data-i18n="requestCustomerFeesTitle">رسوم العميل</span>
+              <strong>50 ر.س</strong>
+              <b data-i18n="requestRareTitle">طلب قطعة نادرة / NOS</b>
+              <small data-i18n="requestRareText">بحث مركز للقطع النادرة، المستعملة الأصلية، أو وكالة قديمة جديدة.</small>
+            </button>
+          </div>
+
+          <form class="part-request-form" id="partRequestForm">
+            <fieldset>
+              <legend data-i18n="requestVehicleTitle">بيانات السيارة</legend>
+              <label>
+                <span data-i18n="requestGeneration">الجيل</span>
+                <select name="generation">
+                  <option value="Y60">Y60</option>
+                  <option value="Y61">Y61</option>
+                  <option value="Y62">Y62</option>
+                  <option value="Y63">Y63</option>
+                </select>
+              </label>
+              <label>
+                <span data-i18n="requestYear">سنة الصنع</span>
+                <input name="year" inputmode="numeric" placeholder="1992">
+              </label>
+              <label>
+                <span data-i18n="requestVin">رقم الهيكل VIN</span>
+                <input name="vin" placeholder="WGY60-348567">
+              </label>
+              <label>
+                <span data-i18n="requestEngine">المحرك</span>
+                <input name="engine" placeholder="TB42S">
+              </label>
+              <label>
+                <span data-i18n="requestTransmission">القير</span>
+                <input name="transmission" placeholder="FS5R50A">
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend data-i18n="requestPartTitle">بيانات القطعة</legend>
+              <label>
+                <span data-i18n="requestPartNumber">رقم القطعة إن وجد</span>
+                <input name="part_number" placeholder="11010-03J80">
+              </label>
+              <label>
+                <span data-i18n="requestPartName">اسم القطعة</span>
+                <input name="part_name" placeholder="وجه رأس / Cylinder Head Gasket">
+              </label>
+              <label>
+                <span data-i18n="requestPartType">نوع القطعة المطلوبة</span>
+                <select name="part_type">
+                  <option value="oem" data-i18n="requestTypeOem">أصلي وكالة OEM</option>
+                  <option value="manufacturer" data-i18n="requestTypeManufacturer">OEM Manufacturer</option>
+                  <option value="aftermarket" data-i18n="requestTypeAftermarket">بديل تجاري</option>
+                  <option value="used" data-i18n="requestTypeUsed">مستعمل أصلي</option>
+                  <option value="nos" data-i18n="requestTypeNos">NOS وكالة قديمة جديدة</option>
+                  <option value="any" data-i18n="requestTypeAny">أي خيار مناسب</option>
+                </select>
+              </label>
+              <label>
+                <span data-i18n="requestGoal">هدف الطلب</span>
+                <select name="goal">
+                  <option value="availability" data-i18n="requestGoalAvailability">أبحث عن توفر فقط</option>
+                  <option value="buy" data-i18n="requestGoalBuy">أريد شراء مباشر</option>
+                  <option value="compare" data-i18n="requestGoalCompare">أريد مقارنة أسعار</option>
+                  <option value="best_quality" data-i18n="requestGoalBestQuality">أريد أفضل جودة</option>
+                  <option value="cheapest" data-i18n="requestGoalCheapest">أريد أرخص خيار</option>
+                </select>
+              </label>
+              <label class="wide">
+                <span data-i18n="requestNotes">ملاحظات إضافية</span>
+                <textarea name="notes" rows="3" placeholder="المدينة، حالة القطعة المطلوبة، أو أي تفاصيل مهمة"></textarea>
+              </label>
+            </fieldset>
+
+            <button class="request-submit" type="submit" data-i18n="requestSubmit">دفع الرسوم وتجهيز الطلب</button>
+            <div class="request-status" id="partRequestStatus" role="status"></div>
+          </form>
+        </section>
+
+        <section class="shared-fitment-section" data-section="shared-fitment" aria-label="القطع المشتركة بين الموديلات">
+          <div class="section-heading">
+            <h2 data-i18n="sharedFitmentTitle">القطع المشتركة بين أكثر من موديل</h2>
+            <span data-i18n="sharedFitmentSubtitle">مرشحات من قاعدة Y60 تظهر عبر سنوات ومحركات متعددة، وتحتاج مطابقة رقم الهيكل قبل التركيب</span>
+          </div>
+          <div class="shared-fitment-summary">
+            <article>
+              <strong id="sharedFitmentCount">0</strong>
+              <span data-i18n="sharedFitmentCountLabel">قطعة مرشحة للتوافق الواسع</span>
+            </article>
+            <article>
+              <strong>1988-1997</strong>
+              <span data-i18n="sharedFitmentScopeLabel">نطاق سنوات Y60 المفهرسة</span>
+            </article>
+            <article>
+              <strong>TB42S / RB30S / TD42</strong>
+              <span data-i18n="sharedFitmentEngineLabel">محركات تظهر في بيانات التوافق</span>
+            </article>
+          </div>
+          <div class="shared-fitment-grid" id="sharedFitmentGrid"></div>
+          <p class="shared-fitment-note" data-i18n="sharedFitmentNote">مهم: القطعة المشتركة لا تعني التركيب المباشر على كل سيارة. طابق رقم القطعة مع VIN، سنة الصنع، المحرك، القير، والفئة قبل الشراء أو التركيب.</p>
         </section>
       </main>
 
@@ -195,17 +611,23 @@
           <span>⌕</span>
           <strong data-i18n="menuParts">القطع</strong>
         </button>
-        <button class="dock-item" type="button" data-menu-target="prices">
-          <span>﷼</span>
-          <strong data-i18n="menuPrices">الأسعار</strong>
+        <button class="dock-item" type="button" data-menu-target="part-request">
+          <span>✦</span>
+          <strong data-i18n="menuPartRequest">طلب قطعة</strong>
         </button>
         <button class="dock-item" type="button" data-menu-target="more">
           <span>•••</span>
           <strong data-i18n="menuMore">المزيد</strong>
         </button>
       </nav>
+
+      <footer class="legal-footer" aria-label="روابط قانونية">
+        <a href="privacy.html">سياسة الخصوصية</a>
+        <a href="terms.html">شروط الاستخدام</a>
+        <a href="support.html">الدعم</a>
+      </footer>
     </div>
 
-    <script src="app.js?v=hierarchy-1"></script>
+    <script src="app.js?v=backend-foundation-22"></script>
   </body>
 </html>

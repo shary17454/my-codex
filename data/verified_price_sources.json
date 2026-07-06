@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-07-02",
+  "policy": {
+    "display_unverified_prices": false,
+    "external_store_links_are_independent": true,
+    "official_nissan_affiliation": false,
+    "store_categories": [
+      "local_saudi",
+      "gulf",
+      "global",
+      "salvage",
+      "used_original",
+      "nos"
+    ],
+    "required_fields": [
+      "part_number",
+      "source",
+      "url",
+      "amount",
+      "currency",
+      "availability",
+      "condition",
+      "updated_at",
+      "verified"
+    ],
+    "notes_ar": "لا تعرض الواجهة أي سعر أو شحن أو ضريبة إلا إذا كان السعر مأخوذاً من مصدر حقيقي قابل للفتح ويحتوي تاريخ تحديث. روابط المتاجر خيارات خارجية مستقلة ولا تعني اعتماداً من نيسان أو الوكيل.",
+    "notes_en": "The UI must not display any price, shipping, or tax unless it comes from a real openable source with an update date. Store links are independent external options and do not imply Nissan or dealer endorsement."
+  },
+  "sources": [
+    {
+      "id": "partsouq",
+      "name": "PartSouq",
+      "url": "https://partsouq.com/",
+      "search_url_template": "https://partsouq.com/en/search/all?q={part_number}",
+      "type": "online_oem_parts_store",
+      "store_category": "global",
+      "relationship": "independent_external_store",
+      "supported_data": [
+        "part_price",
+        "currency",
+        "availability",
+        "shipping_country",
+        "dispatch_days"
+      ],
+      "verification_method": "part_number_lookup"
+    },
+    {
+      "id": "amayama",
+      "name": "Amayama",
+      "url": "https://www.amayama.com/en",
+      "search_url_template": "https://www.amayama.com/en/part/nissan/{part_number}",
+      "type": "online_oem_parts_store",
+      "store_category": "global",
+      "relationship": "independent_external_store",
+      "supported_data": [
+        "part_price",
+        "currency",
+        "availability",
+        "shipping_options"
+      ],
+      "verification_method": "part_number_lookup"
+    },
+    {
+      "id": "megazip",
+      "name": "MegaZip",
+      "url": "https://www.megazip.net/",
+      "search_url_template": "https://www.megazip.net/search?q={part_number}",
+      "type": "online_oem_parts_store",
+      "store_category": "global",
+      "relationship": "independent_external_store",
+      "supported_data": [
+        "part_price",
+        "currency",
+        "availability",
+        "shipping_options",
+        "delivery_time"
+      ],
+      "verification_method": "part_number_lookup"
+    },
+    {
+      "id": "almoosa",
+      "name": "الموسى لقطع غيار نيسان",
+      "url": "https://almoosaparts.com/",
+      "search_url_template": "https://almoosaparts.com/search?q={part_number}",
+      "type": "local_independent_parts_store",
+      "store_category": "local_saudi",
+      "relationship": "independent_external_store",
+      "country": "SA",
+      "contact": {
+        "email": "almousanissan@gmail.com",
+        "phone": "+966163621016",
+        "whatsapp": "+966163621016",
+        "instagram": "https://instagram.com/almoosa_parts",
+        "twitter": "https://twitter.com/Almoosa_parts",
+        "snapchat": "https://www.snapchat.com/add/Almoosa_Parts"
+      },
+      "supported_data": [
+        "part_price",
+        "currency",
+        "availability",
+        "local_shipping_options",
+        "payment_methods"
+      ],
+      "verification_method": "official_store_page_metadata",
+      "source_evidence": "https://almoosaparts.com/"
+    }
+  ]
+}

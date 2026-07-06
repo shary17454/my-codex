@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-28T15:04:16.820780+00:00",
+  "generated_at": "2026-07-01T14:53:57.676924+00:00",
   "model": "Nissan Patrol Y60",
   "audit_method": "structured line parsing from extracted EPC PDF text with duplicate source removal by sha256",
   "source_count": 12,

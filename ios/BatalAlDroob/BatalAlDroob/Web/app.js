@@ -1,14 +1,89 @@
 let catalog = { parts: [], sources: [] };
 let catalogSearchIndex = { entries: [], stats: [] };
+let patrolCatalogDatabase = { summary: null, files: [] };
+let patrolFullCatalogIndex = { files: [], summary: null };
 let parts = [];
-let activeFilter = "all";
+let activeFilter = "engine";
 let activeModel = "Y60";
 let selectedPartId = null;
+let selectedDiagramNumber = null;
 let currentLang = localStorage.getItem("batalLang") || "ar";
 let currentCurrency = localStorage.getItem("batalCurrency") || "SAR";
 let visibleLimit = 60;
 let searchDebounceTimer = null;
 const wishlist = new Set();
+const paidPartUnlocks = new Set();
+let pendingPaidAction = null;
+const catalogUnlockProductId = "batal.catalog.unlock";
+const partRequestPlans = [
+  {
+    id: "basic",
+    productId: "batal.parts.request.basic",
+    priceSar: 10,
+    titleKey: "requestBasicTitle",
+    textKey: "requestBasicText"
+  },
+  {
+    id: "urgent",
+    productId: "batal.parts.request.urgent",
+    priceSar: 20,
+    titleKey: "requestUrgentTitle",
+    textKey: "requestUrgentText"
+  },
+  {
+    id: "rare",
+    productId: "batal.parts.request.rare",
+    priceSar: 50,
+    titleKey: "requestRareTitle",
+    textKey: "requestRareText"
+  }
+];
+const storeCategoryLabels = {
+  local_saudi: { ar: "محلي سعودي", en: "Saudi local" },
+  gulf: { ar: "خليجي", en: "Gulf" },
+  global: { ar: "عالمي", en: "Global" },
+  salvage: { ar: "تشليح", en: "Salvage yard" },
+  used_original: { ar: "مستعمل أصلي", en: "Used original" },
+  nos: { ar: "NOS / وكالة قديمة جديدة", en: "NOS / new old stock" }
+};
+const pricingStores = [
+  {
+    id: "partsouq",
+    name: "PartSouq",
+    category: "global",
+    homeUrl: "https://partsouq.com/",
+    searchUrl: (partNumber) => `https://partsouq.com/en/search/all?q=${encodeURIComponent(partNumber)}`,
+    dataAr: "السعر، العملة، التوفر، ومدة التجهيز",
+    dataEn: "price, currency, availability, and dispatch time"
+  },
+  {
+    id: "amayama",
+    name: "Amayama",
+    category: "global",
+    homeUrl: "https://www.amayama.com/en",
+    searchUrl: (partNumber) => `https://www.amayama.com/en/part/nissan/${encodeURIComponent(partNumber)}`,
+    dataAr: "سعر OEM، التوفر، وخيارات الشحن",
+    dataEn: "OEM price, availability, and shipping options"
+  },
+  {
+    id: "megazip",
+    name: "MegaZip",
+    category: "global",
+    homeUrl: "https://www.megazip.net/",
+    searchUrl: (partNumber) => `https://www.megazip.net/search?q=${encodeURIComponent(partNumber)}`,
+    dataAr: "سعر OEM، التوفر، الشحن، ومدة التوصيل",
+    dataEn: "OEM price, availability, shipping, and delivery time"
+  },
+  {
+    id: "almoosa",
+    name: "الموسى لقطع غيار نيسان",
+    category: "local_saudi",
+    homeUrl: "https://almoosaparts.com/",
+    searchUrl: (partNumber) => `https://almoosaparts.com/search?q=${encodeURIComponent(partNumber)}`,
+    dataAr: "متجر محلي مستقل، توفر القطعة، السعر، وخيارات الدفع/الشحن من صفحة المتجر",
+    dataEn: "independent local store, availability, price, and checkout/shipping options from the store page"
+  }
+];
 
 const fallbackParts = [
   {
@@ -35,6 +110,14 @@ const wishlistCount = document.getElementById("wishlistCount");
 const languageToggle = document.getElementById("languageToggle");
 const menuToggle = document.getElementById("menuToggle");
 const menuPanel = document.getElementById("menuPanel");
+const sharedFitmentGrid = document.getElementById("sharedFitmentGrid");
+const sharedFitmentCount = document.getElementById("sharedFitmentCount");
+const partRequestForm = document.getElementById("partRequestForm");
+const partRequestStatus = document.getElementById("partRequestStatus");
+const vehicleProfileForm = document.getElementById("vehicleProfileForm");
+const vehicleProfileSummary = document.getElementById("vehicleProfileSummary");
+const maintenanceForm = document.getElementById("maintenanceForm");
+const maintenanceList = document.getElementById("maintenanceList");
 const currencyOptions = document.querySelectorAll("[data-currency]");
 
 const translations = {
@@ -56,13 +139,19 @@ const translations = {
     heroBadgeData: "قاعدة مدققة",
     heroBadgeOffline: "جاهز للمتصفح و iOS",
     heroBadgeLang: "عربي / English",
+    independentNotice: "بطل الدروب تطبيق مستقل. لا يتبع نيسان أو الوكيل الرسمي، وروابط المتاجر الخارجية للتسهيل فقط وليست اعتماداً رسمياً.",
+    metricPartsLabel: "قطعة موثقة",
+    metricRecordsLabel: "سجل مستخرج",
+    metricBuildLabel: "إصدار التطبيق",
     wishlist: "قائمة الرغبات",
     currencySar: "ريال",
     currencyUsd: "دولار",
     menuHome: "الرئيسية",
     menuParts: "القطع",
+    menuPartRequest: "طلب قطعة",
     menuFaults: "الأعطال الشائعة",
     menuCatalogs: "الكتالوجات",
+    menuSharedFitment: "القطع المشتركة",
     menuSourceIntake: "مصادر الفهرسة",
     menuPrices: "الأسعار",
     menuVision: "الرؤية العالمية",
@@ -75,8 +164,67 @@ const translations = {
     generationY61: "جيل السفاري المعروف بقوة الاعتماد وكثرة الاستخدام في الخليج.",
     generationY62: "جيل فاخر كبير الحجم مع أنظمة حديثة وقاعدة قطع مختلفة.",
     generationY63: "الجيل الجديد بواجهة عمودية وشبك كبير وإضاءة C مميزة.",
+    generationActive: "الجيل الحالي النشط",
+    generationSoon: "قريباً في التحديث القادم",
+    generationSubscription: "اشتراك",
+    generationDbFiles: "ملفات",
+    generationDbUnique: "فريدة",
+    generationDbPages: "صفحات",
+    generationDbYears: "سنوات",
+    generationDbEngines: "محركات",
+    generationDbNoData: "لم تضاف كتالوجات لهذا الجيل بعد",
+    sharedFitmentTitle: "القطع المشتركة بين أكثر من موديل",
+    sharedFitmentSubtitle: "مرشحات من قاعدة Y60 تظهر عبر سنوات ومحركات متعددة، وتحتاج مطابقة رقم الهيكل قبل التركيب",
+    sharedFitmentCountLabel: "قطعة مرشحة للتوافق الواسع",
+    sharedFitmentScopeLabel: "نطاق سنوات Y60 المفهرسة",
+    sharedFitmentEngineLabel: "محركات تظهر في بيانات التوافق",
+    sharedFitmentNote: "مهم: القطعة المشتركة لا تعني التركيب المباشر على كل سيارة. طابق رقم القطعة مع VIN، سنة الصنع، المحرك، القير، والفئة قبل الشراء أو التركيب.",
+    sharedPartTag: "مشتركة",
+    sharedPartWide: "تغطي سنوات كثيرة",
+    sharedPartEngines: "تظهر مع أكثر من محرك",
+    sharedPartSources: "مصادر متعددة",
+    sharedPartOpen: "عرض القطعة",
+    sharedPartVerify: "تحقق قبل التركيب",
+    partRequestTitle: "طلب قطعة مدفوع",
+    partRequestSubtitle: "ادفع رسوم طلب رمزية، ثم جهز بيانات القطعة لإرسالها للمتاجر السعودية والخليجية والعالمية.",
+    requestCustomerFeesTitle: "رسوم العميل",
+    requestBasicTitle: "طلب عادي",
+    requestBasicText: "تجهيز الطلب وإرساله للمتاجر المناسبة.",
+    requestUrgentTitle: "طلب مستعجل",
+    requestUrgentText: "أولوية أعلى وصياغة طلب جاهز للواتساب والبريد.",
+    requestRareTitle: "طلب قطعة نادرة / NOS",
+    requestRareText: "بحث مركز للقطع النادرة، المستعملة الأصلية، أو وكالة قديمة جديدة.",
+    requestVehicleTitle: "بيانات السيارة",
+    requestPartTitle: "بيانات القطعة",
+    requestGeneration: "الجيل",
+    requestYear: "سنة الصنع",
+    requestVin: "رقم الهيكل VIN",
+    requestEngine: "المحرك",
+    requestTransmission: "القير",
+    requestPartNumber: "رقم القطعة إن وجد",
+    requestPartName: "اسم القطعة",
+    requestPartType: "نوع القطعة المطلوبة",
+    requestGoal: "هدف الطلب",
+    requestNotes: "ملاحظات إضافية",
+    requestSubmit: "دفع الرسوم وتجهيز الطلب",
+    requestDraftTitle: "نص الطلب الجاهز للمتاجر",
+    requestRequired: "أدخل اسم القطعة أو رقم القطعة على الأقل.",
+    requestSubmitted: "تم حفظ طلب القطعة بعد الدفع. يمكنك نسخ النص وإرساله للمتاجر.",
+    requestPlanLabel: "رسوم الطلب",
+    requestTypeOem: "أصلي وكالة OEM",
+    requestTypeManufacturer: "OEM Manufacturer",
+    requestTypeAftermarket: "بديل تجاري",
+    requestTypeUsed: "مستعمل أصلي",
+    requestTypeNos: "NOS وكالة قديمة جديدة",
+    requestTypeAny: "أي خيار مناسب",
+    requestGoalAvailability: "أبحث عن توفر فقط",
+    requestGoalBuy: "أريد شراء مباشر",
+    requestGoalCompare: "أريد مقارنة أسعار",
+    requestGoalBestQuality: "أريد أفضل جودة",
+    requestGoalCheapest: "أريد أرخص خيار",
     smartSearch: "بحث ذكي",
     searchPlaceholder: "رقم القطعة، الاسم، القسم، أو VIN",
+    searchHint: "التصفية فورية ومخففة لتقليل التقطيع أثناء الكتابة.",
     generationFilterTitle: "اختر جيل الباترول",
     generationFilterHint: "الجيل يحدد قاعدة البيانات المناسبة",
     categoryFilterTitle: "أقسام القطع",
@@ -92,7 +240,7 @@ const translations = {
     catFuel: "وقود",
     catGeneral: "عام",
     statParts: "قطع مفهرسة",
-    statSources: "مصادر PDF",
+    statSources: "ملفات PDF مفحوصة",
     statReview: "تحتاج مراجعة",
     statRecords: "سجلات مستخرجة",
     statCatalogPages: "صفحات كتالوج",
@@ -132,7 +280,7 @@ const translations = {
     resultsTitle: "نتائج القطع",
     partsPageAll: "كل قطع",
     partsPageCategory: "قطع",
-    modelComingSoon: "قاعدة هذا الجيل قيد التجهيز. اختر Y60 لعرض القطع المفهرسة الآن.",
+    modelComingSoon: "قاعدة هذا الجيل ضمن الاشتراك. افتح الاشتراك للوصول إلى كتالوجات الجيل وأرقام القطع.",
     resultSingular: "نتيجة",
     resultPlural: "نتيجة",
     oem: "OEM",
@@ -156,15 +304,32 @@ const translations = {
     applicationDates: "تواريخ التطبيق",
     sourceCount: "عدد المصادر",
     occurrenceCount: "عدد مرات الظهور",
-    marketPrices: "الأسعار التقريبية",
+    marketPrices: "أسعار موثقة",
     localMarket: "السوق السعودي",
     gulfMarket: "متاجر الخليج",
     globalMarket: "المتاجر العالمية",
-    shippingIncluded: "يشمل تقدير الشحن والضريبة",
+    shippingIncluded: "مصدر موثق مع تاريخ التحديث",
+    noVerifiedPrices: "لا توجد أسعار حقيقية موثقة لهذه القطعة حالياً.",
+    priceSource: "المصدر",
+    priceUpdatedAt: "آخر تحديث",
+    pricingStoresTitle: "خيارات شراء خارجية مستقلة",
+    pricingStoresSubtitle: "افتح المتجر المستقل وتحقق من السعر الحقيقي برقم القطعة. ظهور المتجر لا يعني شراكة رسمية إلا إذا ظهرت شارة اتفاق موثق.",
+    storeCategory: "تصنيف المتجر",
+    openStore: "فتح الخيار الخارجي",
+    storeData: "بيانات قد يوفرها",
+    lookupNeedsNumber: "يتطلب رقم قطعة حقيقي",
+    copyPartNumber: "رقم القطعة",
     category: "التصنيف المبدئي",
     auditStatus: "حالة التدقيق",
     confidenceScore: "درجة الثقة",
     catalogEvidence: "أدلة من الكتالوجات",
+    fullPartNumbers: "أرقام القطع الكاملة",
+    fullPartNumbersHint: "تعرض كل أرقام OEM المستخرجة من صفحات الكتالوج المرتبطة بهذه النتيجة.",
+    noPartNumbers: "لا توجد أرقام قطعة مستخرجة",
+    generatedDiagramTitle: "مخطط مرسوم حسب رقم القطعة",
+    generatedDiagramNote: "رسم إرشادي مستخرج من بيانات القطعة للتمييز السريع. للتحقق النهائي افتح صفحة PDF الأصلية.",
+    diagramNumber: "رقم الرسم",
+    payUnlockNumbers: "دفع وفتح أرقام القطع",
     year: "سنة",
     page: "صفحة",
     enrichmentNext: "خطوة الإثراء التالية",
@@ -174,6 +339,7 @@ const translations = {
     saveWishlist: "حفظ في قائمة الرغبات",
     saved: "تم الحفظ",
     priceAlert: "تنبيه عند توفر بيانات سعر",
+    priceEstimateDisclaimer: "لا يعرض بطل الدروب أي سعر إلا إذا كان مربوطاً بمصدر حقيقي، رابط، عملة، حالة توفر، وتاريخ تحديث.",
     faultsTitle: "الأعطال الشائعة",
     faultWear: "ضعف أو اهتزاز مرتبط بالاستهلاك الطبيعي للقطعة.",
     faultHeat: "ارتفاع حرارة أو ضغط زائد عند إهمال الصيانة الدورية.",
@@ -191,11 +357,23 @@ const translations = {
     auditHigh: "مدقق آليًا بدرجة عالية",
     auditOk: "مدقق آليًا",
     auditReviewName: "يحتاج مراجعة اسم/تطبيق",
-    auditReviewManual: "يحتاج مراجعة يدوية"
+    auditReviewManual: "يحتاج مراجعة يدوية",
+    lockedPartNumber: "رقم القطعة محمي",
+    paymentRequired: "يتطلب دفع رمزي",
+    paywallTitle: "فتح الكتالوجات وأرقام القطع",
+    paywallText: "رقم القطعة وصفحة PDF محمية. ادفع مبلغًا رمزيًا لكل عملية فتح للاطلاع على الرقم أو فتح صفحة الكتالوج الأصلية.",
+    payUnlockNumber: "دفع وفتح رقم القطعة",
+    payOpenCatalog: "دفع وفتح الكتالوج",
+    purchasePending: "جاري طلب الدفع...",
+    purchaseSuccess: "تم الدفع وفتح المحتوى",
+    purchaseUnavailable: "الدفع غير متاح الآن. تأكد من إضافة منتج الشراء داخل App Store Connect.",
+    purchaseCancelled: "تم إلغاء عملية الدفع.",
+    protectedContent: "المحتوى محمي",
+    captureBlocked: "تم حجب الكتالوج أثناء تسجيل الشاشة أو العرض الخارجي."
   },
   en: {
     brandMark: "BD",
-    appName: "Batal Al-Droob",
+    appName: "بطل الدروب",
     brandSubtitle: "Patrol Y60 Parts Catalog",
     navCatalog: "Catalog",
     navDiagrams: "Diagrams",
@@ -206,18 +384,24 @@ const translations = {
     dataStatus: "Data Status",
     dataTitle: "Integrated Y60 Database",
     dataText: "Audited PDF catalog data stored in SQLite and ready for search and browsing.",
-    eyebrow: "Batal Al-Droob for Nissan Patrol Parts",
+    eyebrow: "بطل الدروب for Nissan Patrol Parts",
     headline: "Find the part number, fitment, sources, and audit status in one place",
     heroBadgeData: "Audited database",
     heroBadgeOffline: "Browser and iOS ready",
     heroBadgeLang: "Arabic / English",
+    independentNotice: "بطل الدروب is an independent app. It is not affiliated with Nissan or an official dealer; external store links are provided for convenience only.",
+    metricPartsLabel: "verified parts",
+    metricRecordsLabel: "extracted records",
+    metricBuildLabel: "app version",
     wishlist: "Wishlist",
     currencySar: "SAR",
     currencyUsd: "USD",
     menuHome: "Home",
     menuParts: "Parts",
+    menuPartRequest: "Request Part",
     menuFaults: "Common Faults",
     menuCatalogs: "Catalogs",
+    menuSharedFitment: "Shared Parts",
     menuSourceIntake: "Indexing Sources",
     menuPrices: "Prices",
     menuVision: "Global Vision",
@@ -230,8 +414,67 @@ const translations = {
     generationY61: "The Safari generation known for durability and heavy Gulf use.",
     generationY62: "A large luxury generation with modern systems and a different parts base.",
     generationY63: "The new generation with an upright front, large grille, and C-shaped lighting.",
+    generationActive: "Current active generation",
+    generationSoon: "Coming in the next update",
+    generationSubscription: "Subscription",
+    generationDbFiles: "Files",
+    generationDbUnique: "Unique",
+    generationDbPages: "Pages",
+    generationDbYears: "Years",
+    generationDbEngines: "Engines",
+    generationDbNoData: "No catalogs added for this generation yet",
+    sharedFitmentTitle: "Parts Shared Across More Than One Model",
+    sharedFitmentSubtitle: "Candidates from the Y60 database that appear across multiple years and engines. Verify by VIN before installation.",
+    sharedFitmentCountLabel: "wide-fitment candidate parts",
+    sharedFitmentScopeLabel: "indexed Y60 year range",
+    sharedFitmentEngineLabel: "engines found in fitment data",
+    sharedFitmentNote: "Important: a shared part does not mean direct fitment on every vehicle. Match the part number with VIN, production year, engine, transmission, and trim before buying or installing.",
+    sharedPartTag: "Shared",
+    sharedPartWide: "Wide year coverage",
+    sharedPartEngines: "Appears with multiple engines",
+    sharedPartSources: "Multiple sources",
+    sharedPartOpen: "View part",
+    sharedPartVerify: "Verify before install",
+    partRequestTitle: "Paid Part Request",
+    partRequestSubtitle: "Pay a small request fee, then prepare the part request for Saudi, Gulf, and global stores.",
+    requestCustomerFeesTitle: "Customer fee",
+    requestBasicTitle: "Standard request",
+    requestBasicText: "Prepare the request and route it to matching stores.",
+    requestUrgentTitle: "Urgent request",
+    requestUrgentText: "Higher priority and a ready WhatsApp/email message.",
+    requestRareTitle: "Rare / NOS request",
+    requestRareText: "Focused search for rare, used original, or new old stock parts.",
+    requestVehicleTitle: "Vehicle details",
+    requestPartTitle: "Part details",
+    requestGeneration: "Generation",
+    requestYear: "Production year",
+    requestVin: "VIN",
+    requestEngine: "Engine",
+    requestTransmission: "Transmission",
+    requestPartNumber: "Part number if known",
+    requestPartName: "Part name",
+    requestPartType: "Requested part type",
+    requestGoal: "Request goal",
+    requestNotes: "Additional notes",
+    requestSubmit: "Pay fee and prepare request",
+    requestDraftTitle: "Store-ready request text",
+    requestRequired: "Enter either the part name or part number.",
+    requestSubmitted: "Part request saved after payment. You can copy the text and send it to stores.",
+    requestPlanLabel: "Request fee",
+    requestTypeOem: "OEM genuine",
+    requestTypeManufacturer: "OEM Manufacturer",
+    requestTypeAftermarket: "Aftermarket",
+    requestTypeUsed: "Used original",
+    requestTypeNos: "NOS new old stock",
+    requestTypeAny: "Any suitable option",
+    requestGoalAvailability: "Check availability only",
+    requestGoalBuy: "Ready to buy",
+    requestGoalCompare: "Compare prices",
+    requestGoalBestQuality: "Best quality",
+    requestGoalCheapest: "Cheapest option",
     smartSearch: "Smart Search",
     searchPlaceholder: "Part number, name, category, or VIN",
+    searchHint: "Instant filtering is throttled to keep typing smooth.",
     generationFilterTitle: "Choose Patrol Generation",
     generationFilterHint: "The generation selects the matching database",
     categoryFilterTitle: "Part Sections",
@@ -247,7 +490,7 @@ const translations = {
     catFuel: "Fuel",
     catGeneral: "General",
     statParts: "Indexed Parts",
-    statSources: "PDF Sources",
+    statSources: "Checked PDF Files",
     statReview: "Need Review",
     statRecords: "Extracted Records",
     statCatalogPages: "Catalog Pages",
@@ -287,7 +530,7 @@ const translations = {
     resultsTitle: "Part Results",
     partsPageAll: "All parts for",
     partsPageCategory: "Parts for",
-    modelComingSoon: "This generation database is being prepared. Choose Y60 to view indexed parts now.",
+    modelComingSoon: "This generation database is part of the subscription. Unlock access to view catalogs and part numbers.",
     resultSingular: "result",
     resultPlural: "results",
     oem: "OEM",
@@ -311,15 +554,32 @@ const translations = {
     applicationDates: "Application Dates",
     sourceCount: "Source Count",
     occurrenceCount: "Occurrences",
-    marketPrices: "Estimated Prices",
+    marketPrices: "Verified Prices",
     localMarket: "Saudi Market",
     gulfMarket: "Gulf Stores",
     globalMarket: "Global Stores",
-    shippingIncluded: "Includes estimated shipping and VAT",
+    shippingIncluded: "Verified source with update date",
+    noVerifiedPrices: "No real verified prices are available for this part yet.",
+    priceSource: "Source",
+    priceUpdatedAt: "Updated",
+    pricingStoresTitle: "Independent External Buying Options",
+    pricingStoresSubtitle: "Open the independent store and verify the real price by part number. A listed store is not an official partnership unless a verified agreement badge is shown.",
+    storeCategory: "Store category",
+    openStore: "Open External Option",
+    storeData: "May provide",
+    lookupNeedsNumber: "Requires a real part number",
+    copyPartNumber: "Part number",
     category: "Initial Category",
     auditStatus: "Audit Status",
     confidenceScore: "Confidence Score",
     catalogEvidence: "Catalog Evidence",
+    fullPartNumbers: "Full Part Numbers",
+    fullPartNumbersHint: "Shows all OEM numbers extracted from the catalog pages linked to this result.",
+    noPartNumbers: "No extracted part numbers",
+    generatedDiagramTitle: "Diagram Drawn From Part Number",
+    generatedDiagramNote: "Reference drawing derived from the part data for quick identification. Open the original PDF page for final verification.",
+    diagramNumber: "Diagram number",
+    payUnlockNumbers: "Pay and unlock part numbers",
     year: "Year",
     page: "Page",
     enrichmentNext: "Next Enrichment Step",
@@ -329,6 +589,7 @@ const translations = {
     saveWishlist: "Save to Wishlist",
     saved: "Saved",
     priceAlert: "Alert when price data is available",
+    priceEstimateDisclaimer: "بطل الدروب only shows prices when they are tied to a real source, URL, currency, availability status, and update date.",
     faultsTitle: "Common Faults",
     faultWear: "Weakness or vibration caused by natural part wear.",
     faultHeat: "Overheating or excess pressure when routine maintenance is ignored.",
@@ -346,7 +607,19 @@ const translations = {
     auditHigh: "High-confidence automated audit",
     auditOk: "Automated audit",
     auditReviewName: "Needs name/fitment review",
-    auditReviewManual: "Needs manual review"
+    auditReviewManual: "Needs manual review",
+    lockedPartNumber: "Protected part number",
+    paymentRequired: "Small payment required",
+    paywallTitle: "Unlock catalogs and part numbers",
+    paywallText: "Part numbers and PDF pages are protected. Pay a small fee for each unlock to view the number or open the original catalog page.",
+    payUnlockNumber: "Pay and unlock part number",
+    payOpenCatalog: "Pay and open catalog",
+    purchasePending: "Requesting purchase...",
+    purchaseSuccess: "Payment complete. Content unlocked.",
+    purchaseUnavailable: "Payment is not available now. Add the in-app purchase product in App Store Connect.",
+    purchaseCancelled: "Purchase was cancelled.",
+    protectedContent: "Protected content",
+    captureBlocked: "Catalog content is hidden while screen recording or mirroring is active."
   }
 };
 
@@ -451,27 +724,64 @@ function formatMoney(amount) {
   }).format(converted);
 }
 
-function priceEstimate(part) {
-  const categoryBase = {
-    engine: 920,
-    cooling: 430,
-    electrical: 360,
-    body: 610,
-    brake: 280,
-    suspension: 520,
-    interior: 240,
-    fuel: 470,
-    general: 180
-  };
-  const base = categoryBase[part.category] || categoryBase.general;
-  const rarityLift = part.source_count <= 1 ? 1.55 : part.source_count <= 3 ? 1.25 : 1;
-  const confidenceDiscount = (part.confidence || 80) < 70 ? 0.9 : 1;
-  const market = Math.round(base * rarityLift * confidenceDiscount);
-  return [
-    { label: t("localMarket"), amount: market },
-    { label: t("gulfMarket"), amount: Math.round(market * 1.12) },
-    { label: t("globalMarket"), amount: Math.round(market * 1.28) }
-  ];
+function verifiedPrices(part) {
+  if (!Array.isArray(part?.prices)) return [];
+  return part.prices.filter((price) => (
+    price
+    && price.verified === true
+    && Number.isFinite(Number(price.amount))
+    && typeof price.currency === "string"
+    && price.currency.length === 3
+    && typeof price.source === "string"
+    && typeof price.url === "string"
+    && /^https?:\/\//i.test(price.url)
+    && typeof price.updated_at === "string"
+  ));
+}
+
+function formatVerifiedMoney(price) {
+  const locale = currentLang === "ar" ? "ar-SA" : "en-US";
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: price.currency,
+    maximumFractionDigits: price.currency === "JPY" ? 0 : 2
+  }).format(Number(price.amount));
+}
+
+function isRealPartNumber(part) {
+  const value = part?.part_number || "";
+  return Boolean(value && !value.startsWith("CAT-") && !value.startsWith("••"));
+}
+
+function renderPricingStoreOptions(part) {
+  const partNumber = isRealPartNumber(part) ? part.part_number : "";
+  return `
+    <div class="store-options">
+      <div class="store-options-head">
+        <h4>${t("pricingStoresTitle")}</h4>
+        <p>${t("pricingStoresSubtitle")}</p>
+        <p class="store-legal">${t("independentNotice")}</p>
+      </div>
+      <div class="store-grid">
+        ${pricingStores.map((store) => {
+          const url = partNumber ? store.searchUrl(partNumber) : store.homeUrl;
+          const dataLabel = currentLang === "ar" ? store.dataAr : store.dataEn;
+          const storeType = storeCategoryLabels[store.category]?.[currentLang] || store.category;
+          return `
+            <article class="store-card">
+              <div>
+                <em class="store-type">${t("storeCategory")}: ${storeType}</em>
+                <strong>${store.name}</strong>
+                <span>${t("storeData")}: ${dataLabel}</span>
+                <small>${partNumber ? `${t("copyPartNumber")}: ${partNumber}` : t("lookupNeedsNumber")}</small>
+              </div>
+              <a href="${url}" target="_blank" rel="noopener">${t("openStore")}</a>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
 }
 
 function categoryLabel(part) {
@@ -494,8 +804,44 @@ function sectionToCategory(sectionId) {
   return map[sectionId] || "general";
 }
 
+function formatOemNumber(value) {
+  const raw = String(value || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
+  if (raw.length !== 10) return "";
+  const digitCount = raw.replace(/[^0-9]/g, "").length;
+  if (digitCount < 5) return "";
+  return `${raw.slice(0, 5)}-${raw.slice(5)}`;
+}
+
+function extractOemNumbersFromText(...values) {
+  const found = [];
+  values.forEach((value) => {
+    if (!value) return;
+    const text = typeof value === "string" ? value : JSON.stringify(value);
+    const matches = text.toUpperCase().match(/\b[0-9A-Z]{5}-?[0-9A-Z]{5}\b/g) || [];
+    matches.forEach((match) => {
+      const formatted = formatOemNumber(match);
+      if (formatted && !found.includes(formatted)) found.push(formatted);
+    });
+  });
+  return found.slice(0, 24);
+}
+
+function buildDiagramKey(numbers = [], fallback = "") {
+  const source = (numbers.join("") || String(fallback || "")).toUpperCase();
+  const total = Array.from(source).reduce((sum, char, index) => sum + ((index + 1) * char.charCodeAt(0)), 0);
+  return `DGM-${String(total % 100000).padStart(5, "0")}`;
+}
+
 function catalogEntryToPart(entry) {
   const keywords = Array.isArray(entry.keywords) ? entry.keywords : [];
+  const partNumbers = extractOemNumbersFromText(
+    entry.titleAr,
+    entry.titleEn,
+    entry.subtitleAr,
+    entry.snippet,
+    entry.queryText,
+    keywords.join(" ")
+  );
   return {
     part_number: `CAT-${entry.id}`,
     name_ar: entry.titleAr || entry.titleEn || entry.id,
@@ -514,6 +860,9 @@ function catalogEntryToPart(entry) {
     rarity: "موثق",
     record_type: "catalog_page",
     catalog_id: entry.id,
+    part_numbers: partNumbers,
+    primary_oem_number: partNumbers[0] || "",
+    diagram_key: buildDiagramKey(partNumbers, entry.id),
     source_pdf_path: entry.sourcePdfPath,
     page_number: entry.pageNumber,
     keywords,
@@ -560,14 +909,32 @@ function applyLanguage() {
   if (languageToggle) {
     languageToggle.textContent = t("toggleLabel");
   }
+  const shield = document.getElementById("screenShield");
+  if (shield) {
+    shield.innerHTML = `<div><strong>${t("protectedContent")}</strong><span>${t("captureBlocked")}</span></div>`;
+  }
   updateCurrencyButtons();
   updateStats();
+  renderGenerationDatabaseStats();
+  renderSharedFitment();
+  renderVehicleProfile();
+  renderMaintenanceLog();
   renderParts();
 }
 
 function updateCurrencyButtons() {
   currencyOptions.forEach((button) => {
     button.classList.toggle("active", button.dataset.currency === currentCurrency);
+  });
+  updatePartRequestPlans();
+}
+
+function updatePartRequestPlans() {
+  document.querySelectorAll(".request-plan").forEach((button) => {
+    const plan = partRequestPlans.find((item) => item.id === button.dataset.requestPlan);
+    if (!plan) return;
+    const price = button.querySelector("strong");
+    if (price) price.textContent = formatMoney(plan.priceSar);
   });
 }
 
@@ -622,6 +989,68 @@ function dateRangesLabel(part) {
 
 function yearsLabel(part) {
   return part.years?.length ? part.years.join(" / ") : t("notSpecified");
+}
+
+function sharedFitmentScore(part) {
+  const yearCount = Array.isArray(part.years) ? part.years.length : 0;
+  const engineCount = Array.isArray(part.engines) ? part.engines.length : 0;
+  const sourceCount = Number(part.source_count || 0);
+  const occurrenceCount = Number(part.occurrence_count || 0);
+  return (yearCount * 8) + (engineCount * 11) + (sourceCount * 7) + Math.min(occurrenceCount, 60);
+}
+
+function sharedFitmentReasons(part) {
+  const reasons = [];
+  if ((part.years?.length || 0) >= 6) reasons.push(t("sharedPartWide"));
+  if ((part.engines?.length || 0) >= 2) reasons.push(t("sharedPartEngines"));
+  if ((part.source_count || 0) >= 3) reasons.push(t("sharedPartSources"));
+  return reasons.length ? reasons : [t("sharedPartVerify")];
+}
+
+function isSharedFitmentCandidate(part) {
+  return part.model === "Y60"
+    && part.record_type !== "catalog_page"
+    && ((part.years?.length || 0) >= 4 || (part.engines?.length || 0) >= 2 || (part.source_count || 0) >= 4);
+}
+
+function sharedFitmentParts(limit = 8) {
+  return parts
+    .filter(isSharedFitmentCandidate)
+    .sort((a, b) => {
+      const scoreDiff = sharedFitmentScore(b) - sharedFitmentScore(a);
+      if (scoreDiff) return scoreDiff;
+      return String(a.part_number).localeCompare(String(b.part_number));
+    })
+    .slice(0, limit);
+}
+
+function renderSharedFitment() {
+  if (!sharedFitmentGrid) return;
+  const candidates = sharedFitmentParts(8);
+  if (sharedFitmentCount) {
+    sharedFitmentCount.textContent = parts.filter(isSharedFitmentCandidate).length.toLocaleString("en-US");
+  }
+
+  sharedFitmentGrid.innerHTML = candidates.map((part) => `
+    <article class="shared-part-card">
+      <div class="shared-part-head">
+        <span>${t("sharedPartTag")}</span>
+        <strong>${part.confidence || 0}%</strong>
+      </div>
+      <h3>${displayName(part)}</h3>
+      ${originalNameLine(part)}
+      <div class="shared-part-number">${protectedPartNumber(part)}</div>
+      <div class="shared-part-meta">
+        <span>${yearsLabel(part)}</span>
+        <span>${enginesLabel(part)}</span>
+        <span>${part.source_count || 0} ${t("sources")}</span>
+      </div>
+      <div class="shared-reasons">
+        ${sharedFitmentReasons(part).map((reason) => `<span>${reason}</span>`).join("")}
+      </div>
+      <button class="secondary-action" type="button" data-shared-part="${part.part_number}">${t("sharedPartOpen")}</button>
+    </article>
+  `).join("");
 }
 
 function evidenceText(part) {
@@ -687,6 +1116,374 @@ function categorySymbol(category) {
   return symbols[category] || "⚙";
 }
 
+function partAccessId(part) {
+  return part?.part_number || part?.catalog_id || "";
+}
+
+function fullPartNumbers(part) {
+  if (!part) return [];
+  const numbers = [];
+  const primary = formatOemNumber(part.primary_oem_number || part.part_number);
+  if (primary) numbers.push(primary);
+  (Array.isArray(part.part_numbers) ? part.part_numbers : []).forEach((number) => {
+    const formatted = formatOemNumber(number);
+    if (formatted && !numbers.includes(formatted)) numbers.push(formatted);
+  });
+  (part.evidence || []).forEach((item) => {
+    extractOemNumbersFromText(item.reference, item.context).forEach((number) => {
+      if (!numbers.includes(number)) numbers.push(number);
+    });
+  });
+  return numbers.slice(0, 24);
+}
+
+function isPartUnlocked(part) {
+  const id = partAccessId(part);
+  return id && paidPartUnlocks.has(id);
+}
+
+function protectedPartNumber(part) {
+  if (!part) return t("lockedPartNumber");
+  const numbers = fullPartNumbers(part);
+  if (part.record_type === "catalog_page" && !numbers.length) return `#${part.page_number}`;
+  return isPartUnlocked(part) ? (numbers[0] || part.part_number) : t("lockedPartNumber");
+}
+
+function protectedPartNumbersText(part) {
+  const numbers = fullPartNumbers(part);
+  if (!numbers.length) return t("noPartNumbers");
+  return isPartUnlocked(part) ? numbers.join(" · ") : t("lockedPartNumber");
+}
+
+function protectedMeta(part) {
+  const label = part.record_type === "catalog_page" ? t("catalogPage") : t("oem");
+  const value = part.record_type === "catalog_page" ? `#${part.page_number}` : protectedPartNumber(part);
+  return `${label} ${value} · ${part.model}`;
+}
+
+function showPaymentStatus(message, mode = "info") {
+  const existing = document.querySelector(".payment-toast");
+  existing?.remove();
+  document.body.insertAdjacentHTML("beforeend", `<div class="payment-toast ${mode}">${message}</div>`);
+  window.setTimeout(() => document.querySelector(".payment-toast")?.remove(), 3200);
+}
+
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+function localRecords(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalRecords(key, records) {
+  localStorage.setItem(key, JSON.stringify(records));
+}
+
+function localUserId() {
+  const key = "batalLocalUserId";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = `batal-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
+async function postJsonSafe(path, payload) {
+  try {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Batal-User": localUserId()
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    return { ok: false, offline: true, error: error.message };
+  }
+}
+
+async function syncAppOverview() {
+  try {
+    const response = await fetch("/api/app-overview", {
+      headers: { "X-Batal-User": localUserId() }
+    });
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (payload.profile && !localStorage.getItem("batalVehicleProfile")) {
+      localStorage.setItem("batalVehicleProfile", JSON.stringify({
+        vin: payload.profile.vin,
+        generation: payload.profile.generation,
+        year: payload.profile.year,
+        trim: payload.profile.trim,
+        engine: payload.profile.engine,
+        transmission: payload.profile.transmission,
+        color: payload.profile.color
+      }));
+    }
+  } catch {
+    // Offline web/app builds keep using local storage.
+  }
+}
+
+function profileObjectFromForm(form) {
+  return Object.fromEntries(
+    Object.entries(Object.fromEntries(new FormData(form).entries()))
+      .map(([key, value]) => [key, String(value || "").trim()])
+  );
+}
+
+function renderVehicleProfile() {
+  if (!vehicleProfileSummary) return;
+  const profile = JSON.parse(localStorage.getItem("batalVehicleProfile") || "null");
+  if (!profile) {
+    vehicleProfileSummary.innerHTML = "<h3>لا توجد سيارة محفوظة</h3><p>أضف بيانات سيارتك لربط البحث والتوافق والصيانة بها.</p>";
+    return;
+  }
+  vehicleProfileSummary.innerHTML = `
+    <h3>${escapeHtml(profile.generation || "Y60")} · ${escapeHtml(profile.year || "غير محدد")}</h3>
+    <div class="profile-facts">
+      <span>VIN: <strong>${escapeHtml(profile.vin || "غير محدد")}</strong></span>
+      <span>المحرك: <strong>${escapeHtml(profile.engine || "غير محدد")}</strong></span>
+      <span>القير: <strong>${escapeHtml(profile.transmission || "غير محدد")}</strong></span>
+      <span>الفئة: <strong>${escapeHtml(profile.trim || "غير محدد")}</strong></span>
+      <span>اللون: <strong>${escapeHtml(profile.color || "غير محدد")}</strong></span>
+    </div>
+    <p>سيتم استخدام هذه البيانات لتخصيص نتائج التوافق والتنبيهات وطلبات القطع.</p>
+  `;
+}
+
+function renderMaintenanceLog() {
+  if (!maintenanceList) return;
+  const records = localRecords("batalMaintenanceLog");
+  if (!records.length) {
+    maintenanceList.innerHTML = `<div class="internal-empty">لا توجد عمليات صيانة محفوظة بعد.</div>`;
+    return;
+  }
+  maintenanceList.innerHTML = records.slice(0, 12).map((record) => `
+    <article class="maintenance-record">
+      <strong>${escapeHtml(record.service || "صيانة")}</strong>
+      <span>${escapeHtml(record.date || "بدون تاريخ")} · العداد ${escapeHtml(record.odometer || "غير محدد")}</span>
+      <p>${escapeHtml(record.workshop || "ورشة غير محددة")} · ${escapeHtml(record.cost || "0")} ر.س</p>
+      <small>التنبيه القادم: ${escapeHtml(record.next || "غير محدد")}</small>
+    </article>
+  `).join("");
+}
+
+function aiCandidateParts(query, limit = 4) {
+  const normalizedQuery = normalize(query);
+  if (!normalizedQuery) return parts.slice(0, limit);
+  return parts
+    .filter((part) => matchesSearch(part, normalizedQuery) || normalize(displayName(part)).includes(normalizedQuery))
+    .slice(0, limit);
+}
+
+function renderAiCandidates(target, query, leadText) {
+  if (!target) return;
+  const candidates = aiCandidateParts(query, 4);
+  target.innerHTML = `
+    <strong>${escapeHtml(leadText)}</strong>
+    <div class="ai-candidates">
+      ${candidates.length ? candidates.map((part) => `
+        <button type="button" data-ai-part="${escapeHtml(part.part_number)}">
+          <span>${escapeHtml(displayName(part))}</span>
+          <small>${escapeHtml(protectedMeta(part))}</small>
+        </button>
+      `).join("") : "<p>لم تظهر نتائج قريبة. جرّب وصفاً أدق أو رقم قطعة.</p>"}
+    </div>
+  `;
+}
+
+function diagnosticKeywords(text) {
+  const value = normalize(text);
+  const findings = [];
+  if (value.includes("تهريب") || value.includes("زيت")) findings.push("افحص الصوف، الجلود، وجه الغطاء، وجه الكارتير، ومستوى الزيت.");
+  if (value.includes("حراره") || value.includes("رديتر") || value.includes("ماء")) findings.push("ابدأ بكلتش المروحة، الرديتر، بلف الحرارة، طرمبة الماء، وغطاء الرديتر.");
+  if (value.includes("يرتج") || value.includes("رجفه")) findings.push("افحص كراسي المكينة، البواجي، الأسلاك، الكربريتر/البخاخات، والفاكيوم.");
+  if (value.includes("قير") || value.includes("ينفض")) findings.push("افحص زيت القير، قواعد القير، الكلتش/الفحمات، والوصلات قبل تغيير القطع.");
+  if (value.includes("ما تشتغل") || value.includes("لا تشتغل")) findings.push("افحص البطارية، السلف، الفيوزات، الطرمبة، الشرارة، والوقود.");
+  return findings.length ? findings : ["الوصف عام. أضف صوت العطل، مكانه، متى يظهر، وهل يحدث مع البرودة أو الحرارة."];
+}
+
+function tireDiameter(size) {
+  const match = String(size || "").toUpperCase().match(/(\d{3})\s*\/\s*(\d{2})\s*R\s*(\d{2})/);
+  if (!match) return null;
+  const width = Number(match[1]);
+  const aspect = Number(match[2]);
+  const rim = Number(match[3]);
+  return (rim * 25.4) + (2 * width * (aspect / 100));
+}
+
+function updateTireCalculation() {
+  const oldSize = document.getElementById("tireOld")?.value;
+  const newSize = document.getElementById("tireNew")?.value;
+  const result = document.getElementById("tireCalcResult");
+  if (!result) return;
+  const oldDiameter = tireDiameter(oldSize);
+  const newDiameter = tireDiameter(newSize);
+  if (!oldDiameter || !newDiameter) {
+    result.textContent = "اكتب المقاسين بهذا الشكل: 265/70R16 و 285/75R16.";
+    return;
+  }
+  const diff = ((newDiameter - oldDiameter) / oldDiameter) * 100;
+  const shownSpeed = 100;
+  const realSpeed = shownSpeed * (newDiameter / oldDiameter);
+  result.textContent = `الفرق ${diff.toFixed(2)}%. عند قراءة 100 كم/س تكون السرعة الفعلية تقريباً ${realSpeed.toFixed(1)} كم/س.`;
+}
+
+function selectedPartRequestPlan() {
+  const selected = document.querySelector(".request-plan.active")?.dataset.requestPlan || "basic";
+  return partRequestPlans.find((plan) => plan.id === selected) || partRequestPlans[0];
+}
+
+function requestPlanLine(plan) {
+  return `${t(plan.titleKey)} · ${formatMoney(plan.priceSar)}`;
+}
+
+function collectPartRequest(form) {
+  const data = Object.fromEntries(new FormData(form).entries());
+  return Object.fromEntries(Object.entries(data).map(([key, value]) => [key, String(value || "").trim()]));
+}
+
+function buildPartRequestDraft(request, plan) {
+  const typeLabel = t(`requestType${{
+    oem: "Oem",
+    manufacturer: "Manufacturer",
+    aftermarket: "Aftermarket",
+    used: "Used",
+    nos: "Nos",
+    any: "Any"
+  }[request.part_type] || "Any"}`);
+  const goalLabel = t(`requestGoal${{
+    availability: "Availability",
+    buy: "Buy",
+    compare: "Compare",
+    best_quality: "BestQuality",
+    cheapest: "Cheapest"
+  }[request.goal] || "Availability"}`);
+
+  return [
+    "السلام عليكم، أبحث عن القطعة التالية:",
+    `السيارة: Nissan Patrol ${request.generation || "Y60"}`,
+    request.year ? `سنة الصنع: ${request.year}` : "",
+    request.vin ? `رقم الهيكل: ${request.vin}` : "",
+    request.engine ? `المحرك: ${request.engine}` : "",
+    request.transmission ? `القير: ${request.transmission}` : "",
+    request.part_number ? `رقم القطعة: ${request.part_number}` : "",
+    request.part_name ? `اسم القطعة: ${request.part_name}` : "",
+    `نوع القطعة المطلوب: ${typeLabel}`,
+    `هدف الطلب: ${goalLabel}`,
+    `نوع الخدمة: ${requestPlanLine(plan)}`,
+    request.notes ? `ملاحظات: ${request.notes}` : "",
+    "فضلاً أرسل السعر، حالة القطعة، التوفر، مدة التجهيز، وتكلفة الشحن للسعودية إن وجدت."
+  ].filter(Boolean).join("\n");
+}
+
+function updatePartRequestStatus(message, mode = "info", draft = "") {
+  if (!partRequestStatus) return;
+  partRequestStatus.className = `request-status ${mode}`;
+  partRequestStatus.innerHTML = `
+    <strong>${escapeHtml(message)}</strong>
+    ${draft ? `<label><span>${escapeHtml(t("requestDraftTitle"))}</span><textarea readonly rows="8">${escapeHtml(draft)}</textarea></label>` : ""}
+  `;
+}
+
+function savePartRequest(request, plan) {
+  const draft = buildPartRequestDraft(request, plan);
+  const record = {
+    id: `REQ-${Date.now()}`,
+    created_at: new Date().toISOString(),
+    plan_id: plan.id,
+    product_id: plan.productId,
+    fee_sar: plan.priceSar,
+    currency: "SAR",
+    status: "paid_saved_locally",
+    request,
+    draft
+  };
+  const stored = JSON.parse(localStorage.getItem("batalPartRequests") || "[]");
+  stored.unshift(record);
+  localStorage.setItem("batalPartRequests", JSON.stringify(stored.slice(0, 50)));
+  postJsonSafe("/api/part-requests", record).then((result) => {
+    if (result.ok) showPaymentStatus("تم حفظ الطلب محلياً ومزامنته مع قاعدة التطبيق", "success");
+  });
+  updatePartRequestStatus(t("requestSubmitted"), "success", draft);
+}
+
+function requestPaidAccess(action) {
+  pendingPaidAction = action;
+  showPaymentStatus(t("purchasePending"));
+  const bridge = window.webkit?.messageHandlers?.batalStore;
+  if (bridge) {
+    bridge.postMessage({ action: "purchaseAccess", productId: action.productId || catalogUnlockProductId });
+    return;
+  }
+
+  const confirmed = window.confirm(`${action.confirmTitle || t("paywallTitle")}\n\n${action.confirmText || t("paywallText")}`);
+  if (confirmed) {
+    completePaidAction();
+  } else {
+    pendingPaidAction = null;
+    showPaymentStatus(t("purchaseCancelled"), "warning");
+  }
+}
+
+function completePaidAction() {
+  const action = pendingPaidAction;
+  pendingPaidAction = null;
+  if (!action) return;
+  if (action.type === "unlock-number") {
+    paidPartUnlocks.add(action.partId);
+    showPaymentStatus(t("purchaseSuccess"), "success");
+    renderDetails();
+    renderParts();
+    return;
+  }
+  if (action.type === "open-pdf" && action.url) {
+    showPaymentStatus(t("purchaseSuccess"), "success");
+    window.location.assign(action.url);
+    return;
+  }
+  if (action.type === "submit-part-request" && action.request && action.plan) {
+    showPaymentStatus(t("purchaseSuccess"), "success");
+    savePartRequest(action.request, action.plan);
+  }
+}
+
+window.BatalNativeStore = {
+  receive(payload) {
+    if (payload?.status === "success") {
+      completePaidAction();
+      return;
+    }
+    pendingPaidAction = null;
+    const key = payload?.status === "cancelled" ? "purchaseCancelled" : "purchaseUnavailable";
+    showPaymentStatus(t(key), payload?.status === "cancelled" ? "warning" : "error");
+  },
+  screenCaptureChanged(isCaptured) {
+    const shield = document.getElementById("screenShield");
+    if (!shield) return;
+    shield.classList.toggle("active", Boolean(isCaptured));
+  },
+  screenshotTaken() {
+    showPaymentStatus(t("captureBlocked"), "warning");
+  }
+};
+
 function renderParts() {
   const query = searchInput.value;
   const visibleParts = parts.filter((part) => matchesFilter(part) && matchesSearch(part, query));
@@ -714,7 +1511,7 @@ function renderParts() {
       <div class="part-main">
         <h3>${displayName(part)}</h3>
         ${originalNameLine(part)}
-        <div class="meta-line">${part.record_type === "catalog_page" ? t("catalogPage") : t("oem")} ${part.record_type === "catalog_page" ? `#${part.page_number}` : part.part_number} · ${part.model}</div>
+        <div class="meta-line">${protectedMeta(part)}</div>
         <div class="compatibility">${yearsLabel(part)} · ${enginesLabel(part)} · ${part.occurrence_count.toLocaleString("en-US")} ${t("records")}</div>
         <div class="badge-row">
           <span class="badge ${typeClass(part)}">${categoryLabel(part)}</span>
@@ -737,18 +1534,68 @@ function renderParts() {
 }
 
 function diagramSvg(part) {
+  const numbers = fullPartNumbers(part);
+  const selected = selectedDiagramNumber && numbers.includes(selectedDiagramNumber)
+    ? selectedDiagramNumber
+    : (numbers[0] || part.part_number || part.catalog_id || "BATAL");
+  const publicNumber = isPartUnlocked(part) ? selected : t("lockedPartNumber");
+  const seed = Array.from(selected).reduce((sum, char, index) => sum + (char.charCodeAt(0) * (index + 3)), 0);
+  const width = 90 + (seed % 78);
+  const height = 38 + (seed % 46);
+  const radius = 12 + (seed % 28);
+  const notch = 18 + (seed % 34);
+  const accent = ["#1f7a57", "#d4af37", "#2d6cdf", "#b5531b"][seed % 4];
+  const secondary = ["#dfe9e5", "#f1d98a", "#e8edf7", "#f4dfd3"][seed % 4];
+  const diagramKey = part.diagram_key || buildDiagramKey(numbers, part.part_number);
+  const calloutLabelWidth = Math.max(98, Math.min(186, publicNumber.length * 9 + 34));
+  const calloutX = 260 - calloutLabelWidth / 2;
+  const calloutPositions = [
+    { x: 58, y: 68, tx: 126, ty: 86 },
+    { x: 394, y: 62, tx: 331, ty: 88 },
+    { x: 76, y: 157, tx: 159, ty: 134 },
+    { x: 408, y: 151, tx: 340, ty: 131 },
+    { x: 198, y: 58, tx: 221, ty: 84 },
+    { x: 316, y: 178, tx: 296, ty: 139 }
+  ];
+  const visibleCallouts = (numbers.length ? numbers : [selected]).slice(0, calloutPositions.length);
+  const inactiveCallouts = visibleCallouts
+    .filter((number) => number !== selected)
+    .map((number, index) => {
+      const point = calloutPositions[index % calloutPositions.length];
+      const label = isPartUnlocked(part) ? number : `E${String((seed + index * 37) % 10000).padStart(4, "0")}`;
+      const labelWidth = Math.max(54, Math.min(116, label.length * 8 + 20));
+      return `
+        <path class="callout-reference-line" d="M${point.x} ${point.y + 9} L${point.tx} ${point.ty}" />
+        <rect class="callout-reference-pill" x="${point.x - labelWidth / 2}" y="${point.y - 10}" width="${labelWidth}" height="22" rx="11"/>
+        <text class="callout-reference-text" x="${point.x}" y="${point.y + 6}" text-anchor="middle">${escapeHtml(label)}</text>
+      `;
+    }).join("");
+
   return `
-    <svg viewBox="0 0 520 210" role="img" aria-label="رسم توضيحي للقطعة">
-      <rect x="24" y="72" width="144" height="66" rx="10" fill="#dfe9e5" stroke="#1f7a57" stroke-width="3"/>
-      <rect x="352" y="66" width="132" height="78" rx="10" fill="#e8edf7" stroke="#2d6cdf" stroke-width="3"/>
-      <circle cx="260" cy="105" r="43" fill="#ffffff" stroke="#1f2a29" stroke-width="4"/>
-      <circle cx="260" cy="105" r="14" fill="#1f7a57"/>
-      <path d="M168 105h48M304 105h48" stroke="#1f2a29" stroke-width="4" stroke-dasharray="8 7"/>
-      <path d="M260 62v-34" stroke="#b5531b" stroke-width="4"/>
-      <text x="260" y="22" text-anchor="middle" font-size="14" fill="#1f2a29">${part.part_number}</text>
-      <text x="96" y="109" text-anchor="middle" font-size="13" fill="#1f2a29">${t("epcSource")}</text>
-      <text x="418" y="109" text-anchor="middle" font-size="13" fill="#1f2a29">${categoryLabel(part)}</text>
-      <text x="260" y="175" text-anchor="middle" font-size="16" fill="#1f7a57">${displayName(part)}</text>
+    <svg viewBox="0 0 520 230" role="img" aria-label="${escapeHtml(t("generatedDiagramTitle"))}">
+      <defs>
+        <pattern id="grid-${diagramKey}" width="18" height="18" patternUnits="userSpaceOnUse">
+          <path d="M18 0H0V18" fill="none" stroke="rgba(31,42,41,.14)" stroke-width="1"/>
+        </pattern>
+        <filter id="callout-glow-${diagramKey}" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ef4444" flood-opacity="0.65"/>
+        </filter>
+      </defs>
+      <rect x="16" y="16" width="488" height="198" rx="18" fill="rgba(246,246,239,.94)" stroke="rgba(31,42,41,.18)"/>
+      <rect x="16" y="16" width="488" height="198" rx="18" fill="url(#grid-${diagramKey})" stroke="rgba(31,42,41,.18)"/>
+      <path d="M72 ${122 - notch / 3} C128 ${60 + (seed % 22)} 174 ${152 - (seed % 18)} 226 ${104 + (seed % 12)} S332 ${58 + (seed % 28)} 444 ${118 - (seed % 20)}" fill="none" stroke="#8d948f" stroke-width="5" stroke-linecap="round"/>
+      <rect x="${260 - width / 2}" y="${108 - height / 2}" width="${width}" height="${height}" rx="${Math.min(18, radius / 2)}" fill="${secondary}" stroke="#1f2a29" stroke-width="4"/>
+      <rect class="callout-target-highlight" x="${260 - width / 2 - 9}" y="${108 - height / 2 - 9}" width="${width + 18}" height="${height + 18}" rx="${Math.min(22, radius / 2 + 7)}" fill="none" stroke="#ef4444" stroke-width="5" filter="url(#callout-glow-${diagramKey})"/>
+      <circle cx="${260 - width / 2 + notch}" cy="108" r="${radius}" fill="#fff" stroke="#606b78" stroke-width="5"/>
+      <circle cx="${260 + width / 2 - notch}" cy="108" r="${Math.max(10, radius - 8)}" fill="#fff" stroke="#1f2a29" stroke-width="4"/>
+      <path d="M260 ${108 - height / 2 - 18}v-30M260 ${108 + height / 2 + 18}v30M${260 - width / 2 - 34} 108h-42M${260 + width / 2 + 34} 108h42" stroke="#1f2a29" stroke-width="3" stroke-dasharray="8 7"/>
+      ${inactiveCallouts}
+      <path class="callout-leader" d="M260 ${108 + height / 2 + 12} L260 166" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+      <rect class="callout-label" x="${calloutX}" y="168" width="${calloutLabelWidth}" height="28" rx="14" fill="#ef4444" stroke="#fff7ed" stroke-width="2" filter="url(#callout-glow-${diagramKey})"/>
+      <text x="260" y="43" text-anchor="middle" font-size="14" fill="#1f2a29">${escapeHtml(t("diagramNumber"))}: ${escapeHtml(diagramKey)}</text>
+      <text class="callout-label-text" x="260" y="187" text-anchor="middle" font-size="15" fill="#fff" font-weight="900">${escapeHtml(publicNumber)}</text>
+      <text x="80" y="196" text-anchor="middle" font-size="12" fill="#1f2a29">${escapeHtml(categoryLabel(part))}</text>
+      <text x="438" y="196" text-anchor="middle" font-size="12" fill="#1f2a29">${escapeHtml(t("epcSource"))}</text>
     </svg>
   `;
 }
@@ -759,18 +1606,53 @@ function renderDetails() {
     detailPanel.innerHTML = `<div class="detail-empty">${t("noResults")}</div>`;
     return;
   }
+  const realPrices = verifiedPrices(part);
+  const numbers = fullPartNumbers(part);
+  if (selectedDiagramNumber && !numbers.includes(selectedDiagramNumber)) {
+    selectedDiagramNumber = null;
+  }
+  const activeDiagramNumber = selectedDiagramNumber || numbers[0] || "";
+  const numbersUnlocked = isPartUnlocked(part);
 
   detailPanel.innerHTML = `
     <div class="detail-title">
       <h2>${displayName(part)}</h2>
-      <span class="meta-line">${part.record_type === "catalog_page" ? t("catalogPage") : t("oem")} ${part.record_type === "catalog_page" ? `#${part.page_number}` : part.part_number} · ${part.model}</span>
+      <span class="meta-line">${protectedMeta(part)}</span>
       <div class="badge-row">
         <span class="badge ${typeClass(part)}">${categoryLabel(part)}</span>
         <span class="badge ${rarityClass(part)}">${localizedValue(part.rarity)}</span>
+        <span class="badge locked-badge">${t("paymentRequired")}</span>
       </div>
     </div>
 
+    <div class="detail-section part-number-section">
+      <h3>${t("fullPartNumbers")}</h3>
+      <p class="detail-copy">${t("fullPartNumbersHint")}</p>
+      <div class="part-number-list">
+        ${numbers.length ? numbers.map((number, index) => `
+          <button class="part-number-chip ${number === activeDiagramNumber ? "active" : ""}" type="button" data-diagram-number="${escapeHtml(number)}">
+            ${numbersUnlocked ? escapeHtml(number) : `${t("lockedPartNumber")} ${index + 1}`}
+          </button>
+        `).join("") : `<span class="internal-empty">${t("noPartNumbers")}</span>`}
+      </div>
+    </div>
+
+    <div class="diagram-tools">
+      <h3>${t("generatedDiagramTitle")}</h3>
+      <p>${t("generatedDiagramNote")}</p>
+    </div>
     <div class="diagram">${diagramSvg(part)}</div>
+
+    <div class="paywall-card">
+      <div>
+        <h3>${t("paywallTitle")}</h3>
+        <p>${t("paywallText")}</p>
+      </div>
+      <div class="paywall-actions">
+        ${numbers.length || part.record_type !== "catalog_page" ? `<button class="primary-action" type="button" data-paid-reveal="${partAccessId(part)}">${numbersUnlocked ? protectedPartNumbersText(part) : t("payUnlockNumbers")}</button>` : ""}
+        ${part.source_pdf_path ? `<button class="secondary-action" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
+      </div>
+    </div>
 
     <div class="detail-section">
       <h3>${t("dbInfo")}</h3>
@@ -789,16 +1671,19 @@ function renderDetails() {
     <div class="detail-section" data-section="prices">
       <h3>${t("marketPrices")}</h3>
       <div class="price-list">
-        ${priceEstimate(part).map((item) => `
+        ${realPrices.length ? realPrices.map((item) => `
           <div class="price-row">
             <div>
-              <strong>${item.label}</strong>
-              <span>${t("shippingIncluded")}</span>
+              <strong>${item.source}</strong>
+              <span>${t("shippingIncluded")} · ${t("priceUpdatedAt")}: ${item.updated_at}</span>
+              <a href="${item.url}" target="_blank" rel="noopener">${t("priceSource")}</a>
             </div>
-            <b>${formatMoney(item.amount)}</b>
+            <b>${formatVerifiedMoney(item)}</b>
           </div>
-        `).join("")}
+        `).join("") : `<div class="internal-empty">${t("noVerifiedPrices")}</div>`}
       </div>
+      <p class="price-disclaimer">${t("priceEstimateDisclaimer")}</p>
+      ${renderPricingStoreOptions(part)}
     </div>
 
     <div class="detail-section">
@@ -809,12 +1694,12 @@ function renderDetails() {
             <div>
               <strong>${item.source_id}</strong>
               <span>${t("year")} ${item.year} · ${t("page")} ${item.page}</span>
-              <span>${item.context}</span>
+              <span>${isPartUnlocked(part) ? item.context : t("lockedPartNumber")}</span>
             </div>
           </div>
         `).join("")}
       </div>
-      ${part.source_pdf_path ? `<a class="pdf-link" href="${pdfHref(part.source_pdf_path)}" target="_blank" rel="noopener">${t("openPdf")} · ${t("page")} ${part.page_number}</a>` : ""}
+      ${part.source_pdf_path ? `<button class="pdf-link" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
     </div>
 
     <div class="detail-section">
@@ -838,6 +1723,7 @@ function renderDetails() {
     <div class="detail-section" data-section="catalogs">
       <h3>${t("catalogsTitle")}</h3>
       <p class="detail-copy">${t("catalogsText")}</p>
+      ${renderFullCatalogSummary()}
     </div>
 
     <div class="detail-section" data-section="contact">
@@ -855,10 +1741,92 @@ function renderDetails() {
 function updateStats() {
   const cards = document.querySelectorAll(".stats-grid article strong");
   if (cards.length < 4) return;
+  const manifestSummary = patrolCatalogDatabase?.summary || {};
   cards[0].textContent = catalog.part_count?.toLocaleString("en-US") || parts.length.toLocaleString("en-US");
-  cards[1].textContent = (catalogSearchIndex.stats?.length || catalog.source_count || 0).toLocaleString("en-US");
+  cards[1].textContent = (manifestSummary.total_files || catalogSearchIndex.stats?.length || catalog.source_count || 0).toLocaleString("en-US");
   cards[2].textContent = parts.filter((part) => (part.confidence || 0) < 70).length.toLocaleString("en-US");
   cards[3].textContent = (catalogSearchIndex.entries?.length || parts.reduce((sum, part) => sum + part.occurrence_count, 0)).toLocaleString("en-US");
+}
+
+function renderFullCatalogSummary() {
+  const summary = patrolFullCatalogIndex?.summary || patrolCatalogDatabase?.summary || {};
+  const files = Array.isArray(patrolFullCatalogIndex?.files) ? patrolFullCatalogIndex.files : [];
+  const groups = files.reduce((acc, file) => {
+    const generation = file.generation || "unknown";
+    acc[generation] ||= { count: 0, years: new Set() };
+    acc[generation].count += 1;
+    (file.years || []).forEach((year) => acc[generation].years.add(year));
+    return acc;
+  }, {});
+  const ordered = ["Y60", "Y61", "Y62", "Y63", "unknown"].filter((key) => groups[key]);
+  const isArabic = currentLang === "ar";
+  const title = isArabic ? "الكتالوجات الشاملة المدمجة" : "Integrated Full Catalogs";
+  const uniqueLabel = isArabic ? "ملف فريد داخل التطبيق" : "unique files in app";
+  const duplicatesLabel = isArabic ? "ملف مكرر تم استبعاده" : "duplicates excluded";
+  const pagesLabel = isArabic ? "صفحة مفهرسة" : "indexed pages";
+  const sortedLabel = isArabic ? "الفرز حسب الجيل والسنة" : "sorted by generation and year";
+  const unknownLabel = isArabic ? "غير مصنف" : "Unclassified";
+  return `
+    <div class="catalog-full-summary">
+      <h4>${title}</h4>
+      <div class="catalog-full-stats">
+        <span><strong>${Number(summary.unique_files || files.length || 0).toLocaleString("en-US")}</strong>${uniqueLabel}</span>
+        <span><strong>${Number(summary.duplicate_files || 0).toLocaleString("en-US")}</strong>${duplicatesLabel}</span>
+        <span><strong>${Number(summary.total_pages || 0).toLocaleString("en-US")}</strong>${pagesLabel}</span>
+      </div>
+      <div class="catalog-full-groups">
+        ${ordered.map((generation) => {
+          const group = groups[generation];
+          return `
+            <div>
+              <strong>${generation === "unknown" ? unknownLabel : generation}</strong>
+              <span>${group.count.toLocaleString("en-US")} PDF · ${yearRange([...group.years].sort())}</span>
+            </div>
+          `;
+        }).join("")}
+      </div>
+      <p>${sortedLabel}: <code>catalog/patrol_full_unique</code></p>
+    </div>
+  `;
+}
+
+function yearRange(years = []) {
+  if (!years.length) return t("notSpecified");
+  if (years.length === 1) return years[0];
+  return `${years[0]} - ${years[years.length - 1]}`;
+}
+
+function shortList(values = [], limit = 3) {
+  if (!values.length) return t("notSpecified");
+  const visible = values.slice(0, limit).join(", ");
+  return values.length > limit ? `${visible} +${values.length - limit}` : visible;
+}
+
+function renderGenerationDatabaseStats() {
+  const generations = patrolCatalogDatabase?.summary?.generations || {};
+  document.querySelectorAll(".generation-card[data-generation]").forEach((card) => {
+    const generation = card.dataset.generation;
+    const info = generations[generation];
+    card.querySelector(".generation-db-stats")?.remove();
+
+    const stats = document.createElement("div");
+    stats.className = "generation-db-stats";
+
+    if (!info) {
+      stats.innerHTML = `<span>${t("generationDbNoData")}</span>`;
+      card.appendChild(stats);
+      return;
+    }
+
+    stats.innerHTML = `
+      <span>${t("generationDbFiles")}: <strong>${Number(info.file_count || 0).toLocaleString("en-US")}</strong></span>
+      <span>${t("generationDbUnique")}: <strong>${Number(info.unique_file_count || 0).toLocaleString("en-US")}</strong></span>
+      <span>${t("generationDbPages")}: <strong>${Number(info.total_pages || 0).toLocaleString("en-US")}</strong></span>
+      <span>${t("generationDbYears")}: <strong>${yearRange(info.years || [])}</strong></span>
+      <span>${t("generationDbEngines")}: <strong>${shortList(info.engines || [])}</strong></span>
+    `;
+    card.appendChild(stats);
+  });
 }
 
 async function fetchFirstJson(paths) {
@@ -893,6 +1861,24 @@ async function loadCatalog() {
       catalogSearchIndex = { entries: [], stats: [] };
       console.warn("Catalog page index unavailable", indexError);
     }
+    try {
+      patrolCatalogDatabase = await fetchFirstJson([
+        "data/patrol_catalog_manifest.json",
+        "ios/BatalAlDroob/BatalAlDroob/Web/data/patrol_catalog_manifest.json"
+      ]);
+    } catch (patrolDbError) {
+      patrolCatalogDatabase = { summary: null, files: [] };
+      console.warn("Patrol catalog database unavailable", patrolDbError);
+    }
+    try {
+      patrolFullCatalogIndex = await fetchFirstJson([
+        "data/patrol_full_catalog_files.json",
+        "ios/BatalAlDroob/BatalAlDroob/Web/data/patrol_full_catalog_files.json"
+      ]);
+    } catch (fullCatalogError) {
+      patrolFullCatalogIndex = { files: [], summary: patrolCatalogDatabase?.summary || null };
+      console.warn("Full patrol catalog index unavailable", fullCatalogError);
+    }
     parts = mergeCatalogEntries(baseParts, catalogSearchIndex);
   } catch (error) {
     catalog = { parts: fallbackParts, sources: [] };
@@ -901,6 +1887,8 @@ async function loadCatalog() {
   }
   selectedPartId = parts[0]?.part_number || null;
   updateStats();
+  renderGenerationDatabaseStats();
+  renderSharedFitment();
   renderParts();
 }
 
@@ -915,15 +1903,77 @@ partsList.addEventListener("click", (event) => {
   const card = event.target.closest(".part-card");
   if (!card) return;
   selectedPartId = card.dataset.id;
+  selectedDiagramNumber = null;
   renderParts();
 });
 
 detailPanel.addEventListener("click", (event) => {
+  const revealButton = event.target.closest("[data-paid-reveal]");
+  if (revealButton) {
+    requestPaidAccess({ type: "unlock-number", partId: revealButton.dataset.paidReveal });
+    return;
+  }
+
+  const pdfButton = event.target.closest("[data-paid-pdf]");
+  if (pdfButton) {
+    requestPaidAccess({ type: "open-pdf", url: pdfButton.dataset.paidPdf });
+    return;
+  }
+
+  const diagramButton = event.target.closest("[data-diagram-number]");
+  if (diagramButton) {
+    selectedDiagramNumber = diagramButton.dataset.diagramNumber;
+    renderDetails();
+    return;
+  }
+
   const button = event.target.closest("[data-wishlist]");
   if (!button) return;
   wishlist.add(button.dataset.wishlist);
   wishlistCount.textContent = wishlist.size;
   button.textContent = t("saved");
+});
+
+sharedFitmentGrid?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-shared-part]");
+  if (!button) return;
+  selectedPartId = button.dataset.sharedPart;
+  selectedDiagramNumber = null;
+  activeModel = "Y60";
+  activeFilter = "all";
+  visibleLimit = 60;
+  if (searchInput) searchInput.value = selectedPartId;
+  document.querySelectorAll(".model-chip").forEach((item) => item.classList.toggle("active", item.dataset.model === "Y60"));
+  document.querySelectorAll(".category-card").forEach((item) => item.classList.toggle("active", item.dataset.filter === "all"));
+  renderParts();
+  document.querySelector(".parts-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+document.querySelectorAll(".request-plan").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".request-plan").forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+  });
+});
+
+partRequestForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const request = collectPartRequest(partRequestForm);
+  if (!request.part_number && !request.part_name) {
+    updatePartRequestStatus(t("requestRequired"), "error");
+    return;
+  }
+
+  const plan = selectedPartRequestPlan();
+  const draft = buildPartRequestDraft(request, plan);
+  requestPaidAccess({
+    type: "submit-part-request",
+    productId: plan.productId,
+    request,
+    plan,
+    confirmTitle: t("partRequestTitle"),
+    confirmText: `${requestPlanLine(plan)}\n\n${draft}`
+  });
 });
 
 document.querySelectorAll(".model-chip").forEach((chip) => {
@@ -1004,8 +2054,17 @@ function navigateMenuTarget(target) {
   const targets = {
     home: ".topbar",
     parts: ".parts-panel",
+    "part-request": '[data-section="part-request"]',
+    "ai-hub": '[data-section="ai-hub"]',
+    "my-car": '[data-section="my-car"]',
+    "maintenance-log": '[data-section="maintenance-log"]',
+    marketplace: '[data-section="marketplace"]',
+    community: '[data-section="community"]',
+    "pro-tools": '[data-section="pro-tools"]',
+    "next-generation": '[data-section="next-generation"]',
     faults: '[data-section="faults"]',
     catalogs: '[data-section="catalogs"]',
+    "shared-fitment": '[data-section="shared-fitment"]',
     "source-intake": '[data-section="source-intake"]',
     prices: '[data-section="prices"]',
     vision: '[data-section="vision"]',
@@ -1034,8 +2093,94 @@ document.addEventListener("pointerdown", (event) => {
   panel.classList.remove("open");
 });
 
+vehicleProfileForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const profile = profileObjectFromForm(vehicleProfileForm);
+  localStorage.setItem("batalVehicleProfile", JSON.stringify(profile));
+  renderVehicleProfile();
+  postJsonSafe("/api/vehicle-profile", profile).then((result) => {
+    if (result.ok) showPaymentStatus("تم حفظ ملف السيارة ومزامنته مع قاعدة التطبيق", "success");
+  });
+  showPaymentStatus("تم حفظ ملف السيارة محلياً", "success");
+});
+
+maintenanceForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const profile = JSON.parse(localStorage.getItem("batalVehicleProfile") || "null");
+  const record = {
+    ...profileObjectFromForm(maintenanceForm),
+    vin: profile?.vin || ""
+  };
+  const records = localRecords("batalMaintenanceLog");
+  const savedRecord = { ...record, id: `MNT-${Date.now()}` };
+  records.unshift(savedRecord);
+  saveLocalRecords("batalMaintenanceLog", records.slice(0, 80));
+  postJsonSafe("/api/maintenance", savedRecord).then((result) => {
+    if (result.ok) showPaymentStatus("تمت مزامنة عملية الصيانة مع قاعدة التطبيق", "success");
+  });
+  maintenanceForm.reset();
+  renderMaintenanceLog();
+  showPaymentStatus("تمت إضافة عملية الصيانة", "success");
+});
+
+document.getElementById("aiImageInput")?.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  const target = document.getElementById("aiImageResult");
+  if (!file) return;
+  const keywords = file.name.replace(/\.[a-z0-9]+$/i, " ").replace(/[-_]+/g, " ");
+  renderAiCandidates(target, keywords || "engine cooling electrical", `تم تجهيز الصورة: ${file.name}. النتائج التالية مرشحة من قاعدة الكتالوج إلى حين ربط نموذج التعرف من الصور.`);
+});
+
+document.getElementById("descriptionSearchButton")?.addEventListener("click", () => {
+  const input = document.getElementById("descriptionSearchInput");
+  const result = document.getElementById("descriptionSearchResult");
+  const query = input?.value || "";
+  const diagnostics = diagnosticKeywords(query);
+  renderAiCandidates(result, query, `تحليل الوصف: ${diagnostics.join(" ")}`);
+  if (query.trim().length > 1 && searchInput) {
+    searchInput.value = query;
+    visibleLimit = 60;
+    renderParts();
+  }
+});
+
+document.getElementById("soundDiagnosticButton")?.addEventListener("click", () => {
+  const result = document.getElementById("soundDiagnosticResult");
+  if (!result) return;
+  result.innerHTML = `
+    <strong>تقرير صوتي تجريبي</strong>
+    <p>قبل تفعيل التحليل الحقيقي نحتاج نموذج صوتي أو API. الواجهة جاهزة لتسجيل الصوت وتصنيف احتمالات: بلف، كرسي ماكينة، جنزير، دفرنس، رولمان، سير، أو طرمبة ماء.</p>
+  `;
+});
+
+document.getElementById("tireCalcButton")?.addEventListener("click", updateTireCalculation);
+
+document.addEventListener("click", (event) => {
+  const aiPart = event.target.closest("[data-ai-part]");
+  if (!aiPart) return;
+  selectedPartId = aiPart.dataset.aiPart;
+  activeModel = "Y60";
+  activeFilter = "all";
+  if (searchInput) searchInput.value = selectedPartId;
+  renderParts();
+  document.querySelector(".parts-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 loadCatalog();
 applyLanguage();
+syncAppOverview().then(() => {
+  renderVehicleProfile();
+  renderMaintenanceLog();
+});
+
+document.body.insertAdjacentHTML("beforeend", `
+  <div class="screen-shield" id="screenShield" aria-live="assertive">
+    <div>
+      <strong>${t("protectedContent")}</strong>
+      <span>${t("captureBlocked")}</span>
+    </div>
+  </div>
+`);
 
 if ("serviceWorker" in navigator && ["http:", "https:"].includes(window.location.protocol)) {
   window.addEventListener("load", () => {

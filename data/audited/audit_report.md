@@ -1,6 +1,6 @@
 # Y60 Catalog Audit Report
 
-Generated: 2026-06-28T15:04:16.820780+00:00
+Generated: 2026-07-01T14:53:57.676924+00:00
 Sources after duplicate removal: 12 PDFs
 Skipped duplicate PDFs: 1
 Unique source hashes: 12

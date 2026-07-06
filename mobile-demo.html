@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>محاكاة بطل الدروب للجوال</title>
+  <meta name="theme-color" content="#070908">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="mobile-demo.css">
+</head>
+<body>
+  <main class="demo-shell">
+    <section class="intro">
+      <img class="app-icon" src="assets/icons/icon-192.png" alt="بطل الدروب">
+      <p class="eyebrow">محاكاة الجوال</p>
+      <h1>بطل الدروب</h1>
+      <p class="lead">واجهة تجريبية تعرض شكل التطبيق وطريقة تصفح القطع والكتالوجات والدفع الرمزي قبل فتح أرقام القطع.</p>
+      <div class="quick-actions">
+        <button type="button" data-jump="parts">جرّب البحث</button>
+        <button type="button" data-jump="paywall">شاهد الدفع</button>
+      </div>
+    </section>
+
+    <section class="phone-stage" aria-label="محاكاة تطبيق بطل الدروب">
+      <div class="phone">
+        <div class="phone-status">
+          <span>7:25</span>
+          <span>5G 100%</span>
+        </div>
+
+        <div class="app-screen active" data-screen="home">
+          <header class="app-hero">
+            <button class="circle-button" type="button" data-menu>☰</button>
+            <div>
+              <small>قاعدة قطع نيسان باترول</small>
+              <h2>بطل الدروب</h2>
+            </div>
+          </header>
+
+          <div class="hero-image">
+            <span>Y60 Safari</span>
+          </div>
+
+          <div class="search-box" data-jump="parts">
+            <span>بحث ذكي</span>
+            <b>رقم القطعة، الاسم، أو VIN</b>
+          </div>
+
+          <div class="stats-row">
+            <div><strong>5,271</strong><span>نتيجة</span></div>
+            <div><strong>11</strong><span>PDF</span></div>
+            <div><strong>10</strong><span>أقسام</span></div>
+          </div>
+
+          <div class="section-title">
+            <h3>الأقسام السريعة</h3>
+          </div>
+          <div class="tiles">
+            <button type="button" data-jump="parts">المحرك</button>
+            <button type="button" data-jump="parts">الكهرباء</button>
+            <button type="button" data-jump="catalogs">الكتالوجات</button>
+            <button type="button" data-jump="paywall">الدفع</button>
+          </div>
+        </div>
+
+        <div class="app-screen" data-screen="parts">
+          <header class="screen-header">
+            <button class="circle-button" type="button" data-back>‹</button>
+            <div>
+              <small>البحث والفهرسة</small>
+              <h2>القطع</h2>
+            </div>
+          </header>
+
+          <label class="input-shell">
+            <span>بحث</span>
+            <input value="TB42S" aria-label="بحث عن قطعة">
+          </label>
+
+          <div class="filter-row">
+            <button class="active" type="button">الكل</button>
+            <button type="button">محرك</button>
+            <button type="button">تكييف</button>
+            <button type="button">كهرباء</button>
+          </div>
+
+          <div class="part-list">
+            <button class="part-item" type="button" data-jump="detail">
+              <span class="part-icon">⚙</span>
+              <div>
+                <strong>Block Assy-Cylinder</strong>
+                <small>رقم القطعة محمي · Y60 · TB42S</small>
+              </div>
+            </button>
+            <button class="part-item" type="button" data-jump="detail">
+              <span class="part-icon">◌</span>
+              <div>
+                <strong>مفتاح المكيف</strong>
+                <small>رقم القطعة محمي · صفحة كتالوج</small>
+              </div>
+            </button>
+            <button class="part-item" type="button" data-jump="detail">
+              <span class="part-icon">↯</span>
+              <div>
+                <strong>ضفيرة أمامية</strong>
+                <small>رقم القطعة محمي · كهرباء</small>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="app-screen" data-screen="detail">
+          <header class="screen-header">
+            <button class="circle-button" type="button" data-back="parts">‹</button>
+            <div>
+              <small>تفاصيل القطعة</small>
+              <h2>Block Assy-Cylinder</h2>
+            </div>
+          </header>
+
+          <div class="diagram-card">
+            <span>رسم كتالوج</span>
+            <b>رقم القطعة محمي</b>
+          </div>
+
+          <div class="detail-grid">
+            <div><span>القسم</span><strong>المحرك والوقود</strong></div>
+            <div><span>السنة</span><strong>1988 - 1997</strong></div>
+            <div><span>المحرك</span><strong>TB42S</strong></div>
+            <div><span>الثقة</span><strong>100%</strong></div>
+          </div>
+
+          <div class="pay-card" id="paywall">
+            <h3>فتح المحتوى المحمي</h3>
+            <p>لرؤية رقم القطعة أو فتح صفحة PDF الأصلية يتم طلب دفع رمزي لكل عملية فتح.</p>
+            <button type="button" data-unlock>دفع وفتح رقم القطعة</button>
+            <button class="ghost" type="button" data-unlock>دفع وفتح الكتالوج</button>
+          </div>
+
+          <div class="unlocked-result" hidden>
+            <span>تم الفتح</span>
+            <strong>OEM 11010-03J80</strong>
+          </div>
+        </div>
+
+        <div class="app-screen" data-screen="catalogs">
+          <header class="screen-header">
+            <button class="circle-button" type="button" data-back>‹</button>
+            <div>
+              <small>المصادر الأصلية</small>
+              <h2>الكتالوجات</h2>
+            </div>
+          </header>
+          <div class="catalog-list">
+            <button type="button" data-jump="paywall">Y60 1991 PDF <span>محمي</span></button>
+            <button type="button" data-jump="paywall">Y60 1997 PDF <span>محمي</span></button>
+            <button type="button" data-jump="paywall">WGY60348567 <span>محمي</span></button>
+            <button type="button" data-jump="paywall">Y62 2012 PDF <span>قريبًا</span></button>
+          </div>
+        </div>
+
+        <nav class="bottom-nav">
+          <button class="active" type="button" data-nav="home">الرئيسية</button>
+          <button type="button" data-nav="parts">القطع</button>
+          <button type="button" data-nav="catalogs">الكتالوجات</button>
+          <button type="button" data-nav="detail">الدفع</button>
+        </nav>
+      </div>
+    </section>
+
+    <section class="walkthrough">
+      <h2>طريقة التصفح داخل التطبيق</h2>
+      <ol>
+        <li>ابدأ من الرئيسية واختر البحث أو القسم المناسب.</li>
+        <li>اكتب رقم القطعة أو اسمها أو كود مثل TB42S.</li>
+        <li>افتح نتيجة القطعة لمراجعة القسم والسنة والمصدر.</li>
+        <li>ادفع مبلغًا رمزيًا عند الحاجة لعرض رقم القطعة أو فتح PDF.</li>
+      </ol>
+    </section>
+  </main>
+
+  <script src="mobile-demo.js"></script>
+</body>
+</html>

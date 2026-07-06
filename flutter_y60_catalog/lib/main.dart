@@ -92,6 +92,8 @@ class HomePage extends StatelessWidget {
             HeroSection(generation: y60),
             const SearchSection(),
             const DatabaseOverviewSection(),
+            const AppCompletionSection(),
+            const GlobalReferenceVisionSection(),
             const ImplementationGuideSection(),
             const CatalogPdfSection(),
             VehicleProfileSection(generation: y60),
@@ -175,6 +177,7 @@ class HeaderMenuButton extends StatelessWidget {
     HeaderMenuItem('photos', 'الصور', Icons.photo_library),
     HeaderMenuItem('catalogs', 'الكتالوجات', Icons.picture_as_pdf),
     HeaderMenuItem('database', 'قاعدة البيانات', Icons.storage),
+    HeaderMenuItem('vision', 'الرؤية العالمية', Icons.public),
     HeaderMenuItem('guide', 'الشرح', Icons.menu_book),
     HeaderMenuItem('contact', 'تواصل معنا', Icons.mail),
   ];
@@ -277,10 +280,11 @@ class HeaderLink extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('سيتم ربط التنقل الداخلي في المرحلة القادمة.')),
-        );
+        if (label == 'الأقسام') {
+          HeaderMenuButton.openItem(context, 'parts');
+          return;
+        }
+        HeaderMenuButton.openItem(context, 'database');
       },
       child: Text(label, style: const TextStyle(color: Colors.white)),
     );
@@ -422,7 +426,7 @@ class HeroCopy extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         const Text(
-          'موقع رسمي أولي لإدارة كتالوج قطع باترول Y60، مجهز للبحث برقم القطعة، ربط الصور والمخططات، وتصنيف الأنظمة قبل تحويله لاحقًا إلى تطبيق جوال كامل.',
+          'تطبيق وموقع Offline-first لإدارة كتالوج وقطع Nissan Patrol Safari Y60 SGL موديل 1991/1992، مبني بقاعدة JSON محلية ومرتبط بملفات PDF الأصلية من 1988 إلى 1997.',
           style: TextStyle(
             color: Color(0xFFD8D2CC),
             fontSize: 16,
@@ -436,8 +440,9 @@ class HeroCopy extends StatelessWidget {
           children: [
             HeroBadge(text: 'عربي و RTL'),
             HeroBadge(text: 'Offline-first'),
-            HeroBadge(text: 'جاهز للصور والمخططات'),
-            HeroBadge(text: 'قابل للتحويل لتطبيق'),
+            HeroBadge(text: '5271 نتيجة'),
+            HeroBadge(text: '11 ملف PDF'),
+            HeroBadge(text: 'Web + Windows'),
           ],
         ),
         const SizedBox(height: 24),
@@ -854,7 +859,8 @@ class _SearchSectionState extends State<SearchSection> {
                 onSubmitted: _runSearch,
                 textDirection: TextDirection.ltr,
                 decoration: InputDecoration(
-                  hintText: 'رقم القطعة / الاسم العربي / English name',
+                  hintText:
+                      'رقم القطعة / الاسم العربي / English / WGY60348567 / TB42S',
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _controller.text.isEmpty
                       ? null
@@ -1140,7 +1146,7 @@ class _PartsCatalogPageState extends State<PartsCatalogPage> {
                               ? 'جاري تحميل فهرس القطع...'
                               : 'الفهرس جاهز: $loadedCount نتيجة',
                           hintText:
-                              'مثال: 27500 / 64826 / مفتاح / SWITCH / A/C',
+                              'مثال: WGY60348567 / TB42S / FS5R50A / 27500 / مفتاح / SWITCH',
                           prefixIcon: const Icon(Icons.manage_search),
                           suffixIcon: _controller.text.isEmpty
                               ? null
@@ -1753,6 +1759,16 @@ class _DatabaseOverviewSectionState extends State<DatabaseOverviewSection> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(14),
+                  child: Text(
+                    'مصادر البيانات مركبة داخل التطبيق: catalog_search_index.json للبحث، catalog_section_index.json للأقسام، وملفات PDF الأصلية داخل assets/catalog/pdfs. التطبيق يعمل حالياً بدون تسجيل دخول وبدون Backend، لذلك يمكن تشغيله على الويب وويندوز مع قابلية نقله لاحقاً إلى Android و iOS.',
+                    style: TextStyle(color: Color(0xFFD8D2CC), height: 1.55),
+                  ),
+                ),
+              ),
             ],
           );
         },
@@ -1821,6 +1837,292 @@ class DatabaseStatCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AppCompletionSection extends StatelessWidget {
+  const AppCompletionSection({super.key});
+
+  static const items = [
+    AppCompletionItem(
+      Icons.web,
+      'تطبيق ويب',
+      'واجهة Flutter Web جاهزة للتشغيل محلياً ومرتبطة بفهرس Y60.',
+    ),
+    AppCompletionItem(
+      Icons.desktop_windows,
+      'تطبيق ويندوز',
+      'البنية نفسها تعمل كتطبيق Windows عند توفر بيئة Flutter المناسبة.',
+    ),
+    AppCompletionItem(
+      Icons.storage,
+      'Offline-first',
+      'البيانات الأساسية داخل assets: JSON للفهارس وPDF للكتالوجات.',
+    ),
+    AppCompletionItem(
+      Icons.search,
+      'بحث فعلي',
+      'يدعم رقم القطعة، العربي، الإنجليزي، WGY60348567، TB42S، وFS5R50A.',
+    ),
+    AppCompletionItem(
+      Icons.description,
+      'تفاصيل قبل PDF',
+      'كل نتيجة تفتح صفحة تفاصيل تعرض المصدر، الصفحة، الأرقام، والملاحظات.',
+    ),
+    AppCompletionItem(
+      Icons.phone_iphone,
+      'جاهز للتوسع',
+      'البنية مهيأة لاحقاً لأندرويد و iOS وقاعدة بيانات قابلة للتحرير.',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return PageShell(
+      title: 'حالة التطبيق المتكامل',
+      subtitle:
+          'ملخص تنفيذي لما أصبح جاهزاً داخل Patrol Hub وما يجعله قابلاً للتطوير كتطبيق كامل.',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final columns = constraints.maxWidth >= 980
+              ? 3
+              : constraints.maxWidth >= 620
+                  ? 2
+                  : 1;
+
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              mainAxisExtent: 150,
+            ),
+            itemBuilder: (context, index) => AppCompletionCard(
+              item: items[index],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class AppCompletionItem {
+  const AppCompletionItem(this.icon, this.title, this.body);
+
+  final IconData icon;
+  final String title;
+  final String body;
+}
+
+class AppCompletionCard extends StatelessWidget {
+  const AppCompletionCard({super.key, required this.item});
+
+  final AppCompletionItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A1A12),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF8C5A2B)),
+                  ),
+                  child: Icon(item.icon, color: const Color(0xFFFF8A1E)),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              item.body,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFFD8D2CC),
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GlobalReferenceVisionSection extends StatelessWidget {
+  const GlobalReferenceVisionSection({super.key});
+
+  static const pillars = [
+    VisionPillar(
+      Icons.account_tree,
+      'قاعدة بيانات احترافية',
+      'رسومات أصلية، OEM، أسماء متعددة اللغات، وظيفة القطعة، موقعها، الصور، والأبعاد عند توفرها.',
+    ),
+    VisionPillar(
+      Icons.compare_arrows,
+      'توافق القطع',
+      'ربط القطعة بأجيال Y60 وY61 وY62 مستقبلاً، مع السنة والمحرك والقير والفئة.',
+    ),
+    VisionPillar(
+      Icons.manage_search,
+      'البحث الذكي',
+      'بحث بالرقم، الاسم، العربية، الإنجليزية، VIN، والقسم الفني.',
+    ),
+    VisionPillar(
+      Icons.price_change,
+      'مقارنة الأسعار',
+      'عرض السعر، العملة، الشحن، مدة التوصيل، الدولة، وحالة القطعة.',
+    ),
+    VisionPillar(
+      Icons.verified,
+      'تصنيف نوع القطعة',
+      'OEM، مصنع أصلي، إعادة تصنيع عالية الجودة، بديل تجاري، مستعملة أصلية، وNOS.',
+    ),
+    VisionPillar(
+      Icons.signal_cellular_alt,
+      'مؤشر الندرة',
+      'متوفرة، محدودة، نادرة، أو موقوفة الإنتاج NLA.',
+    ),
+    VisionPillar(
+      Icons.build_circle,
+      'الصيانة والشروحات',
+      'أعراض التلف، سبب التعطل، العمر الافتراضي، العزم، الأدوات، وخطوات الفك والتركيب.',
+    ),
+    VisionPillar(
+      Icons.groups,
+      'المجتمع والمتاجر',
+      'تقييمات، تجارب ملاك، مشاريع ترميم، متاجر عالمية وخليجية، تشاليح، وبائعون موثقون.',
+    ),
+    VisionPillar(
+      Icons.psychology,
+      'الذكاء الاصطناعي',
+      'تعرف على القطعة من صورة، اقتراح بدائل، واستخراج تشخيص أولي من وصف العطل.',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return PageShell(
+      title: 'الرؤية العالمية لتطبيق الباترول',
+      subtitle:
+          'خارطة مزايا تجعل Patrol Hub مرجعاً شاملاً للقطع، الأسعار، الصيانة، المجتمع، والذكاء الاصطناعي.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 1040
+                  ? 3
+                  : constraints.maxWidth >= 680
+                      ? 2
+                      : 1;
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: pillars.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  mainAxisExtent: 166,
+                ),
+                itemBuilder: (context, index) =>
+                    VisionPillarCard(pillar: pillars[index]),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'الهدف النهائي: أن يصبح التطبيق المرجع العالمي الأول لملاك نيسان باترول، بحيث يجد المستخدم كل ما يحتاجه عن أي قطعة في مكان واحد دون التنقل بين عشرات المواقع والمتاجر.',
+                style: TextStyle(
+                  color: Color(0xFFEDE4DA),
+                  fontSize: 16,
+                  height: 1.6,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class VisionPillar {
+  const VisionPillar(this.icon, this.title, this.body);
+
+  final IconData icon;
+  final String title;
+  final String body;
+}
+
+class VisionPillarCard extends StatelessWidget {
+  const VisionPillarCard({super.key, required this.pillar});
+
+  final VisionPillar pillar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(pillar.icon, color: const Color(0xFFFF8A1E), size: 30),
+            const SizedBox(height: 10),
+            Text(
+              pillar.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              pillar.body,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Color(0xFFD8D2CC), height: 1.45),
             ),
           ],
         ),
@@ -1953,18 +2255,29 @@ class VehicleProfileSection extends StatelessWidget {
     final profile = generation.vehicleProfile;
     final items = [
       SpecItem('الفئة', profile?.nameAr ?? 'نيسان باترول سفاري Y60 SGL'),
-      SpecItem('الشاصي', profile?.chassisPrefix ?? 'WGY60'),
+      SpecItem('رقم الهيكل', profile?.chassisNumber ?? 'WGY60-348567'),
       SpecItem('الموديل', profile?.modelCode ?? 'WLGY60JFRC5'),
       const SpecItem('الإنتاج', '10 / 1991'),
+      const SpecItem('موديل الاستمارة', '1992'),
+      const SpecItem('بلد الصنع', 'اليابان'),
       SpecItem('المحرك', profile?.engineCode ?? 'TB42S'),
+      SpecItem(
+        'وصف المحرك',
+        profile?.engineDescriptionAr ?? 'بنزين 6 سلندر مستقيم، 4.2 لتر',
+      ),
       SpecItem('القير', profile?.transmissionCode ?? 'FS5R50A'),
+      SpecItem('الدفرنس', profile?.finalDriveCode ?? 'HG41'),
+      SpecItem('الهيكل', profile?.bodyStyleAr ?? 'Wagon طويل خمسة أبواب'),
+      SpecItem('اللون الخارجي', profile?.exteriorColorCode ?? '2L3'),
+      SpecItem('اللون الداخلي', profile?.interiorColorCode ?? 'AH3 / عنابي'),
       SpecItem('المقود', profile?.driveSide ?? 'LHD'),
       SpecItem('السوق', profile?.market ?? 'الخليج / السعودية'),
     ];
 
     return PageShell(
       title: 'بطاقة السيارة',
-      subtitle: 'بيانات الأساس التي ستربط الكتالوج والمخططات لاحقًا.',
+      subtitle:
+          'بيانات السيارة الخاصة WGY60-348567 المستخدمة في البحث والكتالوجات.',
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isWide = constraints.maxWidth >= 780;
@@ -2667,7 +2980,7 @@ class CatalogEntryDetailPage extends StatelessWidget {
                             ? 'صفحة ${entry.pageNumber}'
                             : 'بطاقة مركبة',
                       ),
-                      DetailChip(Icons.verified, entry.type),
+                      DetailChip(Icons.verified, _typeLabel(entry.type)),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -2831,6 +3144,19 @@ class CatalogEntryDetailPage extends StatelessWidget {
           'افتح صفحة الكتالوج الأصلية للتحقق من رقم النداء، رقم القطعة، والموديلات المطابقة.',
           'اعتمد القطعة فقط بعد مطابقة سنة السيارة، السوق، المحرك، ونوع القير.',
         ];
+    }
+  }
+
+  static String _typeLabel(String type) {
+    switch (type) {
+      case 'vehicle':
+        return 'بطاقة سيارة';
+      case 'vehicle_pdf_page':
+        return 'صفحة ملف السيارة';
+      case 'catalog_page':
+        return 'صفحة كتالوج';
+      default:
+        return type;
     }
   }
 }
@@ -3100,6 +3426,22 @@ class MenuContentPage extends StatelessWidget {
             'assets/hero و assets/generations: صور الواجهة والأجيال والعرض البصري.',
             'طريقة التركيب: عند البناء للويب أو ويندوز تُنسخ هذه الأصول داخل build وتعمل بدون خادم بيانات.',
             'التطوير القادم: يمكن نقل نفس البنية إلى SQLite أو Isar عند الحاجة لتعديل البيانات من داخل التطبيق.',
+          ],
+        );
+      case 'vision':
+        return const MenuPageContent(
+          'هذه الصفحة تعتمد خارطة المزايا التي تجعل Patrol Hub مرجعاً عالمياً لملاك نيسان باترول.',
+          [
+            'قاعدة بيانات احترافية: الرسومات الأصلية، OEM، أسماء متعددة اللغات، وصف الوظيفة، الموقع، الصور، والأبعاد عند توفرها.',
+            'توافق القطع: معرفة السيارات المطابقة والفروقات بين Y60 وY61 وY62 مستقبلاً حسب السنة والمحرك والقير والفئة.',
+            'البحث الذكي: رقم القطعة، الاسم، العربية، الإنجليزية، VIN، والقسم الفني مثل مكيف ومحرك وكهرباء وديكور.',
+            'مقارنة الأسعار: السعر، العملة، الشحن، مدة التوصيل، الدولة، وحالة القطعة من عدة متاجر.',
+            'تصنيف نوع القطعة: OEM، مصنع أصلي، إعادة تصنيع عالية الجودة، بديل تجاري، مستعملة أصلية، وNOS.',
+            'مؤشر الندرة: متوفرة بكثرة، محدودة، نادرة، أو موقوفة الإنتاج NLA.',
+            'معلومات الصيانة: سبب التعطل، أعراض التلف، العمر الافتراضي، وقت التغيير، والأعطال الناتجة عن الإهمال.',
+            'الشروحات: فيديوهات، صور خطوة بخطوة، عزم الربط، الأدوات المطلوبة، ودرجة الصعوبة.',
+            'المجتمع والمتاجر: تقييمات، تجارب ملاك، مشاريع ترميم، متاجر عالمية وخليجية، تشاليح، وبائعون موثقون.',
+            'الذكاء الاصطناعي والإحصائيات: معرفة القطعة من صورة، اقتراح البدائل، تشخيص الأعطال، وأكثر القطع طلباً وندرة.',
           ],
         );
       case 'guide':

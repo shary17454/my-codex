@@ -30,6 +30,8 @@ __pycache__/
 **/Pods/
 **/DerivedData/
 ios/**/DerivedData/
+**/*.xcuserstate
+**/xcuserdata/
 **/.gradle/
 **/local.properties
 

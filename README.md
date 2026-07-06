@@ -60,6 +60,7 @@ C:\src\flutter\bin\flutter.bat build web --release
 - `docs/chat-transcript-2026-06-29.md`
 - `docs/life-assistant-chat-handoff.md`
 - `docs/patrol-hub-chat-handoff.md`
+- `docs/patrol-hub-full-description-ar.md`
 - `nissan-patrol/`
 
 ## كتيب مرزوق بن حويد العضياني

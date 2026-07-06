@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-07-02",
+  "policy": {
+    "show_only_verified_as_buying_option": true,
+    "do_not_claim_partnership_without_written_approval": true,
+    "do_not_show_estimated_prices": true,
+    "notes_ar": "يعرض التطبيق المتاجر الموثقة فقط كخيارات شراء. أما المرشحون فيبقون داخل ملف البحث حتى يتم التحقق من رابط رسمي أو بريد أو رقم واتساب منشور من المصدر نفسه."
+  },
+  "categories": [
+    {
+      "id": "local_saudi",
+      "name_ar": "محلي سعودي",
+      "name_en": "Saudi local",
+      "purpose_ar": "متاجر سعودية مستقلة في سلة أو مواقع خاصة."
+    },
+    {
+      "id": "gulf",
+      "name_ar": "خليجي",
+      "name_en": "Gulf",
+      "purpose_ar": "متاجر خليجية، خصوصاً الإمارات والكويت."
+    },
+    {
+      "id": "global",
+      "name_ar": "عالمي",
+      "name_en": "Global",
+      "purpose_ar": "متاجر عالمية تقبل البحث برقم القطعة وتشحن دولياً."
+    },
+    {
+      "id": "salvage",
+      "name_ar": "تشليح",
+      "name_en": "Salvage yard",
+      "purpose_ar": "تشاليح موثوقة للقطع المستخدمة الأصلية."
+    },
+    {
+      "id": "used_original",
+      "name_ar": "مستعمل أصلي",
+      "name_en": "Used original",
+      "purpose_ar": "بائعون أو متاجر قطع مستعملة أصلية قابلة للتحقق."
+    },
+    {
+      "id": "nos",
+      "name_ar": "NOS / وكالة قديمة جديدة",
+      "name_en": "NOS / new old stock",
+      "purpose_ar": "موردون يوفرون قطع وكالة قديمة جديدة أو مخزون متوقف."
+    }
+  ],
+  "verified_stores": [
+    {
+      "id": "almoosa",
+      "name_ar": "الموسى لقطع غيار نيسان",
+      "name_en": "Almoosa Nissan Parts",
+      "category": "local_saudi",
+      "secondary_categories": [
+        "used_original"
+      ],
+      "website": "https://almoosaparts.com/",
+      "search_url_template": "https://almoosaparts.com/search?q={part_number}",
+      "contact": {
+        "email": "almousanissan@gmail.com",
+        "phone": "+966163621016",
+        "whatsapp": "+966163621016",
+        "instagram": "https://instagram.com/almoosa_parts",
+        "twitter": "https://twitter.com/Almoosa_parts",
+        "snapchat": "https://www.snapchat.com/add/Almoosa_Parts"
+      },
+      "verification": {
+        "status": "verified_from_official_store_page",
+        "source": "https://almoosaparts.com/",
+        "evidence_ar": "صفحة المتجر الرسمية وبيانات Salla الداخلية تعرض الاسم والوصف ووسائل التواصل."
+      },
+      "outreach": {
+        "status": "sent",
+        "sent_at": "2026-07-02",
+        "channel": "email",
+        "to": "almousanissan@gmail.com",
+        "subject": "طلب تعاون وربط متجر الموسى داخل تطبيق بطل الدروب",
+        "gmail_message_id": "19f23a5e3b707cea"
+      }
+    },
+    {
+      "id": "partsouq",
+      "name_en": "PartSouq",
+      "category": "global",
+      "website": "https://partsouq.com/",
+      "search_url_template": "https://partsouq.com/en/search/all?q={part_number}",
+      "verification": {
+        "status": "verified_openable_store_url",
+        "source": "https://partsouq.com/"
+      }
+    },
+    {
+      "id": "amayama",
+      "name_en": "Amayama",
+      "category": "global",
+      "website": "https://www.amayama.com/en",
+      "search_url_template": "https://www.amayama.com/en/part/nissan/{part_number}",
+      "verification": {
+        "status": "verified_openable_store_url",
+        "source": "https://www.amayama.com/en"
+      }
+    },
+    {
+      "id": "megazip",
+      "name_en": "MegaZip",
+      "category": "global",
+      "website": "https://www.megazip.net/",
+      "search_url_template": "https://www.megazip.net/search?q={part_number}",
+      "verification": {
+        "status": "verified_openable_store_url",
+        "source": "https://www.megazip.net/"
+      }
+    }
+  ],
+  "candidate_categories_to_fill": [
+    {
+      "category": "gulf",
+      "status": "needs_verified_store_contact",
+      "notes_ar": "لم يتم تفعيل متجر خليجي كخيار موثق حتى يظهر رابط رسمي ووسيلة تواصل واضحة من المصدر."
+    },
+    {
+      "category": "salvage",
+      "status": "needs_verified_store_contact",
+      "notes_ar": "لا يتم تفعيل التشاليح إلا بعد التحقق من سمعة البائع وطريقة إرجاع القطع وحالة القطعة."
+    },
+    {
+      "category": "used_original",
+      "status": "partially_covered",
+      "notes_ar": "يمكن لبعض المتاجر المحلية بيع قطع أصلية مستعملة، لكن حالة كل قطعة يجب أن تظهر من صفحة المتجر نفسها."
+    },
+    {
+      "category": "nos",
+      "status": "needs_verified_store_contact",
+      "notes_ar": "يجب إثبات أن القطعة NOS فعلاً: وكالة قديمة جديدة، غير مركبة، وبعلبتها أو برقمها الأصلي."
+    },
+    {
+      "category": "y60_y61_specialist",
+      "status": "needs_verified_store_contact",
+      "notes_ar": "أي متجر متخصص في Y60/Y61 يضاف بعد التحقق من وجود مخزون واضح أو صفحات منتجات مرتبطة بهذه الأجيال."
+    }
+  ],
+  "unverified_search_targets": [
+    {
+      "name_ar": "تبيان لقطع غيار نيسان",
+      "status": "unverified",
+      "needed_to_activate_ar": "رابط رسمي أو حساب اجتماعي مؤكد أو بريد/واتساب منشور من المصدر نفسه."
+    },
+    {
+      "name_ar": "متاجر إنستغرام/واتساب لقطع الباترول",
+      "status": "unverified_group",
+      "needed_to_activate_ar": "يجب التحقق من الحساب، وسائل الدفع، سياسة الإرجاع، ووجود منتجات باترول فعلية."
+    },
+    {
+      "name_ar": "تشاليح قطع باترول",
+      "status": "unverified_group",
+      "needed_to_activate_ar": "يجب توثيق بيانات التشليح وتقييمه قبل عرضه للمستخدمين."
+    }
+  ]
+}

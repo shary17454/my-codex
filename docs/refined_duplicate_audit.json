@@ -1,0 +1,354 @@
+{
+  "scanned_files": 353,
+  "duplicate_groups": 34,
+  "intentional_groups": 32,
+  "actionable_groups": 2,
+  "catalog_pdf_duplicate_groups": 0,
+  "actionable_duplicates": [
+    {
+      "short_sha": "964b7e40a65d",
+      "sha256": "964b7e40a65dc8aa951cedc38ed2af266014a412d6496f473bc25f00d6c4733c",
+      "count": 2,
+      "files": [
+        "privacy.html",
+        "ios/BatalAlDroob/BatalAlDroob/Web/privacy.html"
+      ],
+      "reason": "يحتاج قرار: قد يكون نسخة احتياطية/وثيقة قديمة/ملف وسيط."
+    },
+    {
+      "short_sha": "5113d5d52192",
+      "sha256": "5113d5d52192da261bd20ff466a6b5835d1fec4faf3b5f2b9e5b72a27837957a",
+      "count": 2,
+      "files": [
+        "data/raw_text/03_year_catalog_1988.txt",
+        "data/raw_text/04_year_catalog_1988.txt"
+      ],
+      "reason": "يحتاج قرار: قد يكون نسخة احتياطية/وثيقة قديمة/ملف وسيط."
+    }
+  ],
+  "intentional_duplicates": [
+    {
+      "short_sha": "2e0f026ae8e0",
+      "sha256": "2e0f026ae8e097dc9fa3a2dbbb340aaa55599d7bb01f54cec2827622a5d8df83",
+      "count": 2,
+      "files": [
+        "index.html",
+        "ios/BatalAlDroob/BatalAlDroob/Web/index.html"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "95134b7e61c3",
+      "sha256": "95134b7e61c3f80f6b061bd7335d1b10e9ec305818cb1ef3f00883982b0be225",
+      "count": 2,
+      "files": [
+        "styles.css",
+        "ios/BatalAlDroob/BatalAlDroob/Web/styles.css"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "610013cf6e8a",
+      "sha256": "610013cf6e8aef1365f3019f20ce45822bf91840e020ce91cdb441f238ca6039",
+      "count": 2,
+      "files": [
+        "support.html",
+        "ios/BatalAlDroob/BatalAlDroob/Web/support.html"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "520860f24111",
+      "sha256": "520860f24111f13851dadd56e3b4f1ceec2723d400632bcfdc65d6e67fe2f707",
+      "count": 2,
+      "files": [
+        "service-worker.js",
+        "ios/BatalAlDroob/BatalAlDroob/Web/service-worker.js"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "ddadd9de65f2",
+      "sha256": "ddadd9de65f26874525260f3f81af57a3453952a64a4de7aafd967866a6096a1",
+      "count": 2,
+      "files": [
+        "manifest.webmanifest",
+        "ios/BatalAlDroob/BatalAlDroob/Web/manifest.webmanifest"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "286b02387fb8",
+      "sha256": "286b02387fb8a403fc57ff4ab98ec6fba3a724d878c02f3d5f6f4e5d0e94c438",
+      "count": 2,
+      "files": [
+        "app.js",
+        "ios/BatalAlDroob/BatalAlDroob/Web/app.js"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "4e0ac2b5281a",
+      "sha256": "4e0ac2b5281a50e9f5967e56379ad1878312e8426d0615428966cd2dacf11877",
+      "count": 2,
+      "files": [
+        "app-store/icons/app-icon-1024.png",
+        "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-1024.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "15fa946dc94b",
+      "sha256": "15fa946dc94bf1ddb48c4dff5c9d4250f3f870c52f7781e80daa5e1e16f5db4a",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/data/y60_app_catalog.json",
+        "data/y60_app_catalog.json"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "4b9013f53116",
+      "sha256": "4b9013f5311686c1a009afe18b3ba6b0f2d0a1468f33ae10d41b5eb43eed1f35",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y63.webp",
+        "assets/models/patrol-y63.webp"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "f7cc1748283f",
+      "sha256": "f7cc1748283f54cb1e0e02097158469cc88e1130e5eee5106eaddc4d0d1f3238",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y62.jpg",
+        "assets/models/patrol-y62.jpg"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "d1d8ee2807b3",
+      "sha256": "d1d8ee2807b32f3cb92132bac795b59fea5661f155703e068da9b61cb2895497",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y62.png",
+        "assets/models/patrol-y62.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "9d50789cab87",
+      "sha256": "9d50789cab87f494fed8451bba7dada7bec020c6ebdc3769c8d5e62ce7dfc51b",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y63.png",
+        "assets/models/patrol-y63.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "76064586b8cf",
+      "sha256": "76064586b8cf0219f9959fcead2b37bed14af299f77c590aa71cbdc6687c66c1",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y63.jpg",
+        "assets/models/patrol-y63.jpg"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "9c9a898cd8a5",
+      "sha256": "9c9a898cd8a5e8726647f5d78b05554eb035baf9a4bb7e82c851b5704cc16443",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y61.jpg",
+        "assets/models/patrol-y61.jpg"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "5f4a07a5ecab",
+      "sha256": "5f4a07a5ecab6036ffa55ddf7353dc99d43a9fe578ca40df67852b4bbcb51895",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y61.png",
+        "assets/models/patrol-y61.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "c00f98ddfff5",
+      "sha256": "c00f98ddfff5045cf73eef4decaa88ea33f018b46e69111a6f9b853218900733",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y60.png",
+        "assets/models/patrol-y60.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "bdd848cc790b",
+      "sha256": "bdd848cc790bf43e6985498eba638b655fb52495cf9618de1cfb3107cc778711",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y60.jpg",
+        "assets/models/patrol-y60.jpg"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "933be6619e23",
+      "sha256": "933be6619e23bcce408747c2b406558df7c1f72705daa2a5db1a859f5f4aa689",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/backgrounds/batal-droob-patrol.jpg",
+        "assets/backgrounds/batal-droob-patrol.jpg"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "5061a3320ec1",
+      "sha256": "5061a3320ec1132ea7c08889e9e986cddfc5f6ac996aeefd99efbf934beb12e3",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/icons/apple-touch-icon.png",
+        "assets/icons/apple-touch-icon.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "ed127c5978d1",
+      "sha256": "ed127c5978d14a0a3296068173756d509efbae583609e49ea37c57a2a06a14a1",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/icons/icon-192.png",
+        "assets/icons/icon-192.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "ca2943f58cc1",
+      "sha256": "ca2943f58cc18fd0b5d49b2338044ec4ef4a858c2431452c9fd35821318f7056",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Web/assets/icons/icon-512.png",
+        "assets/icons/icon-512.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "0fd49ba3c358",
+      "sha256": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/Contents.json",
+        "SafariY60Parts/Preview Content/Preview Assets.xcassets/Contents.json"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "ee44554eb2de",
+      "sha256": "ee44554eb2de749c6f561cbd536feae592dbab34ae29eed7ce5cdf0efa9145fc",
+      "count": 2,
+      "files": [
+        "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-40@3x.png",
+        "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-60@2x.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "46c3c9702ff7",
+      "sha256": "46c3c9702ff7c5584e11c954d943cfb6e07fb26e3fbd072ddbc0f388aa352de1",
+      "count": 2,
+      "files": [
+        "flutter_y60_catalog/macos/Runner.xcworkspace/contents.xcworkspacedata",
+        "flutter_y60_catalog/ios/Runner.xcworkspace/contents.xcworkspacedata"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "dfa0f9bb85b9",
+      "sha256": "dfa0f9bb85b95ccba9c6811adadf8cb407fb5d52088e89db83ebc308ec448542",
+      "count": 4,
+      "files": [
+        "flutter_y60_catalog/macos/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+        "flutter_y60_catalog/macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+        "flutter_y60_catalog/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+        "flutter_y60_catalog/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "62290ad8e938",
+      "sha256": "62290ad8e938bf410206d8c7e131262696b58a6df110d39faf3399396ffe61b1",
+      "count": 2,
+      "files": [
+        "flutter_y60_catalog/macos/Flutter/Flutter-Debug.xcconfig",
+        "flutter_y60_catalog/macos/Flutter/Flutter-Release.xcconfig"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "11b247bc6796",
+      "sha256": "11b247bc6796892d67c9a821d18604db4dd6a880981b34f38460b9866e6b247f",
+      "count": 2,
+      "files": [
+        "flutter_y60_catalog/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+        "flutter_y60_catalog/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "93ae7d494fad",
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+      "count": 3,
+      "files": [
+        "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+        "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+        "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "b9ad02cf6576",
+      "sha256": "b9ad02cf6576a04d1b6806ac02a2431481b448dd0c2e505ce25842d1f7c4730b",
+      "count": 2,
+      "files": [
+        "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png",
+        "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "19be171481dc",
+      "sha256": "19be171481dc71a0b2803ebcd01dd8b0c5fd5778dee34c0a3cabc948c225f24e",
+      "count": 2,
+      "files": [
+        "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png",
+        "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "a82d7765b371",
+      "sha256": "a82d7765b37116ee4821d2cd1d65942febf8032353757ffb0826eabde785b4a6",
+      "count": 2,
+      "files": [
+        "flutter_y60_catalog/ios/Flutter/Debug.xcconfig",
+        "flutter_y60_catalog/ios/Flutter/Release.xcconfig"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    },
+    {
+      "short_sha": "30b0832ed8b9",
+      "sha256": "30b0832ed8b92dfbd6ae2abfa939ccf26333d37600056b1572bd4a397a18a74b",
+      "count": 2,
+      "files": [
+        "flutter_y60_catalog/android/app/src/profile/AndroidManifest.xml",
+        "flutter_y60_catalog/android/app/src/debug/AndroidManifest.xml"
+      ],
+      "reason": "تكرار متعمد لبنية iOS/Flutter أو الأيقونات."
+    }
+  ]
+}

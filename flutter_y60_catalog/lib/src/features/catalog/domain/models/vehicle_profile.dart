@@ -12,6 +12,10 @@ class VehicleProfile {
     required this.engineDescriptionAr,
     required this.transmissionCode,
     required this.transmissionDescriptionAr,
+    required this.finalDriveCode,
+    required this.bodyStyleAr,
+    required this.exteriorColorCode,
+    required this.interiorColorCode,
     required this.driveSide,
     required this.market,
     required this.sourceCatalogPath,
@@ -30,6 +34,10 @@ class VehicleProfile {
   final String engineDescriptionAr;
   final String transmissionCode;
   final String transmissionDescriptionAr;
+  final String finalDriveCode;
+  final String bodyStyleAr;
+  final String exteriorColorCode;
+  final String interiorColorCode;
   final String driveSide;
   final String market;
   final String sourceCatalogPath;
@@ -43,6 +51,10 @@ class VehicleProfile {
         modelCode,
         engineCode,
         transmissionCode,
+        finalDriveCode,
+        bodyStyleAr,
+        exteriorColorCode,
+        interiorColorCode,
         market,
       ].join(' ');
 
@@ -60,6 +72,10 @@ class VehicleProfile {
       engineDescriptionAr: json['engineDescriptionAr'] as String,
       transmissionCode: json['transmissionCode'] as String,
       transmissionDescriptionAr: json['transmissionDescriptionAr'] as String,
+      finalDriveCode: json['finalDriveCode'] as String? ?? '',
+      bodyStyleAr: json['bodyStyleAr'] as String? ?? '',
+      exteriorColorCode: json['exteriorColorCode'] as String? ?? '',
+      interiorColorCode: json['interiorColorCode'] as String? ?? '',
       driveSide: json['driveSide'] as String,
       market: json['market'] as String,
       sourceCatalogPath: json['sourceCatalogPath'] as String,
@@ -81,6 +97,10 @@ class VehicleProfile {
       'engineDescriptionAr': engineDescriptionAr,
       'transmissionCode': transmissionCode,
       'transmissionDescriptionAr': transmissionDescriptionAr,
+      'finalDriveCode': finalDriveCode,
+      'bodyStyleAr': bodyStyleAr,
+      'exteriorColorCode': exteriorColorCode,
+      'interiorColorCode': interiorColorCode,
       'driveSide': driveSide,
       'market': market,
       'sourceCatalogPath': sourceCatalogPath,

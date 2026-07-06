@@ -21,13 +21,14 @@ def main():
     for name in FILES:
         copy2(ROOT / name, WEB_OUT / name)
 
-    for folder in ["data", "assets"]:
+    for folder in ["data", "assets", "catalog"]:
         destination = WEB_OUT / folder
         if destination.exists():
             rmtree(destination)
     (WEB_OUT / "data").mkdir()
     copy2(ROOT / "data" / "y60_app_catalog.json", WEB_OUT / "data" / "y60_app_catalog.json")
     copytree(ROOT / "assets", WEB_OUT / "assets")
+    copytree(ROOT / "flutter_y60_catalog" / "assets" / "catalog", WEB_OUT / "catalog")
     print(f"Synced web app to {WEB_OUT.relative_to(ROOT)}")
 
 

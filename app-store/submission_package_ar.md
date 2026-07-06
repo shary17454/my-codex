@@ -8,7 +8,7 @@
 - Bundle ID: `com.batalaldroob.parts`
 - SKU: `batal-droob-y60`
 - الإصدار: `1.0`
-- رقم البناء: `1`
+- رقم البناء: `2`
 - التصنيف المقترح: `Reference`
 - أقل إصدار iOS: `15.0`
 
@@ -46,15 +46,12 @@
 
 ## روابط الخصوصية والدعم
 
-إذا تم تفعيل GitHub Pages للمستودع:
+روابط عامة جاهزة للاستخدام في App Store Connect:
 
-- سياسة الخصوصية: `https://shary17454.github.io/my-codex/privacy.html`
-- الدعم: `https://shary17454.github.io/my-codex/support.html`
+- سياسة الخصوصية: `https://github.com/shary17454/codex/blob/main/docs/privacy.html`
+- الدعم: `https://github.com/shary17454/codex/blob/main/docs/support.html`
 
-إذا لم يتم تفعيل GitHub Pages بعد، ارفع الملفين التاليين إلى أي استضافة HTTPS عامة:
-
-- `docs/privacy.html`
-- `docs/support.html`
+تم استخدام مستودع عام لأن روابط GitHub Pages للمستودع الخاص لم تكن مفعلة وقت التجهيز.
 
 ## لقطات الشاشة
 
@@ -70,6 +67,8 @@
 - `app-store/icons/app-icon-1024.png`
 
 الأبعاد المفحوصة: `1024 × 1024`.
+
+تم تحديث الأيقونة إلى صورة الباترول الدائرية في الوادي وقت العاصفة.
 
 ## App Privacy
 

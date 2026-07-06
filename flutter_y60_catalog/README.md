@@ -1,72 +1,106 @@
-# Flutter Y60 Catalog Foundation
+# Patrol Hub - Nissan Patrol Safari Y60
 
-This folder contains the initial architecture and data model foundation for a Flutter mobile app for Nissan Patrol Safari catalog content.
+تطبيق **Patrol Hub** هو تطبيق وموقع لإدارة كتالوج وقطع نيسان باترول سفاري Y60، مخصص لسيارة **Nissan Patrol Safari Y60 SGL** موديل 1991/1992 بمحرك `TB42S` وقير عادي `FS5R50A`، مع دعم عربي كامل واتجاه RTL.
 
-Scope is intentionally limited to:
+التطبيق مبني بـ Flutter ليعمل على الويب وويندوز، ومجهز لاحقاً للتحويل إلى Android و iOS. يعتمد على قاعدة بيانات محلية Offline-first من ملفات كتالوج Y60 وملفات PDF الأصلية، بدون تسجيل دخول وبدون Backend حالياً.
 
-- Dart data models
-- Offline-first storage contracts
-- Arabic-first / RTL-ready naming fields
-- Catalog PDF, page image, and diagram references
-- Search-ready text fields for future full-text indexing
-- Seed vehicle profile data
-- A minimal `main.dart` shell that reads from the seed/domain layer
-
-No authentication, backend integration, or package installations are included.
-
-## Suggested Folder Structure
+الوصف الرسمي المدمج للمشروع موجود في:
 
 ```text
-flutter_y60_catalog/
-  pubspec.yaml
-  assets/
-    catalog/
-      pages/
-      diagrams/
-  lib/
-    main.dart
-    src/
-      features/
-        catalog/
-          domain/
-            models/
-              vehicle_profile.dart
-              catalog_section.dart
-              catalog_page.dart
-              part_diagram.dart
-              part_item.dart
-              maintenance_reminder.dart
-              common_issue.dart
-              patrol_generation.dart
-              catalog_models.dart
-          data/
-            local/
-              catalog_local_store.dart
-            seed/
-              y60_vehicle_profile_seed.dart
-              patrol_generations_seed.dart
+../docs/patrol-hub-full-description-ar.md
 ```
 
-## Architecture Notes
+## المميزات الحالية
 
-The catalog module is structured around offline-first content. The app should load the Nissan Patrol Safari catalog PDF, rendered page images, diagram images, and extracted metadata into a local store before building search workflows.
+- واجهة عربية RTL.
+- تصميم داكن بطابع سفاري Y60.
+- صفحة رئيسية باسم نيسان باترول Y60.
+- قائمة علوية: الرئيسية، القطع، الأعطال، الصيانة، الصور، الكتالوجات، قاعدة البيانات، الشرح، تواصل معنا.
+- بحث داخل الكتالوج برقم القطعة، الاسم العربي، الاسم الإنجليزي، وأكواد مثل `TB42S` و `FS5R50A`.
+- دعم البحث برقم الهيكل `WGY60-348567` و `WGY60348567`.
+- تطبيع البحث العربي والإنجليزي لتقليل أخطاء الكتابة.
+- Debounce للبحث بزمن 280ms.
+- منع البحث بحرف واحد لتخفيف الحمل على الجوال.
+- فتح صفحة PDF الأصلية المطابقة من صفحة التفاصيل.
+- لوحة حالة التطبيق المتكامل: Web، Windows، Offline-first، البحث، صفحة التفاصيل، وقابلية التوسع.
 
-Each main entity includes stable IDs and JSON serialization methods. Search is prepared through `searchableText` getters, but no search engine or database package is added yet.
+## قاعدة البيانات
 
-Images and diagrams are referenced by local asset paths:
+- ملف البحث: `assets/catalog/search/catalog_search_index.json`.
+- ملف الأقسام: `assets/catalog/search/catalog_section_index.json`.
+- عدد النتائج المفهرسة: `5271`.
+- عدد الأقسام: `10`.
+- عدد ملفات PDF: `11`.
+- نطاق الكتالوجات: `1988 - 1997`.
 
-- `CatalogPage.pageImagePath` points to a rendered catalog page image.
-- `PartDiagram.imagePath` points to a cropped or extracted diagram image.
-- `PartItem.imagePath` is optional for future direct part photos.
+## الكتالوجات المضافة
 
-## Seed Data
+- Y60 1988
+- Y60 1989
+- Y60 1990
+- Y60 1991
+- Y60 1992
+- Y60 1993
+- Y60 1994
+- Y60 1995
+- Y60 1996
+- Y60 1997
+- WGY60348567 General Asia LHD Wagon TB42S SGL
 
-The seed files define:
+## أقسام الكتالوج
+
+- بطاقة السيارة
+- المحرك والوقود
+- القير والدبل
+- الدفرنسات والمحاور
+- الفرامل
+- البدي والخارجية
+- الداخلية والفرش
+- الكهرباء والظفيرة
+- التكييف والثلاجات
+- عام وباقي الصفحات
+
+## معلومات السيارة
 
 - Nissan Patrol Safari Y60 SGL
-- WGY60 chassis prefix
-- TB42S engine
-- Manual 5 Speed
-- FS5R50A transmission
-- Gulf / Saudi market
-- Patrol generations Y60, Y61, Y62, and Y63 for the initial app shell
+- رقم الهيكل: `WGY60-348567`
+- رقم الموديل: `WLGY60JFRC5`
+- تاريخ الإنتاج: `10/1991`
+- موديل الاستمارة: `1992`
+- بلد الصنع: اليابان
+- السوق: الخليج / السعودية
+- المقود: يسار LHD
+- المحرك: `TB42S`
+- 6 سلندر مستقيم، 4.2 لتر، بنزين، كربريتر
+- القير: `FS5R50A` عادي 5 سرعات
+- الدفرنس: `HG41`
+- الهيكل: Wagon طويل خمسة أبواب
+- اللون الخارجي: `2L3`
+- اللون الداخلي: `AH3 / عنابي`
+
+## التشغيل
+
+```bash
+flutter run -d chrome
+```
+
+لبناء نسخة الويب:
+
+```bash
+flutter build web --release
+```
+
+لبناء نسخة ويندوز:
+
+```powershell
+flutter build windows
+```
+
+## حالة المشروع
+
+- يعمل على الويب.
+- يعمل كتطبيق ويندوز عند توفر بيئة Flutter Windows.
+- جاهز للتطوير لاحقاً كتطبيق Android.
+- قابل للنقل إلى iOS عند توفر macOS أو خدمة بناء سحابية.
+- مرتبط بمستودع GitHub:
+  `https://github.com/shary17454/my-codex`
