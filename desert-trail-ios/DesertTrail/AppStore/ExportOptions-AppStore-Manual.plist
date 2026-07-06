@@ -10,8 +10,8 @@
 	<string>app-store-connect</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>com.batalaldroob.parts</key>
-		<string>iOS Team Store Provisioning Profile: com.batalaldroob.parts</string>
+		<key>com.codex.DesertTrail</key>
+		<string>iOS Team Store Provisioning Profile: com.codex.DesertTrail</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string>Apple Distribution</string>

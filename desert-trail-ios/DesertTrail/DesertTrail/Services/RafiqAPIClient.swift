@@ -138,11 +138,11 @@ struct RafiqAPIClient {
 
     private static var defaultBaseURL: URL {
         if let configured = Bundle.main.object(forInfoDictionaryKey: "RafiqAPIBaseURL") as? String,
-           let url = URL(string: configured),
-           !configured.isEmpty {
+           !configured.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           let url = URL(string: configured) {
             return url
         }
-        return URL(string: "https://api.rafiqalkhala.example")!
+        return URL(string: "http://127.0.0.1:8787") ?? URL(fileURLWithPath: "/")
     }
 }
 

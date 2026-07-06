@@ -13,7 +13,7 @@ struct TripPlan: Identifiable, Hashable {
     var participants: [String]
 
     var shareURL: URL {
-        URL(string: "https://deserttrail.local/trip/\(id.uuidString)")!
+        URL(string: "https://deserttrail.local/trip/\(id.uuidString)") ?? URL(fileURLWithPath: "/")
     }
 
     static let sample = TripPlan(

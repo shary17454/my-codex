@@ -9,6 +9,7 @@ struct AdvancedToolsView: View {
     @State private var showingLiveShare = false
     @State private var showingAssistant = false
     @State private var showingTripReport = false
+    @State private var showingTripCamera = false
     @State private var isRecording = false
     @State private var recordingStartedAt = Date()
     @State private var packingItems = PackingItem.samples
@@ -98,6 +99,9 @@ struct AdvancedToolsView: View {
         }
         .sheet(isPresented: $showingTripReport) {
             TripReportView(startedAt: recordingStartedAt, coordinate: coordinate)
+        }
+        .sheet(isPresented: $showingTripCamera) {
+            TripCameraPicker()
         }
     }
 
@@ -767,12 +771,12 @@ struct AdvancedToolsView: View {
 
     private var tripCameraCard: some View {
         featureCard(title: "كاميرا الرحلات", icon: "camera", color: .desertCopper) {
-            Text("تحفظ الصورة مع اسم الموقع والإحداثيات والتاريخ والارتفاع واتجاه التصوير.")
+            Text("تفتح الكاميرا أو مكتبة الصور لتوثيق الرحلة مع عرض موقع الالتقاط الحالي داخل التطبيق.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             row(icon: "mappin", title: "موقع الالتقاط", subtitle: String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude), trailing: altitudeText)
             Button {
-                UIApplication.shared.open(URL(string: "camera:") ?? URL(string: "photos-redirect://")!)
+                showingTripCamera = true
             } label: {
                 Label("فتح الكاميرا", systemImage: "camera.fill")
                     .frame(maxWidth: .infinity)
@@ -1118,7 +1122,7 @@ struct LiveShareView: View {
     @Environment(\.dismiss) private var dismiss
 
     private var liveURL: URL {
-        URL(string: "https://deserttrail.local/live/\(trip.id.uuidString)?hours=\(Int(hours))")!
+        URL(string: "https://deserttrail.local/live/\(trip.id.uuidString)?hours=\(Int(hours))") ?? URL(fileURLWithPath: "/")
     }
 
     var body: some View {
@@ -1183,6 +1187,43 @@ struct SmartAssistantView: View {
             .toolbar {
                 Button("تم") { dismiss() }
             }
+        }
+    }
+}
+
+struct TripCameraPicker: UIViewControllerRepresentable {
+    @Environment(\.dismiss) private var dismiss
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = Self.preferredSourceType
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(dismiss: dismiss)
+    }
+
+    private static var preferredSourceType: UIImagePickerController.SourceType {
+        UIImagePickerController.isSourceTypeAvailable(.camera) ? .camera : .photoLibrary
+    }
+
+    final class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        private let dismiss: DismissAction
+
+        init(dismiss: DismissAction) {
+            self.dismiss = dismiss
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            dismiss()
+        }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            dismiss()
         }
     }
 }

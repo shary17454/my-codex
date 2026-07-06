@@ -62,7 +62,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>تستخدم كاميرا الرحلات لحفظ الصور مع موقع الالتقاط والوقت والاتجاه أثناء الرحلات.</string>
 	<key>RafiqAPIBaseURL</key>
-	<string>https://api.rafiqalkhala.example</string>
+	<string></string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

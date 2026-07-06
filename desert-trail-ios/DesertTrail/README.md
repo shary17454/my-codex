@@ -1,4 +1,4 @@
-# DesertTrail
+# رفيق الخلا
 
 تطبيق iOS موحد للرحلات البرية والكشتات والأماكن المخفية.
 
@@ -8,7 +8,7 @@
 2. اختر Target باسم `DesertTrail`.
 3. ضع `DEVELOPMENT_TEAM` المناسب لحساب Apple Developer.
 4. فعّل iCloud وCloudKit للحاوية:
-   `iCloud.com.batalaldroob.parts`
+   `iCloud.com.codex.DesertTrail`
 5. شغل التطبيق على جهاز حقيقي لاختبار GPS والبوصلة والخلفية بدقة.
 
 ## API
@@ -27,6 +27,8 @@ npm run dev
 ```text
 http://127.0.0.1:8787/health
 ```
+
+لربط التطبيق بالخدمة أثناء التطوير، حدّث قيمة `RafiqAPIBaseURL` في `DesertTrail/DesertTrail/Info.plist` إلى عنوان الخادم المتاح من الجهاز.
 
 ## الميزات المنفذة
 

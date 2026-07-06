@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 
 const keyId = '8W59ZRTHZ4';
 const issuerId = '26cc2279-524d-4d33-ba75-9333cf111ad1';
-const identifier = 'com.batalaldroob.deserttrail';
+const identifier = 'com.codex.DesertTrail';
 const privateKey = fs.readFileSync(`${process.env.HOME}/.appstoreconnect/private_keys/AuthKey_${keyId}.p8`, 'utf8');
 
 function b64url(input) {

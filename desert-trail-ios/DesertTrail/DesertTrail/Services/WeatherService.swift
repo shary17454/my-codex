@@ -4,8 +4,8 @@ import Foundation
 
 final class WeatherService {
     static let backgroundTaskIdentifier = "com.codex.DesertTrail.environment.refresh"
-    private let weatherEndpoint = URL(string: "https://api.open-meteo.com/v1/forecast")!
-    private let airQualityEndpoint = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality")!
+    private let weatherEndpoint = URL(string: "https://api.open-meteo.com/v1/forecast") ?? URL(fileURLWithPath: "/")
+    private let airQualityEndpoint = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality") ?? URL(fileURLWithPath: "/")
 
     func fetchReport(for coordinate: CLLocationCoordinate2D) async -> EnvironmentalReport {
         async let weather = fetchWeather(for: coordinate)
