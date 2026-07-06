@@ -3,7 +3,7 @@ import CoreLocation
 import Foundation
 
 final class CloudKitStore {
-    private let database = CKContainer(identifier: "iCloud.com.batalaldroob.parts").privateCloudDatabase
+    private let database = CKContainer(identifier: "iCloud.com.codex.DesertTrail").privateCloudDatabase
 
     func saveHiddenPlaceForReview(_ place: HiddenPlace) async throws {
         let record = CKRecord(recordType: "HiddenPlace")

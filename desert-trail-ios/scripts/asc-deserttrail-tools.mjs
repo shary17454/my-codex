@@ -83,6 +83,21 @@ async function main() {
     });
   }
 
+  if (mode === 'update-name') {
+    await api(`/appInfoLocalizations/${appInfoLocalization.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        data: {
+          type: 'appInfoLocalizations',
+          id: appInfoLocalization.id,
+          attributes: {
+            name: 'رفيق الخلا'
+          }
+        }
+      })
+    });
+  }
+
   console.log(JSON.stringify({
     mode,
     version: version && {
@@ -104,6 +119,7 @@ async function main() {
     appInfoLocalization: appInfoLocalization && {
       id: appInfoLocalization.id,
       locale: appInfoLocalization.attributes.locale,
+      name: appInfoLocalization.attributes.name,
       privacyPolicyUrl: appInfoLocalization.attributes.privacyPolicyUrl
     },
     categories: categories.data.map(category => ({

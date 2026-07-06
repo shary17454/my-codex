@@ -162,7 +162,7 @@ struct AdvancedToolsView: View {
     }
 
     private var platformVisionCard: some View {
-        featureCard(title: "منصة درب الصحراء المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
+        featureCard(title: "منصة رفيق الخلا المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
             Text("هذه الشاشة تجمع التخطيط، الملاحة، الخرائط دون اتصال، السلامة، المجتمع، الذكاء الاصطناعي، والتكامل مع أجهزة Apple في تجربة واحدة للرحلة البرية.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -1052,7 +1052,7 @@ struct AdvancedToolsView: View {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }
             let content = UNMutableNotificationContent()
-            content.title = "تحذير درب الصحراء"
+            content.title = "تحذير رفيق الخلا"
             content.body = "اقتربت من مسار رملي ناعم. تحقق من ضغط الإطارات قبل الدخول."
             content.sound = .default
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false)
@@ -1068,7 +1068,7 @@ struct SOSView: View {
 
     private var message: String {
         """
-        SOS درب الصحراء
+        SOS رفيق الخلا
         آخر موقع معروف:
         \(coordinate.latitude), \(coordinate.longitude)
         الوقت: \(Date().formatted(date: .numeric, time: .shortened))
@@ -1194,7 +1194,7 @@ struct TripReportView: View {
 
     private var report: String {
         """
-        تقرير رحلة درب الصحراء
+        تقرير رحلة رفيق الخلا
         البداية: \(startedAt.formatted(date: .numeric, time: .shortened))
         النهاية: \(Date().formatted(date: .numeric, time: .shortened))
         المسافة المقدرة: 18.6 كم

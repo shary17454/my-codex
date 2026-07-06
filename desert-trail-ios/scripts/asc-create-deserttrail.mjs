@@ -90,7 +90,7 @@ if (!app) {
         type: 'apps',
         attributes: {
           bundleId: identifier,
-          name: 'درب الصحراء',
+          name: 'رفيق الخلا',
           primaryLocale: 'ar-SA',
           sku: 'DESERT-TRAIL-1'
         }

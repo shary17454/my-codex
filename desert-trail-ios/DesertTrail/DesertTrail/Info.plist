@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ar</string>
 	<key>CFBundleDisplayName</key>
-	<string>درب الصحراء</string>
+	<string>رفيق الخلا</string>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>
@@ -61,6 +61,8 @@
 	<string>يمكنك اختيار صور للمواقع المخفية قبل إرسالها للمراجعة.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>تستخدم كاميرا الرحلات لحفظ الصور مع موقع الالتقاط والوقت والاتجاه أثناء الرحلات.</string>
+	<key>RafiqAPIBaseURL</key>
+	<string>https://api.rafiqalkhala.example</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

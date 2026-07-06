@@ -105,8 +105,8 @@ enum LocalizedKey {
 
     func value(for language: AppLanguage) -> String {
         switch (self, language) {
-        case (.appTitle, .arabic): return "درب الصحراء"
-        case (.appTitle, .english): return "Desert Trail"
+        case (.appTitle, .arabic): return "رفيق الخلا"
+        case (.appTitle, .english): return "Rafiq Al Khala"
         case (.map, .arabic): return "الخريطة"
         case (.map, .english): return "Map"
         case (.compass, .arabic): return "البوصلة"

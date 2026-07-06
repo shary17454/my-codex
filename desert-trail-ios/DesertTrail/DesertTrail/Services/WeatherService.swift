@@ -3,7 +3,7 @@ import CoreLocation
 import Foundation
 
 final class WeatherService {
-    static let backgroundTaskIdentifier = "com.batalaldroob.parts.environment.refresh"
+    static let backgroundTaskIdentifier = "com.codex.DesertTrail.environment.refresh"
     private let weatherEndpoint = URL(string: "https://api.open-meteo.com/v1/forecast")!
     private let airQualityEndpoint = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality")!
 

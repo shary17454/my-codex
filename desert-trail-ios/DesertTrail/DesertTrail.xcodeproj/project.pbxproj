@@ -29,7 +29,13 @@
 		0A1000130000000000000001 /* OfflineMapsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000160000000000000001 /* OfflineMapsView.swift */; };
 		0A1000140000000000000001 /* ZoomableImageMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000170000000000000001 /* ZoomableImageMapView.swift */; };
 		0A1000110000000000000001 /* SampleRoute.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000110000000000000001 /* SampleRoute.gpx */; };
+		0A1000150000000000000001 /* AjajiSaudi.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000180000000000000001 /* AjajiSaudi.jpg */; };
+		0A1000160000000000000001 /* AjajiRiyadhRegion.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */; };
+		0A1000170000000000000001 /* AjajiMarkedPlans.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001A0000000000000001 /* AjajiMarkedPlans.jpg */; };
 		0A1000180000000000000001 /* PDFMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20001B0000000000000001 /* PDFMapView.swift */; };
+		0A1000190000000000000001 /* AjajiSaudi.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001C0000000000000001 /* AjajiSaudi.pdf */; };
+		0A10001A0000000000000001 /* AjajiRiyadhRegion.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001D0000000000000001 /* AjajiRiyadhRegion.pdf */; };
+		0A10001B0000000000000001 /* AjajiMarkedPlans.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001E0000000000000001 /* AjajiMarkedPlans.pdf */; };
 		0A10001C0000000000000001 /* PDFMapStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20001F0000000000000001 /* PDFMapStore.swift */; };
 		0A10001D0000000000000001 /* PDFImportPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000200000000000000001 /* PDFImportPicker.swift */; };
 		0A10001E0000000000000001 /* PDFSourceManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000210000000000000001 /* PDFSourceManagerView.swift */; };
@@ -41,6 +47,7 @@
 		0A1000240000000000000001 /* Icon-1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000270000000000000001 /* Icon-1024.png */; };
 		0A1000250000000000000001 /* AdvancedFeatureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000280000000000000001 /* AdvancedFeatureModels.swift */; };
 		0A1000260000000000000001 /* AdvancedToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000290000000000000001 /* AdvancedToolsView.swift */; };
+		0A10002C0000000000000001 /* RafiqAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002C0000000000000001 /* RafiqAPIClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,7 +73,13 @@
 		0A2000170000000000000001 /* ZoomableImageMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageMapView.swift; sourceTree = "<group>"; };
 		0A2000110000000000000001 /* SampleRoute.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleRoute.gpx; sourceTree = "<group>"; };
 		0A2000100000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0A2000180000000000000001 /* AjajiSaudi.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiSaudi.jpg; sourceTree = "<group>"; };
+		0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiRiyadhRegion.jpg; sourceTree = "<group>"; };
+		0A20001A0000000000000001 /* AjajiMarkedPlans.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiMarkedPlans.jpg; sourceTree = "<group>"; };
 		0A20001B0000000000000001 /* PDFMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFMapView.swift; sourceTree = "<group>"; };
+		0A20001C0000000000000001 /* AjajiSaudi.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AjajiSaudi.pdf; sourceTree = "<group>"; };
+		0A20001D0000000000000001 /* AjajiRiyadhRegion.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AjajiRiyadhRegion.pdf; sourceTree = "<group>"; };
+		0A20001E0000000000000001 /* AjajiMarkedPlans.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AjajiMarkedPlans.pdf; sourceTree = "<group>"; };
 		0A20001F0000000000000001 /* PDFMapStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFMapStore.swift; sourceTree = "<group>"; };
 		0A2000200000000000000001 /* PDFImportPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFImportPicker.swift; sourceTree = "<group>"; };
 		0A2000210000000000000001 /* PDFSourceManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFSourceManagerView.swift; sourceTree = "<group>"; };
@@ -78,6 +91,7 @@
 		0A2000270000000000000001 /* Icon-1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcons/Icon-1024.png"; sourceTree = "<group>"; };
 		0A2000280000000000000001 /* AdvancedFeatureModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedFeatureModels.swift; sourceTree = "<group>"; };
 		0A2000290000000000000001 /* AdvancedToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToolsView.swift; sourceTree = "<group>"; };
+		0A20002C0000000000000001 /* RafiqAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RafiqAPIClient.swift; sourceTree = "<group>"; };
 		0A2000120000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0A2000130000000000000001 /* DesertTrail.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DesertTrail.entitlements; sourceTree = "<group>"; };
 		0A2000140000000000000001 /* DesertTrail.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DesertTrail.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,6 +161,7 @@
 				0A2000090000000000000001 /* QRCodeGenerator.swift */,
 				0A2000150000000000000001 /* OfflineMapStore.swift */,
 				0A20001F0000000000000001 /* PDFMapStore.swift */,
+				0A20002C0000000000000001 /* RafiqAPIClient.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -181,6 +196,12 @@
 				0A2000250000000000000001 /* Icon-76@2x.png */,
 				0A2000260000000000000001 /* Icon-83.5@2x.png */,
 				0A2000270000000000000001 /* Icon-1024.png */,
+				0A2000180000000000000001 /* AjajiSaudi.jpg */,
+				0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */,
+				0A20001A0000000000000001 /* AjajiMarkedPlans.jpg */,
+				0A20001C0000000000000001 /* AjajiSaudi.pdf */,
+				0A20001D0000000000000001 /* AjajiRiyadhRegion.pdf */,
+				0A20001E0000000000000001 /* AjajiMarkedPlans.pdf */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -288,6 +309,7 @@
 				0A10001E0000000000000001 /* PDFSourceManagerView.swift in Sources */,
 				0A1000250000000000000001 /* AdvancedFeatureModels.swift in Sources */,
 				0A1000260000000000000001 /* AdvancedToolsView.swift in Sources */,
+				0A10002C0000000000000001 /* RafiqAPIClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,7 +440,7 @@
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "درب الصحراء";
+				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الخلا";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -443,7 +465,7 @@
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "درب الصحراء";
+				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الخلا";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
