@@ -140,7 +140,7 @@ enum AskDemoStore {
             title: "أشتري iPhone 17 Pro Max أو Galaxy S26 Ultra؟",
             details: "أهم شيء عندي الكاميرا والبطارية والاستخدام اليومي لسنوات.",
             category: .phones,
-            author: "فريق اسأل",
+            author: "فريق وش الرأي",
             timeAgo: "مثال",
             options: [
                 PollOption(title: "iPhone 17 Pro Max", votes: 0),
@@ -153,7 +153,7 @@ enum AskDemoStore {
             title: "كامري هايبرد أو أكورد هايبرد؟",
             details: "أبي سيارة عملية للدوام والخطوط، أهم شيء الاعتمادية والصرفية.",
             category: .cars,
-            author: "فريق اسأل",
+            author: "فريق وش الرأي",
             timeAgo: "مثال",
             options: [
                 PollOption(title: "كامري هايبرد", votes: 0),
@@ -165,7 +165,7 @@ enum AskDemoStore {
             title: "أفضل مطعم برجر للتجمع؟",
             details: "نبي مكان مناسب لعشرة أشخاص، الطعم مهم والسعر يكون معقول.",
             category: .restaurants,
-            author: "فريق اسأل",
+            author: "فريق وش الرأي",
             timeAgo: "مثال",
             options: [
                 PollOption(title: "مطعم A", votes: 0),
@@ -191,12 +191,17 @@ enum AskDemoStore {
 enum KnowledgeSearchIndex {
     static func search(_ items: [KnowledgeItem], query: String, category: AskCategory) -> [KnowledgeItem] {
         let normalizedQuery = normalize(query)
-        return items
-            .filter { category == .all || $0.category == category }
+
+        let categoryItems = items.filter { category == .all || $0.category == category }
+        guard !normalizedQuery.isEmpty else {
+            return categoryItems
+        }
+
+        return categoryItems
             .map { item in
                 (item: item, score: score(item, query: normalizedQuery))
             }
-            .filter { normalizedQuery.isEmpty || $0.score > 0 }
+            .filter { $0.score > 0 }
             .sorted {
                 if $0.score == $1.score {
                     return $0.item.name.localizedStandardCompare($1.item.name) == .orderedAscending

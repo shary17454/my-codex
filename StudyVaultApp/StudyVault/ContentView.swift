@@ -559,7 +559,7 @@ struct DashboardView: View {
             }
             .padding(16)
         }
-        .navigationTitle("راح تفهم")
+        .navigationTitle("وش الرأي؟")
         .background(AppBackground())
     }
 }
@@ -1306,7 +1306,7 @@ struct PremiumHeroCard: View {
                 .shadow(color: .black.opacity(0.28), radius: 18, y: 10)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("راح تفهم")
+                Text("وش الرأي؟")
                     .font(.largeTitle.weight(.black))
                 Text("قرارك أوضح قبل الشراء. قارن بين خيارين أو عشرة، وافهم الفروقات من قاعدة معرفة منظمة وآراء قابلة للتصويت.")
                     .font(.body)
