@@ -1,13 +1,19 @@
 import Foundation
 
-enum AskCategory: String, CaseIterable, Identifiable {
+enum AskCategory: String, CaseIterable, Identifiable, Codable {
     case all
     case phones
     case cars
     case restaurants
     case laptops
+    case services
+    case subscriptions
     case gaming
     case travel
+    case education
+    case home
+    case fashion
+    case health
     case other
 
     var id: String { rawValue }
@@ -19,8 +25,14 @@ enum AskCategory: String, CaseIterable, Identifiable {
         case .cars: "سيارات"
         case .restaurants: "مطاعم"
         case .laptops: "لابتوبات"
+        case .services: "خدمات"
+        case .subscriptions: "اشتراكات"
         case .gaming: "ألعاب"
         case .travel: "سفر"
+        case .education: "تعليم"
+        case .home: "منزل"
+        case .fashion: "أزياء"
+        case .health: "صحة"
         case .other: "أخرى"
         }
     }
@@ -32,75 +44,63 @@ enum AskCategory: String, CaseIterable, Identifiable {
         case .cars: "car"
         case .restaurants: "fork.knife"
         case .laptops: "laptopcomputer"
+        case .services: "wrench.and.screwdriver"
+        case .subscriptions: "creditcard"
         case .gaming: "gamecontroller"
         case .travel: "airplane"
+        case .education: "graduationcap"
+        case .home: "house"
+        case .fashion: "tshirt"
+        case .health: "heart"
         case .other: "sparkles"
         }
     }
 }
 
-struct PollOption: Identifiable, Hashable {
+struct PollOption: Identifiable, Hashable, Codable {
     let id: UUID
     var title: String
     var votes: Int
-    var verifiedVotes: Int
-    var expertVotes: Int
-    var regretRate: Int
-    var satisfactionRate: Int
-    var repurchaseRate: Int
 
-    init(
-        id: UUID = UUID(),
-        title: String,
-        votes: Int,
-        verifiedVotes: Int? = nil,
-        expertVotes: Int? = nil,
-        regretRate: Int? = nil,
-        satisfactionRate: Int? = nil,
-        repurchaseRate: Int? = nil
-    ) {
+    init(id: UUID = UUID(), title: String, votes: Int) {
         self.id = id
         self.title = title
         self.votes = votes
-        self.verifiedVotes = verifiedVotes ?? max(0, Int(Double(votes) * 0.38))
-        self.expertVotes = expertVotes ?? max(0, Int(Double(votes) * 0.12))
-        let resolvedRegretRate = regretRate ?? Self.derivedRegretRate(title: title, votes: votes)
-        let resolvedSatisfactionRate = satisfactionRate ?? min(98, max(60, 100 - resolvedRegretRate - (votes == 0 ? 7 : 0)))
-        self.regretRate = resolvedRegretRate
-        self.satisfactionRate = resolvedSatisfactionRate
-        self.repurchaseRate = repurchaseRate ?? min(96, max(55, resolvedSatisfactionRate - 6))
-    }
-
-    var experienceWeight: Int {
-        votes + (verifiedVotes * 2) + (expertVotes * 3)
-    }
-
-    private static func derivedRegretRate(title: String, votes: Int) -> Int {
-        guard votes > 0 else { return 0 }
-        let seed = abs(title.unicodeScalars.reduce(0) { $0 + Int($1.value) } + votes)
-        return 4 + (seed % 15)
     }
 }
 
-struct AskComment: Identifiable, Hashable {
+struct AskComment: Identifiable, Hashable, Codable {
     let id: UUID
     var author: String
     var text: String
     var likes: Int
     var optionID: UUID?
     var optionTitle: String?
+    var trustBadge: String?
+    var reasonCategory: String?
 
-    init(id: UUID = UUID(), author: String, text: String, likes: Int, optionID: UUID? = nil, optionTitle: String? = nil) {
+    init(
+        id: UUID = UUID(),
+        author: String,
+        text: String,
+        likes: Int,
+        optionID: UUID? = nil,
+        optionTitle: String? = nil,
+        trustBadge: String? = nil,
+        reasonCategory: String? = nil
+    ) {
         self.id = id
         self.author = author
         self.text = text
         self.likes = likes
         self.optionID = optionID
         self.optionTitle = optionTitle
+        self.trustBadge = trustBadge
+        self.reasonCategory = reasonCategory
     }
 }
 
-struct AskQuestion: Identifiable, Hashable {
+struct AskQuestion: Identifiable, Hashable, Codable {
     let id: UUID
     var title: String
     var details: String
@@ -141,40 +141,169 @@ struct AskQuestion: Identifiable, Hashable {
         return options.max { $0.votes < $1.votes }
     }
 
-    var experienceWinner: PollOption? {
-        guard !options.isEmpty else { return nil }
-        return options.max { $0.experienceWeight < $1.experienceWeight }
+    var verifiedComments: [AskComment] {
+        comments.filter { $0.trustBadge != nil }
     }
 
-    var lowestRegretOption: PollOption? {
-        options.filter { $0.votes > 0 }.min { $0.regretRate < $1.regretRate }
+    var decisionConfidence: Int {
+        guard totalVotes > 0, let winner = winningOption else { return 52 }
+        let lead = Double(winner.votes) / Double(max(totalVotes, 1))
+        let reasonDepth = min(comments.count * 4, 24)
+        let verifiedBoost = min(verifiedComments.count * 7, 21)
+        return min(96, max(55, Int(lead * 58) + reasonDepth + verifiedBoost))
     }
 
-    var verifiedShare: Int {
-        let verified = options.reduce(0) { $0 + $1.verifiedVotes }
-        guard totalVotes > 0 else { return 0 }
-        return min(100, Int((Double(verified) / Double(totalVotes)) * 100))
+    var repeatedPros: [String] {
+        topReasonKeywords(matching: ["جودة", "سعر", "ضمان", "بطارية", "كاميرا", "راحة", "اعتمادية", "خدمة", "عملي", "قيمة"])
     }
 
-    var aiSummary: String {
-        guard let winner = winningOption else {
-            return "ابدأ التصويت حتى تظهر خلاصة ذكية تربط بين النتيجة، الخبرة، ونسبة الندم."
+    var repeatedCons: [String] {
+        topReasonKeywords(matching: ["غالي", "صيانة", "استهلاك", "ضعيف", "بطء", "حرارة", "قطع", "زحمة", "عيب", "تأخير"])
+    }
+
+    var smartSummary: String {
+        guard let winner = winningOption, totalVotes > 0 else {
+            return "ابدأ بالتصويت وكتابة الأسباب حتى تظهر خلاصة تساعد صاحب السؤال على فهم الاتجاه العام."
         }
 
-        let regretText = lowestRegretOption.map { " وأقل ندم ظاهر حاليًا عند \($0.title) بنسبة \($0.regretRate)%." } ?? "."
-        return "الأغلبية تميل إلى \(winner.title)، مع \(verifiedShare)% من الأصوات المصنفة كتجارب موثقة أو قريبة منها\(regretText)"
+        let percent = Int((Double(winner.votes) / Double(totalVotes)) * 100)
+        let reasonText: String
+        if comments.isEmpty {
+            reasonText = "النتيجة مبنية حاليًا على التصويت فقط، وستصبح أدق عند إضافة أسباب وتجارب مكتوبة."
+        } else {
+            let pros = repeatedPros.prefix(2).joined(separator: " و")
+            reasonText = pros.isEmpty
+                ? "الأسباب المكتوبة بدأت تعطي صورة أوضح، لكن ما زالت تحتاج مشاركات أكثر."
+                : "أكثر ما يتكرر في الأسباب: \(pros)."
+        }
+
+        return "\(winner.title) هو المتقدم حاليًا بنسبة \(percent)% من الأصوات. \(reasonText) إذا كان احتياجك مختلفًا، راجع آراء أصحاب التجربة قبل القرار النهائي."
     }
 
-    var finalDecision: String {
-        guard let winner = winningOption else {
-            return "القرار النهائي ينتظر أول تصويت وتجربة."
-        }
+    private func topReasonKeywords(matching keywords: [String]) -> [String] {
+        let blob = comments.map { [$0.text, $0.reasonCategory ?? ""].joined(separator: " ") }.joined(separator: " ")
+        return keywords.filter { blob.localizedCaseInsensitiveContains($0) }
+    }
+}
 
-        if let experienceWinner, experienceWinner.id != winner.id {
-            return "الناس يصوتون لـ \(winner.title)، لكن وزن الخبرة يميل إلى \(experienceWinner.title). راجع أسباب الملاك قبل القرار."
-        }
+enum DecisionMode: String, CaseIterable, Identifiable {
+    case quick
+    case deep
 
-        return "القرار الأقرب الآن: \(winner.title)، بشرط أن يناسب ميزانيتك وطريقة استخدامك."
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .quick: "قرار سريع"
+        case .deep: "قرار عميق"
+        }
+    }
+}
+
+enum CommentFilter: String, CaseIterable, Identifiable {
+    case all
+    case verified
+    case reasons
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .all: "الكل"
+        case .verified: "مجرّب فعليًا"
+        case .reasons: "أسباب التصويت"
+        }
+    }
+}
+
+enum SavedDecisionState: String, CaseIterable, Identifiable {
+    case thinking
+    case comparing
+    case decided
+    case purchased
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .thinking: "أفكر أشتريه"
+        case .comparing: "قيد المقارنة"
+        case .decided: "قررت"
+        case .purchased: "تم الشراء"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .thinking: "lightbulb"
+        case .comparing: "scale.3d"
+        case .decided: "checkmark.seal"
+        case .purchased: "bag"
+        }
+    }
+}
+
+enum DecisionFeatureCatalog {
+    static func criteria(for category: AskCategory) -> [String] {
+        switch category {
+        case .phones:
+            ["البطارية", "الكاميرا", "الأداء", "السعر", "النظام", "القيمة"]
+        case .cars:
+            ["السعر", "البنزين", "الراحة", "قطع الغيار", "إعادة البيع", "الاعتمادية"]
+        case .restaurants:
+            ["الطعم", "السعر", "النظافة", "الخدمة", "سرعة التوصيل", "الموقع"]
+        case .laptops:
+            ["الأداء", "البطارية", "الشاشة", "الوزن", "السعر", "الحرارة"]
+        case .services:
+            ["السعر", "الجودة", "الالتزام", "الدعم", "سرعة التنفيذ", "الضمان"]
+        case .subscriptions:
+            ["السعر", "المحتوى", "سهولة الإلغاء", "القيمة", "عدد الأجهزة", "الدعم"]
+        case .gaming:
+            ["الألعاب", "الأداء", "الاشتراكات", "السعر", "الأصدقاء", "التوفر"]
+        case .travel:
+            ["السعر", "الراحة", "الموقع", "الأمان", "الخدمات", "التجربة"]
+        case .education:
+            ["الجودة", "الاعتماد", "السعر", "مرونة الدراسة", "فرص العمل", "الدعم"]
+        case .home:
+            ["الجودة", "العمر الافتراضي", "الضمان", "السعر", "سهولة الصيانة", "الأمان"]
+        case .fashion:
+            ["الخامة", "السعر", "الراحة", "التصميم", "التحمل", "المقاس"]
+        case .health:
+            ["السلامة", "الاعتماد", "الجودة", "السعر", "سهولة الاستخدام", "النتائج"]
+        case .all, .other:
+            ["السعر", "الجودة", "التجربة", "خدمة العملاء", "الاعتمادية", "القيمة"]
+        }
+    }
+
+    static func voteReasons(for category: AskCategory) -> [String] {
+        switch category {
+        case .phones:
+            ["الكاميرا أفضل", "البطارية أقوى", "النظام أنسب", "القيمة مقابل السعر", "استخدمته فعليًا"]
+        case .cars:
+            ["اعتمادية أعلى", "صرفية أفضل", "قطع الغيار متوفرة", "مناسب للعائلة", "إعادة البيع ممتازة"]
+        case .restaurants:
+            ["الطعم أفضل", "السعر مناسب", "الخدمة أسرع", "النظافة أعلى", "مناسب للمجموعات"]
+        case .laptops:
+            ["الأداء أفضل", "بطارية أطول", "خفيف للتنقل", "مناسب للدراسة", "القيمة أعلى"]
+        case .services:
+            ["جودة أعلى", "دعم أفضل", "التزام أوضح", "سعر مناسب", "تجربة سابقة"]
+        case .subscriptions:
+            ["محتوى أفضل", "سعر أوفر", "إلغاء أسهل", "يناسب العائلة", "قيمة أعلى"]
+        case .gaming:
+            ["الألعاب أفضل", "الأصدقاء عليه", "الاشتراك أقوى", "الأداء أعلى", "السعر مناسب"]
+        case .travel:
+            ["أريح للسفر", "سعره أفضل", "موقعه مناسب", "تجربة الناس أفضل", "الخدمات أوضح"]
+        case .education:
+            ["اعتماده أفضل", "جودة أعلى", "مرونة أكثر", "سعر أنسب", "فرصه أفضل"]
+        case .home:
+            ["عمره أطول", "ضمان أفضل", "صيانة أسهل", "سعر مناسب", "أكثر أمانًا"]
+        case .fashion:
+            ["خامة أفضل", "تصميم أجمل", "مريح أكثر", "سعر مناسب", "يناسب الاستخدام"]
+        case .health:
+            ["أكثر أمانًا", "موثوق أكثر", "نتائجه أوضح", "سهل الاستخدام", "سعره مناسب"]
+        case .all, .other:
+            ["السعر أفضل", "الجودة أعلى", "تجربة شخصية", "خدمة العملاء", "عملي أكثر"]
+        }
     }
 }
 
@@ -207,7 +336,7 @@ enum AskDemoStore {
             title: "أشتري iPhone 17 Pro Max أو Galaxy S26 Ultra؟",
             details: "أهم شيء عندي الكاميرا والبطارية والاستخدام اليومي لسنوات.",
             category: .phones,
-            author: "فريق وش الراي",
+            author: "فريق وش الرأي",
             timeAgo: "مثال",
             options: [
                 PollOption(title: "iPhone 17 Pro Max", votes: 0),
@@ -220,7 +349,7 @@ enum AskDemoStore {
             title: "كامري هايبرد أو أكورد هايبرد؟",
             details: "أبي سيارة عملية للدوام والخطوط، أهم شيء الاعتمادية والصرفية.",
             category: .cars,
-            author: "فريق وش الراي",
+            author: "فريق وش الرأي",
             timeAgo: "مثال",
             options: [
                 PollOption(title: "كامري هايبرد", votes: 0),
@@ -232,7 +361,7 @@ enum AskDemoStore {
             title: "أفضل مطعم برجر للتجمع؟",
             details: "نبي مكان مناسب لعشرة أشخاص، الطعم مهم والسعر يكون معقول.",
             category: .restaurants,
-            author: "فريق وش الراي",
+            author: "فريق وش الرأي",
             timeAgo: "مثال",
             options: [
                 PollOption(title: "مطعم A", votes: 0),
@@ -258,17 +387,12 @@ enum AskDemoStore {
 enum KnowledgeSearchIndex {
     static func search(_ items: [KnowledgeItem], query: String, category: AskCategory) -> [KnowledgeItem] {
         let normalizedQuery = normalize(query)
-
-        let categoryItems = items.filter { category == .all || $0.category == category }
-        guard !normalizedQuery.isEmpty else {
-            return categoryItems
-        }
-
-        return categoryItems
+        return items
+            .filter { category == .all || $0.category == category }
             .map { item in
                 (item: item, score: score(item, query: normalizedQuery))
             }
-            .filter { $0.score > 0 }
+            .filter { normalizedQuery.isEmpty || $0.score > 0 }
             .sorted {
                 if $0.score == $1.score {
                     return $0.item.name.localizedStandardCompare($1.item.name) == .orderedAscending
@@ -544,6 +668,560 @@ enum ComparisonEngine {
         let spread = candidates[0].score - candidates[1].score
         return min(92, max(62, 70 + spread))
     }
+}
+
+enum ComparisonStatus: String, Codable {
+    case active
+    case closed
+    case draft
+    case archived
+}
+
+enum ComparisonCategory: String, Codable, CaseIterable, Identifiable {
+    case phones
+    case cars
+    case restaurants
+    case laptops
+    case services
+    case subscriptions
+    case travel
+    case education
+    case home
+    case fashion
+    case gaming
+    case health
+    case other
+
+    var id: String { rawValue }
+
+    var arabicTitle: String {
+        AskCategory(rawValue: rawValue)?.title ?? "أخرى"
+    }
+
+    var systemImage: String {
+        AskCategory(rawValue: rawValue)?.systemImage ?? "square.grid.2x2"
+    }
+
+    var askCategory: AskCategory {
+        AskCategory(rawValue: rawValue) ?? .other
+    }
+}
+
+struct ComparisonPost: Identifiable, Codable, Hashable {
+    let id: UUID
+    var title: String
+    var description: String
+    var category: ComparisonCategory
+    var options: [ComparisonOption]
+    var author: UserSummary?
+    var createdAt: Date
+    var expiresAt: Date?
+    var isAnonymous: Bool
+    var allowsComments: Bool
+    var allowsVoteReasons: Bool
+    var voteCount: Int
+    var commentCount: Int
+    var viewCount: Int
+    var status: ComparisonStatus
+    var tags: [String]
+}
+
+struct ComparisonOption: Identifiable, Codable, Hashable {
+    let id: UUID
+    var title: String
+    var subtitle: String?
+    var description: String?
+    var imageURL: URL?
+    var localImageName: String?
+    var voteCount: Int
+    var strengths: [String]
+    var weaknesses: [String]
+    var attributes: [ComparisonAttribute]
+}
+
+struct ComparisonAttribute: Identifiable, Codable, Hashable {
+    let id: UUID
+    var name: String
+    var value: String
+}
+
+struct Vote: Identifiable, Codable, Hashable {
+    let id: UUID
+    let comparisonID: UUID
+    let optionID: UUID
+    let userID: UUID?
+    let reason: String?
+    let createdAt: Date
+    let isAnonymous: Bool
+}
+
+struct VoteReason: Identifiable, Codable, Hashable {
+    let id: UUID
+    let voteID: UUID
+    let optionID: UUID
+    let author: UserSummary?
+    let text: String
+    let helpfulCount: Int
+    let createdAt: Date
+}
+
+struct ComparisonComment: Identifiable, Codable, Hashable {
+    let id: UUID
+    let comparisonID: UUID
+    let author: UserSummary?
+    let text: String
+    let createdAt: Date
+    let helpfulCount: Int
+}
+
+struct UserSummary: Identifiable, Codable, Hashable {
+    let id: UUID
+    var displayName: String
+    var avatarURL: URL?
+    var reputationScore: Int
+    var totalVotes: Int
+    var totalComparisons: Int
+}
+
+struct ComparisonDraft: Codable, Equatable {
+    var title: String = ""
+    var description: String = ""
+    var category: ComparisonCategory = .phones
+    var options: [ComparisonOptionDraft] = [
+        ComparisonOptionDraft(title: ""),
+        ComparisonOptionDraft(title: "")
+    ]
+    var expiresAt: Date?
+    var isAnonymous: Bool = false
+    var allowsComments: Bool = true
+    var allowsVoteReasons: Bool = true
+    var tags: [String] = []
+}
+
+struct ComparisonOptionDraft: Identifiable, Codable, Equatable {
+    let id: UUID
+    var title: String
+    var subtitle: String
+    var description: String
+    var localImageData: Data?
+    var attributes: [ComparisonAttribute]
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        subtitle: String = "",
+        description: String = "",
+        localImageData: Data? = nil,
+        attributes: [ComparisonAttribute] = []
+    ) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.description = description
+        self.localImageData = localImageData
+        self.attributes = attributes
+    }
+}
+
+enum DecisionConfidenceLevel: String, Codable {
+    case low
+    case medium
+    case high
+
+    var arabicTitle: String {
+        switch self {
+        case .low: "منخفضة"
+        case .medium: "متوسطة"
+        case .high: "عالية"
+        }
+    }
+}
+
+struct DecisionHighlight: Identifiable, Codable {
+    let id: UUID
+    let optionID: UUID
+    let title: String
+    let details: String
+}
+
+struct DecisionSummary: Codable {
+    let winningOptionID: UUID?
+    let confidenceLevel: DecisionConfidenceLevel
+    let totalVotes: Int
+    let voteGapPercentage: Double
+    let highlights: [DecisionHighlight]
+    let recommendationText: String
+    let warningText: String?
+}
+
+struct PreferenceCriterion: Identifiable, Codable, Hashable {
+    let id: UUID
+    var name: String
+    var weight: Int
+
+    init(id: UUID = UUID(), name: String, weight: Int = 3) {
+        self.id = id
+        self.name = name
+        self.weight = min(5, max(1, weight))
+    }
+}
+
+struct OptionCriterionScore: Identifiable, Codable, Hashable {
+    let id: UUID
+    let optionID: UUID
+    let criterionID: UUID
+    let score: Double
+}
+
+struct WeightedComparisonResult: Identifiable, Codable, Hashable {
+    let id: UUID
+    let optionID: UUID
+    let finalScore: Double
+    let explanation: String
+}
+
+enum AppError: LocalizedError {
+    case networkUnavailable
+    case unauthorized
+    case forbidden
+    case invalidInput(String)
+    case comparisonNotFound
+    case voteAlreadyExists
+    case votingClosed
+    case uploadFailed
+    case decodingFailed
+    case serviceUnavailable
+    case unavailableData
+    case unknown(Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .networkUnavailable:
+            return "لا يوجد اتصال بالإنترنت."
+        case .unauthorized:
+            return "يجب تسجيل الدخول لإكمال العملية."
+        case .forbidden:
+            return "لا تملك صلاحية تنفيذ هذه العملية."
+        case .invalidInput(let message):
+            return message
+        case .comparisonNotFound:
+            return "لم يتم العثور على المقارنة."
+        case .voteAlreadyExists:
+            return "سبق لك التصويت في هذه المقارنة."
+        case .votingClosed:
+            return "انتهى التصويت في هذه المقارنة."
+        case .uploadFailed:
+            return "تعذر رفع الصورة."
+        case .decodingFailed:
+            return "تعذر قراءة البيانات."
+        case .serviceUnavailable:
+            return "الخدمة غير متاحة حاليًا."
+        case .unavailableData:
+            return "لا تتوفر بيانات حاليًا."
+        case .unknown:
+            return "حدث خطأ غير متوقع."
+        }
+    }
+}
+
+protocol ComparisonRepositoryProtocol {
+    func fetchComparisons(category: ComparisonCategory?, page: Int) async throws -> [ComparisonPost]
+    func fetchComparison(id: UUID) async throws -> ComparisonPost
+    func createComparison(draft: ComparisonDraft) async throws -> ComparisonPost
+    func updateComparison(id: UUID, draft: ComparisonDraft) async throws -> ComparisonPost
+    func deleteComparison(id: UUID) async throws
+    func searchComparisons(query: String) async throws -> [ComparisonPost]
+}
+
+protocol VotingRepositoryProtocol {
+    func vote(comparisonID: UUID, optionID: UUID, reason: String?, isAnonymous: Bool) async throws -> Vote
+    func updateVote(voteID: UUID, optionID: UUID, reason: String?) async throws -> Vote
+    func deleteVote(voteID: UUID) async throws
+}
+
+protocol BookmarkRepositoryProtocol {
+    func saveComparison(id: UUID) async throws
+    func removeSavedComparison(id: UUID) async throws
+    func fetchSavedComparisonIDs() async throws -> Set<UUID>
+}
+
+protocol CommentRepositoryProtocol {
+    func fetchComments(comparisonID: UUID, page: Int) async throws -> [ComparisonComment]
+    func addComment(comparisonID: UUID, text: String) async throws -> ComparisonComment
+    func deleteComment(id: UUID) async throws
+}
+
+protocol AuthenticationServiceProtocol {
+    var currentUser: UserSummary? { get }
+    func signInWithApple() async throws -> UserSummary
+    func signOut() async throws
+    func deleteAccount() async throws
+}
+
+enum ComparisonValidationService {
+    static func validate(draft: ComparisonDraft) throws {
+        let title = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else {
+            throw AppError.invalidInput("اكتب عنوان المقارنة أولًا.")
+        }
+
+        let optionNames = draft.options
+            .map { $0.title.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        guard optionNames.count >= 2 else {
+            throw AppError.invalidInput("أضف خيارين على الأقل للمقارنة.")
+        }
+
+        let normalized = optionNames.map(KnowledgeSearchIndex.normalize)
+        guard Set(normalized).count == normalized.count else {
+            throw AppError.invalidInput("أسماء الخيارات لا يجب أن تكون مكررة.")
+        }
+    }
+}
+
+final class LocalDraftStore: @unchecked Sendable {
+    static let shared = LocalDraftStore()
+    private let key = "wash_alray_comparison_draft"
+    private let decoder = JSONDecoder()
+    private let encoder = JSONEncoder()
+
+    private init() {}
+
+    func save(_ draft: ComparisonDraft) {
+        guard let data = try? encoder.encode(draft) else { return }
+        UserDefaults.standard.set(data, forKey: key)
+    }
+
+    func load() -> ComparisonDraft? {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
+        return try? decoder.decode(ComparisonDraft.self, from: data)
+    }
+
+    func clear() {
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+}
+
+final class LocalBookmarkRepository: BookmarkRepositoryProtocol, @unchecked Sendable {
+    static let shared = LocalBookmarkRepository()
+    private let key = "wash_alray_saved_comparison_ids"
+
+    private init() {}
+
+    func saveComparison(id: UUID) async throws {
+        var ids = try await fetchSavedComparisonIDs()
+        ids.insert(id)
+        persist(ids)
+    }
+
+    func removeSavedComparison(id: UUID) async throws {
+        var ids = try await fetchSavedComparisonIDs()
+        ids.remove(id)
+        persist(ids)
+    }
+
+    func fetchSavedComparisonIDs() async throws -> Set<UUID> {
+        let values = UserDefaults.standard.stringArray(forKey: key) ?? []
+        return Set(values.compactMap(UUID.init(uuidString:)))
+    }
+
+    private func persist(_ ids: Set<UUID>) {
+        UserDefaults.standard.set(ids.map(\.uuidString), forKey: key)
+    }
+}
+
+final class LocalVotingRepository: VotingRepositoryProtocol, @unchecked Sendable {
+    static let shared = LocalVotingRepository()
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+    private let key = "wash_alray_local_votes"
+
+    private init() {}
+
+    func vote(comparisonID: UUID, optionID: UUID, reason: String?, isAnonymous: Bool) async throws -> Vote {
+        var votes = loadVotes()
+        if votes.contains(where: { $0.comparisonID == comparisonID }) {
+            throw AppError.voteAlreadyExists
+        }
+        let vote = Vote(
+            id: UUID(),
+            comparisonID: comparisonID,
+            optionID: optionID,
+            userID: nil,
+            reason: reason?.trimmingCharacters(in: .whitespacesAndNewlines),
+            createdAt: Date(),
+            isAnonymous: isAnonymous
+        )
+        votes.append(vote)
+        saveVotes(votes)
+        return vote
+    }
+
+    func updateVote(voteID: UUID, optionID: UUID, reason: String?) async throws -> Vote {
+        var votes = loadVotes()
+        guard let index = votes.firstIndex(where: { $0.id == voteID }) else {
+            throw AppError.unavailableData
+        }
+        let old = votes[index]
+        let updated = Vote(
+            id: old.id,
+            comparisonID: old.comparisonID,
+            optionID: optionID,
+            userID: old.userID,
+            reason: reason?.trimmingCharacters(in: .whitespacesAndNewlines),
+            createdAt: old.createdAt,
+            isAnonymous: old.isAnonymous
+        )
+        votes[index] = updated
+        saveVotes(votes)
+        return updated
+    }
+
+    func deleteVote(voteID: UUID) async throws {
+        var votes = loadVotes()
+        votes.removeAll { $0.id == voteID }
+        saveVotes(votes)
+    }
+
+    private func loadVotes() -> [Vote] {
+        guard let data = UserDefaults.standard.data(forKey: key),
+              let votes = try? decoder.decode([Vote].self, from: data) else {
+            return []
+        }
+        return votes
+    }
+
+    private func saveVotes(_ votes: [Vote]) {
+        guard let data = try? encoder.encode(votes) else { return }
+        UserDefaults.standard.set(data, forKey: key)
+    }
+}
+
+enum DecisionSummaryService {
+    static func makeSummary(for question: AskQuestion) -> DecisionSummary {
+        let sorted = question.options.sorted { $0.votes > $1.votes }
+        let winner = sorted.first
+        let runnerUp = sorted.dropFirst().first
+        let totalVotes = question.totalVotes
+        let gap: Double
+        if let winner, let runnerUp, totalVotes > 0 {
+            gap = (Double(winner.votes - runnerUp.votes) / Double(totalVotes)) * 100
+        } else {
+            gap = 0
+        }
+
+        let confidence: DecisionConfidenceLevel
+        if totalVotes < 10 || gap < 5 {
+            confidence = .low
+        } else if totalVotes < 50 {
+            confidence = .medium
+        } else {
+            confidence = .high
+        }
+
+        let recommendation: String
+        if let winner, totalVotes > 0 {
+            let percent = Int((Double(winner.votes) / Double(max(totalVotes, 1))) * 100)
+            recommendation = "يميل المصوتون إلى \(winner.title) بنسبة \(percent)%. راجع الأسباب ونقاط القوة قبل اتخاذ القرار النهائي."
+        } else {
+            recommendation = "النتيجة غير حاسمة بعد. أضف تصويتات وأسبابًا حتى يظهر اتجاه أوضح."
+        }
+
+        let warning: String?
+        if totalVotes < 10 {
+            warning = "عدد الأصوات قليل، لذلك لا تعتبر النتيجة نهائية."
+        } else if gap < 5 {
+            warning = "النتيجة متقاربة جدًا بين الخيارات."
+        } else {
+            warning = nil
+        }
+
+        let highlights = sorted.prefix(3).map { option in
+            DecisionHighlight(
+                id: UUID(),
+                optionID: option.id,
+                title: option.title,
+                details: "\(option.votes) صوت، مع مراجعة الأسباب المكتوبة لمعرفة الملاءمة الفعلية."
+            )
+        }
+
+        return DecisionSummary(
+            winningOptionID: winner?.id,
+            confidenceLevel: confidence,
+            totalVotes: totalVotes,
+            voteGapPercentage: gap,
+            highlights: highlights,
+            recommendationText: recommendation,
+            warningText: warning
+        )
+    }
+}
+
+enum ComparisonScoringService {
+    static func score(
+        question: AskQuestion,
+        criteria: [PreferenceCriterion],
+        optionScores: [OptionCriterionScore] = []
+    ) -> [WeightedComparisonResult] {
+        guard !criteria.isEmpty else {
+            return question.options.map { option in
+                WeightedComparisonResult(
+                    id: UUID(),
+                    optionID: option.id,
+                    finalScore: voteShare(option: option, totalVotes: question.totalVotes),
+                    explanation: "النتيجة مبنية على نسبة تصويت المجتمع فقط لعدم تحديد معايير شخصية."
+                )
+            }
+        }
+
+        let totalWeight = Double(criteria.reduce(0) { $0 + $1.weight })
+        return question.options.map { option in
+            let personalScore = criteria.reduce(0.0) { partial, criterion in
+                let explicitScore = optionScores.first { $0.optionID == option.id && $0.criterionID == criterion.id }?.score
+                let inferredScore = explicitScore ?? inferredCriterionScore(option: option, criterionName: criterion.name)
+                return partial + (inferredScore * Double(criterion.weight))
+            } / max(totalWeight, 1)
+            let communityScore = voteShare(option: option, totalVotes: question.totalVotes)
+            let finalScore = (personalScore * 0.65) + (communityScore * 0.35)
+            return WeightedComparisonResult(
+                id: UUID(),
+                optionID: option.id,
+                finalScore: min(100, max(0, finalScore)),
+                explanation: "تم دمج أولوياتك مع اتجاه تصويت المجتمع لإعطاء ترشيح أقرب لاحتياجك."
+            )
+        }
+        .sorted { $0.finalScore > $1.finalScore }
+    }
+
+    private static func voteShare(option: PollOption, totalVotes: Int) -> Double {
+        guard totalVotes > 0 else { return 50 }
+        return (Double(option.votes) / Double(totalVotes)) * 100
+    }
+
+    private static func inferredCriterionScore(option: PollOption, criterionName: String) -> Double {
+        let blob = KnowledgeSearchIndex.normalize(option.title + " " + criterionName)
+        if blob.contains("اقتصاد") || blob.contains("سعر") || blob.contains("قيمه") {
+            return 70
+        }
+        if blob.contains("جوده") || blob.contains("اداء") || blob.contains("اعتماديه") {
+            return 75
+        }
+        return 60
+    }
+}
+
+enum ComparisonTemplateLibrary {
+    static let quickPrompts: [String] = [
+        "آيفون أم سامسونج؟",
+        "كامري أم أكورد؟",
+        "أفضل مطعم للعائلة؟",
+        "أفضل لابتوب للدراسة؟",
+        "أفضل شركة شحن؟",
+        "أفضل خدمة بث؟",
+        "أشتري الآن أم أنتظر؟",
+        "المنتج الأصلي أم البديل الأرخص؟"
+    ]
 }
 
 private struct SeedQuestionRecord: Decodable {

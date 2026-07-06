@@ -1,12 +1,9 @@
 # OS and editor files
 .DS_Store
+._*
 Thumbs.db
-desktop.ini
 *.swp
 *.tmp
-*.temp
-*.bak
-*.orig
 
 # Local Codex/session state
 .codex/
@@ -14,13 +11,22 @@ desktop.ini
 tmp/
 work/
 
+# Secrets and signing/private material
+.env
+.env.*
+*.mobileprovision
+*.provisionprofile
+AuthKey_*.p8
+*.cer
+*.p12
+
 # Python/local generated files
 vendor/
 data/raw_text/
 data/extracted/
 __pycache__/
 .pycache-check/
-*.py[cod]
+*.pyc
 
 # Flutter/Dart generated files
 **/.dart_tool/
@@ -29,41 +35,37 @@ __pycache__/
 **/.packages
 **/build/
 **/ephemeral/
-.dart_tool/
 
-# Native dependency folders and generated caches
-**/Pods/
+# Node/local caches
+node_modules/
+
+# Xcode build output and local state
+DerivedData/
+build/
+Archives/
+Exported/
 **/DerivedData/
 ios/**/DerivedData/
-DerivedData/
-**/*.xcuserstate
-**/xcuserdata/
-**/.swiftpm/
-**/SourcePackages/
-**/.build/
-**/*.xcresult/
-**/*.moved-aside
-**/*.hmap
-**/*.ipa
-**/*.dSYM.zip
-**/.gradle/
-**/local.properties
-
-# Node/web generated folders
-node_modules/
-**/node_modules/
-.next/
-dist/
-coverage/
-
-# Build outputs and archives generated during local sessions
-outputs/
-build/
 **/*.xcarchive/
 **/*.ipa
 **/*.dSYM/
+**/*.dSYM.zip
 **/ArchiveIntermediates/
 **/ModuleCache.noindex/
+**/Intermediates.noindex/
+xcuserdata/
+**/xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+
+# Native dependency folders and generated caches
+**/Pods/
+**/.gradle/
+**/local.properties
+
+# Packaged snapshots generated during development
+*.zip
 
 # SQLite sidecar files
 data/*.sqlite-shm
@@ -71,14 +73,6 @@ data/*.sqlite-wal
 
 # Logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Local secrets and machine-specific config
-.env
-.env.*
-!.env.example
 
 # BatalAlDroob App Store build keeps searchable catalog data in-app.
 # Original PDF catalog packs stay outside the submitted app bundle.

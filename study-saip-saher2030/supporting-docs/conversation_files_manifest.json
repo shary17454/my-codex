@@ -1,0 +1,1789 @@
+{
+  "generated_at": "2026-06-29T16:26:53.976372",
+  "root": "/Users/shrybnhshymbnmrzwqbnhwyd/Documents/Codex/2026-06-28/new-chat",
+  "file_count": 295,
+  "total_size_bytes": 419399624,
+  "excluded": [
+    ".dart_tool",
+    ".git",
+    ".gradle",
+    "DerivedData",
+    "__pycache__",
+    "batal-droob-my-codex.bundle",
+    "build",
+    "tmp",
+    "vendor"
+  ],
+  "files": [
+    {
+      "path": "PHOTO-2026-06-21-09-10-33.jpg",
+      "size_bytes": 148954,
+      "sha256": "d455caa8a858f31033c8d609c4fdfd257a1e3cb753e39f6946bcb4356c30e3d8",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "PRODUCT_REQUIREMENTS_AR.md",
+      "size_bytes": 2972,
+      "sha256": "d12b47564240a8cd55220cb70c192891d0505702d5b54b5c964dec3c2b6446c7",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 4981,
+      "sha256": "5687f68e1f16a4c76680d84cf97d785b5a310dda08eb1e54048a73d1970cfbac",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "SafariY60Parts.xcodeproj/project.pbxproj",
+      "size_bytes": 10885,
+      "sha256": "b58a8ff723960e72df5642a570855e2e9e912faaa61332ee79cd507d93656350",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "SafariY60Parts/Assets.xcassets/AccentColor.colorset/Contents.json",
+      "size_bytes": 330,
+      "sha256": "f29209ff2e36e294ad95aacb86a6f2d62cbccec6991f935a89eab6ccb69caaf4",
+      "type": "application/json"
+    },
+    {
+      "path": "SafariY60Parts/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "size_bytes": 84,
+      "sha256": "85cbbad026ab319cab65f048ede4a79334accbd5824f09dff1ca544dcf78970d",
+      "type": "application/json"
+    },
+    {
+      "path": "SafariY60Parts/Assets.xcassets/Contents.json",
+      "size_bytes": 64,
+      "sha256": "6248561bf2784c2488a1d948159a69fd8a6c9d06206c408a1c35b202d3c26c0a",
+      "type": "application/json"
+    },
+    {
+      "path": "SafariY60Parts/Info.plist",
+      "size_bytes": 1507,
+      "sha256": "67545ed969f62fe162ac99c2b07549376be651dbdbdd4fefdda16608765e7ea0",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "SafariY60Parts/Models.swift",
+      "size_bytes": 1799,
+      "sha256": "2795ba0b64814e616502ffedb56d840246671ec5a41c4233ad9a9c74f1e534b2",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "SafariY60Parts/Preview Content/Preview Assets.xcassets/Contents.json",
+      "size_bytes": 63,
+      "sha256": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+      "type": "application/json"
+    },
+    {
+      "path": "SafariY60Parts/Resources/parts_seed.json",
+      "size_bytes": 7847061,
+      "sha256": "68c86d887022beed25bbf1df59b2cb2a2612c03edea5e5fc6c0e75595c9a990c",
+      "type": "application/json"
+    },
+    {
+      "path": "SafariY60Parts/SafariY60PartsApp.swift",
+      "size_bytes": 240,
+      "sha256": "916e7d8f94c44711cbff5b5fde391b4a5c58da7bb22a7db797467520775f8ed9",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "SafariY60Parts/Store.swift",
+      "size_bytes": 4367,
+      "sha256": "538ca45d3574cf728e293e4e4ab5fd124b21fb467206d886def90cc36bafe427",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "SafariY60Parts/Views.swift",
+      "size_bytes": 16751,
+      "sha256": "84367a1ff0d4087af7f1a218cffdb12f172b3e649bacdaefb80a55d8120c6fc7",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ac_control_unit_parts_card.jpg",
+      "size_bytes": 340371,
+      "sha256": "d4ab965bb714d81254542a77a2ed9347261ca2926309d097427ba9baaa8f386c",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "app-store/checklist.md",
+      "size_bytes": 1066,
+      "sha256": "da452e56b683f563e3340d330e47f383227c0da38ef76f927826f52a0939d3ff",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "app-store/icons/app-icon-1024.png",
+      "size_bytes": 14358,
+      "sha256": "4e0ac2b5281a50e9f5967e56379ad1878312e8426d0615428966cd2dacf11877",
+      "type": "image/png"
+    },
+    {
+      "path": "app-store/legal/privacy_policy.md",
+      "size_bytes": 1023,
+      "sha256": "c25b4e5bb9c172b640c1f5fed53ef69bbf5514e6ee42f1772f45d48bac7bd91e",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "app-store/metadata_ar.md",
+      "size_bytes": 1938,
+      "sha256": "af5bdcb3abe99574b32180c6ac93fa13da6936654b827fbc49082d288f611a02",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "app-store/metadata_en.md",
+      "size_bytes": 1245,
+      "sha256": "a5b59c4c92c8c0bc22b089951eaa3385a0e78d4058cad7a8ef93e66347224a6d",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "app-store/review_notes.md",
+      "size_bytes": 670,
+      "sha256": "a54712812e4ea1890fef816abd594e90282955aca94dd283977f2d3853f0081d",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "app-store/screenshots/iphone-67-ar-catalog.png",
+      "size_bytes": 865447,
+      "sha256": "c702fec2c33394dea0a555f1b105e61b6c8073f225fbb49dd82f7712795168b5",
+      "type": "image/png"
+    },
+    {
+      "path": "app-store/screenshots/iphone-67-en-catalog.png",
+      "size_bytes": 730773,
+      "sha256": "837c9c47f4f0b330288c5e7de0e9cb5bbbf808c4c75d91380427a8f05fff5641",
+      "type": "image/png"
+    },
+    {
+      "path": "app-store/screenshots/iphone-ar-catalog.png",
+      "size_bytes": 41007,
+      "sha256": "e1090dbc51638f70fe8f6df484eabb6a459a351f1161640edf03a491d9479272",
+      "type": "image/png"
+    },
+    {
+      "path": "app-store/screenshots/iphone-en-catalog.png",
+      "size_bytes": 34905,
+      "sha256": "dea52f7155ddafbcdd30b84d1d50b8bc1859aa55391bc26976a1cd09e13b93cd",
+      "type": "image/png"
+    },
+    {
+      "path": "app-store/upload_guide_ar.md",
+      "size_bytes": 2176,
+      "sha256": "9538ff625be018e57e9b1b16db0bb8c9b27ae3603aadce7655a6bc8081a1bd20",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "app.js",
+      "size_bytes": 31934,
+      "sha256": "3571faa77e418e40f18052291ef35df21b333300f4109f316901403f899043d7",
+      "type": "text/javascript"
+    },
+    {
+      "path": "ask-people/CHAT_CONTENT.md",
+      "size_bytes": 4818,
+      "sha256": "c57dd32ede10372223bc1127c319b3374bdd7179ecd743ec02bb9419b6564765",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ask-people/README.md",
+      "size_bytes": 2463,
+      "sha256": "2fa4e23be6609e1784e61179bb0a18e30c675d121e3f7c4e0b596c53fb67bc68",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ask-people/app.js",
+      "size_bytes": 14291,
+      "sha256": "fcc530a84119cdc3081887e3bf907a009ee04dfdd11e65472aaf51171f4f55f4",
+      "type": "text/javascript"
+    },
+    {
+      "path": "ask-people/index.html",
+      "size_bytes": 9992,
+      "sha256": "15ec69be3b71e873527b3794d5f74810d7395f58b3350d0811e97c2b99aa9480",
+      "type": "text/html"
+    },
+    {
+      "path": "ask-people/styles.css",
+      "size_bytes": 11972,
+      "sha256": "76e7bef237e6d981b7ed548b5e9d1ce80421b010b3a6601f51b8285124808b9e",
+      "type": "text/css"
+    },
+    {
+      "path": "assets/backgrounds/batal-droob-patrol.jpg",
+      "size_bytes": 291234,
+      "sha256": "933be6619e23bcce408747c2b406558df7c1f72705daa2a5db1a859f5f4aa689",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "assets/icons/apple-touch-icon.png",
+      "size_bytes": 2015,
+      "sha256": "5061a3320ec1132ea7c08889e9e986cddfc5f6ac996aeefd99efbf934beb12e3",
+      "type": "image/png"
+    },
+    {
+      "path": "assets/icons/icon-192.png",
+      "size_bytes": 2107,
+      "sha256": "ed127c5978d14a0a3296068173756d509efbae583609e49ea37c57a2a06a14a1",
+      "type": "image/png"
+    },
+    {
+      "path": "assets/icons/icon-512.png",
+      "size_bytes": 6301,
+      "sha256": "ca2943f58cc18fd0b5d49b2338044ec4ef4a858c2431452c9fd35821318f7056",
+      "type": "image/png"
+    },
+    {
+      "path": "assets/models/patrol-y60.jpg",
+      "size_bytes": 157904,
+      "sha256": "bdd848cc790bf43e6985498eba638b655fb52495cf9618de1cfb3107cc778711",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "assets/models/patrol-y60.png",
+      "size_bytes": 2775016,
+      "sha256": "c00f98ddfff5045cf73eef4decaa88ea33f018b46e69111a6f9b853218900733",
+      "type": "image/png"
+    },
+    {
+      "path": "assets/models/patrol-y61.jpg",
+      "size_bytes": 154689,
+      "sha256": "9c9a898cd8a5e8726647f5d78b05554eb035baf9a4bb7e82c851b5704cc16443",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "assets/models/patrol-y61.png",
+      "size_bytes": 2608726,
+      "sha256": "5f4a07a5ecab6036ffa55ddf7353dc99d43a9fe578ca40df67852b4bbcb51895",
+      "type": "image/png"
+    },
+    {
+      "path": "assets/models/patrol-y62.jpg",
+      "size_bytes": 28604,
+      "sha256": "f7cc1748283f54cb1e0e02097158469cc88e1130e5eee5106eaddc4d0d1f3238",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "assets/models/patrol-y62.png",
+      "size_bytes": 2241309,
+      "sha256": "d1d8ee2807b32f3cb92132bac795b59fea5661f155703e068da9b61cb2895497",
+      "type": "image/png"
+    },
+    {
+      "path": "assets/models/patrol-y63.jpg",
+      "size_bytes": 121708,
+      "sha256": "76064586b8cf0219f9959fcead2b37bed14af299f77c590aa71cbdc6687c66c1",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "assets/models/patrol-y63.png",
+      "size_bytes": 2270951,
+      "sha256": "9d50789cab87f494fed8451bba7dada7bec020c6ebdc3769c8d5e62ce7dfc51b",
+      "type": "image/png"
+    },
+    {
+      "path": "assets/models/patrol-y63.webp",
+      "size_bytes": 29980,
+      "sha256": "4b9013f5311686c1a009afe18b3ba6b0f2d0a1468f33ae10d41b5eb43eed1f35",
+      "type": "image/webp"
+    },
+    {
+      "path": "data/app_database.sqlite",
+      "size_bytes": 46673920,
+      "sha256": "a872b6c60e68297c4c9dc5623c55525df43caca90ff63aa959654179e50e0068",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "data/audited/audit_report.md",
+      "size_bytes": 955,
+      "sha256": "f0d570e1a680cf35cfbdd103391806ae6caaa178d219e47cd2c1271b94cf1044",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "data/audited/duplicates_removed.json",
+      "size_bytes": 239,
+      "sha256": "4fd0ba6096ee0f0b7350e4a3c942063a8905fafdb11c9a074b71854c5a02c1b4",
+      "type": "application/json"
+    },
+    {
+      "path": "data/audited/y60_audited_database.json",
+      "size_bytes": 12743486,
+      "sha256": "267dd61f2341bc7353c61b965dbf5e7f3e02eed9bce8894d08afde0f5532b4d6",
+      "type": "application/json"
+    },
+    {
+      "path": "data/audited/y60_audited_parts.csv",
+      "size_bytes": 1298511,
+      "sha256": "320df996f607bf30806f7a143a7e4ede2570a1225d6d14194a60c13772b54925",
+      "type": "text/csv"
+    },
+    {
+      "path": "data/audited/y60_audited_records.csv",
+      "size_bytes": 25346809,
+      "sha256": "9783636c5d09d697ff8d141836eac370a68682609b3a702806c1e15cba7cb3d3",
+      "type": "text/csv"
+    },
+    {
+      "path": "data/extracted/y60_part_occurrences.csv",
+      "size_bytes": 41102085,
+      "sha256": "764ca50da8eb86dbf3ee0b2139c500a74e46c10aa472ad9096680bd9b83f5b8c",
+      "type": "text/csv"
+    },
+    {
+      "path": "data/extracted/y60_parts_database.json",
+      "size_bytes": 41489768,
+      "sha256": "e33f7c18d6a2f70643d58de804620365444483ac1fb41e4ad7bd2a213cd605f2",
+      "type": "application/json"
+    },
+    {
+      "path": "data/extracted/y60_parts_index.csv",
+      "size_bytes": 1538294,
+      "sha256": "d7d124cfa7ddb4bdc90fa61d2acfd369354ae3298eedb3a7195ee45cc7877273",
+      "type": "text/csv"
+    },
+    {
+      "path": "data/extracted/y60_sources.json",
+      "size_bytes": 10579415,
+      "sha256": "cda73159d47ed5e343c428d265f90dc38f21c9013886cdd842d80128564f5132",
+      "type": "application/json"
+    },
+    {
+      "path": "data/raw_text/01_combined_catalog_1988_1997.txt",
+      "size_bytes": 8390832,
+      "sha256": "6825ee46bfa3d8cd0c4ac95c8675f38b222bc7921a4813f2aa1fab6fd5b37c44",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/02_vin_report_VIN.txt",
+      "size_bytes": 498788,
+      "sha256": "64bcff09b014a6b7b4df6dee8ce3927a80abf30a0221e17aa02827492033b3db",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/03_year_catalog_1988.txt",
+      "size_bytes": 1457885,
+      "sha256": "5113d5d52192da261bd20ff466a6b5835d1fec4faf3b5f2b9e5b72a27837957a",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/04_year_catalog_1988.txt",
+      "size_bytes": 1457885,
+      "sha256": "5113d5d52192da261bd20ff466a6b5835d1fec4faf3b5f2b9e5b72a27837957a",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/05_year_catalog_1989.txt",
+      "size_bytes": 1449312,
+      "sha256": "93680209af499afb28c76629777fbf5460f4a672a16a74e9b9cbe9d26446353c",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/06_year_catalog_1990.txt",
+      "size_bytes": 1433978,
+      "sha256": "92c6499fc94f2915f190f0137509d47b68c638dd46602d0719d079e4b43f8411",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/07_year_catalog_1991.txt",
+      "size_bytes": 1742090,
+      "sha256": "bdad7eb3d599bd51e85f9076ec02330491414d052f25ebcb4629ec7f729e56e6",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/08_year_catalog_1992.txt",
+      "size_bytes": 1053404,
+      "sha256": "ae6a9e73c9df68e34c5c7e895ba94314937b5dfeecf8024dbd8ad07cd3ff02b7",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/09_year_catalog_1993.txt",
+      "size_bytes": 1046458,
+      "sha256": "cc8513625d8a14603d7e9a212718b9826626cb5b5cee853f9c48b812a528f1bc",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/10_year_catalog_1994.txt",
+      "size_bytes": 699539,
+      "sha256": "3cb236edcdde2dcf6a5820de7d9d71651159671eb1bd662e42b7c1459d9c9913",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/11_year_catalog_1995.txt",
+      "size_bytes": 684060,
+      "sha256": "86b24cbb513473d06a67ca2938d6e75ec8f6a1a6ac7770c582e7d141a146c462",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/12_year_catalog_1996.txt",
+      "size_bytes": 671493,
+      "sha256": "b628907318d7441a7cf505a144b3c222080b98a0752e1858592cb4bd681a5a82",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/raw_text/13_year_catalog_1997.txt",
+      "size_bytes": 670675,
+      "sha256": "8320c9878262019d0c2441e2efe0cd4360b8d08fa3986c995410aa8557db821b",
+      "type": "text/plain"
+    },
+    {
+      "path": "data/y60_app_catalog.json",
+      "size_bytes": 12743285,
+      "sha256": "15fa946dc94bf1ddb48c4dff5c9d4250f3f870c52f7781e80daa5e1e16f5db4a",
+      "type": "application/json"
+    },
+    {
+      "path": "docs/CHAT_HANDOFF_AR.md",
+      "size_bytes": 4042,
+      "sha256": "a88a08af2761e7f824a22048dfa5a95498ba099d8c57c0347b52fb7cb7a4bd0d",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/chat-history.md",
+      "size_bytes": 6856,
+      "sha256": "b159f6f96914dc380c28633f6c0391529cd09107b704a22acf653589db2da93e",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/chat-transcript-2026-06-29.md",
+      "size_bytes": 4367,
+      "sha256": "c4f209c32b02fa56e9c94f03a03aaa971b5f6d460c363403ee3efc5d17deee6e",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/life-assistant-chat-handoff.md",
+      "size_bytes": 9987,
+      "sha256": "134a92ca6d2e1818ce50934a44b9170b8d9fcd57827aacb9f106cdcec39db183",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/marzouq-book/README.md",
+      "size_bytes": 2841,
+      "sha256": "87e5ee33e4389d2f8983c8f4f23769e5357788ec30d07badaaa7c2694de6ee48",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/marzouq-book/artifacts.md",
+      "size_bytes": 2393,
+      "sha256": "b13fe42bd952e1213eb2a44017f50279984d3958ea8c760f3ab62a8489fb8cf5",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/marzouq-book/chat-log.md",
+      "size_bytes": 6708,
+      "sha256": "b5ab3a9105fe6116eda022b255257ab9c8ca12da2dadf20bdaf06f24cc4eaa21",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/marzouq-book/requirements.txt",
+      "size_bytes": 57,
+      "sha256": "3bacbde9359e7cfc1c3a18788a1d1e44f33131b115afb40a11629dbf502380bd",
+      "type": "text/plain"
+    },
+    {
+      "path": "docs/patrol-hub-chat-handoff.md",
+      "size_bytes": 1561,
+      "sha256": "6f96dbf0504a85438834158ddd29d776293dedbc36a9d15fcc5ab5b9c5948f2c",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/patrol-hub-full-description-ar.md",
+      "size_bytes": 22595,
+      "sha256": "32e2359ef8594aa188a9214012646c39859a024c6412c350022488eef16bd79a",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "docs/saher2030-codex-handoff-2026-06-29.md",
+      "size_bytes": 6121,
+      "sha256": "283b5caae900749b3b7017bc6ed18def6847419e70cd103db3d1258c372dfce6",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/README.md",
+      "size_bytes": 3962,
+      "sha256": "7e611c5894082c4fb74600de8e68404030cf47e0355d74be167262b26824f84b",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/analysis_options.yaml",
+      "size_bytes": 1420,
+      "sha256": "e0ea485cfdbc3e12b93efb8679a5ea73ebfe20ea4ca0c473dc594fc2fb274ed5",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/build.gradle.kts",
+      "size_bytes": 1395,
+      "sha256": "a9d03ec82a60b8b4315db51dcd72c85b2cd06ce0d6632c28bb7ca039f370ac14",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/debug/AndroidManifest.xml",
+      "size_bytes": 378,
+      "sha256": "30b0832ed8b92dfbd6ae2abfa939ccf26333d37600056b1572bd4a397a18a74b",
+      "type": "application/xml"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/AndroidManifest.xml",
+      "size_bytes": 2198,
+      "sha256": "e80196fb5d993f414ae579fbff5feecd0d9ce717b282e6bbd369016cfecd4ccb",
+      "type": "application/xml"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/drawable-v21/launch_background.xml",
+      "size_bytes": 438,
+      "sha256": "7ca6d5cec2169c5a98661a119db23a6f3399c8fef2256ff04f3a642831282478",
+      "type": "application/xml"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/drawable/launch_background.xml",
+      "size_bytes": 434,
+      "sha256": "94433756fe10005ddd6fc55cc5c0b1e9f3c10b66a08ceac795ece6713d34e28a",
+      "type": "application/xml"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "size_bytes": 544,
+      "sha256": "6a7c8f0d703e3682108f9662f813302236240d3f8f638bb391e32bfb96055fef",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "size_bytes": 442,
+      "sha256": "c7c0c0189145e4e32a401c61c9bdc615754b0264e7afae24e834bb81049eaf81",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "size_bytes": 721,
+      "sha256": "e14aa40904929bf313fded22cf7e7ffcbf1d1aac4263b5ef1be8bfce650397aa",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "size_bytes": 1031,
+      "sha256": "4d470bf22d5c17d84edc5f82516d1ba8a1c09559cd761cefb792f86d9f52b540",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "size_bytes": 1443,
+      "sha256": "3c34e1f298d0c9ea3455d46db6b7759c8211a49e9ec6e44b635fc5c87dfb4180",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/values-night/styles.xml",
+      "size_bytes": 995,
+      "sha256": "8c5bad5152f217e837519f9c15211d19f39bd45f5f67faf6dd81cb4b299e518f",
+      "type": "application/xml"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/main/res/values/styles.xml",
+      "size_bytes": 996,
+      "sha256": "937d7c82f539c72eb94fd3a3773f29b3d3fef1997213c92cb632298cedf4bda9",
+      "type": "application/xml"
+    },
+    {
+      "path": "flutter_y60_catalog/android/app/src/profile/AndroidManifest.xml",
+      "size_bytes": 378,
+      "sha256": "30b0832ed8b92dfbd6ae2abfa939ccf26333d37600056b1572bd4a397a18a74b",
+      "type": "application/xml"
+    },
+    {
+      "path": "flutter_y60_catalog/android/build.gradle.kts",
+      "size_bytes": 537,
+      "sha256": "6a26dba2cb8dfba1e74f540b0d17a89d96c1301d3c3bfda14348bed257fddcba",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/android/gradle.properties",
+      "size_bytes": 300,
+      "sha256": "0f82b18017fba6bb5ce3aa4b2d1a00c9382fc8aae7b1d9326e44b18abd66d80b",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/android/gradle/wrapper/gradle-wrapper.properties",
+      "size_bytes": 202,
+      "sha256": "3221993eac1057198d652b7437105e2953ca4850d415eb0eb2b9625874fd059e",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/android/gradlew",
+      "size_bytes": 4971,
+      "sha256": "ec56c02543666d92d9ac5ae7fcc48f88ce4de0deb8b7f9b39928ca46f68c1b2b",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/android/gradlew.bat",
+      "size_bytes": 2314,
+      "sha256": "f4f428c5626b3d90cef3bd4e7fd3ad3ea5760442db8c09d586b5bfe031dbe5e3",
+      "type": "application/x-msdownload"
+    },
+    {
+      "path": "flutter_y60_catalog/android/settings.gradle.kts",
+      "size_bytes": 771,
+      "sha256": "b76d554153a63772dddbe2ee91abdf582f5f871af40698b80a2ef7b70903d96f",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/wgy60348567_vehicle_catalog.pdf",
+      "size_bytes": 6466635,
+      "sha256": "48c5b1466ea0099dec43e24510d151f79e349fed5808318bf37dbc5f5be895ac",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1988.pdf",
+      "size_bytes": 12032111,
+      "sha256": "c2b22602d0c93d807b27c9896c59f48ce11c50a8ac01cf9fe8f9a3f7739018ad",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1989.pdf",
+      "size_bytes": 12019489,
+      "sha256": "6679986ef77e4bc38ee1c0cc45f25a75251d9af482785aa9124e023791b49f40",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1990.pdf",
+      "size_bytes": 11952670,
+      "sha256": "f3b07f092c96aded9845dc643a86b2f05b9ee2729abfa1019c32bca21f0923a4",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1991.pdf",
+      "size_bytes": 13669571,
+      "sha256": "0f9973e6ef190d038ef14923b787993df8b13cb2dacd1c7d8b32d9a1b6df58d5",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1992.pdf",
+      "size_bytes": 13439727,
+      "sha256": "7aa0a4fcfd3877d7920dbcf220dc8e20310bd11bb7a0996e52f338b328139fad",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1993.pdf",
+      "size_bytes": 13404914,
+      "sha256": "c579fe4b6f3ed8a1b32a533e34c2769ddb470479ee76d2e8d5ef748f3265366d",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1994.pdf",
+      "size_bytes": 12037048,
+      "sha256": "d9fc1b57681c5b74290b50272cada6bb09fadf16ee870be316a24084c9c11b9d",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1995.pdf",
+      "size_bytes": 11767982,
+      "sha256": "733b3e82e1c7e785eb9a5c63fbb7535dc3cb370a45451bd21dc12db46db185b8",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1996.pdf",
+      "size_bytes": 11682794,
+      "sha256": "082db8c2b3ea2a56e1fb470c49ee0914ff07f953a1ef617c1d5fe44bab184272",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/pdfs/y60_1997.pdf",
+      "size_bytes": 11680963,
+      "sha256": "05ce7879596e07723cc8eae8b707b842bfd0a2d5a9733ff8b66ee8a7fb5c48ed",
+      "type": "application/pdf"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/search/catalog_search_index.json",
+      "size_bytes": 18237497,
+      "sha256": "54f479db3777dd012284ed23d5e211d6e8de46c64434467114dd1564f3063e0f",
+      "type": "application/json"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/catalog/search/catalog_section_index.json",
+      "size_bytes": 1196824,
+      "sha256": "97644b8654465b32b33fcd2ee0560baeca42498acbcd49607dd00b65c552e860",
+      "type": "application/json"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/generations/patrol_y60.jpg",
+      "size_bytes": 20283,
+      "sha256": "3a02a0199d56b27c88b8ecd193db73a23f761b316a3b8daee8ce9ccd4997ba08",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/generations/patrol_y61.jpg",
+      "size_bytes": 27350,
+      "sha256": "bc6fbf9ae86fd82f87be4c028276f574ab1a46c918dba99418f34fa6ed0ddbb9",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/generations/patrol_y62.jpg",
+      "size_bytes": 26659,
+      "sha256": "1df2640cb06e356cae95dbb6f59f329c40764bae738495db12aee8c430f7779c",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/generations/patrol_y63.jpg",
+      "size_bytes": 17403,
+      "sha256": "b7ff33ab08f00dbc0ffa0c208c368a68056f7c91c780c18b184c79532504708d",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/hero/patrol_hub_mobile_mockup.png",
+      "size_bytes": 2217586,
+      "sha256": "d8f362f8d62bc29b81b7b0e3150022c7bfe3da85fd32326fa65fb949b40d765e",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/assets/hero/patrol_y60_storm.jpg",
+      "size_bytes": 257637,
+      "sha256": "3832231f890466947f9e8f284718c411a7a7d8d6fc8edf98835119fdfb201ba2",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Flutter/AppFrameworkInfo.plist",
+      "size_bytes": 720,
+      "sha256": "da12038f9b2688a8a26160fea2609fa8fcb11421448c109f09c0f573efe7698d",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner.xcodeproj/project.pbxproj",
+      "size_bytes": 25614,
+      "sha256": "d0456b62de4230f41322d97fb0f88ebd9de99fdaf174fac984e4e10c5edd72b8",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "size_bytes": 238,
+      "sha256": "dfa0f9bb85b95ccba9c6811adadf8cb407fb5d52088e89db83ebc308ec448542",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "size_bytes": 238,
+      "sha256": "dfa0f9bb85b95ccba9c6811adadf8cb407fb5d52088e89db83ebc308ec448542",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/AppDelegate.swift",
+      "size_bytes": 539,
+      "sha256": "451c6d9ba0a2b3ff43092ea349c60fa79a91f1158b915eb29dbdd357cb95d7b8",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "size_bytes": 2519,
+      "sha256": "3b1e214f466ffedff74baa5598ad5c4421130eea6bc8d57b8fe23435e8280ae4",
+      "type": "application/json"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png",
+      "size_bytes": 10932,
+      "sha256": "7770183009e914112de7d8ef1d235a6a30c5834424858e0d2f8253f6b8d31926",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png",
+      "size_bytes": 295,
+      "sha256": "cab10a0d391ec5bc09ef50ce49e8ad401cee7ef03707ec0923a222c5c2b3d212",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png",
+      "size_bytes": 406,
+      "sha256": "b9ad02cf6576a04d1b6806ac02a2431481b448dd0c2e505ce25842d1f7c4730b",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png",
+      "size_bytes": 450,
+      "sha256": "c6e6d3b215ae744a9c391f4c4d44157eff5e739d6ad6c39f9bfa5df66dddd267",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png",
+      "size_bytes": 282,
+      "sha256": "5dee24dc104ac76dc162e42ae0beb163d426bf365562ee28ba7b3ad368559a60",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png",
+      "size_bytes": 462,
+      "sha256": "a9b21eb6f4271385655a8771f76e29eef8c1107d7879cbcfc567e6619d1f716a",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png",
+      "size_bytes": 704,
+      "sha256": "e677d701ffe4af7bc2935098d6b3984cc9ab7ace573e6900955a5535b12410cf",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png",
+      "size_bytes": 406,
+      "sha256": "b9ad02cf6576a04d1b6806ac02a2431481b448dd0c2e505ce25842d1f7c4730b",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png",
+      "size_bytes": 586,
+      "sha256": "7c61c42fc7b657d9cf314d32a4ec458f0647c3aaf360be1b9377857266ec2499",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png",
+      "size_bytes": 862,
+      "sha256": "19be171481dc71a0b2803ebcd01dd8b0c5fd5778dee34c0a3cabc948c225f24e",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png",
+      "size_bytes": 862,
+      "sha256": "19be171481dc71a0b2803ebcd01dd8b0c5fd5778dee34c0a3cabc948c225f24e",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png",
+      "size_bytes": 1674,
+      "sha256": "4209a49e44a92ec40a327d3455eb1b1c153ee83d75de1c2be0a12ab18b2ff9de",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png",
+      "size_bytes": 762,
+      "sha256": "836c918cb613249eba0483a6b02fa3df3c1c0a89a315ee4d3b88509b83c7ab73",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png",
+      "size_bytes": 1226,
+      "sha256": "41c7d42f6e61f8fe7f30b1ffa2256aecbc9682be06d18c4a3062043e1a2e547c",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png",
+      "size_bytes": 1418,
+      "sha256": "5d7e5bdf01b93802bc973345b3a78c038907147625035952a08a115a563b7f81",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json",
+      "size_bytes": 391,
+      "sha256": "ccc7950fd5f5b82067c85f667940a9d59189151460761ece8098ca78daa19469",
+      "type": "application/json"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+      "size_bytes": 68,
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+      "size_bytes": 68,
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+      "size_bytes": 68,
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
+      "size_bytes": 336,
+      "sha256": "a985b626c4f7546a8ba392d135e9226c3547c8e2b46895f5f2bdf40d7b14ef9f",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/Info.plist",
+      "size_bytes": 2218,
+      "sha256": "5ed6a811d2a738eb2f4c56c923b6d2632aff959ef37505c0ea3dc404625b4c42",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/Runner/SceneDelegate.swift",
+      "size_bytes": 76,
+      "sha256": "add68b905971dedfcc0d0b5b7118030de5925ba8c081ad9815463699e3a444ad",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/ios/RunnerTests/RunnerTests.swift",
+      "size_bytes": 285,
+      "sha256": "5e8f4908dacea6f29b2a790e4d38bf5fded69096063f9a27a2f21584d62b30c0",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/main.dart",
+      "size_bytes": 116671,
+      "sha256": "02b055d7f1721bc68e819272ee614369a8639227a3badbc7796a799ce31b1f26",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/data/local/catalog_local_store.dart",
+      "size_bytes": 854,
+      "sha256": "3109113859227142162f847b942bf441b2c4864a4a88746d8483a448bdf3e435",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/data/seed/patrol_generations_seed.dart",
+      "size_bytes": 1490,
+      "sha256": "a6f0409647fda54c2429871a67a87006a92f1a0036af05cf28cd503c16bcdd23",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/data/seed/y60_vehicle_profile_seed.dart",
+      "size_bytes": 925,
+      "sha256": "20c3d64f3d040f4c6fa88254b58baf1105a23efeafb45bafbeeab31481320bcb",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/catalog_models.dart",
+      "size_bytes": 240,
+      "sha256": "9bfe05cd6abbecde4ded09c75f62fc321a365af68eca865d2af9c27b35bb3ce9",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/catalog_page.dart",
+      "size_bytes": 1749,
+      "sha256": "7b9da6d9f3281962ac24cb48b41cb5e2209620c0bc7fd86cafe8a227456ea3b6",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/catalog_section.dart",
+      "size_bytes": 1287,
+      "sha256": "1c155fb1469c7bfc6da5324504f922ce357d4983f954ad6d6b66ee30a605aa2d",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/common_issue.dart",
+      "size_bytes": 1941,
+      "sha256": "34785d0cfb8aa959d604350fd5acd1e894a6de17102f9e15b20d281ae27cb80f",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/maintenance_reminder.dart",
+      "size_bytes": 2304,
+      "sha256": "281760b4f8bfaafdb4b949b14eebb7ecef636fd5ce862a461cc3e3aaffe7ab03",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/part_diagram.dart",
+      "size_bytes": 2098,
+      "sha256": "ffee6df89bd61644d6e67090016506db241caf75d82bd726dc62a8ee530aa4be",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/part_item.dart",
+      "size_bytes": 1978,
+      "sha256": "e46301f1d092edca97d57fdf0cf370a2797b060305b6e2854a81fd7593980473",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/patrol_generation.dart",
+      "size_bytes": 700,
+      "sha256": "41156739a3ac6dde200c6621333bb10c70b21bb65a7d223461ea62e451fabf05",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/features/catalog/domain/models/vehicle_profile.dart",
+      "size_bytes": 3687,
+      "sha256": "c55545ad9e1b57c2d0b5bc88d76ea66f666393de879b2cb9d64b39cc50fd8451",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/platform/open_asset.dart",
+      "size_bytes": 76,
+      "sha256": "46203b1436bb11fcf20684d4751582673f052f209f0f8e265e412d3f3d11ea2b",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/platform/open_asset_stub.dart",
+      "size_bytes": 47,
+      "sha256": "62470f33a6691784bab9f977e3065d4d315d9410b848ac4bd9e6d787462b534e",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/lib/src/platform/open_asset_web.dart",
+      "size_bytes": 187,
+      "sha256": "2c470d832fbd2f2098c8c328a27161273b88b9c1470f75191bfdf951bc4c1565",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/linux/CMakeLists.txt",
+      "size_bytes": 4759,
+      "sha256": "bf7f05335ba867bdcc9530d004db98830bd908fef5dac15f8d55394a4611bbbe",
+      "type": "text/plain"
+    },
+    {
+      "path": "flutter_y60_catalog/linux/flutter/CMakeLists.txt",
+      "size_bytes": 2815,
+      "sha256": "787189e2623313cfee590a0b553338eb9fc68b3af922ddd77c5d39c75f989aeb",
+      "type": "text/plain"
+    },
+    {
+      "path": "flutter_y60_catalog/linux/runner/CMakeLists.txt",
+      "size_bytes": 974,
+      "sha256": "8cdcfd911e770fd7d511c97c7bce6559486a815352a47c953f7ef632e236d2cc",
+      "type": "text/plain"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Flutter/GeneratedPluginRegistrant.swift",
+      "size_bytes": 147,
+      "sha256": "9ebc54b4d21464b875d1289b3dd5e44cd7e68930dbd6e8c7f954e438eb6ad499",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner.xcodeproj/project.pbxproj",
+      "size_bytes": 27880,
+      "sha256": "ce0bb82e38a1ef617b0ced8647a765e0589ecc9703da4bd612a869b5cde37f36",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "size_bytes": 238,
+      "sha256": "dfa0f9bb85b95ccba9c6811adadf8cb407fb5d52088e89db83ebc308ec448542",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "size_bytes": 238,
+      "sha256": "dfa0f9bb85b95ccba9c6811adadf8cb407fb5d52088e89db83ebc308ec448542",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/AppDelegate.swift",
+      "size_bytes": 311,
+      "sha256": "ce9dbe45a57c59e85519da50a26c471615b9c8cdd85a8f4a39d2e480e62a4af4",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "size_bytes": 1291,
+      "sha256": "bc6ba8105ca69651aeeb77358851590de295dca04681a1d58c0f449641c242f3",
+      "type": "application/json"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png",
+      "size_bytes": 102994,
+      "sha256": "6232e5815af17e25e0268b2fec7aea9e068cc92ec709e9605c2b31df4ff2a313",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png",
+      "size_bytes": 5680,
+      "sha256": "15591f03f31313af6fd644ed0512106cc04365130b8b73244f1cfa6dddfb4400",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png",
+      "size_bytes": 520,
+      "sha256": "cc6928b5adfc00dbf526192e2705dd9af641cdf20ab4c6c7ca7cd4936dca59f0",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png",
+      "size_bytes": 14142,
+      "sha256": "416efd77cde932d42ef34168da24dd428a495b1f4f34bbbd125a18d2add186a2",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png",
+      "size_bytes": 1066,
+      "sha256": "ae8c4458e41f1e28b1e851ed87d3268d4a0351ceea427fa2a84cc94ddfb6d4c5",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png",
+      "size_bytes": 36406,
+      "sha256": "0a91c6c1bf242e54ee179e34629e9ef3e8a6d286c0fce01e302280a8be9277e6",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png",
+      "size_bytes": 2218,
+      "sha256": "6ad229623498e5f1277800db3ab7cb11faf85eb2569e1213f7d8e55003c07b42",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/Info.plist",
+      "size_bytes": 1060,
+      "sha256": "f253e89c512b3a9a81bc5cdd7a14bf932470f835f261654a808ea4549cd94aad",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/Runner/MainFlutterWindow.swift",
+      "size_bytes": 388,
+      "sha256": "65c9613c11bcedfa51416b16c975d8ba6ff12b405fc19d60db8755d92e86d9fe",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/macos/RunnerTests/RunnerTests.swift",
+      "size_bytes": 290,
+      "sha256": "6bc180bc77c7def7a21d197233e25dff42cc493ab9d294632edafc18fdf0ac44",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/pubspec.yaml",
+      "size_bytes": 517,
+      "sha256": "8dda921eec9af702152d8ee568118424b6336376996e95211d4ab4b4d09e6dbe",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "flutter_y60_catalog/test/widget_test.dart",
+      "size_bytes": 1612,
+      "sha256": "c351c52380106f52d035b518b57c60d9f0cc84af2d263b25d57cb578552578ee",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "flutter_y60_catalog/web/favicon.png",
+      "size_bytes": 917,
+      "sha256": "7ab2525f4b86b65d3e4c70358a17e5a1aaf6f437f99cbcc046dad73d59bb9015",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/web/icons/Icon-192.png",
+      "size_bytes": 5292,
+      "sha256": "3dce99077602f70421c1c6b2a240bc9b83d64d86681d45f2154143310c980be3",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/web/icons/Icon-512.png",
+      "size_bytes": 8252,
+      "sha256": "baccb205ae45f0b421be1657259b4943ac40c95094ab877f3bcbe12cd544dcbe",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/web/icons/Icon-maskable-192.png",
+      "size_bytes": 5594,
+      "sha256": "d2c842e22a9f4ec9d996b23373a905c88d9a203b220c5c151885ad621f974b5c",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/web/icons/Icon-maskable-512.png",
+      "size_bytes": 20998,
+      "sha256": "6aee06cdcab6b2aef74b1734c4778f4421d2da100b0ff9e52b21b55240202929",
+      "type": "image/png"
+    },
+    {
+      "path": "flutter_y60_catalog/web/index.html",
+      "size_bytes": 1525,
+      "sha256": "a303ec64ab70d36d5999e5e60e02c8ce3eaf4f474a72373229ac75f1cccc74c8",
+      "type": "text/html"
+    },
+    {
+      "path": "flutter_y60_catalog/web/manifest.json",
+      "size_bytes": 916,
+      "sha256": "9242f5bf4b36cb2e111446ab2d36c708af68e71cab7d177d3f9b923a35950669",
+      "type": "application/json"
+    },
+    {
+      "path": "flutter_y60_catalog/windows/CMakeLists.txt",
+      "size_bytes": 4156,
+      "sha256": "5cfa6829e47964d1e34802c4d0a6fce58861ed2932fecfe9d28fd580873c689c",
+      "type": "text/plain"
+    },
+    {
+      "path": "flutter_y60_catalog/windows/flutter/CMakeLists.txt",
+      "size_bytes": 3742,
+      "sha256": "1fe418971b6f41bb35ceb3d64113a835f3f6f171ecaa707bf232492b57a588d6",
+      "type": "text/plain"
+    },
+    {
+      "path": "flutter_y60_catalog/windows/runner/CMakeLists.txt",
+      "size_bytes": 1796,
+      "sha256": "34119ec122e36940235ef4bc245fcfb43b6960ed443e28af1a8d833a81209b9e",
+      "type": "text/plain"
+    },
+    {
+      "path": "flutter_y60_catalog/windows/runner/resources/app_icon.ico",
+      "size_bytes": 33772,
+      "sha256": "c098d3fc85cacff98b8e69811b48e9f0d852fcee278132d794411d978869cbf8",
+      "type": "image/x-icon"
+    },
+    {
+      "path": "front_left_hoodledge_splash_cover_card.jpg",
+      "size_bytes": 329212,
+      "sha256": "1b5b61573f14ff02bf01603d4e60ca02464619225050bee22889665a1017ba55",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "index.html",
+      "size_bytes": 12095,
+      "sha256": "8c8529fe213489a6e952514c043ac874ce9ddbd3f1b0b9912ef550bcc2870abf",
+      "type": "text/html"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob.xcodeproj/project.pbxproj",
+      "size_bytes": 12166,
+      "sha256": "57da1ccdf1ad1c809ce7a57a6cc7a6bbc6536c3c6cdf33a02b3177a628fa4997",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/AppDelegate.swift",
+      "size_bytes": 584,
+      "sha256": "bcc9442a83bb520ede5da51da609c9844ded66b02ebb2a9d62a2ef5b5b234bf1",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "size_bytes": 1208,
+      "sha256": "009c8eb6e07b17240c4ed7cd9469d2bca89001f4be7e7bd23ccd9cfbc386e765",
+      "type": "application/json"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-1024.png",
+      "size_bytes": 14358,
+      "sha256": "4e0ac2b5281a50e9f5967e56379ad1878312e8426d0615428966cd2dacf11877",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-20@2x.png",
+      "size_bytes": 1141,
+      "sha256": "67d8bf3d0a98674d07c6605f1834cc37ea2bc6cfe5d4d3d279c184ae05445f4c",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-20@3x.png",
+      "size_bytes": 1644,
+      "sha256": "c9f61fcda697808f59a7cfcf0b7ff58862e97e73f449163e298b34052a0bbc0d",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-29@2x.png",
+      "size_bytes": 1520,
+      "sha256": "9d18279bac38b3b25c73d4d846d918b38da47ad8d2ea3f588bed43929617a887",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-29@3x.png",
+      "size_bytes": 2173,
+      "sha256": "3b112767865a1d6af534528ad18954614a6a67803c91144abe807b33da6fcaaf",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-40@2x.png",
+      "size_bytes": 2033,
+      "sha256": "ab638d2f2ca222f0cab4d0e2b63540dd6e80505a18857fb825d9145b477b0206",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-40@3x.png",
+      "size_bytes": 2986,
+      "sha256": "ee44554eb2de749c6f561cbd536feae592dbab34ae29eed7ce5cdf0efa9145fc",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-60@2x.png",
+      "size_bytes": 2986,
+      "sha256": "ee44554eb2de749c6f561cbd536feae592dbab34ae29eed7ce5cdf0efa9145fc",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-60@3x.png",
+      "size_bytes": 4441,
+      "sha256": "3fad6f5777eae7b31e17fdb6b788ed92d13c014bfd3ff9bc9ba766a22dd796f1",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-76@1x.png",
+      "size_bytes": 1959,
+      "sha256": "73b144134bab7de114f3f5b5ebdd69167ec7d9e9f5891d19129394762b41110e",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-76@2x.png",
+      "size_bytes": 3690,
+      "sha256": "5abef29c07cf080c465a74baa02b85cdefb5656d8cb8d39e8ea896e461756bb6",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/AppIcon.appiconset/Icon-83.5@2x.png",
+      "size_bytes": 4050,
+      "sha256": "bc3e35f7eb1cdedba43fd22ebe9183a253ba60a463ef0b2ae2b21c3fb06ea59b",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Assets.xcassets/Contents.json",
+      "size_bytes": 63,
+      "sha256": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+      "type": "application/json"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Info.plist",
+      "size_bytes": 1678,
+      "sha256": "3d4850ee8dc9c13a9cf4b5fbdbbd97472026f3e2198e8ad7175f902f56f73b02",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/SceneDelegate.swift",
+      "size_bytes": 513,
+      "sha256": "449e7c626148e1e2a0504cf67e61f9c857dd4dc67acb9480f56bde7a3545ef46",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/app.js",
+      "size_bytes": 31934,
+      "sha256": "3571faa77e418e40f18052291ef35df21b333300f4109f316901403f899043d7",
+      "type": "text/javascript"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/backgrounds/batal-droob-patrol.jpg",
+      "size_bytes": 291234,
+      "sha256": "933be6619e23bcce408747c2b406558df7c1f72705daa2a5db1a859f5f4aa689",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/icons/apple-touch-icon.png",
+      "size_bytes": 2015,
+      "sha256": "5061a3320ec1132ea7c08889e9e986cddfc5f6ac996aeefd99efbf934beb12e3",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/icons/icon-192.png",
+      "size_bytes": 2107,
+      "sha256": "ed127c5978d14a0a3296068173756d509efbae583609e49ea37c57a2a06a14a1",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/icons/icon-512.png",
+      "size_bytes": 6301,
+      "sha256": "ca2943f58cc18fd0b5d49b2338044ec4ef4a858c2431452c9fd35821318f7056",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y60.jpg",
+      "size_bytes": 157904,
+      "sha256": "bdd848cc790bf43e6985498eba638b655fb52495cf9618de1cfb3107cc778711",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y60.png",
+      "size_bytes": 2775016,
+      "sha256": "c00f98ddfff5045cf73eef4decaa88ea33f018b46e69111a6f9b853218900733",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y61.jpg",
+      "size_bytes": 154689,
+      "sha256": "9c9a898cd8a5e8726647f5d78b05554eb035baf9a4bb7e82c851b5704cc16443",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y61.png",
+      "size_bytes": 2608726,
+      "sha256": "5f4a07a5ecab6036ffa55ddf7353dc99d43a9fe578ca40df67852b4bbcb51895",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y62.jpg",
+      "size_bytes": 28604,
+      "sha256": "f7cc1748283f54cb1e0e02097158469cc88e1130e5eee5106eaddc4d0d1f3238",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y62.png",
+      "size_bytes": 2241309,
+      "sha256": "d1d8ee2807b32f3cb92132bac795b59fea5661f155703e068da9b61cb2895497",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y63.jpg",
+      "size_bytes": 121708,
+      "sha256": "76064586b8cf0219f9959fcead2b37bed14af299f77c590aa71cbdc6687c66c1",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y63.png",
+      "size_bytes": 2270951,
+      "sha256": "9d50789cab87f494fed8451bba7dada7bec020c6ebdc3769c8d5e62ce7dfc51b",
+      "type": "image/png"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/assets/models/patrol-y63.webp",
+      "size_bytes": 29980,
+      "sha256": "4b9013f5311686c1a009afe18b3ba6b0f2d0a1468f33ae10d41b5eb43eed1f35",
+      "type": "image/webp"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/data/y60_app_catalog.json",
+      "size_bytes": 12743285,
+      "sha256": "15fa946dc94bf1ddb48c4dff5c9d4250f3f870c52f7781e80daa5e1e16f5db4a",
+      "type": "application/json"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/index.html",
+      "size_bytes": 12095,
+      "sha256": "8c8529fe213489a6e952514c043ac874ce9ddbd3f1b0b9912ef550bcc2870abf",
+      "type": "text/html"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/privacy.html",
+      "size_bytes": 2442,
+      "sha256": "964b7e40a65dc8aa951cedc38ed2af266014a412d6496f473bc25f00d6c4733c",
+      "type": "text/html"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/service-worker.js",
+      "size_bytes": 965,
+      "sha256": "798fd973a1e6b19cb9b0f3625351fe39b3a38870095a324402a3e2475f8e001a",
+      "type": "text/javascript"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/styles.css",
+      "size_bytes": 20521,
+      "sha256": "59fb60f10d8727de4e5f1719d2dd04544ab96612ec6da81e737048d4e2226921",
+      "type": "text/css"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/Web/support.html",
+      "size_bytes": 1311,
+      "sha256": "610013cf6e8aef1365f3019f20ce45822bf91840e020ce91cdb441f238ca6039",
+      "type": "text/html"
+    },
+    {
+      "path": "ios/BatalAlDroob/BatalAlDroob/WebViewController.swift",
+      "size_bytes": 1408,
+      "sha256": "06b73ea02b5bde7be8bc88c7894ffabdc0e6123f797df85eb72e28796868f31a",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "ios/BatalAlDroob/README.md",
+      "size_bytes": 525,
+      "sha256": "c92ef27f1b1dd4fbcbfa930b71dbbdfe68a98241d1114670df38fc18cc561af8",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "nissan-patrol/README.md",
+      "size_bytes": 958,
+      "sha256": "e758ff3c7b23f5aa257d8d237894e1acded52abbd1eb1bbabd0aa9c40769acba",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "nissan-patrol/maintenance-checklist.md",
+      "size_bytes": 1561,
+      "sha256": "16aade7fb79462c7f16ff8c8b1d8c78f0f72a3ca24acbd7d61d752a8b624ccb7",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "nissan-patrol/overview.md",
+      "size_bytes": 1421,
+      "sha256": "77279ff16a74ad50636b9e2f0ceef3b1661c6b8a398cafed218e125f045220e5",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "nissan-patrol/specs-2026.json",
+      "size_bytes": 1130,
+      "sha256": "bbe1a13ac22051c9a7139eab3c3024cc0084f3338ecdf4fbc244efabd26bd06a",
+      "type": "application/json"
+    },
+    {
+      "path": "notes.md",
+      "size_bytes": 60,
+      "sha256": "8db337d356e7606e1042a8e74ef9654525c9a493fadae92444a639cb507556d5",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "output/saip/aman2030_saip_quality_manifest.json",
+      "size_bytes": 2604,
+      "sha256": "916ec2f042ac7d8fae8fd452f86d14cba806ac2c57c38339026ef9e3ad65bf0f",
+      "type": "application/json"
+    },
+    {
+      "path": "output/saip/aman2030_saip_scientific_dossier.docx",
+      "size_bytes": 751489,
+      "sha256": "09527cfbc967b1f583fd7d673247e1b5ad3d8c9610f6cd956a7e7b754571e317",
+      "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    },
+    {
+      "path": "output/saip/aman2030_saip_scientific_dossier.html",
+      "size_bytes": 361996,
+      "sha256": "2b19b40761a825a42ed66d14b421c5edd91f2b1af86c38751069e07bccf2a8c3",
+      "type": "text/html"
+    },
+    {
+      "path": "output/saip/aman2030_saip_scientific_dossier.pdf",
+      "size_bytes": 982431,
+      "sha256": "1054021f63e674c228b924a7999bfb0b7f03793597648ab0dc96c14eb700103d",
+      "type": "application/pdf"
+    },
+    {
+      "path": "output/saip/saher2030_national_smart_network_manifest.json",
+      "size_bytes": 3044,
+      "sha256": "7819d496caa7986f965b812ffb07b831627cfbd20443785b72370714e04b544a",
+      "type": "application/json"
+    },
+    {
+      "path": "output/saip/saher2030_national_smart_network_saip_submission.html",
+      "size_bytes": 285577,
+      "sha256": "08e99405d138878bbd57810dc826b6422f198c40c3ae4a28bfcef9bc05b1c8ee",
+      "type": "text/html"
+    },
+    {
+      "path": "output/saip/saher2030_national_smart_network_saip_submission.pdf",
+      "size_bytes": 648516,
+      "sha256": "6cd77c371cd520ddea55976dec90b788fac9eae478d3d7e169caf7e4cb442c0a",
+      "type": "application/pdf"
+    },
+    {
+      "path": "output/saip/saher2030_national_smart_network_saip_submission_editable.doc",
+      "size_bytes": 285577,
+      "sha256": "08e99405d138878bbd57810dc826b6422f198c40c3ae4a28bfcef9bc05b1c8ee",
+      "type": "application/msword"
+    },
+    {
+      "path": "patrol-hub-redesign/app.js",
+      "size_bytes": 6959,
+      "sha256": "fb7b785a1f9d49dc2d4fb097a79dedf5eaddfb400a7b2b809a3674120ba03800",
+      "type": "text/javascript"
+    },
+    {
+      "path": "patrol-hub-redesign/index.html",
+      "size_bytes": 5149,
+      "sha256": "05070559d0928b666d40b001d39407b7b8057e8b66e1fd29c83778be3e5aa42c",
+      "type": "text/html"
+    },
+    {
+      "path": "patrol-hub-redesign/styles.css",
+      "size_bytes": 8342,
+      "sha256": "a09338d6a5e0c4be151a07fd127499c8972f48a1f4f0b1364a32d2f210f1bbc5",
+      "type": "text/css"
+    },
+    {
+      "path": "patrol_wgy60_catalog_ar.pdf",
+      "size_bytes": 341479,
+      "sha256": "df253f2b96254ba3e1ecb940fdcaef1bfce9feb9d285374a355fbf616fdc63dc",
+      "type": "application/pdf"
+    },
+    {
+      "path": "patrol_wgy60_epc_original_verified_cropped_arabicكتالوج السفاري عربي.pdf",
+      "size_bytes": 355414,
+      "sha256": "e9ace7efcf3069a936a79233313a04c31fbc6fdb1ef36a0458102df1df2e2d11",
+      "type": "application/pdf"
+    },
+    {
+      "path": "privacy.html",
+      "size_bytes": 2442,
+      "sha256": "964b7e40a65dc8aa951cedc38ed2af266014a412d6496f473bc25f00d6c4733c",
+      "type": "text/html"
+    },
+    {
+      "path": "scripts/audit_y60_database.py",
+      "size_bytes": 15267,
+      "sha256": "f8575139b806fe613b32c4685c8990110d02a44897985b24a3f477bffe00b589",
+      "type": "text/x-python"
+    },
+    {
+      "path": "scripts/build_app_catalog.py",
+      "size_bytes": 4433,
+      "sha256": "591e267dbe96bf70803a05e4af48f6aa8cb72cc48f6993795a421bb9113e5770",
+      "type": "text/x-python"
+    },
+    {
+      "path": "scripts/build_app_database.py",
+      "size_bytes": 13906,
+      "sha256": "18a6b15f89ee2d8c0aa5b0c1138d5d63ae20b4331f1cc611c5c6bfd2787953e7",
+      "type": "text/x-python"
+    },
+    {
+      "path": "scripts/export_docx_with_word.ps1",
+      "size_bytes": 1277,
+      "sha256": "66db512c24400f3c5c3c2307767a94125635a814fa6cc30a7f3fdb69679910af",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "scripts/extract_y60_catalogs.py",
+      "size_bytes": 10333,
+      "sha256": "5fe33d9a1b7765a0e900c6d052b08d0bc68533ea0607855ba009cf824fd6fbef",
+      "type": "text/x-python"
+    },
+    {
+      "path": "scripts/extract_y61_7zap.py",
+      "size_bytes": 8170,
+      "sha256": "40948cc690a217b5c6904dee5a50cd83cf255861d124d073288c70406ae3e9fa",
+      "type": "text/x-python"
+    },
+    {
+      "path": "scripts/print_html_pdf_edge.ps1",
+      "size_bytes": 4608,
+      "sha256": "f8d78b224c59d69fd5d83fcf9479a7e23112f5453808177ec05a3fddc0b76cc2",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "scripts/screenshot_html_edge.ps1",
+      "size_bytes": 1162,
+      "sha256": "d5d82e0c41b6c6f8812622e6264d264f47bb52e83763f643dee9b977cd88f6e6",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "scripts/sync_ios_web.py",
+      "size_bytes": 900,
+      "sha256": "350882a95a9fd4d56adf324ce4157c6457cbab0f20b6761e997155bb35be6b0e",
+      "type": "text/x-python"
+    },
+    {
+      "path": "server.py",
+      "size_bytes": 5609,
+      "sha256": "429822733f43091a812ea5671c0196771118103a5d913619d6bb173c179a6e3d",
+      "type": "text/x-python"
+    },
+    {
+      "path": "service-worker.js",
+      "size_bytes": 965,
+      "sha256": "798fd973a1e6b19cb9b0f3625351fe39b3a38870095a324402a3e2475f8e001a",
+      "type": "text/javascript"
+    },
+    {
+      "path": "styles.css",
+      "size_bytes": 20521,
+      "sha256": "59fb60f10d8727de4e5f1719d2dd04544ab96612ec6da81e737048d4e2226921",
+      "type": "text/css"
+    },
+    {
+      "path": "support.html",
+      "size_bytes": 1311,
+      "sha256": "610013cf6e8aef1365f3019f20ce45822bf91840e020ce91cdb441f238ca6039",
+      "type": "text/html"
+    },
+    {
+      "path": "tools/add_arabic_part_names_to_cards.py",
+      "size_bytes": 11884,
+      "sha256": "9e1626f11bbee109396e02d02e9cf0cb7d02f9eb9953c36cbcdc69344f857d6f",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_body_exterior_complete_pdf.py",
+      "size_bytes": 13846,
+      "sha256": "fab12a205a533dfcece9976371374c651909fd352786730637eea4f6871b8839",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_catalog_search_index.py",
+      "size_bytes": 8494,
+      "sha256": "118c8de12a73149d124fc12c30a160776d0550c5535d21135630ddf491b10ff3",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_catalog_section_index.py",
+      "size_bytes": 3034,
+      "sha256": "854e1b951a4bb39dd04ce58ee2f8d32137c3d594e5e317888002fa53a5227c10",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_hvac_complete_pdf.py",
+      "size_bytes": 11191,
+      "sha256": "a92e7afcc21ae2016936b70a3372f4005abee1727f206098abb323dcecac02a7",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_interior_trim_complete_pdf.py",
+      "size_bytes": 12862,
+      "sha256": "3953cb529ebdcfe456d1600e86d79ac0ef29a7cb5a1df683617f25a3b045527d",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_ios_parts_seed.py",
+      "size_bytes": 5451,
+      "sha256": "d3160a4265b17d940d2cc53da3e51b9f0b94c9b4f849d2098c9ebc3a51998ab9",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_mechanical_complete_pdf.py",
+      "size_bytes": 17297,
+      "sha256": "a15b4bb1b7efb4e2946fbbebc01a30d63aa9913c8b2d066c889d2757b46aa81a",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_special_accessories_complete_pdf.py",
+      "size_bytes": 13660,
+      "sha256": "a21e85f4ffd63ee0634e1e089e3b62644f4494f0ead9f1bbfb80256ecde1a82d",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_vehicle_profile_pdf.py",
+      "size_bytes": 7946,
+      "sha256": "48c14dfc8c92194ce7f85bfae16d603d3e9bde418ec4c794537846125d4db808",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/build_wiring_complete_pdf.py",
+      "size_bytes": 14124,
+      "sha256": "89ca407e3bc9ed774bc6a16a704495d6214ce64b10a1856f43595243183d76dd",
+      "type": "text/x-python"
+    },
+    {
+      "path": "tools/continue_flutter_install.ps1",
+      "size_bytes": 2245,
+      "sha256": "399b018d8e854110681cf894e758ffb4309949dcb88040074489cd0ce2d99dd6",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/finish_android_sdk_setup.ps1",
+      "size_bytes": 1657,
+      "sha256": "16829fe14f4065dc31ff3e87770707a9237120acd6e18c7e8cadab9b92f18d16",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/install_android_studio_windows.ps1",
+      "size_bytes": 5650,
+      "sha256": "096434a8f57efb3cb61c41656af7892c8f0221335a2f0108280d99bbb6384ef5",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/install_flutter_windows.ps1",
+      "size_bytes": 3599,
+      "sha256": "d3a6725ac97403d8793f634a6e4c69330bbd02203760f3d677214fbd3695f69a",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/print_six_complete_cards.ps1",
+      "size_bytes": 1792,
+      "sha256": "7fc678607555bf04be4a6671effe4dac1390d1869195ec2ede7a98f77382ac43",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/start_flutter_web.ps1",
+      "size_bytes": 721,
+      "sha256": "61bae7b1dabf757eeaf9bbd1df3506a6e1f8e7df31f13e891a14e800dd10ce50",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/start_flutter_web_lan.ps1",
+      "size_bytes": 1091,
+      "sha256": "5ff6062564e4e8e42f4a7bfdc4ab5b913cbf7189098e9e47cece4c969f8951b8",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/start_static_web_lan.ps1",
+      "size_bytes": 1070,
+      "sha256": "74c465ed52873288ebd4d1457a0ce179959c4f237442c3201b276eb5b7e2c820",
+      "type": "application/octet-stream"
+    },
+    {
+      "path": "tools/static_file_server.dart",
+      "size_bytes": 1632,
+      "sha256": "251b78a86995b1c8559e993ebc3bb3d2e807d68ea062f7107874d3b417b17571",
+      "type": "application/vnd.dart"
+    },
+    {
+      "path": "بطاقة مفاتيح المكيف.jpg",
+      "size_bytes": 866473,
+      "sha256": "881f4a632f0db0ad929e5561d9d249d152354f38afc6c00d624a7df509f96b0e",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "مرفق ملف PDF شامل لكل ما يخص المكيف والثلاجات والهوايات في كتالوج Patrol Safari Y60 حسب رقم الهيكل WGY60-348567..pdf",
+      "size_bytes": 1233218,
+      "sha256": "2fb3b8ec9021956c95bbe8ec97bc1c77ed6ba4e54ab3bb83f7efddcfbf7c62bd",
+      "type": "application/pdf"
+    },
+    {
+      "path": "‎⁨فتح Codex⁩.png",
+      "size_bytes": 508444,
+      "sha256": "a618f71c33b1ff6922a2637fca7b05e259d8b8e52dff61b39324496652dcfa0d",
+      "type": "image/png"
+    },
+    {
+      "path": "‎⁨كتالوج السفاري⁩.pdf",
+      "size_bytes": 265899,
+      "sha256": "3d97c7e2a689704810b53b54fd3017b89b4142b57ed667c452a33e2afd086622",
+      "type": "application/pdf"
+    }
+  ]
+}
