@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="DesertTrail">
+  <trk>
+    <name>مسار وادي مخفي</name>
+    <trkseg>
+      <trkpt lat="24.6028" lon="46.5535"><ele>735</ele></trkpt>
+      <trkpt lat="24.6104" lon="46.5660"><ele>742</ele></trkpt>
+      <trkpt lat="24.6210" lon="46.5796"><ele>751</ele></trkpt>
+      <trkpt lat="24.6352" lon="46.5927"><ele>766</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>
