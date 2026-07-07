@@ -277,6 +277,44 @@ def app_overview(local_user_id):
     }
 
 
+def load_json_file(relative_path, fallback):
+    path = ROOT / relative_path
+    if not path.exists():
+        return fallback
+    with path.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def load_store_directory():
+    return load_json_file(
+        Path("data") / "store_directory.json",
+        {"schema_version": 1, "verified_stores": [], "categories": []},
+    )
+
+
+def load_request_plans():
+    return load_json_file(
+        Path("data") / "part_request_business_model.json",
+        {"schema_version": 1, "customer_paid_requests": []},
+    )
+
+
+def load_part_requests(local_user_id, limit=50):
+    with sqlite3.connect(DB_PATH) as con:
+        init_app_tables(con)
+        return rows(
+            con,
+            """
+            SELECT *
+            FROM app_part_requests
+            WHERE local_user_id = ?
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (local_user_id, limit),
+        )
+
+
 def part_payload(con, part):
     part_number = part["part_number"]
     part["years"] = [row["year"] for row in rows(con, "SELECT year FROM part_years WHERE part_number = ? ORDER BY year", (part_number,))]
@@ -374,7 +412,15 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_HEAD(self):
         parsed = urlparse(self.path)
-        if parsed.path in {"/api/catalog", "/api/parts", "/api/stats", "/api/app-overview"}:
+        if parsed.path in {
+            "/api/catalog",
+            "/api/parts",
+            "/api/stats",
+            "/api/app-overview",
+            "/api/stores",
+            "/api/request-plans",
+            "/api/part-requests",
+        }:
             self.send_json_headers()
             return
         super().do_HEAD()
@@ -402,6 +448,15 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if parsed.path == "/api/app-overview":
             self.send_json(app_overview(app_user_id(self.headers)))
+            return
+        if parsed.path == "/api/stores":
+            self.send_json(load_store_directory())
+            return
+        if parsed.path == "/api/request-plans":
+            self.send_json(load_request_plans())
+            return
+        if parsed.path == "/api/part-requests":
+            self.send_json({"ok": True, "part_requests": load_part_requests(app_user_id(self.headers))})
             return
         super().do_GET()
 

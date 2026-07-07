@@ -576,6 +576,22 @@
             <button class="request-submit" type="submit" data-i18n="requestSubmit">دفع الرسوم وتجهيز الطلب</button>
             <div class="request-status" id="partRequestStatus" role="status"></div>
           </form>
+
+          <div class="request-history-panel">
+            <div class="mini-heading">
+              <h3 data-i18n="requestHistoryTitle">طلبات القطع المحفوظة</h3>
+              <span data-i18n="requestHistorySubtitle">تظهر آخر الطلبات المحفوظة محلياً أو عبر API المحلي.</span>
+            </div>
+            <div class="request-history-list" id="partRequestHistory"></div>
+          </div>
+
+          <div class="verified-stores-panel">
+            <div class="mini-heading">
+              <h3 data-i18n="verifiedStoresTitle">المتاجر الموثقة</h3>
+              <span data-i18n="verifiedStoresSubtitle">روابط شراء وبحث لا تظهر إلا إذا كانت موثقة من مصدر رسمي.</span>
+            </div>
+            <div class="verified-store-grid" id="verifiedStoresGrid"></div>
+          </div>
         </section>
 
         <section class="shared-fitment-section" data-section="shared-fitment" aria-label="القطع المشتركة بين الموديلات">

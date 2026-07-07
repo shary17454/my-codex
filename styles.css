@@ -1774,6 +1774,112 @@ h1 {
   display: grid;
 }
 
+.request-history-panel,
+.verified-stores-panel {
+  display: grid;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid rgba(212, 175, 55, 0.16);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.mini-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.mini-heading h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.mini-heading span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.request-history-list,
+.verified-store-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.request-history-card,
+.verified-store-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.14);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.request-history-card div,
+.verified-store-card div:first-child {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.request-history-card em,
+.verified-store-card em {
+  color: var(--gold);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.request-history-card strong,
+.verified-store-card strong {
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.request-history-card span,
+.verified-store-card span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.request-history-card button,
+.store-actions a {
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--gold);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.store-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed rgba(212, 175, 55, 0.22);
+  border-radius: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 .request-status.success {
   border-color: rgba(34, 197, 94, 0.36);
 }
@@ -2524,6 +2630,25 @@ body::before {
 .request-plan-grid,
 .part-request-form fieldset {
   grid-template-columns: 1fr;
+}
+
+.request-history-card,
+.verified-store-card {
+  grid-template-columns: 1fr;
+}
+
+.request-history-card button,
+.store-actions {
+  justify-self: stretch;
+}
+
+.store-actions {
+  justify-content: stretch;
+}
+
+.store-actions a {
+  flex: 1 1 130px;
+  text-align: center;
 }
 
 .app-dock {

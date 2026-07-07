@@ -2,6 +2,8 @@ let catalog = { parts: [], sources: [] };
 let catalogSearchIndex = { entries: [], stats: [] };
 let patrolCatalogDatabase = { summary: null, files: [] };
 let patrolFullCatalogIndex = { files: [], summary: null };
+let storeDirectory = { verified_stores: [], categories: [] };
+let savedPartRequests = [];
 let parts = [];
 let activeFilter = "engine";
 let activeModel = "Y60";
@@ -114,6 +116,8 @@ const sharedFitmentGrid = document.getElementById("sharedFitmentGrid");
 const sharedFitmentCount = document.getElementById("sharedFitmentCount");
 const partRequestForm = document.getElementById("partRequestForm");
 const partRequestStatus = document.getElementById("partRequestStatus");
+const partRequestHistory = document.getElementById("partRequestHistory");
+const verifiedStoresGrid = document.getElementById("verifiedStoresGrid");
 const vehicleProfileForm = document.getElementById("vehicleProfileForm");
 const vehicleProfileSummary = document.getElementById("vehicleProfileSummary");
 const maintenanceForm = document.getElementById("maintenanceForm");
@@ -211,6 +215,17 @@ const translations = {
     requestRequired: "أدخل اسم القطعة أو رقم القطعة على الأقل.",
     requestSubmitted: "تم حفظ طلب القطعة بعد الدفع. يمكنك نسخ النص وإرساله للمتاجر.",
     requestPlanLabel: "رسوم الطلب",
+    requestHistoryTitle: "طلبات القطع المحفوظة",
+    requestHistorySubtitle: "تظهر آخر الطلبات المحفوظة محلياً أو عبر API المحلي.",
+    requestHistoryEmpty: "لا توجد طلبات محفوظة بعد.",
+    requestCopyDraft: "نسخ نص الطلب",
+    requestCopied: "تم نسخ نص الطلب.",
+    verifiedStoresTitle: "المتاجر الموثقة",
+    verifiedStoresSubtitle: "روابط شراء وبحث لا تظهر إلا إذا كانت موثقة من مصدر رسمي.",
+    verifiedStoresEmpty: "لا توجد متاجر موثقة مفعلة بعد.",
+    storeOpenWebsite: "فتح المتجر",
+    storeSearchPart: "البحث بالرقم",
+    storeVerification: "التوثيق",
     requestTypeOem: "أصلي وكالة OEM",
     requestTypeManufacturer: "OEM Manufacturer",
     requestTypeAftermarket: "بديل تجاري",
@@ -461,6 +476,17 @@ const translations = {
     requestRequired: "Enter either the part name or part number.",
     requestSubmitted: "Part request saved after payment. You can copy the text and send it to stores.",
     requestPlanLabel: "Request fee",
+    requestHistoryTitle: "Saved part requests",
+    requestHistorySubtitle: "Shows the latest requests saved locally or through the local API.",
+    requestHistoryEmpty: "No saved requests yet.",
+    requestCopyDraft: "Copy request text",
+    requestCopied: "Request text copied.",
+    verifiedStoresTitle: "Verified stores",
+    verifiedStoresSubtitle: "Buying and search links appear only when verified from an official source.",
+    verifiedStoresEmpty: "No verified stores enabled yet.",
+    storeOpenWebsite: "Open store",
+    storeSearchPart: "Search by number",
+    storeVerification: "Verification",
     requestTypeOem: "OEM genuine",
     requestTypeManufacturer: "OEM Manufacturer",
     requestTypeAftermarket: "Aftermarket",
@@ -919,6 +945,8 @@ function applyLanguage() {
   renderSharedFitment();
   renderVehicleProfile();
   renderMaintenanceLog();
+  renderVerifiedStores();
+  renderPartRequestHistory();
   renderParts();
 }
 
@@ -1419,9 +1447,157 @@ function savePartRequest(request, plan) {
   stored.unshift(record);
   localStorage.setItem("batalPartRequests", JSON.stringify(stored.slice(0, 50)));
   postJsonSafe("/api/part-requests", record).then((result) => {
-    if (result.ok) showPaymentStatus("تم حفظ الطلب محلياً ومزامنته مع قاعدة التطبيق", "success");
+    if (result.ok) {
+      showPaymentStatus("تم حفظ الطلب محلياً ومزامنته مع قاعدة التطبيق", "success");
+      loadPartRequestHistory();
+    }
   });
+  savedPartRequests = [record, ...savedPartRequests.filter((item) => item.id !== record.id)].slice(0, 50);
+  renderPartRequestHistory();
   updatePartRequestStatus(t("requestSubmitted"), "success", draft);
+}
+
+function normalizeRemotePartRequest(row) {
+  return {
+    id: row.local_id || `DB-${row.id}`,
+    created_at: row.created_at || new Date().toISOString(),
+    plan_id: row.plan_id || "basic",
+    product_id: row.product_id || "",
+    fee_sar: Number(row.fee_sar || 0),
+    currency: row.currency || "SAR",
+    status: row.status || "saved",
+    request: {
+      generation: row.generation || "",
+      year: row.year || "",
+      vin: row.vin || "",
+      engine: row.engine || "",
+      transmission: row.transmission || "",
+      part_number: row.part_number || "",
+      part_name: row.part_name || "",
+      part_type: row.part_type || "",
+      goal: row.goal || "",
+      notes: row.notes || ""
+    },
+    draft: row.draft || ""
+  };
+}
+
+function mergeSavedRequests(localRequests, remoteRequests) {
+  const merged = [];
+  const seen = new Set();
+  [...localRequests, ...remoteRequests].forEach((request) => {
+    const key = request.id || `${request.created_at}-${request.draft}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    merged.push(request);
+  });
+  return merged
+    .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+    .slice(0, 50);
+}
+
+async function loadPartRequestHistory() {
+  const localRequests = localRecords("batalPartRequests");
+  try {
+    const remote = await fetchFirstJson(["/api/part-requests"]);
+    const remoteRequests = Array.isArray(remote.part_requests)
+      ? remote.part_requests.map(normalizeRemotePartRequest)
+      : [];
+    savedPartRequests = mergeSavedRequests(localRequests, remoteRequests);
+  } catch {
+    savedPartRequests = localRequests;
+  }
+  renderPartRequestHistory();
+}
+
+async function loadServiceDirectories() {
+  try {
+    storeDirectory = await fetchFirstJson([
+      "/api/stores",
+      "data/store_directory.json",
+      "ios/BatalAlDroob/BatalAlDroob/Web/data/store_directory.json"
+    ]);
+  } catch {
+    storeDirectory = { verified_stores: [], categories: [] };
+  }
+  renderVerifiedStores();
+}
+
+function renderPartRequestHistory() {
+  if (!partRequestHistory) return;
+  if (!savedPartRequests.length) {
+    partRequestHistory.innerHTML = `<p class="empty-state">${t("requestHistoryEmpty")}</p>`;
+    return;
+  }
+  partRequestHistory.innerHTML = savedPartRequests.slice(0, 6).map((item) => {
+    const request = item.request || {};
+    const plan = partRequestPlans.find((entry) => entry.id === item.plan_id) || partRequestPlans[0];
+    const title = request.part_name || request.part_number || item.id;
+    const date = item.created_at ? new Date(item.created_at).toLocaleDateString(currentLang === "ar" ? "ar-SA" : "en-US") : "";
+    return `
+      <article class="request-history-card">
+        <div>
+          <em>${escapeHtml(date)} · ${escapeHtml(requestPlanLine(plan))}</em>
+          <strong>${escapeHtml(title)}</strong>
+          <span>${escapeHtml([request.generation, request.year, request.engine, request.transmission].filter(Boolean).join(" · ") || t("notSpecified"))}</span>
+        </div>
+        <button type="button" data-copy-request="${escapeHtml(item.id)}">${t("requestCopyDraft")}</button>
+      </article>
+    `;
+  }).join("");
+}
+
+function storeDisplayName(store) {
+  return currentLang === "ar"
+    ? (store.name_ar || store.name_en || store.id)
+    : (store.name_en || store.name_ar || store.id);
+}
+
+function storeSearchUrl(store) {
+  const samplePart = selectedPartId && !String(selectedPartId).startsWith("CAT-") ? selectedPartId : "";
+  const template = store.search_url_template || "";
+  if (samplePart && template) return template.replace("{part_number}", encodeURIComponent(samplePart));
+  return store.website || "#";
+}
+
+function renderVerifiedStores() {
+  if (!verifiedStoresGrid) return;
+  const stores = Array.isArray(storeDirectory.verified_stores) ? storeDirectory.verified_stores : [];
+  if (!stores.length) {
+    verifiedStoresGrid.innerHTML = `<p class="empty-state">${t("verifiedStoresEmpty")}</p>`;
+    return;
+  }
+  verifiedStoresGrid.innerHTML = stores.map((store) => {
+    const category = storeCategoryLabels[store.category]?.[currentLang] || store.category || "";
+    const verification = store.verification?.evidence_ar || store.verification?.status || t("verified");
+    return `
+      <article class="verified-store-card">
+        <div>
+          <em>${escapeHtml(category)}</em>
+          <strong>${escapeHtml(storeDisplayName(store))}</strong>
+          <span>${t("storeVerification")}: ${escapeHtml(verification)}</span>
+        </div>
+        <div class="store-actions">
+          ${store.website ? `<a href="${escapeHtml(store.website)}" target="_blank" rel="noopener">${t("storeOpenWebsite")}</a>` : ""}
+          <a href="${escapeHtml(storeSearchUrl(store))}" target="_blank" rel="noopener">${t("storeSearchPart")}</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function copyText(text) {
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(() => showPaymentStatus(t("requestCopied"), "success"));
+    return;
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  textarea.remove();
+  showPaymentStatus(t("requestCopied"), "success");
 }
 
 function requestPaidAccess(action) {
@@ -1880,9 +2056,11 @@ async function loadCatalog() {
       console.warn("Full patrol catalog index unavailable", fullCatalogError);
     }
     parts = mergeCatalogEntries(baseParts, catalogSearchIndex);
+    await Promise.all([loadServiceDirectories(), loadPartRequestHistory()]);
   } catch (error) {
     catalog = { parts: fallbackParts, sources: [] };
     parts = fallbackParts;
+    await Promise.all([loadServiceDirectories(), loadPartRequestHistory()]);
     console.warn("Using fallback catalog", error);
   }
   selectedPartId = parts[0]?.part_number || null;
@@ -2079,6 +2257,13 @@ function navigateMenuTarget(target) {
 }
 
 document.addEventListener("click", (event) => {
+  const copyButton = event.target.closest("[data-copy-request]");
+  if (copyButton) {
+    const item = savedPartRequests.find((request) => request.id === copyButton.dataset.copyRequest);
+    if (item?.draft) copyText(item.draft);
+    return;
+  }
+
   const button = event.target.closest("[data-menu-target]");
   if (!button) return;
   event.stopPropagation();
