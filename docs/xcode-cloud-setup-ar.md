@@ -6,7 +6,7 @@
 - الـ Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Version: `1.0`
-- Build: `30`
+- Build: `31`
 - Signing: `Automatic`
 - Team ID: `4HM66AD594`
 - Deployment Target: `iOS 15.0`
@@ -32,3 +32,4 @@
 - تم ربط `CFBundleShortVersionString` و `CFBundleVersion` بقيم Build Settings.
 - تم توسيع `.gitignore` لمنع أرشيفات Xcode وملفات IPA و dSYM من الدخول لاحقًا في Git.
 - لا تستخدم Xcode Beta في Xcode Cloud إلا إذا كان التطبيق يحتاج SDK غير متوفر في Xcode stable.
+- إذا ظهر خطأ `ITMS-90111` فالحل هو رفع Build جديد مبني بواسطة `Latest Release` في Xcode Cloud، وليس بواسطة Xcode beta المحلي.
