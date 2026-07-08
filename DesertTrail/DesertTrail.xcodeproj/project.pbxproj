@@ -1,0 +1,506 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0A1000100000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000100000000000000001 /* Assets.xcassets */; };
+		0A1000010000000000000001 /* DesertTrailApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000010000000000000001 /* DesertTrailApp.swift */; };
+		0A1000020000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000020000000000000001 /* ContentView.swift */; };
+		0A1000030000000000000001 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000030000000000000001 /* AppState.swift */; };
+		0A1000040000000000000001 /* TripModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000040000000000000001 /* TripModels.swift */; };
+		0A1000050000000000000001 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000050000000000000001 /* LocationManager.swift */; };
+		0A1000060000000000000001 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000060000000000000001 /* WeatherService.swift */; };
+		0A1000070000000000000001 /* CloudKitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000070000000000000001 /* CloudKitStore.swift */; };
+		0A1000080000000000000001 /* GPXParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000080000000000000001 /* GPXParser.swift */; };
+		0A1000090000000000000001 /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000090000000000000001 /* QRCodeGenerator.swift */; };
+		0A10000A0000000000000001 /* DesertMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000A0000000000000001 /* DesertMapView.swift */; };
+		0A10002A0000000000000001 /* HomeDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002A0000000000000001 /* HomeDashboardView.swift */; };
+		0A10002B0000000000000001 /* ActiveTripDriveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002B0000000000000001 /* ActiveTripDriveView.swift */; };
+		0A10000B0000000000000001 /* CompassPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000B0000000000000001 /* CompassPanel.swift */; };
+		0A10000C0000000000000001 /* PlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000C0000000000000001 /* PlannerView.swift */; };
+		0A10000D0000000000000001 /* CommunityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000D0000000000000001 /* CommunityView.swift */; };
+		0A10000E0000000000000001 /* HiddenPlaceForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000E0000000000000001 /* HiddenPlaceForm.swift */; };
+		0A10000F0000000000000001 /* EnvironmentBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000F0000000000000001 /* EnvironmentBanner.swift */; };
+		0A1000120000000000000001 /* OfflineMapStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000150000000000000001 /* OfflineMapStore.swift */; };
+		0A1000130000000000000001 /* OfflineMapsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000160000000000000001 /* OfflineMapsView.swift */; };
+		0A1000140000000000000001 /* ZoomableImageMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000170000000000000001 /* ZoomableImageMapView.swift */; };
+		0A1000110000000000000001 /* SampleRoute.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000110000000000000001 /* SampleRoute.gpx */; };
+		0A1000150000000000000001 /* AjajiSaudi.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000180000000000000001 /* AjajiSaudi.jpg */; };
+		0A1000160000000000000001 /* AjajiRiyadhRegion.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */; };
+		0A1000170000000000000001 /* AjajiMarkedPlans.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001A0000000000000001 /* AjajiMarkedPlans.jpg */; };
+		0A1000180000000000000001 /* PDFMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20001B0000000000000001 /* PDFMapView.swift */; };
+		0A1000190000000000000001 /* AjajiSaudi.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001C0000000000000001 /* AjajiSaudi.pdf */; };
+		0A10001A0000000000000001 /* AjajiRiyadhRegion.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001D0000000000000001 /* AjajiRiyadhRegion.pdf */; };
+		0A10001B0000000000000001 /* AjajiMarkedPlans.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001E0000000000000001 /* AjajiMarkedPlans.pdf */; };
+		0A10001C0000000000000001 /* PDFMapStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20001F0000000000000001 /* PDFMapStore.swift */; };
+		0A10001D0000000000000001 /* PDFImportPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000200000000000000001 /* PDFImportPicker.swift */; };
+		0A10001E0000000000000001 /* PDFSourceManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000210000000000000001 /* PDFSourceManagerView.swift */; };
+		0A10001F0000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000220000000000000001 /* PrivacyInfo.xcprivacy */; };
+		0A1000200000000000000001 /* Icon-60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000230000000000000001 /* Icon-60@3x.png */; };
+		0A1000210000000000000001 /* Icon-60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000240000000000000001 /* Icon-60@2x.png */; };
+		0A1000220000000000000001 /* Icon-76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000250000000000000001 /* Icon-76@2x.png */; };
+		0A1000230000000000000001 /* Icon-83.5@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000260000000000000001 /* Icon-83.5@2x.png */; };
+		0A1000240000000000000001 /* Icon-1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000270000000000000001 /* Icon-1024.png */; };
+		0A1000250000000000000001 /* AdvancedFeatureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000280000000000000001 /* AdvancedFeatureModels.swift */; };
+		0A1000260000000000000001 /* AdvancedToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000290000000000000001 /* AdvancedToolsView.swift */; };
+		0A10002C0000000000000001 /* RafiqAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002C0000000000000001 /* RafiqAPIClient.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0A2000010000000000000001 /* DesertTrailApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesertTrailApp.swift; sourceTree = "<group>"; };
+		0A2000020000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0A2000030000000000000001 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		0A2000040000000000000001 /* TripModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripModels.swift; sourceTree = "<group>"; };
+		0A2000050000000000000001 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		0A2000060000000000000001 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		0A2000070000000000000001 /* CloudKitStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitStore.swift; sourceTree = "<group>"; };
+		0A2000080000000000000001 /* GPXParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXParser.swift; sourceTree = "<group>"; };
+		0A2000090000000000000001 /* QRCodeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
+		0A20000A0000000000000001 /* DesertMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesertMapView.swift; sourceTree = "<group>"; };
+		0A20002A0000000000000001 /* HomeDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeDashboardView.swift; sourceTree = "<group>"; };
+		0A20002B0000000000000001 /* ActiveTripDriveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveTripDriveView.swift; sourceTree = "<group>"; };
+		0A20000B0000000000000001 /* CompassPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPanel.swift; sourceTree = "<group>"; };
+		0A20000C0000000000000001 /* PlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannerView.swift; sourceTree = "<group>"; };
+		0A20000D0000000000000001 /* CommunityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityView.swift; sourceTree = "<group>"; };
+		0A20000E0000000000000001 /* HiddenPlaceForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenPlaceForm.swift; sourceTree = "<group>"; };
+		0A20000F0000000000000001 /* EnvironmentBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentBanner.swift; sourceTree = "<group>"; };
+		0A2000150000000000000001 /* OfflineMapStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineMapStore.swift; sourceTree = "<group>"; };
+		0A2000160000000000000001 /* OfflineMapsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineMapsView.swift; sourceTree = "<group>"; };
+		0A2000170000000000000001 /* ZoomableImageMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageMapView.swift; sourceTree = "<group>"; };
+		0A2000110000000000000001 /* SampleRoute.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleRoute.gpx; sourceTree = "<group>"; };
+		0A2000100000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0A2000180000000000000001 /* AjajiSaudi.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiSaudi.jpg; sourceTree = "<group>"; };
+		0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiRiyadhRegion.jpg; sourceTree = "<group>"; };
+		0A20001A0000000000000001 /* AjajiMarkedPlans.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiMarkedPlans.jpg; sourceTree = "<group>"; };
+		0A20001B0000000000000001 /* PDFMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFMapView.swift; sourceTree = "<group>"; };
+		0A20001C0000000000000001 /* AjajiSaudi.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AjajiSaudi.pdf; sourceTree = "<group>"; };
+		0A20001D0000000000000001 /* AjajiRiyadhRegion.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AjajiRiyadhRegion.pdf; sourceTree = "<group>"; };
+		0A20001E0000000000000001 /* AjajiMarkedPlans.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = AjajiMarkedPlans.pdf; sourceTree = "<group>"; };
+		0A20001F0000000000000001 /* PDFMapStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFMapStore.swift; sourceTree = "<group>"; };
+		0A2000200000000000000001 /* PDFImportPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFImportPicker.swift; sourceTree = "<group>"; };
+		0A2000210000000000000001 /* PDFSourceManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFSourceManagerView.swift; sourceTree = "<group>"; };
+		0A2000220000000000000001 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		0A2000230000000000000001 /* Icon-60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcons/Icon-60@3x.png"; sourceTree = "<group>"; };
+		0A2000240000000000000001 /* Icon-60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcons/Icon-60@2x.png"; sourceTree = "<group>"; };
+		0A2000250000000000000001 /* Icon-76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcons/Icon-76@2x.png"; sourceTree = "<group>"; };
+		0A2000260000000000000001 /* Icon-83.5@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcons/Icon-83.5@2x.png"; sourceTree = "<group>"; };
+		0A2000270000000000000001 /* Icon-1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcons/Icon-1024.png"; sourceTree = "<group>"; };
+		0A2000280000000000000001 /* AdvancedFeatureModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedFeatureModels.swift; sourceTree = "<group>"; };
+		0A2000290000000000000001 /* AdvancedToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToolsView.swift; sourceTree = "<group>"; };
+		0A20002C0000000000000001 /* RafiqAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RafiqAPIClient.swift; sourceTree = "<group>"; };
+		0A2000120000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0A2000130000000000000001 /* DesertTrail.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DesertTrail.entitlements; sourceTree = "<group>"; };
+		0A2000140000000000000001 /* DesertTrail.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DesertTrail.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0A3000010000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0A4000010000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				0A4000020000000000000001 /* DesertTrail */,
+				0A4000030000000000000001 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0A4000020000000000000001 /* DesertTrail */ = {
+			isa = PBXGroup;
+			children = (
+				0A2000010000000000000001 /* DesertTrailApp.swift */,
+				0A2000020000000000000001 /* ContentView.swift */,
+				0A2000030000000000000001 /* AppState.swift */,
+				0A4000040000000000000001 /* Models */,
+				0A4000050000000000000001 /* Services */,
+				0A4000060000000000000001 /* Views */,
+				0A4000070000000000000001 /* Resources */,
+				0A2000100000000000000001 /* Assets.xcassets */,
+				0A2000120000000000000001 /* Info.plist */,
+				0A2000130000000000000001 /* DesertTrail.entitlements */,
+				0A2000220000000000000001 /* PrivacyInfo.xcprivacy */,
+			);
+			path = DesertTrail;
+			sourceTree = "<group>";
+		};
+		0A4000030000000000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A2000140000000000000001 /* DesertTrail.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0A4000040000000000000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0A2000040000000000000001 /* TripModels.swift */,
+				0A2000280000000000000001 /* AdvancedFeatureModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		0A4000050000000000000001 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				0A2000050000000000000001 /* LocationManager.swift */,
+				0A2000060000000000000001 /* WeatherService.swift */,
+				0A2000070000000000000001 /* CloudKitStore.swift */,
+				0A2000080000000000000001 /* GPXParser.swift */,
+				0A2000090000000000000001 /* QRCodeGenerator.swift */,
+				0A2000150000000000000001 /* OfflineMapStore.swift */,
+				0A20001F0000000000000001 /* PDFMapStore.swift */,
+				0A20002C0000000000000001 /* RafiqAPIClient.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		0A4000060000000000000001 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0A20000A0000000000000001 /* DesertMapView.swift */,
+				0A20002A0000000000000001 /* HomeDashboardView.swift */,
+				0A20002B0000000000000001 /* ActiveTripDriveView.swift */,
+				0A20000B0000000000000001 /* CompassPanel.swift */,
+				0A20000C0000000000000001 /* PlannerView.swift */,
+				0A20000D0000000000000001 /* CommunityView.swift */,
+				0A20000E0000000000000001 /* HiddenPlaceForm.swift */,
+				0A20000F0000000000000001 /* EnvironmentBanner.swift */,
+				0A2000160000000000000001 /* OfflineMapsView.swift */,
+				0A2000170000000000000001 /* ZoomableImageMapView.swift */,
+				0A20001B0000000000000001 /* PDFMapView.swift */,
+				0A2000200000000000000001 /* PDFImportPicker.swift */,
+				0A2000210000000000000001 /* PDFSourceManagerView.swift */,
+				0A2000290000000000000001 /* AdvancedToolsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		0A4000070000000000000001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0A2000110000000000000001 /* SampleRoute.gpx */,
+				0A2000230000000000000001 /* Icon-60@3x.png */,
+				0A2000240000000000000001 /* Icon-60@2x.png */,
+				0A2000250000000000000001 /* Icon-76@2x.png */,
+				0A2000260000000000000001 /* Icon-83.5@2x.png */,
+				0A2000270000000000000001 /* Icon-1024.png */,
+				0A2000180000000000000001 /* AjajiSaudi.jpg */,
+				0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */,
+				0A20001A0000000000000001 /* AjajiMarkedPlans.jpg */,
+				0A20001C0000000000000001 /* AjajiSaudi.pdf */,
+				0A20001D0000000000000001 /* AjajiRiyadhRegion.pdf */,
+				0A20001E0000000000000001 /* AjajiMarkedPlans.pdf */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0A5000010000000000000001 /* DesertTrail */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0A9000020000000000000001 /* Build configuration list for PBXNativeTarget "DesertTrail" */;
+			buildPhases = (
+				0A6000010000000000000001 /* Sources */,
+				0A3000010000000000000001 /* Frameworks */,
+				0A7000010000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DesertTrail;
+			productName = DesertTrail;
+			productReference = 0A2000140000000000000001 /* DesertTrail.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0A8000010000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					0A5000010000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 0A9000010000000000000001 /* Build configuration list for PBXProject "DesertTrail" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = ar;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				ar,
+				en,
+				Base,
+			);
+			mainGroup = 0A4000010000000000000001;
+			productRefGroup = 0A4000030000000000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0A5000010000000000000001 /* DesertTrail */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0A7000010000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A1000100000000000000001 /* Assets.xcassets in Resources */,
+				0A1000110000000000000001 /* SampleRoute.gpx in Resources */,
+				0A1000200000000000000001 /* Icon-60@3x.png in Resources */,
+				0A1000210000000000000001 /* Icon-60@2x.png in Resources */,
+				0A1000220000000000000001 /* Icon-76@2x.png in Resources */,
+				0A1000230000000000000001 /* Icon-83.5@2x.png in Resources */,
+				0A1000240000000000000001 /* Icon-1024.png in Resources */,
+				0A10001F0000000000000001 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0A6000010000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A1000010000000000000001 /* DesertTrailApp.swift in Sources */,
+				0A1000020000000000000001 /* ContentView.swift in Sources */,
+				0A1000030000000000000001 /* AppState.swift in Sources */,
+				0A1000040000000000000001 /* TripModels.swift in Sources */,
+				0A1000050000000000000001 /* LocationManager.swift in Sources */,
+				0A1000060000000000000001 /* WeatherService.swift in Sources */,
+				0A1000070000000000000001 /* CloudKitStore.swift in Sources */,
+				0A1000080000000000000001 /* GPXParser.swift in Sources */,
+				0A1000090000000000000001 /* QRCodeGenerator.swift in Sources */,
+				0A10000A0000000000000001 /* DesertMapView.swift in Sources */,
+				0A10002A0000000000000001 /* HomeDashboardView.swift in Sources */,
+				0A10002B0000000000000001 /* ActiveTripDriveView.swift in Sources */,
+				0A10000B0000000000000001 /* CompassPanel.swift in Sources */,
+				0A10000C0000000000000001 /* PlannerView.swift in Sources */,
+				0A10000D0000000000000001 /* CommunityView.swift in Sources */,
+				0A10000E0000000000000001 /* HiddenPlaceForm.swift in Sources */,
+				0A10000F0000000000000001 /* EnvironmentBanner.swift in Sources */,
+				0A1000120000000000000001 /* OfflineMapStore.swift in Sources */,
+				0A1000130000000000000001 /* OfflineMapsView.swift in Sources */,
+				0A1000140000000000000001 /* ZoomableImageMapView.swift in Sources */,
+				0A1000180000000000000001 /* PDFMapView.swift in Sources */,
+				0A10001C0000000000000001 /* PDFMapStore.swift in Sources */,
+				0A10001D0000000000000001 /* PDFImportPicker.swift in Sources */,
+				0A10001E0000000000000001 /* PDFSourceManagerView.swift in Sources */,
+				0A1000250000000000000001 /* AdvancedFeatureModels.swift in Sources */,
+				0A1000260000000000000001 /* AdvancedToolsView.swift in Sources */,
+				0A10002C0000000000000001 /* RafiqAPIClient.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0A9000030000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		0A9000040000000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		0A9000050000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 27;
+				DEVELOPMENT_TEAM = 4HM66AD594;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DesertTrail/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الخلا";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codex.DesertTrail;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0A9000060000000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 27;
+				DEVELOPMENT_TEAM = 4HM66AD594;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DesertTrail/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الخلا";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codex.DesertTrail;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0A9000010000000000000001 /* Build configuration list for PBXProject "DesertTrail" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A9000030000000000000001 /* Debug */,
+				0A9000040000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0A9000020000000000000001 /* Build configuration list for PBXNativeTarget "DesertTrail" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A9000050000000000000001 /* Debug */,
+				0A9000060000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0A8000010000000000000001 /* Project object */;
+}
