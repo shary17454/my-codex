@@ -1,0 +1,25 @@
+.DS_Store
+
+# Xcode user and build output
+DerivedData/
+build/
+*.xcarchive
+*.ipa
+*.dSYM
+*.xcuserstate
+xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Secrets and local credentials
+.env
+*.p8
+private_keys/
+.appstoreconnect/
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
