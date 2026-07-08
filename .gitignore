@@ -38,6 +38,12 @@ ios/**/DerivedData/
 # Build outputs and archives generated during this session
 outputs/
 build/
+**/*.xcarchive/
+**/*.ipa
+**/*.dSYM/
+**/ArchiveIntermediates/
+**/ModuleCache.noindex/
+**/Intermediates.noindex/
 
 # SQLite sidecar files
 data/*.sqlite-shm
