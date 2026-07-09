@@ -54,3 +54,7 @@ data/*.sqlite-wal
 
 # Logs
 *.log
+
+# BatalAlDroob App Store build keeps searchable catalog data in-app.
+# Original PDF catalog packs stay outside the submitted app bundle.
+ios/BatalAlDroob/BatalAlDroob/Web/**/*.pdf

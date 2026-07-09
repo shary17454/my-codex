@@ -377,9 +377,10 @@ const translations = {
     lockedPartNumber: "رقم القطعة محمي",
     paymentRequired: "يتطلب دفع رمزي",
     paywallTitle: "فتح الكتالوجات وأرقام القطع",
-    paywallText: "رقم القطعة وصفحة PDF محمية. ادفع مبلغًا رمزيًا لكل عملية فتح للاطلاع على الرقم أو فتح صفحة الكتالوج الأصلية.",
+    paywallText: "أرقام القطع محمية. ادفع مبلغًا رمزيًا لكل عملية فتح للاطلاع على الرقم وبياناته المفهرسة.",
     payUnlockNumber: "دفع وفتح رقم القطعة",
     payOpenCatalog: "دفع وفتح الكتالوج",
+    catalogPdfUnavailable: "ملفات PDF الأصلية غير مضمّنة في نسخة App Store الحالية. رقم القطعة وبيانات التوافق والمصدر المفهرس متاحة داخل التطبيق.",
     purchasePending: "جاري طلب الدفع...",
     purchaseSuccess: "تم الدفع وفتح المحتوى",
     purchaseUnavailable: "الدفع غير متاح الآن. تأكد من إضافة منتج الشراء داخل App Store Connect.",
@@ -638,9 +639,10 @@ const translations = {
     lockedPartNumber: "Protected part number",
     paymentRequired: "Small payment required",
     paywallTitle: "Unlock catalogs and part numbers",
-    paywallText: "Part numbers and PDF pages are protected. Pay a small fee for each unlock to view the number or open the original catalog page.",
+    paywallText: "Part numbers are protected. Pay a small fee for each unlock to view the number and indexed source details.",
     payUnlockNumber: "Pay and unlock part number",
     payOpenCatalog: "Pay and open catalog",
+    catalogPdfUnavailable: "Original PDF files are not bundled in this App Store build. Part numbers, fitment data, and indexed source references remain available in the app.",
     purchasePending: "Requesting purchase...",
     purchaseSuccess: "Payment complete. Content unlocked.",
     purchaseUnavailable: "Payment is not available now. Add the in-app purchase product in App Store Connect.",
@@ -1682,6 +1684,10 @@ function completePaidAction() {
   }
   if (action.type === "open-pdf" && action.url) {
     showPaymentStatus(t("purchaseSuccess"), "success");
+    if (!canOpenCatalogUrl(action.url)) {
+      showPaymentStatus(t("catalogPdfUnavailable"), "warning");
+      return;
+    }
     window.location.assign(action.url);
     return;
   }
@@ -1689,6 +1695,16 @@ function completePaidAction() {
     showPaymentStatus(t("purchaseSuccess"), "success");
     savePartRequest(action.request, action.plan);
   }
+}
+
+function canOpenCatalogUrl(url) {
+  if (/^https?:\/\//i.test(String(url || ""))) return true;
+  return partFitmentIndex?.pdfs_bundled === true;
+}
+
+function canOpenCatalogForPart(part) {
+  const url = pdfHref(part?.source_pdf_path || "");
+  return Boolean(url && canOpenCatalogUrl(url));
 }
 
 window.BatalNativeStore = {
@@ -1877,7 +1893,7 @@ function renderDetails() {
       </div>
       <div class="paywall-actions">
         ${numbers.length || part.record_type !== "catalog_page" ? `<button class="primary-action" type="button" data-paid-reveal="${partAccessId(part)}">${numbersUnlocked ? protectedPartNumbersText(part) : t("payUnlockNumbers")}</button>` : ""}
-        ${part.source_pdf_path ? `<button class="secondary-action" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
+        ${canOpenCatalogForPart(part) ? `<button class="secondary-action" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
       </div>
     </div>
 
@@ -1927,7 +1943,7 @@ function renderDetails() {
           </div>
         `).join("")}
       </div>
-      ${part.source_pdf_path ? `<button class="pdf-link" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
+      ${canOpenCatalogForPart(part) ? `<button class="pdf-link" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
     </div>
 
     <div class="detail-section">
