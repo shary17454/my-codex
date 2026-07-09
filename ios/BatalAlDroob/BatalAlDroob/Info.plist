@@ -24,6 +24,12 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We use the camera only when you choose to scan or capture a part reference for catalog lookup.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We save images only when you choose to keep a captured catalog or part reference.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We use photo library access only if you choose an image as a catalog or part reference.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
