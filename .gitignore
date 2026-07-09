@@ -45,6 +45,9 @@ build/
 **/ModuleCache.noindex/
 **/Intermediates.noindex/
 
+# Keep the iOS App Store bundle light; full PDF catalogs stay local/external.
+ios/BatalAlDroob/BatalAlDroob/Web/catalog/**/*.pdf
+
 # SQLite sidecar files
 data/*.sqlite-shm
 data/*.sqlite-wal
