@@ -21,12 +21,18 @@ final class AppState: ObservableObject {
 enum AppLanguage: String, CaseIterable, Identifiable {
     case arabic
     case english
+    case french
+    case spanish
+    case chinese
 
     var id: String { rawValue }
     var title: String {
         switch self {
         case .arabic: return "العربية"
         case .english: return "English"
+        case .french: return "Français"
+        case .spanish: return "Español"
+        case .chinese: return "中文"
         }
     }
 }
@@ -109,6 +115,12 @@ enum LocalizedKey {
             return arabicValue
         case .english:
             return englishValue
+        case .french:
+            return frenchValue
+        case .spanish:
+            return spanishValue
+        case .chinese:
+            return chineseValue
         }
     }
 
@@ -189,7 +201,7 @@ enum LocalizedKey {
 
     private var englishValue: String {
         switch self {
-        case .appTitle: return "Rafiq Al Khala"
+        case .appTitle: return "Rafiq Al Droob"
         case .map: return "Map"
         case .compass: return "Compass"
         case .planner: return "Planner"
@@ -259,6 +271,99 @@ enum LocalizedKey {
         case .sourceUnknown: return "No saved source"
         case .download: return "Download"
         case .importedFromFiles: return "Imported from Files"
+        }
+    }
+
+    private var frenchValue: String {
+        switch self {
+        case .appTitle: return "Rafiq Al Droob"
+        case .map: return "Carte"
+        case .compass: return "Boussole"
+        case .planner: return "Planificateur"
+        case .community: return "Communauté"
+        case .weather: return "Environnement"
+        case .share: return "Partager"
+        case .offline: return "Cartes hors ligne"
+        case .done: return "Terminé"
+        case .cancel: return "Annuler"
+        case .submit: return "Envoyer"
+        case .altitude: return "Altitude"
+        case .windSpeed: return "Vitesse du vent"
+        case .windDirection: return "Direction du vent"
+        case .startNavigationTools: return "Activer les outils de navigation"
+        case .gpsReady: return "Prêt"
+        case .gpsActive: return "Actif"
+        case .north: return "Nord"
+        case .northeast: return "Nord-est"
+        case .east: return "Est"
+        case .southeast: return "Sud-est"
+        case .south: return "Sud"
+        case .southwest: return "Sud-ouest"
+        case .west: return "Ouest"
+        case .northwest: return "Nord-ouest"
+        default: return englishValue
+        }
+    }
+
+    private var spanishValue: String {
+        switch self {
+        case .appTitle: return "Rafiq Al Droob"
+        case .map: return "Mapa"
+        case .compass: return "Brújula"
+        case .planner: return "Planificador"
+        case .community: return "Comunidad"
+        case .weather: return "Entorno"
+        case .share: return "Compartir"
+        case .offline: return "Mapas sin conexión"
+        case .done: return "Listo"
+        case .cancel: return "Cancelar"
+        case .submit: return "Enviar"
+        case .altitude: return "Altitud"
+        case .windSpeed: return "Velocidad del viento"
+        case .windDirection: return "Dirección del viento"
+        case .startNavigationTools: return "Activar herramientas de navegación"
+        case .gpsReady: return "Listo"
+        case .gpsActive: return "Activo"
+        case .north: return "Norte"
+        case .northeast: return "Noreste"
+        case .east: return "Este"
+        case .southeast: return "Sureste"
+        case .south: return "Sur"
+        case .southwest: return "Suroeste"
+        case .west: return "Oeste"
+        case .northwest: return "Noroeste"
+        default: return englishValue
+        }
+    }
+
+    private var chineseValue: String {
+        switch self {
+        case .appTitle: return "Rafiq Al Droob"
+        case .map: return "地图"
+        case .compass: return "指南针"
+        case .planner: return "行程"
+        case .community: return "社区"
+        case .weather: return "环境"
+        case .share: return "分享"
+        case .offline: return "离线地图"
+        case .done: return "完成"
+        case .cancel: return "取消"
+        case .submit: return "提交"
+        case .altitude: return "海拔"
+        case .windSpeed: return "风速"
+        case .windDirection: return "风向"
+        case .startNavigationTools: return "启动导航工具"
+        case .gpsReady: return "就绪"
+        case .gpsActive: return "活动"
+        case .north: return "北"
+        case .northeast: return "东北"
+        case .east: return "东"
+        case .southeast: return "东南"
+        case .south: return "南"
+        case .southwest: return "西南"
+        case .west: return "西"
+        case .northwest: return "西北"
+        default: return englishValue
         }
     }
 }

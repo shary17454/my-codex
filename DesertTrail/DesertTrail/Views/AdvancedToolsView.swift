@@ -219,6 +219,7 @@ struct AdvancedToolsView: View {
                     tag("تنبيهات")
                     tag("فلك")
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .buttonStyle(.plain)
@@ -980,8 +981,13 @@ struct AdvancedToolsView: View {
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             Text(value)
-                .font(.headline.monospacedDigit())
+                .font(.subheadline.monospacedDigit().weight(.bold))
+                .lineLimit(2)
+                .minimumScaleFactor(0.62)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, minHeight: 84, alignment: .leading)
         .padding(10)
@@ -1012,9 +1018,13 @@ struct AdvancedToolsView: View {
 
     private func tag(_ text: String) -> some View {
         Text(text)
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 9)
-            .padding(.vertical, 5)
+            .font(.caption2.weight(.semibold))
+            .lineLimit(2)
+            .minimumScaleFactor(0.58)
+            .multilineTextAlignment(.center)
+            .frame(minWidth: 46, maxWidth: 70, minHeight: 32)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
             .background(Color.desertSand.opacity(0.45), in: Capsule())
     }
 
@@ -1271,6 +1281,7 @@ struct TripReportView: View {
 
 struct WildlifeSafetyGuideView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var appState: AppState
     @State private var searchText = ""
     @State private var selectedDanger: WildlifeDangerLevel?
 
@@ -1413,6 +1424,23 @@ struct WildlifeSafetyGuideView: View {
 
     private var locationAlertsCard: some View {
         guideCard(title: "تنبيهات حسب الموقع", icon: "bell.badge.fill", color: .orange) {
+            Text("عند تفعيل الموقع الدائم أثناء الرحلة يمكن للتطبيق تجهيز تنبيهات قرب للمناطق الحساسة مثل الأودية، الرمال الناعمة، المحميات، أو مناطق نشاط الزواحف.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Button {
+                appState.locationManager.requestBackgroundTripUpdates()
+            } label: {
+                Label("تفعيل تنبيهات القرب أثناء الرحلة", systemImage: "location.circle")
+                    .font(.caption.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.orange)
+
+            proximityAlert("وادي مخفي", "اقتربت من مجرى واد. تحقق من توقعات الأمطار ولا تخيم في بطن الوادي.", "3.2 كم", "water.waves")
+            proximityAlert("منطقة رمال ناعمة", "خفف السرعة، فعّل الدفع الرباعي، وتجنب الوقوف فوق الكثبان الهشة.", "1.4 كم", "road.lanes")
+            proximityAlert("نطاق نشاط عقارب", "يزداد النشاط بعد الغروب. افحص مكان الجلوس والأحذية قبل الاستخدام.", "800 م", "moon.stars")
             alertExample("تنبيه ثعابين", "هذه المنطقة تشهد نشاطًا للثعابين خلال فصل الصيف، خاصة بعد غروب الشمس. ينصح بارتداء أحذية مناسبة واستخدام كشاف قبل المشي.", "exclamationmark.triangle")
             alertExample("تنبيه عقارب", "يزداد نشاط العقارب في هذه المنطقة ليلًا. تجنب رفع الصخور أو إدخال اليد في الشقوق دون فحص.", "moon.stars")
         }
@@ -1518,29 +1546,28 @@ struct WildlifeSafetyGuideView: View {
 
     private func speciesCard(_ item: WildlifeSpeciesProfile) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top) {
-                Image(systemName: item.imageName)
-                    .font(.title2)
-                    .foregroundStyle(.white)
-                    .frame(width: 46, height: 46)
-                    .background(item.dangerLevel.color, in: RoundedRectangle(cornerRadius: 8))
+            HStack(alignment: .top, spacing: 12) {
+                wildlifeIllustration(item)
+
                 VStack(alignment: .leading, spacing: 3) {
                     Text(item.arabicName)
                         .font(.headline)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
                     Text(item.scientificName)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                    Text(speciesSummary(item))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(item.dangerLevel.rawValue)
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(item.dangerLevel.color)
-                    Text(item.isVenomous ? "سام" : "غير سام")
-                        .font(.caption2.weight(.semibold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background((item.isVenomous ? Color.red : Color.oasisTeal).opacity(0.12), in: Capsule())
+                    dangerBadge(item.dangerLevel.rawValue, color: item.dangerLevel.color)
+                    dangerBadge(item.isVenomous ? "سام" : "غير سام", color: item.isVenomous ? .red : .oasisTeal)
                 }
             }
 
@@ -1565,6 +1592,49 @@ struct WildlifeSafetyGuideView: View {
         }
         .padding()
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func wildlifeIllustration(_ item: WildlifeSpeciesProfile) -> some View {
+        ZStack(alignment: .bottomTrailing) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(
+                    LinearGradient(
+                        colors: [item.dangerLevel.color.opacity(0.85), Color.black.opacity(0.72)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    Image(systemName: item.imageName)
+                        .font(.system(size: 36, weight: .semibold))
+                        .foregroundStyle(.white)
+                )
+            Text(item.activityPeriod.rawValue)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(.black.opacity(0.38), in: Capsule())
+                .padding(5)
+        }
+        .frame(width: 72, height: 72)
+        .accessibilityLabel("صورة توضيحية: \(item.arabicName)")
+    }
+
+    private func dangerBadge(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(.caption2.weight(.bold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(color)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.12), in: Capsule())
+    }
+
+    private func speciesSummary(_ item: WildlifeSpeciesProfile) -> String {
+        let poison = item.isVenomous ? "سام" : "غير سام"
+        return "\(poison) • نشاط \(item.activityPeriod.rawValue) • \(item.activeSeason)"
     }
 
     private func guideCard<Content: View>(title: String, icon: String, color: Color, @ViewBuilder content: () -> Content) -> some View {
@@ -1599,13 +1669,19 @@ struct WildlifeSafetyGuideView: View {
     private func miniMetric(_ title: String, _ value: String, _ icon: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Label(title, systemImage: icon)
-                .font(.caption)
+                .font(.caption2)
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text(value)
-                .font(.headline.monospacedDigit())
+                .font(.subheadline.monospacedDigit().weight(.bold))
+                .lineLimit(2)
+                .minimumScaleFactor(0.62)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .frame(minHeight: 74, alignment: .leading)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
+        .padding(10)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
     }
 
@@ -1618,12 +1694,17 @@ struct WildlifeSafetyGuideView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
                 Text(subtitle)
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
                 Text(detail)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
         }
@@ -1638,22 +1719,57 @@ struct WildlifeSafetyGuideView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
                 Text(detail)
-                    .font(.footnote)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding()
+        .padding(10)
         .background(Color.orange.opacity(0.09), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func proximityAlert(_ title: String, _ detail: String, _ distance: String, _ icon: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundStyle(.white)
+                .frame(width: 34, height: 34)
+                .background(Color.orange, in: RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(title)
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.72)
+                    Spacer()
+                    Text(distance)
+                        .font(.caption2.monospacedDigit().weight(.bold))
+                        .foregroundStyle(.orange)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                Text(detail)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(10)
+        .background(Color.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func infoLine(_ title: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.caption.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             Text(value)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
