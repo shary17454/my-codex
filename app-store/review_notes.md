@@ -30,3 +30,8 @@ Distribution note:
 - The app download should be free.
 - Paid functionality is handled through Apple In-App Purchase, not through a paid app price.
 - Part request tiers in the app are: basic 10 SAR, urgent 20 SAR, rare/NOS 50 SAR.
+
+Latest review preparation update:
+- A new iPad-responsive layout pass was added for App Review after the earlier design feedback on build 42.
+- The current submission candidate uses version `1.0.1`.
+- Tablet screens now use a wider adaptive layout instead of the previous narrow phone-style presentation.

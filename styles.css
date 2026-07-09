@@ -3572,3 +3572,364 @@ body {
     padding: 12px;
   }
 }
+
+/* Final responsive pass for App Review: restore a full tablet layout instead of
+   forcing the phone storefront into iPad-sized screens. */
+@media (min-width: 721px) and (max-width: 1366px) {
+  html,
+  body {
+    max-width: none;
+    overflow-x: hidden;
+  }
+
+  body {
+    display: block;
+    min-height: 100vh;
+    padding: 0;
+    background:
+      radial-gradient(circle at 68% 8%, rgba(212, 175, 55, 0.14), transparent 24%),
+      linear-gradient(180deg, rgba(7, 8, 8, 0.96), rgba(10, 10, 10, 0.985)),
+      url("assets/backgrounds/batal-droob-patrol.jpg?v=bg-hq-restored-1") center top / cover fixed;
+  }
+
+  body::before {
+    backdrop-filter: blur(2px) saturate(0.92);
+  }
+
+  .app-shell {
+    display: grid !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh;
+    margin: 0;
+    grid-template-columns: 1fr;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .sidebar {
+    position: static;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 16px;
+    height: auto;
+    padding: 18px 22px;
+    background:
+      linear-gradient(180deg, rgba(17, 24, 21, 0.97), rgba(11, 15, 14, 0.96)),
+      url("assets/backgrounds/batal-droob-patrol.jpg?v=bg-hq-restored-1") center / cover;
+    border-inline-end: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+  }
+
+  .brand {
+    padding: 0 0 8px;
+    border: 0;
+  }
+
+  .nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .nav-item {
+    width: auto;
+    min-width: 132px;
+    justify-content: center;
+  }
+
+  .sidebar-panel {
+    display: none;
+  }
+
+  .workspace {
+    width: 100%;
+    min-height: 100vh;
+    max-height: none;
+    overflow: visible;
+    gap: 16px;
+    padding: 22px;
+    border-inline: 0;
+    box-shadow: none;
+    background:
+      radial-gradient(circle at 18% 0, rgba(212, 175, 55, 0.08), transparent 32%),
+      linear-gradient(180deg, rgba(15, 14, 13, 0.95), rgba(9, 9, 9, 0.985));
+  }
+
+  .topbar {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 18px;
+    padding: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.34);
+    background:
+      radial-gradient(circle at 72% 22%, rgba(212, 175, 55, 0.18), transparent 28%),
+      linear-gradient(90deg, rgba(8, 9, 8, 0.92), rgba(17, 13, 10, 0.54)),
+      url("assets/backgrounds/batal-droob-patrol.jpg?v=bg-hq-restored-1") center 55% / cover;
+    box-shadow: var(--shadow);
+    direction: rtl;
+  }
+
+  .topbar::after {
+    content: "";
+    display: block;
+  }
+
+  .topbar h1,
+  .hero-badges,
+  .hero-metrics,
+  .primary-action,
+  .independent-notice {
+    display: block;
+  }
+
+  .hero-badges {
+    display: flex;
+  }
+
+  .hero-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 140px));
+  }
+
+  .eyebrow {
+    min-height: 0;
+    display: block;
+    margin: 0 0 8px;
+    color: #cfe2d7;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .eyebrow::before,
+  .eyebrow::after,
+  .topbar [data-i18n="eyebrow"]::before,
+  .topbar [data-i18n="eyebrow"]::after {
+    content: none;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .language-toggle,
+  .currency-switch {
+    min-height: 38px;
+    background: rgba(0, 0, 0, 0.28);
+  }
+
+  .currency-option {
+    min-height: 34px;
+    min-width: 58px;
+    font-size: 12px;
+  }
+
+  .overflow-menu {
+    position: relative;
+    width: auto;
+    height: auto;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .menu-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    bottom: auto;
+    inset-inline: auto 0;
+    width: min(320px, calc(100vw - 44px));
+    max-width: min(320px, calc(100vw - 44px));
+    margin-inline: 0;
+  }
+
+  .search-band {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(145deg, rgba(18, 18, 18, 0.94), rgba(10, 10, 10, 0.94));
+    box-shadow: var(--shadow);
+  }
+
+  .search-box label,
+  .search-hint {
+    display: block;
+  }
+
+  .filter-title {
+    display: flex;
+  }
+
+  .model-row {
+    display: grid;
+  }
+
+  .search-box::after {
+    content: none;
+  }
+
+  .search-box input {
+    min-height: 52px;
+    padding: 0 16px;
+    font-size: 15px;
+    border-radius: var(--radius);
+  }
+
+  [dir="rtl"] .search-box input {
+    padding: 0 16px;
+  }
+
+  .category-grid {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    direction: rtl;
+  }
+
+  .category-card {
+    min-height: 78px;
+    padding: 10px 8px;
+  }
+
+  .generations-section .section-heading {
+    display: flex;
+  }
+
+  .generation-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    direction: rtl;
+  }
+
+  .generation-card {
+    min-height: 0 !important;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .independent-notice {
+    max-width: 720px;
+  }
+
+  .content-grid,
+  .source-intake-section,
+  .vision-section,
+  .shared-fitment-section,
+  .part-request-section {
+    display: grid;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .source-intake-grid,
+  .vision-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ai-workbench,
+  .market-grid,
+  .community-grid,
+  .tools-grid,
+  .roadmap-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .owner-grid,
+  .maintenance-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-dock {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1367px) {
+  .app-shell {
+    display: grid !important;
+    width: 100% !important;
+    max-width: none !important;
+    grid-template-columns: 280px minmax(0, 1fr);
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .sidebar {
+    display: flex !important;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .nav-list {
+    display: grid;
+  }
+
+  .sidebar-panel {
+    display: block;
+  }
+
+  .workspace {
+    min-height: 100vh;
+    max-height: none;
+    overflow: visible;
+    border-inline: 0;
+    box-shadow: none;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: minmax(420px, 1fr) minmax(360px, 0.82fr);
+  }
+
+  .detail-panel {
+    position: sticky;
+    top: 18px;
+    max-height: calc(100vh - 36px);
+  }
+
+  .source-intake-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .vision-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
