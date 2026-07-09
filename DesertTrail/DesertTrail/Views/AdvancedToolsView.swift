@@ -166,7 +166,7 @@ struct AdvancedToolsView: View {
     }
 
     private var platformVisionCard: some View {
-        featureCard(title: "منصة رفيق الدروب المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
+        featureCard(title: "منصة رفيق الدرب المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
             Text("هذه الشاشة تجمع التخطيط، الملاحة، الخرائط دون اتصال، السلامة، المجتمع، الذكاء الاصطناعي، والتكامل مع أجهزة Apple في تجربة واحدة للرحلة البرية.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -1066,7 +1066,7 @@ struct AdvancedToolsView: View {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }
             let content = UNMutableNotificationContent()
-            content.title = "تحذير رفيق الدروب"
+            content.title = "تحذير رفيق الدرب"
             content.body = "اقتربت من مسار رملي ناعم. تحقق من ضغط الإطارات قبل الدخول."
             content.sound = .default
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false)
@@ -1082,7 +1082,7 @@ struct SOSView: View {
 
     private var message: String {
         """
-        SOS رفيق الدروب
+        SOS رفيق الدرب
         آخر موقع معروف:
         \(coordinate.latitude), \(coordinate.longitude)
         الوقت: \(Date().formatted(date: .numeric, time: .shortened))
@@ -1245,7 +1245,7 @@ struct TripReportView: View {
 
     private var report: String {
         """
-        تقرير رحلة رفيق الدروب
+        تقرير رحلة رفيق الدرب
         البداية: \(startedAt.formatted(date: .numeric, time: .shortened))
         النهاية: \(Date().formatted(date: .numeric, time: .shortened))
         المسافة المقدرة: 18.6 كم
