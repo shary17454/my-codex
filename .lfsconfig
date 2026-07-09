@@ -1,0 +1,2 @@
+[lfs]
+	fetchexclude = data/app_database.sqlite,flutter_y60_catalog/assets/catalog/pdfs/**
