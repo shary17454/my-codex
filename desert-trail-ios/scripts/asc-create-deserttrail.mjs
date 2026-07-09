@@ -90,7 +90,7 @@ if (!app) {
         type: 'apps',
         attributes: {
           bundleId: identifier,
-          name: 'رفيق الخلا',
+          name: 'رفيق الدروب',
           primaryLocale: 'ar-SA',
           sku: 'DESERT-TRAIL-1'
         }

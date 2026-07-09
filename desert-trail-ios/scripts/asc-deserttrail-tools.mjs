@@ -91,7 +91,7 @@ async function main() {
           type: 'appInfoLocalizations',
           id: appInfoLocalization.id,
           attributes: {
-            name: 'رفيق الخلا'
+            name: 'رفيق الدروب'
           }
         }
       })
