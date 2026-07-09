@@ -379,8 +379,6 @@ const translations = {
     paywallText: "رقم القطعة وصفحة PDF محمية. ادفع مبلغًا رمزيًا لكل عملية فتح للاطلاع على الرقم أو فتح صفحة الكتالوج الأصلية.",
     payUnlockNumber: "دفع وفتح رقم القطعة",
     payOpenCatalog: "دفع وفتح الكتالوج",
-    pdfUnavailableButton: "PDF غير مضمّن",
-    catalogPdfUnavailable: "ملفات PDF الأصلية غير مضمّنة في هذا الإصدار لتقليل حجم التطبيق. الفهارس وأرقام القطع ما زالت متاحة داخل التطبيق.",
     purchasePending: "جاري طلب الدفع...",
     purchaseSuccess: "تم الدفع وفتح المحتوى",
     purchaseUnavailable: "الدفع غير متاح الآن. تأكد من إضافة منتج الشراء داخل App Store Connect.",
@@ -642,8 +640,6 @@ const translations = {
     paywallText: "Part numbers and PDF pages are protected. Pay a small fee for each unlock to view the number or open the original catalog page.",
     payUnlockNumber: "Pay and unlock part number",
     payOpenCatalog: "Pay and open catalog",
-    pdfUnavailableButton: "PDF not bundled",
-    catalogPdfUnavailable: "Original PDF files are not bundled in this release to reduce app size. Indexes and part numbers remain available inside the app.",
     purchasePending: "Requesting purchase...",
     purchaseSuccess: "Payment complete. Content unlocked.",
     purchaseUnavailable: "Payment is not available now. Add the in-app purchase product in App Store Connect.",
@@ -1634,7 +1630,8 @@ function completePaidAction() {
     return;
   }
   if (action.type === "open-pdf" && action.url) {
-    showPaymentStatus(t("catalogPdfUnavailable"), "warning");
+    showPaymentStatus(t("purchaseSuccess"), "success");
+    window.location.assign(action.url);
     return;
   }
   if (action.type === "submit-part-request" && action.request && action.plan) {
@@ -1829,7 +1826,7 @@ function renderDetails() {
       </div>
       <div class="paywall-actions">
         ${numbers.length || part.record_type !== "catalog_page" ? `<button class="primary-action" type="button" data-paid-reveal="${partAccessId(part)}">${numbersUnlocked ? protectedPartNumbersText(part) : t("payUnlockNumbers")}</button>` : ""}
-        ${part.source_pdf_path ? `<button class="secondary-action" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("pdfUnavailableButton")} · ${t("page")} ${part.page_number}</button>` : ""}
+        ${part.source_pdf_path ? `<button class="secondary-action" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
       </div>
     </div>
 
@@ -1878,7 +1875,7 @@ function renderDetails() {
           </div>
         `).join("")}
       </div>
-      ${part.source_pdf_path ? `<button class="pdf-link" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("pdfUnavailableButton")} · ${t("page")} ${part.page_number}</button>` : ""}
+      ${part.source_pdf_path ? `<button class="pdf-link" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
     </div>
 
     <div class="detail-section">
@@ -2097,7 +2094,7 @@ detailPanel.addEventListener("click", (event) => {
 
   const pdfButton = event.target.closest("[data-paid-pdf]");
   if (pdfButton) {
-    showPaymentStatus(t("catalogPdfUnavailable"), "warning");
+    requestPaidAccess({ type: "open-pdf", url: pdfButton.dataset.paidPdf });
     return;
   }
 
