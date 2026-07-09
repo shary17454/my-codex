@@ -1,5 +1,6 @@
 import CoreLocation
 import Foundation
+import UserNotifications
 
 @MainActor
 final class LocationManager: NSObject, ObservableObject {
@@ -7,8 +8,10 @@ final class LocationManager: NSObject, ObservableObject {
     @Published var currentLocation: CLLocation?
     @Published var heading: CLHeading?
     @Published var isTracking = false
+    @Published var proximityAlertsEnabled = false
 
     private let manager = CLLocationManager()
+    private let notificationCenter = UNUserNotificationCenter.current()
 
     override init() {
         super.init()
@@ -40,10 +43,72 @@ final class LocationManager: NSObject, ObservableObject {
     }
 
     func requestBackgroundTripUpdates() {
-        manager.requestAlwaysAuthorization()
+        if authorizationStatus == .notDetermined {
+            manager.requestWhenInUseAuthorization()
+        } else if authorizationStatus == .authorizedWhenInUse {
+            manager.requestAlwaysAuthorization()
+        }
         manager.allowsBackgroundLocationUpdates = true
         manager.pausesLocationUpdatesAutomatically = true
+        proximityAlertsEnabled = true
+        startNavigation()
+        requestNotificationAccess()
+        configureDefaultProximityAlerts()
     }
+
+    private func requestNotificationAccess() {
+        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+    }
+
+    private func configureDefaultProximityAlerts() {
+        guard CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) else { return }
+
+        let regions = [
+            ProximityRegion(
+                identifier: "wadi-hidden",
+                coordinate: CLLocationCoordinate2D(latitude: 24.64, longitude: 46.52),
+                radius: 1200,
+                title: "تنبيه قرب واد",
+                body: "اقتربت من وادي مخفي. تحقق من الطقس ولا تخيم في بطن الوادي."
+            ),
+            ProximityRegion(
+                identifier: "soft-sand-zone",
+                coordinate: CLLocationCoordinate2D(latitude: 24.87, longitude: 46.38),
+                radius: 1400,
+                title: "تنبيه رمال ناعمة",
+                body: "أمامك منطقة رمال ناعمة. خفف السرعة وجهز الدفع الرباعي."
+            ),
+            ProximityRegion(
+                identifier: "reptile-activity-zone",
+                coordinate: CLLocationCoordinate2D(latitude: 25.08, longitude: 46.75),
+                radius: 1000,
+                title: "تنبيه حياة فطرية",
+                body: "هذه المنطقة قد تشهد نشاط زواحف وعقارب ليلاً. استخدم كشافاً وافحص المكان."
+            )
+        ]
+
+        for region in regions {
+            let circularRegion = CLCircularRegion(
+                center: region.coordinate,
+                radius: region.radius,
+                identifier: region.identifier
+            )
+            circularRegion.notifyOnEntry = true
+            circularRegion.notifyOnExit = false
+            manager.startMonitoring(for: circularRegion)
+            proximityRegionMessages[region.identifier] = (region.title, region.body)
+        }
+    }
+
+    private var proximityRegionMessages: [String: (title: String, body: String)] = [:]
+}
+
+private struct ProximityRegion {
+    var identifier: String
+    var coordinate: CLLocationCoordinate2D
+    var radius: CLLocationDistance
+    var title: String
+    var body: String
 }
 
 extension LocationManager: CLLocationManagerDelegate {
@@ -66,6 +131,24 @@ extension LocationManager: CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         Task { @MainActor in
             heading = newHeading
+        }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        Task { @MainActor in
+            guard proximityAlertsEnabled else { return }
+            let message = proximityRegionMessages[region.identifier]
+            let content = UNMutableNotificationContent()
+            content.title = message?.title ?? "تنبيه قرب"
+            content.body = message?.body ?? "اقتربت من منطقة تحتاج انتباه أثناء الرحلة."
+            content.sound = .default
+
+            let request = UNNotificationRequest(
+                identifier: "proximity-\(region.identifier)-\(Date().timeIntervalSince1970)",
+                content: content,
+                trigger: nil
+            )
+            try? await notificationCenter.add(request)
         }
     }
 }
