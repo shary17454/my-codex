@@ -2,11 +2,16 @@
 
 App name: Batal Al-Droob / بطل الدروب
 
-This app is an informational reference catalog for Nissan Patrol parts. It contains an offline bundled catalog database extracted from parts PDFs and audited into structured records.
+This app is an informational reference catalog for Nissan Patrol Y60 parts. It contains an offline bundled catalog database extracted from parts PDFs and audited into structured records.
 
 No login is required.
-No payment is required in version 1.0.
-All part numbers and bundled catalog PDF pages are available for App Review without In-App Purchase.
+The app uses Apple In-App Purchase for protected catalog lookups and paid part request services.
+Configured product identifiers:
+- `batal.catalog.unlock`: consumable catalog/part-number lookup unlock.
+- `batal.parts.request.basic`: consumable basic part request, 10 SAR.
+- `batal.parts.request.urgent`: consumable urgent part request, 20 SAR.
+- `batal.parts.request.rare`: consumable rare/NOS part request, 50 SAR.
+The payment flow is used to unlock protected catalog pages, part-number details, and prepare paid part requests.
 No user-generated content is submitted in this version.
 No account credentials are needed for review.
 The app does not use non-exempt encryption; `ITSAppUsesNonExemptEncryption` is set to `false`.
@@ -15,12 +20,13 @@ Main test flow:
 1. Open the app.
 2. Search for a part number such as `63850-05J91`.
 3. Open a result.
-4. Review the part numbers, fitment years, catalog evidence, audit status, and confidence score.
-5. Tap the catalog button to open the bundled PDF catalog page.
-6. Open the part request screen and prepare a request draft without payment.
-7. Switch language between Arabic and English using the top button.
+4. Review the locked catalog/part-number details.
+5. Start the Apple In-App Purchase unlock flow for `batal.catalog.unlock`.
+6. After unlock, open the catalog page and review fitment years, catalog evidence, audit status, and confidence score.
+7. Open the paid part request screen and verify the three request tiers.
+8. Switch language between Arabic and English using the top button.
 
 Distribution note:
 - The app download should be free.
-- Version 1.0 does not require In-App Purchase for catalog lookup, part-number details, PDF catalog viewing, or preparing a part request.
-- Any future paid functionality will be submitted with matching App Store Connect In-App Purchase configuration before use.
+- Paid functionality is handled through Apple In-App Purchase, not through a paid app price.
+- Part request tiers in the app are: basic 10 SAR, urgent 20 SAR, rare/NOS 50 SAR.

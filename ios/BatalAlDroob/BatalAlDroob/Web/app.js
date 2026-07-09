@@ -22,21 +22,21 @@ const partRequestPlans = [
   {
     id: "basic",
     productId: "batal.parts.request.basic",
-    priceSar: 0,
+    priceSar: 10,
     titleKey: "requestBasicTitle",
     textKey: "requestBasicText"
   },
   {
     id: "urgent",
     productId: "batal.parts.request.urgent",
-    priceSar: 0,
+    priceSar: 20,
     titleKey: "requestUrgentTitle",
     textKey: "requestUrgentText"
   },
   {
     id: "rare",
     productId: "batal.parts.request.rare",
-    priceSar: 0,
+    priceSar: 50,
     titleKey: "requestRareTitle",
     textKey: "requestRareText"
   }
@@ -190,9 +190,9 @@ const translations = {
     sharedPartSources: "مصادر متعددة",
     sharedPartOpen: "عرض القطعة",
     sharedPartVerify: "تحقق قبل التركيب",
-    partRequestTitle: "طلب قطعة",
-    partRequestSubtitle: "جهز بيانات القطعة لإرسالها للمتاجر السعودية والخليجية والعالمية بدون دفع في نسخة 1.0.",
-    requestCustomerFeesTitle: "متاح للمراجعة",
+    partRequestTitle: "طلب قطعة مدفوع",
+    partRequestSubtitle: "ادفع رسوم طلب رمزية، ثم جهز بيانات القطعة لإرسالها للمتاجر السعودية والخليجية والعالمية.",
+    requestCustomerFeesTitle: "رسوم العميل",
     requestBasicTitle: "طلب عادي",
     requestBasicText: "تجهيز الطلب وإرساله للمتاجر المناسبة.",
     requestUrgentTitle: "طلب مستعجل",
@@ -211,11 +211,11 @@ const translations = {
     requestPartType: "نوع القطعة المطلوبة",
     requestGoal: "هدف الطلب",
     requestNotes: "ملاحظات إضافية",
-    requestSubmit: "تجهيز الطلب",
+    requestSubmit: "دفع الرسوم وتجهيز الطلب",
     requestDraftTitle: "نص الطلب الجاهز للمتاجر",
     requestRequired: "أدخل اسم القطعة أو رقم القطعة على الأقل.",
-    requestSubmitted: "تم حفظ طلب القطعة. يمكنك نسخ النص وإرساله للمتاجر.",
-    requestPlanLabel: "نوع الطلب",
+    requestSubmitted: "تم حفظ طلب القطعة بعد الدفع. يمكنك نسخ النص وإرساله للمتاجر.",
+    requestPlanLabel: "رسوم الطلب",
     requestHistoryTitle: "طلبات القطع المحفوظة",
     requestHistorySubtitle: "تظهر آخر الطلبات المحفوظة محلياً أو عبر API المحلي.",
     requestHistoryEmpty: "لا توجد طلبات محفوظة بعد.",
@@ -345,7 +345,7 @@ const translations = {
     generatedDiagramTitle: "مخطط مرسوم حسب رقم القطعة",
     generatedDiagramNote: "رسم إرشادي مستخرج من بيانات القطعة ومرجع الكتالوج. ملفات PDF الأصلية تبقى خارج التطبيق وتُفتح عند توفر رابط خارجي.",
     diagramNumber: "رقم الرسم",
-    payUnlockNumbers: "عرض أرقام القطع",
+    payUnlockNumbers: "دفع وفتح أرقام القطع",
     year: "سنة",
     page: "صفحة",
     enrichmentNext: "خطوة الإثراء التالية",
@@ -375,16 +375,16 @@ const translations = {
     auditReviewName: "يحتاج مراجعة اسم/تطبيق",
     auditReviewManual: "يحتاج مراجعة يدوية",
     lockedPartNumber: "رقم القطعة محمي",
-    paymentRequired: "متاح في نسخة 1.0",
-    paywallTitle: "محتوى الكتالوج متاح",
-    paywallText: "أرقام القطع وصفحات PDF المرفقة متاحة في نسخة 1.0 بدون شراء.",
-    payUnlockNumber: "عرض رقم القطعة",
-    payOpenCatalog: "فتح الكتالوج",
-    purchasePending: "جاري فتح المحتوى...",
-    purchaseSuccess: "تم فتح المحتوى",
-    purchaseUnavailable: "المحتوى متاح في نسخة 1.0 بدون شراء.",
-    purchaseCancelled: "تم إلغاء فتح المحتوى.",
-    protectedContent: "محتوى الكتالوج",
+    paymentRequired: "يتطلب دفع رمزي",
+    paywallTitle: "فتح الكتالوجات وأرقام القطع",
+    paywallText: "رقم القطعة وصفحة PDF محمية. ادفع مبلغًا رمزيًا لكل عملية فتح للاطلاع على الرقم أو فتح صفحة الكتالوج الأصلية.",
+    payUnlockNumber: "دفع وفتح رقم القطعة",
+    payOpenCatalog: "دفع وفتح الكتالوج",
+    purchasePending: "جاري طلب الدفع...",
+    purchaseSuccess: "تم الدفع وفتح المحتوى",
+    purchaseUnavailable: "الدفع غير متاح الآن. تأكد من إضافة منتج الشراء داخل App Store Connect.",
+    purchaseCancelled: "تم إلغاء عملية الدفع.",
+    protectedContent: "المحتوى محمي",
     captureBlocked: "تم حجب الكتالوج أثناء تسجيل الشاشة أو العرض الخارجي."
   },
   en: {
@@ -451,9 +451,9 @@ const translations = {
     sharedPartSources: "Multiple sources",
     sharedPartOpen: "View part",
     sharedPartVerify: "Verify before install",
-    partRequestTitle: "Part Request",
-    partRequestSubtitle: "Prepare the part request for Saudi, Gulf, and global stores with no payment in version 1.0.",
-    requestCustomerFeesTitle: "Included for review",
+    partRequestTitle: "Paid Part Request",
+    partRequestSubtitle: "Pay a small request fee, then prepare the part request for Saudi, Gulf, and global stores.",
+    requestCustomerFeesTitle: "Customer fee",
     requestBasicTitle: "Standard request",
     requestBasicText: "Prepare the request and route it to matching stores.",
     requestUrgentTitle: "Urgent request",
@@ -472,11 +472,11 @@ const translations = {
     requestPartType: "Requested part type",
     requestGoal: "Request goal",
     requestNotes: "Additional notes",
-    requestSubmit: "Prepare request",
+    requestSubmit: "Pay fee and prepare request",
     requestDraftTitle: "Store-ready request text",
     requestRequired: "Enter either the part name or part number.",
-    requestSubmitted: "Part request saved. You can copy the text and send it to stores.",
-    requestPlanLabel: "Request type",
+    requestSubmitted: "Part request saved after payment. You can copy the text and send it to stores.",
+    requestPlanLabel: "Request fee",
     requestHistoryTitle: "Saved part requests",
     requestHistorySubtitle: "Shows the latest requests saved locally or through the local API.",
     requestHistoryEmpty: "No saved requests yet.",
@@ -606,7 +606,7 @@ const translations = {
     generatedDiagramTitle: "Diagram Drawn From Part Number",
     generatedDiagramNote: "Reference drawing derived from part data and catalog references. Original PDFs stay outside the app and open only when an external link is available.",
     diagramNumber: "Diagram number",
-    payUnlockNumbers: "Show part numbers",
+    payUnlockNumbers: "Pay and unlock part numbers",
     year: "Year",
     page: "Page",
     enrichmentNext: "Next Enrichment Step",
@@ -636,16 +636,16 @@ const translations = {
     auditReviewName: "Needs name/fitment review",
     auditReviewManual: "Needs manual review",
     lockedPartNumber: "Protected part number",
-    paymentRequired: "Included in version 1.0",
-    paywallTitle: "Catalog content included",
-    paywallText: "Part numbers and bundled PDF pages are available in version 1.0 without purchase.",
-    payUnlockNumber: "Show part number",
-    payOpenCatalog: "Open catalog",
-    purchasePending: "Opening content...",
-    purchaseSuccess: "Content unlocked.",
-    purchaseUnavailable: "Content is available in version 1.0 without purchase.",
-    purchaseCancelled: "Content opening was cancelled.",
-    protectedContent: "Catalog content",
+    paymentRequired: "Small payment required",
+    paywallTitle: "Unlock catalogs and part numbers",
+    paywallText: "Part numbers and PDF pages are protected. Pay a small fee for each unlock to view the number or open the original catalog page.",
+    payUnlockNumber: "Pay and unlock part number",
+    payOpenCatalog: "Pay and open catalog",
+    purchasePending: "Requesting purchase...",
+    purchaseSuccess: "Payment complete. Content unlocked.",
+    purchaseUnavailable: "Payment is not available now. Add the in-app purchase product in App Store Connect.",
+    purchaseCancelled: "Purchase was cancelled.",
+    protectedContent: "Protected content",
     captureBlocked: "Catalog content is hidden while screen recording or mirroring is active."
   }
 };
@@ -1013,7 +1013,7 @@ function updatePartRequestPlans() {
     const plan = partRequestPlans.find((item) => item.id === button.dataset.requestPlan);
     if (!plan) return;
     const price = button.querySelector("strong");
-    if (price) price.textContent = currentLang === "ar" ? "بدون دفع" : "No payment";
+    if (price) price.textContent = formatMoney(plan.priceSar);
   });
 }
 
@@ -1217,7 +1217,8 @@ function fullPartNumbers(part) {
 }
 
 function isPartUnlocked(part) {
-  return Boolean(part);
+  const id = partAccessId(part);
+  return id && paidPartUnlocks.has(id);
 }
 
 function protectedPartNumber(part) {
@@ -1429,7 +1430,7 @@ function selectedPartRequestPlan() {
 }
 
 function requestPlanLine(plan) {
-  return t(plan.titleKey);
+  return `${t(plan.titleKey)} · ${formatMoney(plan.priceSar)}`;
 }
 
 function collectPartRequest(form) {
@@ -1487,9 +1488,9 @@ function savePartRequest(request, plan) {
     created_at: new Date().toISOString(),
     plan_id: plan.id,
     product_id: plan.productId,
-    fee_sar: 0,
+    fee_sar: plan.priceSar,
     currency: "SAR",
-    status: "saved_locally",
+    status: "paid_saved_locally",
     request,
     draft
   };
@@ -1653,7 +1654,19 @@ function copyText(text) {
 function requestPaidAccess(action) {
   pendingPaidAction = action;
   showPaymentStatus(t("purchasePending"));
-  completePaidAction();
+  const bridge = window.webkit?.messageHandlers?.batalStore;
+  if (bridge) {
+    bridge.postMessage({ action: "purchaseAccess", productId: action.productId || catalogUnlockProductId });
+    return;
+  }
+
+  const confirmed = window.confirm(`${action.confirmTitle || t("paywallTitle")}\n\n${action.confirmText || t("paywallText")}`);
+  if (confirmed) {
+    completePaidAction();
+  } else {
+    pendingPaidAction = null;
+    showPaymentStatus(t("purchaseCancelled"), "warning");
+  }
 }
 
 function completePaidAction() {
