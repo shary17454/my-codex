@@ -11,7 +11,7 @@ Configured product identifiers:
 - `batal.parts.request.basic`: consumable basic part request, 10 SAR.
 - `batal.parts.request.urgent`: consumable urgent part request, 20 SAR.
 - `batal.parts.request.rare`: consumable rare/NOS part request, 50 SAR.
-The payment flow is used to unlock protected catalog pages, part-number details, and prepare paid part requests.
+The payment flow is used to unlock protected part-number details, indexed catalog evidence, fitment data, and paid part request drafts.
 No user-generated content is submitted in this version.
 No account credentials are needed for review.
 The app does not use non-exempt encryption; `ITSAppUsesNonExemptEncryption` is set to `false`.
@@ -22,7 +22,7 @@ Main test flow:
 3. Open a result.
 4. Review the locked catalog/part-number details.
 5. Start the Apple In-App Purchase unlock flow for `batal.catalog.unlock`.
-6. After unlock, open the catalog page and review fitment years, catalog evidence, audit status, and confidence score.
+6. After unlock, review the revealed part numbers, fitment years, indexed catalog evidence, audit status, and confidence score. Original PDF files are not bundled in this App Store build.
 7. Open the paid part request screen and verify the three request tiers.
 8. Switch language between Arabic and English using the top button.
 

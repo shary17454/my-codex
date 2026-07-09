@@ -379,7 +379,7 @@ const translations = {
     paywallTitle: "فتح الكتالوجات وأرقام القطع",
     paywallText: "أرقام القطع محمية. ادفع مبلغًا رمزيًا لكل عملية فتح للاطلاع على الرقم وبياناته المفهرسة.",
     payUnlockNumber: "دفع وفتح رقم القطعة",
-    payOpenCatalog: "دفع وفتح الكتالوج",
+    payOpenCatalog: "عرض مرجع الكتالوج",
     catalogPdfUnavailable: "ملفات PDF الأصلية غير مضمّنة في نسخة App Store الحالية. رقم القطعة وبيانات التوافق والمصدر المفهرس متاحة داخل التطبيق.",
     purchasePending: "جاري طلب الدفع...",
     purchaseSuccess: "تم الدفع وفتح المحتوى",
@@ -641,7 +641,7 @@ const translations = {
     paywallTitle: "Unlock catalogs and part numbers",
     paywallText: "Part numbers are protected. Pay a small fee for each unlock to view the number and indexed source details.",
     payUnlockNumber: "Pay and unlock part number",
-    payOpenCatalog: "Pay and open catalog",
+    payOpenCatalog: "View catalog reference",
     catalogPdfUnavailable: "Original PDF files are not bundled in this App Store build. Part numbers, fitment data, and indexed source references remain available in the app.",
     purchasePending: "Requesting purchase...",
     purchaseSuccess: "Payment complete. Content unlocked.",
@@ -1682,15 +1682,6 @@ function completePaidAction() {
     renderParts();
     return;
   }
-  if (action.type === "open-pdf" && action.url) {
-    showPaymentStatus(t("purchaseSuccess"), "success");
-    if (!canOpenCatalogUrl(action.url)) {
-      showPaymentStatus(t("catalogPdfUnavailable"), "warning");
-      return;
-    }
-    window.location.assign(action.url);
-    return;
-  }
   if (action.type === "submit-part-request" && action.request && action.plan) {
     showPaymentStatus(t("purchaseSuccess"), "success");
     savePartRequest(action.request, action.plan);
@@ -1893,7 +1884,6 @@ function renderDetails() {
       </div>
       <div class="paywall-actions">
         ${numbers.length || part.record_type !== "catalog_page" ? `<button class="primary-action" type="button" data-paid-reveal="${partAccessId(part)}">${numbersUnlocked ? protectedPartNumbersText(part) : t("payUnlockNumbers")}</button>` : ""}
-        ${canOpenCatalogForPart(part) ? `<button class="secondary-action" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
       </div>
     </div>
 
@@ -1943,7 +1933,6 @@ function renderDetails() {
           </div>
         `).join("")}
       </div>
-      ${canOpenCatalogForPart(part) ? `<button class="pdf-link" type="button" data-paid-pdf="${pdfHref(part.source_pdf_path)}">${t("payOpenCatalog")} · ${t("page")} ${part.page_number}</button>` : ""}
     </div>
 
     <div class="detail-section">
@@ -2166,12 +2155,6 @@ detailPanel.addEventListener("click", (event) => {
   const revealButton = event.target.closest("[data-paid-reveal]");
   if (revealButton) {
     requestPaidAccess({ type: "unlock-number", partId: revealButton.dataset.paidReveal });
-    return;
-  }
-
-  const pdfButton = event.target.closest("[data-paid-pdf]");
-  if (pdfButton) {
-    requestPaidAccess({ type: "open-pdf", url: pdfButton.dataset.paidPdf });
     return;
   }
 
