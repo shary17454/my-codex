@@ -419,7 +419,7 @@ async function router(req, res) {
         coordinate,
         batteryPercent: Number(body.batteryPercent || 0),
         heading: Number(body.heading || 0),
-        message: String(body.message || 'طلب استغاثة من رفيق الخلا'),
+        message: String(body.message || 'طلب استغاثة من رفيق الدروب'),
         contactIds: Array.isArray(body.contactIds) ? body.contactIds : [],
         status: 'queued',
         createdAt: new Date().toISOString()

@@ -436,11 +436,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الخلا";
+				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الدروب";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -461,11 +461,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الخلا";
+				INFOPLIST_KEY_CFBundleDisplayName = "رفيق الدروب";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
