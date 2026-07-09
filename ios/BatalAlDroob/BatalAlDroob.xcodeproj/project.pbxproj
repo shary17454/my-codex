@@ -149,7 +149,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ -n \"$TARGET_BUILD_DIR\" ] && [ -n \"$FULL_PRODUCT_NAME\" ]; then\n  /usr/bin/xattr -cr \"$TARGET_BUILD_DIR/$FULL_PRODUCT_NAME\" || true\nfi\n";
+			shellScript = "if [ -n \"$TARGET_BUILD_DIR\" ] && [ -n \"$FULL_PRODUCT_NAME\" ]; then\n  APP_BUNDLE=\"$TARGET_BUILD_DIR/$FULL_PRODUCT_NAME\"\n  /usr/bin/xattr -cr \"$APP_BUNDLE\" || true\n  /bin/rm -rf \"$APP_BUNDLE/Web/catalog/patrol_full_unique\" \"$APP_BUNDLE/Web/catalog/pdfs\" || true\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -294,7 +294,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 33;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_ASSET_PATHS = "";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BatalAlDroob/Info.plist;
@@ -313,7 +313,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 33;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_ASSET_PATHS = "";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BatalAlDroob/Info.plist;

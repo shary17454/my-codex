@@ -2,6 +2,7 @@ let catalog = { parts: [], sources: [] };
 let catalogSearchIndex = { entries: [], stats: [] };
 let patrolCatalogDatabase = { summary: null, files: [] };
 let patrolFullCatalogIndex = { files: [], summary: null };
+let partFitmentIndex = { parts: {}, sources: {}, shared_fitment_candidates: [], pdfs_bundled: false };
 let storeDirectory = { verified_stores: [], categories: [] };
 let savedPartRequests = [];
 let parts = [];
@@ -342,7 +343,7 @@ const translations = {
     fullPartNumbersHint: "تعرض كل أرقام OEM المستخرجة من صفحات الكتالوج المرتبطة بهذه النتيجة.",
     noPartNumbers: "لا توجد أرقام قطعة مستخرجة",
     generatedDiagramTitle: "مخطط مرسوم حسب رقم القطعة",
-    generatedDiagramNote: "رسم إرشادي مستخرج من بيانات القطعة للتمييز السريع. للتحقق النهائي افتح صفحة PDF الأصلية.",
+    generatedDiagramNote: "رسم إرشادي مستخرج من بيانات القطعة ومرجع الكتالوج. ملفات PDF الأصلية تبقى خارج التطبيق وتُفتح عند توفر رابط خارجي.",
     diagramNumber: "رقم الرسم",
     payUnlockNumbers: "دفع وفتح أرقام القطع",
     year: "سنة",
@@ -603,7 +604,7 @@ const translations = {
     fullPartNumbersHint: "Shows all OEM numbers extracted from the catalog pages linked to this result.",
     noPartNumbers: "No extracted part numbers",
     generatedDiagramTitle: "Diagram Drawn From Part Number",
-    generatedDiagramNote: "Reference drawing derived from the part data for quick identification. Open the original PDF page for final verification.",
+    generatedDiagramNote: "Reference drawing derived from part data and catalog references. Original PDFs stay outside the app and open only when an external link is available.",
     diagramNumber: "Diagram number",
     payUnlockNumbers: "Pay and unlock part numbers",
     year: "Year",
@@ -919,6 +920,56 @@ function mergeCatalogEntries(baseParts, index) {
     .map(catalogEntryToPart)
     .filter((part) => !existing.has(part.part_number));
   return [...baseParts, ...catalogPageParts];
+}
+
+function normalizePartLookupKey(value) {
+  return String(value || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
+}
+
+function externalPdfPathForFitment(fitment, index) {
+  if (!fitment) return "";
+  if (fitment.remote_url) return fitment.remote_url;
+  if (index?.pdfs_bundled && fitment.source_pdf_path) return fitment.source_pdf_path;
+  return "";
+}
+
+function enrichPartsWithFitment(sourceParts, index) {
+  const fitmentParts = index?.parts || {};
+  const byNormalized = new Map();
+  Object.entries(fitmentParts).forEach(([key, value]) => {
+    byNormalized.set(normalizePartLookupKey(key), value);
+    byNormalized.set(normalizePartLookupKey(value.primary_oem_number), value);
+    (value.part_numbers || []).forEach((number) => byNormalized.set(normalizePartLookupKey(number), value));
+  });
+
+  return sourceParts.map((part) => {
+    const fitment = fitmentParts[part.part_number] || byNormalized.get(normalizePartLookupKey(part.part_number));
+    if (!fitment) return part;
+    const partNumbers = Array.from(new Set([
+      ...(Array.isArray(part.part_numbers) ? part.part_numbers : []),
+      ...(Array.isArray(fitment.part_numbers) ? fitment.part_numbers : [])
+    ].filter(Boolean)));
+    const evidence = (Array.isArray(fitment.evidence) && fitment.evidence.length)
+      ? fitment.evidence
+      : (part.evidence || []);
+    return {
+      ...part,
+      part_numbers: partNumbers,
+      primary_oem_number: fitment.primary_oem_number || part.primary_oem_number,
+      diagram_key: fitment.diagram_key || fitment.diagram_reference || part.diagram_key,
+      diagram_reference: fitment.diagram_reference || part.diagram_reference || "",
+      years: (fitment.years?.length ? fitment.years : part.years) || [],
+      engines: (fitment.engines?.length ? fitment.engines : part.engines) || [],
+      date_ranges: (fitment.date_ranges?.length ? fitment.date_ranges : part.date_ranges) || [],
+      source_count: fitment.source_count || part.source_count || 0,
+      occurrence_count: fitment.occurrence_count || part.occurrence_count || 0,
+      source_pdf_path: externalPdfPathForFitment(fitment, index) || part.source_pdf_path || "",
+      page_number: fitment.page_number || part.page_number,
+      evidence,
+      fitment_indexed: true,
+      shared_fitment_score: fitment.shared_fitment_score || 0
+    };
+  });
 }
 
 function applyLanguage() {
@@ -1836,6 +1887,7 @@ function renderDetails() {
         <div class="info-item"><span>${t("appearanceYears")}</span><strong>${yearsLabel(part)}</strong></div>
         <div class="info-item"><span>${t("engines")}</span><strong>${enginesLabel(part)}</strong></div>
         <div class="info-item"><span>${t("applicationDates")}</span><strong>${dateRangesLabel(part)}</strong></div>
+        <div class="info-item"><span>${t("diagramNumber")}</span><strong>${escapeHtml(part.diagram_reference || part.diagram_key || t("notSpecified"))}</strong></div>
         <div class="info-item"><span>${t("sourceCount")}</span><strong>${part.source_count}</strong></div>
         <div class="info-item"><span>${t("occurrenceCount")}</span><strong>${part.occurrence_count.toLocaleString("en-US")}</strong></div>
         <div class="info-item"><span>${t("category")}</span><strong>${categoryLabel(part)}</strong></div>
@@ -2055,7 +2107,16 @@ async function loadCatalog() {
       patrolFullCatalogIndex = { files: [], summary: patrolCatalogDatabase?.summary || null };
       console.warn("Full patrol catalog index unavailable", fullCatalogError);
     }
-    parts = mergeCatalogEntries(baseParts, catalogSearchIndex);
+    try {
+      partFitmentIndex = await fetchFirstJson([
+        "data/part_fitment_index.json",
+        "ios/BatalAlDroob/BatalAlDroob/Web/data/part_fitment_index.json"
+      ]);
+    } catch (fitmentError) {
+      partFitmentIndex = { parts: {}, sources: {}, shared_fitment_candidates: [], pdfs_bundled: false };
+      console.warn("Part fitment index unavailable", fitmentError);
+    }
+    parts = enrichPartsWithFitment(mergeCatalogEntries(baseParts, catalogSearchIndex), partFitmentIndex);
     await Promise.all([loadServiceDirectories(), loadPartRequestHistory()]);
   } catch (error) {
     catalog = { parts: fallbackParts, sources: [] };

@@ -46,6 +46,10 @@ build/
 **/Intermediates.noindex/
 
 
+
+# Keep heavy PDF catalogs external; the app ships searchable indexes instead.
+ios/BatalAlDroob/BatalAlDroob/Web/catalog/**/*.pdf
+
 # SQLite sidecar files
 data/*.sqlite-shm
 data/*.sqlite-wal
