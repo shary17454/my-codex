@@ -3385,6 +3385,7 @@ body {
 }
 
 .file-drop {
+  width: 100%;
   display: grid;
   gap: 4px;
   place-items: center;
@@ -3395,10 +3396,7 @@ body {
   color: var(--ink);
   background: rgba(212, 175, 55, 0.08);
   cursor: pointer;
-}
-
-.file-drop input {
-  display: none;
+  text-align: center;
 }
 
 .file-drop small,
@@ -3570,5 +3568,92 @@ body {
   .tool-card,
   .roadmap-grid article {
     padding: 12px;
+  }
+}
+
+/* iPad: use the available canvas instead of forcing the phone storefront into a 390px frame. */
+@media (min-width: 768px) {
+  body {
+    display: block;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: none;
+    min-height: 100vh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .workspace {
+    width: min(100%, 1180px);
+    min-height: 100vh;
+    max-height: none;
+    margin-inline: auto;
+    padding: 24px 28px 104px;
+    overflow: visible;
+  }
+
+  .topbar {
+    padding: 10px 2px 8px;
+  }
+
+  .search-band {
+    grid-template-columns: minmax(280px, 1.25fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .search-box {
+    grid-column: 1 / -1;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .generation-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .generation-card h3 {
+    font-size: 24px;
+  }
+
+  .platform-section {
+    padding: 20px;
+  }
+
+  .ai-workbench,
+  .market-grid,
+  .community-grid,
+  .tools-grid,
+  .roadmap-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .owner-grid,
+  .maintenance-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-dock {
+    position: fixed;
+    inset-inline: 50%;
+    transform: translateX(50%);
+    bottom: 12px;
+    width: min(620px, calc(100vw - 40px));
+    margin: 0;
+  }
+
+  [dir="ltr"] .app-dock {
+    transform: translateX(-50%);
   }
 }

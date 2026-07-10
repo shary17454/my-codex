@@ -1,8 +1,9 @@
 import UIKit
+import PhotosUI
 import StoreKit
 import WebKit
 
-final class WebViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler {
+final class WebViewController: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, PHPickerViewControllerDelegate {
     private var webView: WKWebView!
     private let catalogAccessProductID = "batal.catalog.unlock"
     private let allowedProductIDs: Set<String> = [
@@ -53,6 +54,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKScriptM
         let configuration = WKWebViewConfiguration()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.userContentController.add(self, name: "batalStore")
+        configuration.userContentController.add(self, name: "batalMedia")
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
@@ -69,16 +71,21 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKScriptM
     deinit {
         NotificationCenter.default.removeObserver(self)
         webView?.configuration.userContentController.removeScriptMessageHandler(forName: "batalStore")
+        webView?.configuration.userContentController.removeScriptMessageHandler(forName: "batalMedia")
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard
-            message.name == "batalStore",
-            let body = message.body as? [String: Any],
-            let action = body["action"] as? String
-        else {
+        guard let body = message.body as? [String: Any],
+              let action = body["action"] as? String else {
             return
         }
+
+        if message.name == "batalMedia", action == "choosePhoto" {
+            presentPhotoPicker()
+            return
+        }
+
+        guard message.name == "batalStore" else { return }
 
         if action == "purchaseAccess" {
             let productID = (body["productId"] as? String) ?? catalogAccessProductID
@@ -88,6 +95,36 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKScriptM
             }
             Task { await purchaseProduct(productID: productID) }
         }
+    }
+
+    private func presentPhotoPicker() {
+        guard presentedViewController == nil else { return }
+
+        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        configuration.filter = .images
+        configuration.selectionLimit = 1
+
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        picker.modalPresentationStyle = .formSheet
+        present(picker, animated: true)
+    }
+
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+
+        guard let provider = results.first?.itemProvider else {
+            sendJavaScriptCallback("window.BatalNativeMedia?.cancelled?.()")
+            return
+        }
+
+        let photoName = provider.suggestedName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let safeName = (photoName?.isEmpty == false ? photoName : nil) ?? "part-photo"
+        guard let data = try? JSONSerialization.data(withJSONObject: safeName),
+              let json = String(data: data, encoding: .utf8) else {
+            return
+        }
+        sendJavaScriptCallback("window.BatalNativeMedia?.receivePhotoName?.(\(json))")
     }
 
     private func installPrivacyShield() {

@@ -2368,12 +2368,29 @@ maintenanceForm?.addEventListener("submit", (event) => {
   showPaymentStatus("تمت إضافة عملية الصيانة", "success");
 });
 
-document.getElementById("aiImageInput")?.addEventListener("change", (event) => {
-  const file = event.target.files?.[0];
+function showPhotoCandidates(fileName) {
   const target = document.getElementById("aiImageResult");
-  if (!file) return;
-  const keywords = file.name.replace(/\.[a-z0-9]+$/i, " ").replace(/[-_]+/g, " ");
-  renderAiCandidates(target, keywords || "engine cooling electrical", `تم تجهيز الصورة: ${file.name}. النتائج التالية مرشحة من قاعدة الكتالوج إلى حين ربط نموذج التعرف من الصور.`);
+  if (!target || !fileName) return;
+  const keywords = fileName.replace(/\.[a-z0-9]+$/i, " ").replace(/[-_]+/g, " ");
+  renderAiCandidates(target, keywords || "engine cooling electrical", `تم اختيار الصورة: ${fileName}. النتائج التالية مرشحة من قاعدة الكتالوج إلى حين ربط نموذج التعرف من الصور.`);
+}
+
+window.BatalNativeMedia = {
+  receivePhotoName: showPhotoCandidates,
+  cancelled() {
+    const target = document.getElementById("aiImageResult");
+    if (target) target.textContent = "لم يتم اختيار صورة.";
+  }
+};
+
+document.getElementById("aiImageButton")?.addEventListener("click", () => {
+  const bridge = window.webkit?.messageHandlers?.batalMedia;
+  if (bridge) {
+    bridge.postMessage({ action: "choosePhoto" });
+    return;
+  }
+  const target = document.getElementById("aiImageResult");
+  if (target) target.textContent = "اختيار الصور متاح داخل تطبيق iOS.";
 });
 
 document.getElementById("descriptionSearchButton")?.addEventListener("click", () => {
