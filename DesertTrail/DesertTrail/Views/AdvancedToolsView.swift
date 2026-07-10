@@ -166,7 +166,7 @@ struct AdvancedToolsView: View {
     }
 
     private var platformVisionCard: some View {
-        featureCard(title: "منصة رفيق الدرب المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
+        featureCard(title: "منصة الدرب المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
             Text("هذه الشاشة تجمع التخطيط، الملاحة، الخرائط دون اتصال، السلامة، المجتمع، الذكاء الاصطناعي، والتكامل مع أجهزة Apple في تجربة واحدة للرحلة البرية.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -182,7 +182,7 @@ struct AdvancedToolsView: View {
                 }
             }
 
-            HStack {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 8)], alignment: .leading, spacing: 8) {
                 tag("خرائط")
                 tag("سلامة")
                 tag("مجتمع")
@@ -212,7 +212,7 @@ struct AdvancedToolsView: View {
                     }
                 }
 
-                HStack {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 8)], alignment: .leading, spacing: 8) {
                     tag("حيوانات")
                     tag("نباتات")
                     tag("محميات")
@@ -1018,11 +1018,11 @@ struct AdvancedToolsView: View {
 
     private func tag(_ text: String) -> some View {
         Text(text)
-            .font(.caption2.weight(.semibold))
-            .lineLimit(2)
-            .minimumScaleFactor(0.58)
+            .font(.system(size: 11, weight: .semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.62)
             .multilineTextAlignment(.center)
-            .frame(minWidth: 46, maxWidth: 70, minHeight: 32)
+            .frame(minWidth: 58, minHeight: 30)
             .padding(.horizontal, 6)
             .padding(.vertical, 4)
             .background(Color.desertSand.opacity(0.45), in: Capsule())
@@ -1066,7 +1066,7 @@ struct AdvancedToolsView: View {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }
             let content = UNMutableNotificationContent()
-            content.title = "تحذير رفيق الدرب"
+            content.title = "تحذير الدرب"
             content.body = "اقتربت من مسار رملي ناعم. تحقق من ضغط الإطارات قبل الدخول."
             content.sound = .default
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false)
@@ -1082,7 +1082,7 @@ struct SOSView: View {
 
     private var message: String {
         """
-        SOS رفيق الدرب
+        SOS الدرب
         آخر موقع معروف:
         \(coordinate.latitude), \(coordinate.longitude)
         الوقت: \(Date().formatted(date: .numeric, time: .shortened))
@@ -1245,7 +1245,7 @@ struct TripReportView: View {
 
     private var report: String {
         """
-        تقرير رحلة رفيق الدرب
+        تقرير رحلة الدرب
         البداية: \(startedAt.formatted(date: .numeric, time: .shortened))
         النهاية: \(Date().formatted(date: .numeric, time: .shortened))
         المسافة المقدرة: 18.6 كم
@@ -1571,10 +1571,16 @@ struct WildlifeSafetyGuideView: View {
                 }
             }
 
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], alignment: .leading, spacing: 8) {
+                compactFact("الخطورة", item.dangerLevel.rawValue)
+                compactFact("السمية", item.isVenomous ? "سام" : "غير سام")
+                compactFact("الموسم", item.activeSeason)
+                compactFact("النشاط", item.activityPeriod.rawValue)
+            }
+
             infoLine("التعرف", item.identification)
             infoLine("الانتشار", item.distribution)
             infoLine("البيئة", item.habitat)
-            infoLine("النشاط", "\(item.activeSeason) - \(item.activityPeriod.rawValue)")
             infoLine("عند المشاهدة", item.viewingAdvice)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -1605,9 +1611,16 @@ struct WildlifeSafetyGuideView: View {
                     )
                 )
                 .overlay(
-                    Image(systemName: item.imageName)
-                        .font(.system(size: 36, weight: .semibold))
-                        .foregroundStyle(.white)
+                    VStack(spacing: 4) {
+                        Image(systemName: item.imageName)
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(.white)
+                        Text(wildlifeVisualLabel(item))
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.92))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
                 )
             Text(item.activityPeriod.rawValue)
                 .font(.system(size: 9, weight: .bold))
@@ -1619,6 +1632,15 @@ struct WildlifeSafetyGuideView: View {
         }
         .frame(width: 72, height: 72)
         .accessibilityLabel("صورة توضيحية: \(item.arabicName)")
+    }
+
+    private func wildlifeVisualLabel(_ item: WildlifeSpeciesProfile) -> String {
+        if item.arabicName.contains("ثعبان") || item.arabicName.contains("أفعى") { return "زاحف" }
+        if item.arabicName.contains("عقرب") { return "عقرب" }
+        if item.arabicName.contains("عنكبوت") { return "عنكبوت" }
+        if item.arabicName.contains("ذئب") || item.arabicName.contains("ضبع") { return "مفترس" }
+        if item.arabicName.contains("ضب") || item.arabicName.contains("ورل") { return "سحلية" }
+        return "بري"
     }
 
     private func dangerBadge(_ text: String, color: Color) -> some View {
@@ -1683,6 +1705,21 @@ struct WildlifeSafetyGuideView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func compactFact(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.caption.weight(.bold))
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        .padding(8)
+        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func infoBlock(icon: String, title: String, subtitle: String, detail: String) -> some View {

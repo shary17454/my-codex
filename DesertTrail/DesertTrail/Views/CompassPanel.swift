@@ -5,7 +5,8 @@ struct CompassPanel: View {
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
-        VStack(spacing: 24) {
+        ScrollView {
+            VStack(spacing: 20) {
             ZStack {
                 Circle()
                     .fill(LinearGradient(colors: [.desertSand.opacity(0.9), .white], startPoint: .top, endPoint: .bottom))
@@ -56,7 +57,17 @@ struct CompassPanel: View {
             .buttonStyle(.borderedProminent)
             .padding(.horizontal)
 
-            Spacer()
+            Button {
+                appState.locationManager.requestBackgroundTripUpdates()
+            } label: {
+                Label("تفعيل تنبيهات قرب الأودية والخدمات", systemImage: "bell.badge")
+                    .font(.caption.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.orange)
+            .padding(.horizontal)
+            }
         }
         .padding()
     }

@@ -332,7 +332,7 @@ struct HomeDashboardView: View {
                     VStack(alignment: .trailing, spacing: 3) {
                         Text("المجتمع")
                             .font(.headline)
-                        Text("شارك مواقعك وتجاربك مع رحالة رفيق الدرب")
+                        Text("شارك مواقعك وتجاربك مع رحالة الدرب")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
