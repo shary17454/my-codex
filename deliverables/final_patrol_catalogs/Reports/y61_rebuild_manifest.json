@@ -1,0 +1,22 @@
+{
+  "output_dir": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Vehicle_Catalogs",
+  "files": 2,
+  "results": [
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y61_iab\\Y61_1997_213768_General_Asia_LHD_WAGON_TB45E_GRX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Vehicle_Catalogs\\Y61_1997_Y61_1997_213768_General_Asia_LHD_WAGON_TB45E_GRX.pdf",
+      "plates": 417,
+      "parts": 16042,
+      "diagrams": 417,
+      "verification_required": 2
+    },
+    {
+      "source": "C:\\Users\\safwa\\Documents\\Codex\\2026-06-26\\you-are-a-senior-nissan-epc\\sources\\partsouq\\full_y61_iab\\Y61_1997_213772_General_Asia_LHD_WAGON_TB45E_GRX.progressive.json",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Vehicle_Catalogs\\Y61_1997_Y61_1997_213772_General_Asia_LHD_WAGON_TB45E_GRX.pdf",
+      "plates": 417,
+      "parts": 16042,
+      "diagrams": 417,
+      "verification_required": 2
+    }
+  ]
+}

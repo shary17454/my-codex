@@ -1,0 +1,487 @@
+{
+  "output_dir": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup",
+  "vehicles": 26,
+  "results": [
+    {
+      "vid": "209302",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_04.2004_SAFARI_PICK_UP_PICKUP_TB45E_AD_209302.pdf",
+      "plates": 176,
+      "parts": 2911,
+      "diagrams": 176,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB45E",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "04.2004",
+        "spec": "12.2012",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFbb356DiFcBTBRBjlTUQMXNzAuX1BdXE5hUhocLzsnIyEiZ3BcNhgcGCk_JjdxbGZbUjwvLyk9JBBuayojTzs5FhkEVH5ZSw0OTFNINE8BYXZLRE9MWzc7LwQLZ0tET0xaNygucxwOSUpbMSUtLisSEgJLXTAvLUpDTRIIfSQ8TTNFSE0ERBwYSUo_LzspIk8cHgAEG01USUo7NAYPAEVITQsPHk1XEAkOSUoCHAAMTVcQHGUlShIAAAAAu68amA%3D%3D%24&vid=209302&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209303",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_04.2004_SAFARI_PICK_UP_PICKUP_TB45E_STD_209303.pdf",
+      "plates": 62,
+      "parts": 1319,
+      "diagrams": 62,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB45E",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "04.2004",
+        "spec": "12.2012",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEJPSxAYg1lT0JIaXgxD1FFZWJ8DQIPDhwzAEhOfWl1cXNwNSIOZEpOSnttdGUjPjQJAG59fXtvdkI8OXhxHWlrREtWBiwLGV9cHgEaZh1TMyQZFh0eCWVpfVZZNRkWHR4IZXp8IU5cGxgJY3d_fHlAQFAZD2Jvb34fE0JORmR3aR5mFh0dCxhSARofbHpofHJAQFAZV04eARofaztaQRkWHR5eXEsdWExGFxofUUlTWR1YTFJ8dh9BAAAAACBrhJk%3D%24&vid=209303&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209304",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_09.1999_SAFARI_PICK_UP_PICKUP_TB45S_AD_209304.pdf",
+      "plates": 54,
+      "parts": 723,
+      "diagrams": 54,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB45S",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "09.1999",
+        "spec": "04.2004",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFqXk9CAhQ3LxcPbHFLYDImBgEfbmFsbX9QYystHgoWEhATVkFtByktKRgOFwZAXVdqYw0eHhgMFSFfWhsSfgoIJyg1ZU9oejw_fWJ5BX4wUEd6dX59agYKHjU6QHp1fn1rBhkfQi0_eHtqABQcHxojIzN6bAEeHHtyfCM5TBUNfAJ0eXw1dS0peHsOHgoYE34tLzE1KnxleHsKBTc-MXR5fDo-L3xmITw_eHszLTE9fGYhLVQUeyMAAAAA1BSb5w%3D%3D%24&vid=209304&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209305",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_09.1999_SAFARI_PICK_UP_PICKUP_TB45S_STD_209305.pdf",
+      "plates": 7,
+      "parts": 131,
+      "diagrams": 7,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB45S",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "09.1999",
+        "spec": "04.2004",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEwBBUnUnI2fTVFS2FiHGh8XFtFNDs2NyUKOXF3RFBMSEpJDBs3XXN3c0JUTVwaBw0wOVdEREJWT3sFAEFIJFBSfXJvPxUyIGZlJzgjXyRqCh0gLyQnMFxQRG9gGiAvJCcxXENFGHdlIiEwWk5GRUB5eWkgNltWVkcmKnt3f11OUCdfLyQkMiFrOCMmVUNRRUt5eWkgbncnOCMmUgJjeCAvJCdnZXIkYXV4LiMmaHBqYCRhdWtFTyZ4AAAAABZaIEY%3D%24&vid=209305&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209306",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_09.1999_SAFARI_PICK_UP_PICKUP_TB45S_STD_209306.pdf",
+      "plates": 249,
+      "parts": 5199,
+      "diagrams": 249,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB45S",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "09.1999",
+        "spec": "12.2012",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGzh5a-0vfrsdCw7OyCtev_39jGt7i1tKaJuvL0x9PPy8nKj5i03vD08MHXzt-ZhI6zutTHx8HVzPiGg8LLp9PR_vHsvJaxo-XmpLug3KfpiZ6jrKeks9_Tx-zjmaOsp6Sy38DAlvTmoaKz2c3FxsP6-uqjtdjV1cSlqfj0_N7N06TcrKensaLou6Cl1sDSxsj6-uqj7fSku6Cl0YHg-6Osp6Tk5vGn4vb4raCl6_Pp46fi9ujGzKX7AAAAANyDvGI%3D%24&vid=209306&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209307",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\Y61_SAFARI_PICK_UP_General_Asia_LHD_GCTY61_10.2017_209307.pdf",
+      "plates": 28,
+      "parts": 426,
+      "diagrams": 28,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "General/Asia (LHD)",
+        "engine": "GCTY61",
+        "grade": "10.2017",
+        "market": "",
+        "generation": "",
+        "production": "",
+        "spec": "",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGqno-439bN5c6u1ar29_LmxsHfrqGsrb-Qo-vt3srW0tDTloGtx-nt6djO18aAnZeqo83e3tjM1eGfmtvSvsrI5-j1pY-ouvz_vaK5xb7wkIe6tb69qsbK3vX3l927sr-6qsHbgozxtLm8q8fa0dWN7f-4u6vA2d28sOHt5cfYyr3Ftb6-qLvxorm8z9nL39Hj4_O69O29orm824Kbiq6ovLO4u_v6t-3puKqyv7r07PWl7em4u9nTuuQAAAAA-fxDXw%3D%3D%24&vid=209307&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209308",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_TB48DE_AD_209308.pdf",
+      "plates": 90,
+      "parts": 1408,
+      "diagrams": 90,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:MIDDLE AND NEAR EAST; SUSPENSION:COIL",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwEGMiM5bVgKBHVxW146Nl5Kam1zAg0AARM8D0dBcmZ6fnx_Oi0Ba0VBRXRie2osMTsGD2FycnRgeU0zNnd-EmZkS0RZCSMEFlBTEQ4VaRJcPCsWGRIRBmpmcllbO3EXHhMWBm13LiBdGBUQB2t2fXkhQVMUFwdsdXEQHE1BSWt0ZhFpGRISBBddDhUQY3Vnc31PT18WWEERDhUQZDRVThYZEhFRU0QSV0NOBhkSEVlHW1RPWV8Wcn4RSQAAAADnX_EV%24&vid=209308&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209309",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\Y61_SAFARI_PICK_UP_General_Asia_LHD_GCTY61_10.2017_209309.pdf",
+      "plates": 52,
+      "parts": 632,
+      "diagrams": 52,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "General/Asia (LHD)",
+        "engine": "GCTY61",
+        "grade": "10.2017",
+        "market": "",
+        "generation": "",
+        "production": "",
+        "spec": "",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHu2sukhpS566SQs479xraigoWb6uXo6fvU56-pmo6SlpSX0sXpg62prZyKk4LE2dPu54mampyIkaXb3p-W-o6Mo6yx4cvs_ri7-eb9gfq01MP-8fr57oKOmrGz05n_9vv-7oWfxsi18P3474OelZHJqbv8_--EnZn49KWpoYOQjvmB8fr67P-15v34i52Pm5Wnp7f-sKn55v34n8bfzurs-Pf8_7--86mt_O_2-_6wqLHhqa38_52X_qAAAAAA6bOPqA%3D%3D%24&vid=209309&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209310",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_TB48DE_AD_209310.pdf",
+      "plates": 95,
+      "parts": 1418,
+      "diagrams": 94,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:MIDDLE AND NEAR EAST; SUSPENSION:COIL",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGNuajE3NXzitKH2N-An9XB4eb4iYaLipi3hMzK-e3x9ff0saaK4M7Kzv_p8OGnurCNhOr5-f_r8sa4vfz1me3vwM_SgqiPndvYmoWe4pnXt6CdkpmajeHt-dLQsPqclZidjeb8pavWk56bjOD99vKqytifnIzn_vqbl8bKwuDz7ZrikpmZj5zWhZ6b6P7s-PbExNSd08qahZ6b77_exZ2SmZra2M-Z3MjFjpKZmtLM0N_E0tSd-fWawgAAAADKdPfu%24&vid=209310&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209311",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\Y61_SAFARI_PICK_UP_General_Asia_LHD_GCTY61_10.2017_209311.pdf",
+      "plates": 82,
+      "parts": 997,
+      "diagrams": 81,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "General/Asia (LHD)",
+        "engine": "GCTY61",
+        "grade": "10.2017",
+        "market": "",
+        "generation": "",
+        "production": "",
+        "spec": "",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE0ABEfP1F3UDFmMWkWOmx4WF9BMD8yMyEOPXVzQFRITE5NCB8zWXdzd0ZQSVgeAwk0PVNAQEZSS38BBEVMIFRWeXZrOxE2JGJhIzwnWyBuDhkkKyAjNFhUQGtpCUMlLCEkNF9FHBJvKiciNVlET0sTc2EmJTVeVVNEIHNxbzBYTVUkWiwifTg5JD0gI1ZGUkMSc2EmJW1yJD0gIBgSGV8xMSMqJyJnOSdvPCcxLSYlbXA2NW88JyJGSiV9AAAAAEfzuLQ%3D%24&vid=209311&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209312",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_TB48DE_STD_209312.pdf",
+      "plates": 22,
+      "parts": 672,
+      "diagrams": 22,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:MIDDLE AND NEAR EAST; SUSPENSION:COIL",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwG2gpP54e_p2_e1zueqlu762t3Dsr2wsaOMv_fxwtbKzszPip2x2_Xx9cTSy9qcgYu2v9HCwsTQyf2DhsfOotbU-_TpuZO0puDjob6l2aLsjJumqaKhttrWwunri8GnrqOmtt3HnpDtqKWgt9vGzcmR8eOkp7fc19HGovHz7bLaz9em2K6g_7q7pr-iodTE0MGQ8eOkp-_wpr-ioomK-bWnrqOm4OT2_-nvtbWuo6bo8Om58fWkp8XPpvgAAAAAExzzcg%3D%3D%24&vid=209312&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209313",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\Y61_SAFARI_PICK_UP_General_Asia_LHD_GCTY61_10.2017_209313.pdf",
+      "plates": 35,
+      "parts": 539,
+      "diagrams": 35,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "General/Asia (LHD)",
+        "engine": "GCTY61",
+        "grade": "10.2017",
+        "market": "",
+        "generation": "",
+        "production": "",
+        "spec": "",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHm0sPbhaah4ZasoODDyr6qio2T4u3g4fPc76ehkoaanpyf2s3hi6WhpZSCm4rM0dvm74GSkpSAma3T1pee8oaEq6S56cPk9rCz8e71ifK83Mv2-fLx5oqGkrm725H3_vP25o2XzsC9-PXw54uZl5HLobP09-eMlZHw_K2hqYuUhvGJ-fLy5Pe97vXwg5WHk52vr7_2uKHx7vXwl87XxuLk8P_097e2-6Gl9OP-8_a4oLnpoaX095Wf9qgAAAAAld1R5g%3D%3D%24&vid=209313&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209314",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_08.2013_SAFARI_PICK_UP_PICKUP_TB48DE_AD_209314.pdf",
+      "plates": 24,
+      "parts": 660,
+      "diagrams": 24,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "08.2013",
+        "spec": "AREA:MIDDLE AND NEAR EAST; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwF9SVhpAS1-DSsABRwvSSUxERYIeXZ7emhHdDw6CR0BBQcEQVZ6ED46Pg8ZABFXSkB9dBoJCQ8bAjZITQwFaR0fMD8iclh_bSsoanVuEmknR1BtYmlqfREdCSIgQApsZWhtfRYMVVsmY25rfBACDApQOihvbHwXDgprZzY6MhAPHWoSYmlpf2wmdW5rGA4cCAY0NCRtIzpqdW5rH08uNW1iaWoqKD9pLDg1dmJpaiI8IC80IiRtCQVqMgAAAADCDG2N%24&vid=209314&q="
+      },
+      "status": "existing"
+    },
+    {
+      "vid": "209315",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\Y61_SAFARI_PICK_UP_General_Asia_LHD_GCTY61_10.2017_209315.pdf",
+      "plates": 128,
+      "parts": 1946,
+      "diagrams": 128,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "General/Asia (LHD)",
+        "engine": "GCTY61",
+        "grade": "10.2017",
+        "market": "",
+        "generation": "",
+        "production": "",
+        "spec": "",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwG0gJGV5f3s1s3G8u2asuz42N_BsL-ys6GOvfXzwNTIzM7NiJ-z2ffz98bQydieg4m0vdPAwMbSy_-BhMXMoNTW-fbru5G2pOLho7yn26Dujpmkq6CjtNjUwOvpicOlrKGktN_FnJLvqqeitdnLxcOZ8-GmpbXex8Oirv_z-9nK1KPbq6CgtqXvvKei0cfVwc_9_e2k6vOjvKeixZyFlLC2oq2mpeXkqfP3prKsoaTq8uu78_empcfNpPoAAAAAznJTAw%3D%3D%24&vid=209315&q="
+      }
+    },
+    {
+      "vid": "209316",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_TB48DE_AD_209316.pdf",
+      "plates": 95,
+      "parts": 2203,
+      "diagrams": 95,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:MIDDLE AND NEAR EAST; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGJvayj2Y7u04_-iefUodHF5eL8jYKPjpyzgMjO_en18fPwtaKO5MrOyvvt9OWjvrSJgO79_fvv9sK8ufjxnenrxMvWhqyLmd_cnoGa5p3Ts6SZlp2eieXp_dbUtP6YkZyZieL4oa_Sl5qfiOT2-P6kztybmIjj-v6fk8LOxuT36Z7mlp2di5jSgZqf7Pro_PLAwNCZ186egZqf67vawZmWnZ7e3Mud2MzBjpadntbI1NvA1tCZ_fGexgAAAAAEwB02%24&vid=209316&q="
+      }
+    },
+    {
+      "vid": "209317",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\Y61_SAFARI_PICK_UP_General_Asia_LHD_GCTY61_10.2017_209317.pdf",
+      "plates": 50,
+      "parts": 867,
+      "diagrams": 50,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "General/Asia (LHD)",
+        "engine": "GCTY61",
+        "grade": "10.2017",
+        "market": "",
+        "generation": "",
+        "production": "",
+        "spec": "",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHY7P3nmqefvNOcgbfx2oCUtLOt3NPe383i0ZmfrLikoKKh5PPftZufm6q8pbTy7-XY0b-srKq-p5Pt6KmgzLi6lZqH1_3ayI6Nz9DLt8yC4vXIx8zP2LS4rIeF5a_JwM3I2LOp8P6DxsvO2bWnqa_1n43Kydmyub-ozJ-dg9y0obnItsDOkdTVyNHMz7qqvq_-n43KyYGeyNHMzPT-9bPd3c_Gy86L1cuD0MvYwcrJgZza2YPQy86qpsmRAAAAAKbMv54%3D%24&vid=209317&q="
+      }
+    },
+    {
+      "vid": "209318",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_TB48DE_STD_209318.pdf",
+      "plates": 21,
+      "parts": 351,
+      "diagrams": 21,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:MIDDLE AND NEAR EAST; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGDt6a5-NGD1_Dmj8Ops9vP7-j2h4iFhJa5isLE9-P_-_n6v6iE7sDEwPHn_u-ptL6DiuT39_Hl_Mi2s_L7l-PhzsHcjKaBk9XWlIuQ7JfZua6TnJeUg-_j99zevvSSm5aTg-jyq6XYnZCVgu788vSuxNaRkoLp4uTzl8TG2Ifv-uKT7ZuVyo-Ok4qXlOHx5fSlxNaRktrFk4qXl7y_zICSm5aT1dHDytzagIOblpPdxdyMxMCRkvD6k80AAAAAW44Xnw%3D%3D%24&vid=209318&q="
+      }
+    },
+    {
+      "vid": "209319",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_08.2013_SAFARI_PICK_UP_PICKUP_TB48DE_AD_209319.pdf",
+      "plates": 32,
+      "parts": 647,
+      "diagrams": 32,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "08.2013",
+        "spec": "AREA:GENERAL; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGvm4qd39Pu1e3pr97zn_fjw8Taq6SpqLqVpu7o28_T19XWk4Sowuzo7N3L0sOFmJKvpsjb293J0OSan97Xu8_N4u3woIqtv_n6uKe8wLv1lYK_sLu4r8PP2_Dykti-t7q_r8TegYT0sby5rsLQ3tiC6Pq9vq7F3Ni5teTo4MLdz7jAsLu7rb70p7y5ytzO2tTm5va_8ei4p7y5zZ3857-wu7j4-u27_urkrbC7uPDu8v3m8Pa_29e44AAAAABliVRi%24&vid=209319&q="
+      }
+    },
+    {
+      "vid": "209320",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_TB48DE_AD_209320.pdf",
+      "plates": 83,
+      "parts": 1353,
+      "diagrams": 83,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:GENERAL; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHc6PnRqIqmvJSMvrvzzoSQsLep2Nfa28nm1Z2bqLygpKal4PfbsZ-bn664obD26-Hc1buoqK66o5fp7K2kyLy-kZ6D0_nezIqJy9TPs8iG5vHMw8jL3LC8qIOB4avNxMnM3Let8veHws_K3bGjravxm4nOzd22r6vKxpebk7GivMuzw8jI3s2H1M_Kua-9qaeVlYXMgpvL1M_Kvu6PlMzDyMuLiZ7IjZmU2MPIy4OdgY6Vg4XMqKTLkwAAAAAh-jvx%24&vid=209320&q="
+      }
+    },
+    {
+      "vid": "209321",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_TB48DE_STD_209321.pdf",
+      "plates": 41,
+      "parts": 584,
+      "diagrams": 40,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48DE",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:GENERAL; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwECNidIZQZ0Y3V5QHY4BFpObml3BgkEBRc4C0NFdmJ-enh7PikFb0FFQXBmf24oNT8CC2V2dnBkfUk3MnN6FmJgT0BdDScAElRXFQoRbRZYOC8SHRYVAm5idl1fP3UTGhcSAmlzLClZHBEUA299c3UvRVcQEwNoY2VyFkVHWQZue2MSbBoUSw4PEgsWFWBwZHUkRVcQE1tEEgsWFj0-TQETGhcSVFBCS11bAQUaFxJcRF0NRUEQE3F7EkwAAAAABk5QTQ%3D%3D%24&vid=209321&q="
+      }
+    },
+    {
+      "vid": "209325",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2011_SAFARI_PICK_UP_PICKUP_TB48E_AD_209325.pdf",
+      "plates": 151,
+      "parts": 2435,
+      "diagrams": 151,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48E",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2011",
+        "spec": "12.2012",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGYrL2W_uLt-MXOxtaZjsDU9PPtnJOen42ikdnf7Pjk4OLhpLOf9dvf2-r85fSyr6WYkf_s7Or-59OtqOngjPj61drHl72aiM7Nj5CL94zCorWIh4yPmPT47MfFpIiHjI-Z9OvtsN_NiomY8unk5eLR0cGInvPs7omAjtHLvuf_jvCGi47Hh9_bion87Pjq4Yzf3cPH2I6Xion498XMw4aLjsjM3Y6U08TNionB38PPjpTT36bmidEAAAAAjEyJmg%3D%3D%24&vid=209325&q="
+      }
+    },
+    {
+      "vid": "209326",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2011_SAFARI_PICK_UP_PICKUP_TB48E_STD_209326.pdf",
+      "plates": 98,
+      "parts": 1536,
+      "diagrams": 96,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TB48E",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2011",
+        "spec": "12.2012",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwGLv66a0_HY6vXQ_IXQo9PH5-D-j4CNjJ6xgsrM_-v38_Hyt6CM5sjMyPnv9uehvLaLguz___nt9MC-u_rzn-vpxsnUhK6Jm93enIOY5J_RsaablJ-ci-fr_9TWt5uUn5yK5_j-o8zemZqL4fr39vHCwtKbjeDt7fydkcDMxOb165zklJ-fiZrQg5id7vjq_vDCwtKb1cycg5id6bnYw5uUn5zc3smf2s7KlZid08vR25_aztD-9J3DAAAAANUh3ig%3D%24&vid=209326&q="
+      }
+    },
+    {
+      "vid": "209480",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_09.1999_SAFARI_PICK_UP_PICKUP_TD42_STD_209480.pdf",
+      "plates": 63,
+      "parts": 989,
+      "diagrams": 56,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TD42",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "09.1999",
+        "spec": "12.2012",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwE2AhMYPHduRlBtZ2ELMG56Wl1DMj0wMSMMP3dxQlZKTkxPCh0xW3VxdURSS1ocAQs2P1FCQkRQSX0DBkdOIlZUe3RpORM0JmBjIT4lWSJsDBsmKSIhNlpWRGlhbSglIDBbQkFDf39vJjFdT0FERCJxc20xWlFXQCcuIH9lEElRIF4oJSBpKXF1JCdSQlZETyJxc21pdiA5JCdWWWtibSglIGZicyA6fWdjJCdvcW1hIDp9cQhIJ38AAAAA_Row-g%3D%3D%24&vid=209480&q="
+      }
+    },
+    {
+      "vid": "209481",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_09.1999_SAFARI_PICK_UP_PICKUP_TD42_STD_209481.pdf",
+      "plates": 17,
+      "parts": 165,
+      "diagrams": 15,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "TD42",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "09.1999",
+        "spec": "12.2012",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwFHc2JGJlkCSg0XFEBkRR8LKywyQ0xBQFJ9TgYAMyc7Pz0-e2xAKgQABDUjOittcHpHTiAzMzUhOAxydzY_UyclCgUYSGJFVxESUE9UKFMdfWpXWFNQRysnNRgQHFlUUUEqMzY_Dg4eV0AsPjA1NVMAAhxAKyAmMVZfUQ4UYTggUS9ZVFEYWAAEVVYjMyc1PlMAAhwYB1FIVVYnKBoTHFlUURcTAlFLDBcSVVYeABwQUUsMAHk5Vg4AAAAALJsjmA%3D%3D%24&vid=209481&q="
+      }
+    },
+    {
+      "vid": "209719",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_ZD30DDTI_AD_209719.pdf",
+      "plates": 7,
+      "parts": 120,
+      "diagrams": 5,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "ZD30DDTI",
+        "grade": "AD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:GENERAL; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHQ5PXw0tG21q6midTdxoicvLul1NvW18Xq2ZGXpLCsqKqp7PvXvZOXk6K0rbz65-3Q2bekpKK2r5vl4KGoxLCynZKP3_XSwIaFx9jDv8SK6v3Az8TH0Ly-ooiF7aa3rcfOw8bV5PLsrMHIxcDXu6r-9O_Az8TH17ylopmZicDVu6i2wbnKm5fAlsHexcCzpbT6-IvOw8aIkcHexpnh8NTSxsnCwYGAzZeTwtLcycLBiZTS0YvYw8airsGZAAAAAOt8f3c%3D%24&vid=209719&q="
+      }
+    },
+    {
+      "vid": "209720",
+      "pdf": "C:\\Users\\safwa\\Documents\\Codex\\2026-07-01\\partsouq-com-1-y60-y60-y61-2\\outputs\\كتلوجات الباترول من اللابتوب\\النسخة_الشاملة_المترجمة\\Y61\\Safari_Pickup\\TY61_12.2012_SAFARI_PICK_UP_PICKUP_ZD30DDTI_STD_209720.pdf",
+      "plates": 19,
+      "parts": 342,
+      "diagrams": 14,
+      "vehicle": {
+        "vehicle": "SAFARI PICK UP",
+        "body_style": "PICKUP",
+        "engine": "ZD30DDTI",
+        "grade": "STD",
+        "market": "General/Asia (LHD)",
+        "generation": "TY61",
+        "production": "12.2012",
+        "spec": "AREA:GENERAL; SUSPENSION:LEAF",
+        "source": "https://partsouq.com/en/catalog/genuine/vehicle?c=Nissan&ssd=%24%2AKwHe6vuRqrqdrqm4rI2Eg4aSsrWr2tXY2cvk15-Zqr6ipqSn4vXZs52Znay6o7L06ePe17mqqqy4oZXr7q-myr68k5yB0fvczoiLydbNscqE5PPOwcrJ3rKwrIaL46i5o8nAzcjb6vzios_Gy87ZtaTw-uHOwcrJ2bK5vPGZi8zP3LShuci1mZuFhZnI0czPuqnn-urOwcrJgZ7I0pWZ87Xb28nAzciN082F1s3b3MDNyIXH0sPO18rJq6HIlQAAAACWf9e5%24&vid=209720&q="
+      }
+    }
+  ]
+}
