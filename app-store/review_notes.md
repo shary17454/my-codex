@@ -40,3 +40,10 @@ Latest review preparation update:
 - Guideline 4: The iPad interface now uses the full available canvas with responsive multi-column layouts, larger controls, and consistent spacing instead of rendering the phone storefront in a narrow fixed-width frame.
 - Guideline 2.1(a): The WebKit file input that exposed the camera path was removed. Image selection now uses Apple's native PHPicker and is limited to the photo library. We tested opening and cancelling the picker on an iPad Air 11-inch simulator running iPadOS 26.5 without a crash.
 - Guideline 1.5: The Support URL has been replaced with a public support page containing Arabic and English support information.
+
+## App Review fixes in build 56
+
+- Version/Build updated to `1.0.1+56`.
+- App Store metadata URLs (Privacy Policy / Support) now point to `https://batal-al-droob-support.sharyalhwaid.chatgpt.site` in both Arabic and English metadata.
+- Camera startup now prefers back camera in capture flows and handles missing camera/access-denied errors more gracefully with stable fallback and readable user messages.
+- Camera initialization path now consistently returns actionable errors on failure to aid debugging before retrying.

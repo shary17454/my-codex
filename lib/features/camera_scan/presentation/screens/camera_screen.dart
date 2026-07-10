@@ -44,8 +44,13 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
         return;
       }
 
+      final selectedCamera = cameras.firstWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.back,
+        orElse: () => cameras.first,
+      );
+
       final controller = CameraController(
-        cameras.first,
+        selectedCamera,
         ResolutionPreset.high,
         enableAudio: false,
       );
@@ -57,6 +62,18 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
       setState(() {
         _controller = controller;
+        _errorMessage = null;
+        _isInitializing = false;
+      });
+    } on CameraException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      final message = error.code == 'cameraAccessDenied'
+          ? AppLocalizations.of(context).noCamera
+          : error.description ?? error.code;
+      setState(() {
+        _errorMessage = message;
         _isInitializing = false;
       });
     } catch (error) {

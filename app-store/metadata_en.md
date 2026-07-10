@@ -35,7 +35,7 @@ Reference or Utilities
 The app includes an In-App Purchase for unlocking protected catalog pages and part-number details.
 
 ## Privacy Policy URL
-https://github.com/shary17454/my-codex/blob/main/docs/privacy.html
+https://batal-al-droob-support.sharyalhwaid.chatgpt.site
 
 ## Support URL
-https://github.com/shary17454/my-codex/blob/main/docs/support.html
+https://batal-al-droob-support.sharyalhwaid.chatgpt.site

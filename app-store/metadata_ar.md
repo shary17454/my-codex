@@ -35,7 +35,7 @@ Reference أو Utilities
 يحتوي التطبيق على شراء داخل التطبيق لفتح صفحات الكتالوج وأرقام القطع المحمية.
 
 ## رابط سياسة الخصوصية
-https://github.com/shary17454/my-codex/blob/main/docs/privacy.html
+https://batal-al-droob-support.sharyalhwaid.chatgpt.site
 
 ## رابط الدعم
-https://github.com/shary17454/my-codex/blob/main/docs/support.html
+https://batal-al-droob-support.sharyalhwaid.chatgpt.site
