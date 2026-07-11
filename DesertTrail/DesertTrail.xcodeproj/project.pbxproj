@@ -48,6 +48,8 @@
 		0A1000250000000000000001 /* AdvancedFeatureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000280000000000000001 /* AdvancedFeatureModels.swift */; };
 		0A1000260000000000000001 /* AdvancedToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000290000000000000001 /* AdvancedToolsView.swift */; };
 		0A10002C0000000000000001 /* RafiqAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002C0000000000000001 /* RafiqAPIClient.swift */; };
+		0A10002D0000000000000001 /* CoordinateNavigationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002D0000000000000001 /* CoordinateNavigationModels.swift */; };
+		0A10002E0000000000000001 /* CoordinateNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002E0000000000000001 /* CoordinateNavigationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -92,6 +94,8 @@
 		0A2000280000000000000001 /* AdvancedFeatureModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedFeatureModels.swift; sourceTree = "<group>"; };
 		0A2000290000000000000001 /* AdvancedToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedToolsView.swift; sourceTree = "<group>"; };
 		0A20002C0000000000000001 /* RafiqAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RafiqAPIClient.swift; sourceTree = "<group>"; };
+		0A20002D0000000000000001 /* CoordinateNavigationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateNavigationModels.swift; sourceTree = "<group>"; };
+		0A20002E0000000000000001 /* CoordinateNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateNavigationView.swift; sourceTree = "<group>"; };
 		0A2000120000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0A2000130000000000000001 /* DesertTrail.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DesertTrail.entitlements; sourceTree = "<group>"; };
 		0A2000140000000000000001 /* DesertTrail.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DesertTrail.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,6 +151,7 @@
 			children = (
 				0A2000040000000000000001 /* TripModels.swift */,
 				0A2000280000000000000001 /* AdvancedFeatureModels.swift */,
+				0A20002D0000000000000001 /* CoordinateNavigationModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -183,6 +188,7 @@
 				0A2000200000000000000001 /* PDFImportPicker.swift */,
 				0A2000210000000000000001 /* PDFSourceManagerView.swift */,
 				0A2000290000000000000001 /* AdvancedToolsView.swift */,
+				0A20002E0000000000000001 /* CoordinateNavigationView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -310,6 +316,8 @@
 				0A1000250000000000000001 /* AdvancedFeatureModels.swift in Sources */,
 				0A1000260000000000000001 /* AdvancedToolsView.swift in Sources */,
 				0A10002C0000000000000001 /* RafiqAPIClient.swift in Sources */,
+				0A10002D0000000000000001 /* CoordinateNavigationModels.swift in Sources */,
+				0A10002E0000000000000001 /* CoordinateNavigationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,7 +444,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
@@ -445,7 +453,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.codex.DesertTrail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -461,7 +469,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
@@ -470,7 +478,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.codex.DesertTrail;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

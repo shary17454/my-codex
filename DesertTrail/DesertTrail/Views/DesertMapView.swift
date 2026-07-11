@@ -118,7 +118,13 @@ struct DesertMapView: View {
                     metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
                 }
 
-                HStack(spacing: 8) {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 8),
+                        GridItem(.flexible(), spacing: 8)
+                    ],
+                    spacing: 8
+                ) {
                     compactMapActionButton(
                         title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
                         icon: "location.north.line",
@@ -236,7 +242,7 @@ struct DesertMapView: View {
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.55)
             }
-            .frame(maxWidth: .infinity, minHeight: 58)
+            .frame(maxWidth: .infinity, minHeight: 68)
             .padding(.horizontal, 4)
         }
         .buttonStyle(.plain)
@@ -407,16 +413,17 @@ struct GeospatialLayerCatalogView: View {
                 Slider(value: $wildernessTileOpacity, in: 0.2...1.0, step: 0.05)
             }
 
-            HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
                 Label(isTileTemplateValid ? "الرابط جاهز للتطبيق" : "الرابط يجب أن يحتوي {z} و{x} و{y}", systemImage: isTileTemplateValid ? "checkmark.circle" : "exclamationmark.triangle")
                     .foregroundStyle(isTileTemplateValid ? Color.green : Color.orange)
                     .lineLimit(2)
                     .minimumScaleFactor(0.72)
-                Spacer()
-                mapSourceSmallButton("تجربة") { applyDemoTileTemplate() }
-                mapSourceSmallButton("تطبيق") { applyTileTemplate() }
-                    .disabled(!isTileTemplateValid)
-                mapSourceSmallButton("إيقاف") { disableTileOverlay() }
+                HStack(spacing: 8) {
+                    mapSourceSmallButton("تجربة") { applyDemoTileTemplate() }
+                    mapSourceSmallButton("تطبيق") { applyTileTemplate() }
+                        .disabled(!isTileTemplateValid)
+                    mapSourceSmallButton("إيقاف") { disableTileOverlay() }
+                }
             }
             .font(.caption)
 
@@ -633,11 +640,14 @@ struct GeospatialLayerCatalogView: View {
     }
 
     private func mapSourceSmallButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(title, action: action)
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
+        Button(action: action) {
+            Text(title)
+                .font(.caption2.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+                .frame(maxWidth: .infinity, minHeight: 30)
+        }
+        .buttonStyle(.bordered)
     }
 
     private func applyDemoTileTemplate() {

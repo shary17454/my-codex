@@ -45,6 +45,7 @@ struct AdvancedToolsView: View {
         ScrollView {
             LazyVStack(spacing: 14) {
                 activeDriveCard
+                coordinateNavigatorEntryCard
                 toolStatusBanner
                 platformVisionCard
                 wildlifeGuideEntryCard
@@ -165,6 +166,44 @@ struct AdvancedToolsView: View {
         .buttonStyle(.plain)
     }
 
+    private var coordinateNavigatorEntryCard: some View {
+        NavigationLink {
+            CoordinateNavigationView()
+        } label: {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.oasisTeal.opacity(0.16))
+                    Image(systemName: "location.north.line.fill")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(Color.oasisTeal)
+                }
+                .frame(width: 54, height: 54)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("ملاحة الإحداثيات دون إنترنت")
+                        .font(.headline)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                    Text("حفظ نقاط، رجوع للوجهة، اتجاه ومسافة، GPX، مشاركة AirDrop/واتساب وروابط الخرائط.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.74)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.left")
+                    .font(.headline)
+                    .foregroundStyle(Color.oasisTeal)
+            }
+            .padding()
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
+
     private var dashboardCard: some View {
         featureCard(title: "لوحة قيادة الرحلة", icon: "gauge.with.dots.needle.67percent", color: .oasisTeal) {
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
@@ -201,7 +240,7 @@ struct AdvancedToolsView: View {
                 }
             }
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 8)], alignment: .leading, spacing: 8) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 74), spacing: 8)], alignment: .leading, spacing: 8) {
                 tag("خرائط")
                 tag("سلامة")
                 tag("مجتمع")
@@ -231,7 +270,7 @@ struct AdvancedToolsView: View {
                     }
                 }
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 8)], alignment: .leading, spacing: 8) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 74), spacing: 8)], alignment: .leading, spacing: 8) {
                     tag("حيوانات")
                     tag("نباتات")
                     tag("محميات")
@@ -1060,13 +1099,13 @@ struct AdvancedToolsView: View {
             handleToolShortcut(title: text, value: "")
         } label: {
             Text(text)
-                .font(.system(size: 11, weight: .semibold))
-                .lineLimit(1)
-                .minimumScaleFactor(0.62)
+                .font(.system(size: 10, weight: .semibold))
+                .lineLimit(2)
+                .minimumScaleFactor(0.52)
                 .multilineTextAlignment(.center)
-                .frame(minWidth: 58, minHeight: 30)
+                .frame(minWidth: 68, minHeight: 34)
                 .padding(.horizontal, 6)
-                .padding(.vertical, 4)
+                .padding(.vertical, 3)
                 .background(Color.desertSand.opacity(0.45), in: Capsule())
         }
         .buttonStyle(.plain)

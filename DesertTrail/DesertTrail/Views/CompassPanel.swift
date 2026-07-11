@@ -103,6 +103,13 @@ struct CompassPanel: View {
         .padding()
         .navigationBarTitleDisplayMode(.inline)
         .animation(.easeInOut(duration: 0.2), value: statusMessage)
+        .onAppear {
+            if appState.locationManager.authorizationStatus == .notDetermined {
+                appState.locationManager.requestWhenInUse()
+            } else if appState.locationManager.authorizationStatus == .authorizedWhenInUse || appState.locationManager.authorizationStatus == .authorizedAlways {
+                appState.locationManager.startNavigation()
+            }
+        }
     }
 
     private var normalizedHeading: Double {

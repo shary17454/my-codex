@@ -29,6 +29,10 @@ final class LocationManager: NSObject, ObservableObject {
         if authorizationStatus == .notDetermined {
             requestWhenInUse()
         }
+        guard authorizationStatus != .denied, authorizationStatus != .restricted else {
+            isTracking = false
+            return
+        }
         isTracking = true
         manager.startUpdatingLocation()
         if CLLocationManager.headingAvailable() {
@@ -48,7 +52,7 @@ final class LocationManager: NSObject, ObservableObject {
         } else if authorizationStatus == .authorizedWhenInUse {
             manager.requestAlwaysAuthorization()
         }
-        manager.allowsBackgroundLocationUpdates = true
+        manager.allowsBackgroundLocationUpdates = authorizationStatus == .authorizedAlways
         manager.pausesLocationUpdatesAutomatically = true
         proximityAlertsEnabled = true
         startNavigation()
@@ -150,5 +154,9 @@ extension LocationManager: CLLocationManagerDelegate {
             )
             try? await notificationCenter.add(request)
         }
+    }
+
+    nonisolated func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {
+        true
     }
 }
