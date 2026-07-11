@@ -126,7 +126,7 @@ enum LocalizedKey {
 
     private var arabicValue: String {
         switch self {
-        case .appTitle: return "الدرب"
+        case .appTitle: return "الدروب"
         case .map: return "الخريطة"
         case .compass: return "البوصلة"
         case .planner: return "التقويم"
