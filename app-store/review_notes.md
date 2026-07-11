@@ -54,3 +54,9 @@ Latest review preparation update:
 - Guideline 1.5: Review notes now explicitly provide the public support context and confirm the app has no login requirement. Support and Privacy URLs should remain set to `https://batal-al-droob-support.sharyalhwaid.chatgpt.site` in App Store Connect.
 - Guideline 2.1: Review notes now include a complete reviewer test flow covering search, result details, locked catalog details, Apple In-App Purchase unlock, request tiers, and language switching.
 - Build 59 was not selected for this submission because it was produced from `DesertTrail` / `Al Darb` changes in the shared repository, not from the Batal Al-Droob target.
+
+## App Review fixes in build 65
+
+- Version/Build updated to `1.0.1+65` for the Batal Al-Droob target only.
+- Build 64 was not selected because it was generated from `DesertTrail` / `Al Beed` changes in the shared repository and failed in Xcode Cloud with no reported project build errors.
+- This submission returns the Xcode Cloud latest commit to the correct Batal Al-Droob App Store target (`com.batalaldroob.parts`).
