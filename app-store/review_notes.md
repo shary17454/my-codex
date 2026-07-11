@@ -47,3 +47,10 @@ Latest review preparation update:
 - App Store metadata URLs (Privacy Policy / Support) now point to `https://batal-al-droob-support.sharyalhwaid.chatgpt.site` in both Arabic and English metadata.
 - Camera startup now prefers back camera in capture flows and handles missing camera/access-denied errors more gracefully with stable fallback and readable user messages.
 - Camera initialization path now consistently returns actionable errors on failure to aid debugging before retrying.
+
+## App Review fixes in build 60
+
+- Version/Build updated to `1.0.1+60` for the Batal Al-Droob target only.
+- Guideline 1.5: Review notes now explicitly provide the public support context and confirm the app has no login requirement. Support and Privacy URLs should remain set to `https://batal-al-droob-support.sharyalhwaid.chatgpt.site` in App Store Connect.
+- Guideline 2.1: Review notes now include a complete reviewer test flow covering search, result details, locked catalog details, Apple In-App Purchase unlock, request tiers, and language switching.
+- Build 59 was not selected for this submission because it was produced from `DesertTrail` / `Al Darb` changes in the shared repository, not from the Batal Al-Droob target.
