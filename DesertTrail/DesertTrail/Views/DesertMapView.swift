@@ -66,6 +66,7 @@ struct DesertMapView: View {
                     Text(appState.text(.markedPlans)).tag(DesertMapLayer.markedPlans)
                 }
                 .pickerStyle(.segmented)
+                .font(.caption.weight(.semibold))
 
                 if mapLayer == .ajaji {
                     Picker(appState.text(.ajajiMaps), selection: $ajajiImageIndex) {
@@ -117,40 +118,30 @@ struct DesertMapView: View {
                     metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
                 }
 
-                HStack {
-                    Button {
+                HStack(spacing: 8) {
+                    compactMapActionButton(
+                        title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
+                        icon: "location.north.line",
+                        isPrimary: true
+                    ) {
                         appState.locationManager.isTracking ? appState.locationManager.stopNavigation() : appState.locationManager.startNavigation()
-                    } label: {
-                        Label(appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation), systemImage: "location.north.line")
                     }
-                    .buttonStyle(.borderedProminent)
-
-                    Button {
+                    compactMapActionButton(title: appState.text(.addPlace), icon: "plus") {
                         showingAddPlace = true
-                    } label: {
-                        Label(appState.text(.addPlace), systemImage: "plus")
                     }
-                    .buttonStyle(.bordered)
-
-                    Button {
+                    compactMapActionButton(title: appState.text(.offline), icon: "icloud.and.arrow.down") {
                         showingOfflineMaps = true
-                    } label: {
-                        Image(systemName: "icloud.and.arrow.down")
                     }
-                    .buttonStyle(.bordered)
-                    .accessibilityLabel(appState.text(.offline))
-
-                    Button {
+                    compactMapActionButton(title: "GIS", icon: "square.3.layers.3d") {
                         showingGeospatialCatalog = true
-                    } label: {
-                        Image(systemName: "square.3.layers.3d")
                     }
-                    .buttonStyle(.bordered)
-                    .accessibilityLabel("مصادر GIS")
                 }
             }
-            .padding()
+            .padding(12)
             .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .padding(.horizontal, 10)
+            .padding(.bottom, 76)
         }
         .task(id: appState.locationManager.currentLocation?.coordinate.latitude) {
             let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
@@ -220,11 +211,45 @@ struct DesertMapView: View {
                 .font(.caption2)
                 .foregroundStyle(.secondary)
             Text(value)
-                .font(.headline.monospacedDigit())
+                .font(.headline.monospacedDigit().weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.56)
         }
-        .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
         .padding(10)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func compactMapActionButton(
+        title: String,
+        icon: String,
+        isPrimary: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.headline.weight(.bold))
+                Text(title)
+                    .font(.caption2.weight(.bold))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.55)
+            }
+            .frame(maxWidth: .infinity, minHeight: 58)
+            .padding(.horizontal, 4)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(isPrimary ? .white : Color.desertCopper)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(isPrimary ? Color.desertCopper : Color(.systemBackground).opacity(0.72))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Color.desertCopper.opacity(isPrimary ? 0.0 : 0.35), lineWidth: 1)
+        )
+        .accessibilityLabel(title)
     }
 }
 
@@ -266,9 +291,11 @@ struct LicensedMapPlaceholderView: View {
 
 struct GeospatialLayerCatalogView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @State private var query = ""
     @State private var selectedFormat: GeospatialLayerFormat?
     @State private var layers = GeospatialMapLayer.officialSamples
+    @State private var statusMessage: String?
     @AppStorage("wildernessTileOverlayEnabled") private var wildernessTileOverlayEnabled = false
     @AppStorage("wildernessTileTemplate") private var wildernessTileTemplate = ""
     @AppStorage("wildernessTileName") private var wildernessTileName = "طبقة برية مخصصة"
@@ -302,6 +329,7 @@ struct GeospatialLayerCatalogView: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("مصادر الخرائط البرية")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("تم") {
@@ -315,10 +343,13 @@ struct GeospatialLayerCatalogView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("كتالوج GIS عالي الدقة", systemImage: "map")
-                .font(.title3.weight(.bold))
+                .font(.headline.weight(.bold))
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
             Text("يدير مصادر المساحة الجيولوجية، خرائط العجاجي، المخططات المرشمة، وحزم MBTiles/WMTS المرخصة قبل دمجها في MapKit وPDFKit.")
-                .font(.footnote)
+                .font(.caption)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
@@ -331,21 +362,18 @@ struct GeospatialLayerCatalogView: View {
                 .textFieldStyle(.roundedBorder)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    Button("الكل") {
+                HStack(spacing: 8) {
+                    filterButton("الكل", isSelected: selectedFormat == nil) {
                         selectedFormat = nil
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(selectedFormat == nil ? .oasisTeal : .gray)
 
                     ForEach(GeospatialLayerFormat.allCases) { format in
-                        Button(format.rawValue) {
+                        filterButton(format.rawValue, isSelected: selectedFormat == format) {
                             selectedFormat = format
                         }
-                        .buttonStyle(.bordered)
-                        .tint(selectedFormat == format ? .oasisTeal : .gray)
                     }
                 }
+                .padding(.vertical, 2)
             }
         }
         .padding()
@@ -364,6 +392,7 @@ struct GeospatialLayerCatalogView: View {
                 .keyboardType(.URL)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .font(.caption.monospaced())
 
             Toggle("تفعيل الطبقة فوق القمر الصناعي", isOn: $wildernessTileOverlayEnabled)
                 .disabled(!isTileTemplateValid)
@@ -378,20 +407,33 @@ struct GeospatialLayerCatalogView: View {
                 Slider(value: $wildernessTileOpacity, in: 0.2...1.0, step: 0.05)
             }
 
-            HStack {
+            HStack(alignment: .top, spacing: 8) {
                 Label(isTileTemplateValid ? "الرابط جاهز للتطبيق" : "الرابط يجب أن يحتوي {z} و{x} و{y}", systemImage: isTileTemplateValid ? "checkmark.circle" : "exclamationmark.triangle")
                     .foregroundStyle(isTileTemplateValid ? Color.green : Color.orange)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
                 Spacer()
-                Button("إيقاف") {
-                    wildernessTileOverlayEnabled = false
-                }
-                .buttonStyle(.bordered)
+                mapSourceSmallButton("تجربة") { applyDemoTileTemplate() }
+                mapSourceSmallButton("تطبيق") { applyTileTemplate() }
+                    .disabled(!isTileTemplateValid)
+                mapSourceSmallButton("إيقاف") { disableTileOverlay() }
             }
             .font(.caption)
+
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(Color.oasisTeal, in: Capsule())
+                    .transition(.opacity)
+            }
 
             Text("استخدم هذا الحقل فقط مع مصادر مرخصة أو رسمية. يدعم MapKit قوالب Tiles/WMTS من نوع XYZ، وسيتم عرض الطبقة مباشرة عند الرجوع إلى خريطة القمر الصناعي.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
@@ -411,12 +453,20 @@ struct GeospatialLayerCatalogView: View {
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Text(layer.status.title)
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(layer.status.color)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 5)
-                            .background(layer.status.color.opacity(0.12), in: Capsule())
+                        Button {
+                            handleLayerAction(layer)
+                        } label: {
+                            Text(layer.status.title)
+                                .font(.caption2.weight(.bold))
+                                .lineLimit(2)
+                                .multilineTextAlignment(.center)
+                                .minimumScaleFactor(0.68)
+                                .foregroundStyle(layer.status.color)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 6)
+                                .background(layer.status.color.opacity(0.12), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     Text(layer.detail)
@@ -438,6 +488,28 @@ struct GeospatialLayerCatalogView: View {
                         .font(.caption2.monospaced())
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
+
+                    HStack(spacing: 8) {
+                        Button {
+                            handleLayerAction(layer)
+                        } label: {
+                            Label(layerActionTitle(layer), systemImage: layerActionIcon(layer))
+                                .font(.caption.weight(.semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(layer.status.color)
+
+                        Button {
+                            openLayerSource(layer)
+                        } label: {
+                            Label("فتح المصدر", systemImage: "safari")
+                                .font(.caption.weight(.semibold))
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(!isHTTPSource(layer.sourceURL))
+                    }
                 }
                 .padding()
                 .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
@@ -449,18 +521,31 @@ struct GeospatialLayerCatalogView: View {
         VStack(alignment: .leading, spacing: 10) {
             sectionTitle("معالجة البيانات الجغرافية")
             ForEach(GeospatialProcessingStep.pipeline) { step in
-                HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: step.icon)
-                        .foregroundStyle(Color.oasisTeal)
-                        .frame(width: 28)
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(step.title)
-                            .font(.subheadline.weight(.semibold))
-                        Text(step.detail)
-                            .font(.caption)
+                Button {
+                    showCatalogStatus("\(step.title): جاهز ضمن مسار تجهيز الخرائط")
+                } label: {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: step.icon)
+                            .foregroundStyle(Color.oasisTeal)
+                            .frame(width: 28)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(step.title)
+                                .font(.subheadline.weight(.semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.78)
+                            Text(step.detail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 0)
+                        Image(systemName: "chevron.left")
+                            .font(.caption.weight(.bold))
                             .foregroundStyle(.secondary)
                     }
                 }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
                 Divider()
             }
         }
@@ -472,21 +557,36 @@ struct GeospatialLayerCatalogView: View {
         VStack(alignment: .leading, spacing: 10) {
             sectionTitle("بحث جغرافي متقدم")
             ForEach(GeospatialSearchResult.samples) { result in
-                HStack(spacing: 10) {
-                    Image(systemName: "mappin.and.ellipse")
-                        .foregroundStyle(Color.desertCopper)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(result.name)
-                            .font(.subheadline.weight(.semibold))
-                        Text("\(result.type) - \(result.source)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Text(String(format: "%.4f, %.4f", result.coordinate.latitude, result.coordinate.longitude))
+                Button {
+                    query = result.name
+                    showCatalogStatus("تم تحديد \(result.name) عند \(coordinateText(result.coordinate))")
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundStyle(Color.desertCopper)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(result.name)
+                                .font(.subheadline.weight(.semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.78)
+                            Text("\(result.type) - \(result.source)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(String(format: "%.4f", result.coordinate.latitude))
+                            Text(String(format: "%.4f", result.coordinate.longitude))
+                        }
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    }
                 }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
             }
         }
         .padding()
@@ -512,8 +612,109 @@ struct GeospatialLayerCatalogView: View {
 
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
-            .font(.headline)
+            .font(.subheadline.weight(.bold))
+            .lineLimit(2)
+            .minimumScaleFactor(0.72)
             .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func filterButton(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .foregroundStyle(isSelected ? .white : .primary)
+                .background(isSelected ? Color.oasisTeal : Color(.tertiarySystemFill), in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func mapSourceSmallButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(title, action: action)
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+    }
+
+    private func applyDemoTileTemplate() {
+        wildernessTileName = "طبقة OpenStreetMap تجريبية"
+        wildernessTileTemplate = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        wildernessTileOverlayEnabled = true
+        showCatalogStatus("تم تفعيل طبقة تجريبية فوق القمر الصناعي")
+    }
+
+    private func applyTileTemplate() {
+        wildernessTileOverlayEnabled = true
+        showCatalogStatus("تم تطبيق الطبقة. ارجع للخريطة لمشاهدتها.")
+    }
+
+    private func disableTileOverlay() {
+        wildernessTileOverlayEnabled = false
+        showCatalogStatus("تم إيقاف الطبقة")
+    }
+
+    private func handleLayerAction(_ layer: GeospatialMapLayer) {
+        switch layer.format {
+        case .wms, .wmts, .mbtiles, .vector:
+            if layer.status == .readyForImport {
+                applyDemoTileTemplate()
+            } else {
+                openLayerSource(layer)
+            }
+        case .pdf:
+            openLayerSource(layer)
+        }
+    }
+
+    private func layerActionTitle(_ layer: GeospatialMapLayer) -> String {
+        switch layer.status {
+        case .readyForImport, .offlineReady:
+            return "تجهيز الطبقة"
+        case .bundled:
+            return "عرض"
+        case .sourceRequired:
+            return "طلب المصدر"
+        }
+    }
+
+    private func layerActionIcon(_ layer: GeospatialMapLayer) -> String {
+        switch layer.status {
+        case .readyForImport, .offlineReady:
+            return "checkmark.circle"
+        case .bundled:
+            return "eye"
+        case .sourceRequired:
+            return "link"
+        }
+    }
+
+    private func openLayerSource(_ layer: GeospatialMapLayer) {
+        guard isHTTPSource(layer.sourceURL), let url = URL(string: layer.sourceURL) else {
+            showCatalogStatus("هذا المصدر يحتاج ملفاً مرخصاً من إدارة الخرائط")
+            return
+        }
+        openURL(url)
+    }
+
+    private func isHTTPSource(_ source: String) -> Bool {
+        source.lowercased().hasPrefix("http://") || source.lowercased().hasPrefix("https://")
+    }
+
+    private func coordinateText(_ coordinate: CLLocationCoordinate2D) -> String {
+        String(format: "%.4f, %.4f", coordinate.latitude, coordinate.longitude)
+    }
+
+    private func showCatalogStatus(_ message: String) {
+        statusMessage = message
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
+            if statusMessage == message {
+                statusMessage = nil
+            }
+        }
     }
 
     private func layerMetric(_ title: String, _ value: String) -> some View {
@@ -552,6 +753,12 @@ struct MapCanvasView: UIViewRepresentable {
         mapView.delegate = context.coordinator
         mapView.showsUserLocation = true
         mapView.showsCompass = false
+        mapView.showsScale = true
+        mapView.isZoomEnabled = true
+        mapView.isScrollEnabled = true
+        mapView.isPitchEnabled = true
+        mapView.isRotateEnabled = true
+        mapView.mapType = .hybridFlyover
         mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .realistic)
         mapView.setRegion(region, animated: false)
         return mapView
@@ -559,6 +766,8 @@ struct MapCanvasView: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         context.coordinator.tileOpacity = tileOpacity
+        mapView.mapType = .hybridFlyover
+        mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .realistic)
         mapView.removeOverlays(mapView.overlays)
         mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
 

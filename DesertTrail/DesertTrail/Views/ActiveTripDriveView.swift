@@ -6,8 +6,8 @@ import UIKit
 struct ActiveTripDriveView: View {
     @EnvironmentObject private var appState: AppState
     @State private var route = GPXParser.loadRoute(named: "SampleRoute")
-    @State private var selectedTool: DriveTool = .navigation
     @State private var isTripStarted = false
+    @State private var statusMessage: String?
 
     private let driveRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
@@ -29,10 +29,9 @@ struct ActiveTripDriveView: View {
                     routeNodes
                     sideControls
                     startTripButton
+                    statusToast
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                bottomNavigation
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -223,21 +222,38 @@ struct ActiveTripDriveView: View {
     private var sideControls: some View {
         HStack {
             VStack(spacing: 14) {
-                driveRoundButton(icon: "location.fill", title: "موقعي")
-                driveRoundButton(icon: "exclamationmark.triangle.fill", title: "تنبيه")
-                driveRoundButton(icon: "map.fill", title: "خرائط")
+                driveRoundButton(icon: "location.fill", title: "موقعي") {
+                    appState.locationManager.requestWhenInUse()
+                    appState.locationManager.startNavigation()
+                    showStatus("تم طلب صلاحية الموقع")
+                }
+                driveRoundButton(icon: "exclamationmark.triangle.fill", title: "تنبيه") {
+                    appState.locationManager.requestBackgroundTripUpdates()
+                    showStatus("تنبيهات الأودية والخدمات مفعلة")
+                }
+                driveRoundButton(icon: "map.fill", title: "خرائط") {
+                    showStatus("وضع الخريطة")
+                }
             }
 
             Spacer()
 
             VStack(spacing: 14) {
-                driveRoundButton(icon: "arrow.up.right.navigation.fill", title: "اتجاه")
-                driveRoundButton(icon: "scope", title: "تتبع")
-                driveRoundButton(icon: "sos.circle.fill", title: "SOS")
+                driveRoundButton(icon: "arrow.up.right.navigation.fill", title: "اتجاه") {
+                    appState.locationManager.startNavigation()
+                    showStatus("تم تشغيل التوجيه")
+                }
+                driveRoundButton(icon: "scope", title: "تتبع") {
+                    appState.locationManager.startNavigation()
+                    showStatus("تم تشغيل التتبع")
+                }
+                driveRoundButton(icon: "sos.circle.fill", title: "SOS") {
+                    showStatus("تم تجهيز طلب SOS عند الحاجة")
+                }
             }
         }
         .padding(.horizontal, 18)
-        .padding(.bottom, 120)
+        .padding(.bottom, 132)
         .frame(maxHeight: .infinity, alignment: .bottom)
     }
 
@@ -259,7 +275,7 @@ struct ActiveTripDriveView: View {
                         .font(.headline.weight(.bold))
                 }
                 .foregroundStyle(Color.driveBlack)
-                .frame(width: 116, height: 88)
+                .frame(width: 104, height: 80)
                 .background(
                     Circle()
                         .fill(DrivePalette.goldGradient)
@@ -268,29 +284,28 @@ struct ActiveTripDriveView: View {
                 )
             }
             .buttonStyle(.plain)
-            .padding(.bottom, 14)
+            .padding(.bottom, 28)
         }
     }
 
-    private var bottomNavigation: some View {
-        HStack(spacing: 0) {
-            driveTab(.weather, "الطقس", "cloud.sun.fill")
-            driveTab(.discover, "استكشاف", "magnifyingglass")
-            Spacer(minLength: 118)
-            driveTab(.community, "المجتمع", "person.3.fill")
-            driveTab(.profile, "الملف الشخصي", "person.fill")
+    private var statusToast: some View {
+        VStack {
+            Spacer()
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color.black.opacity(0.76), in: Capsule())
+                    .overlay(Capsule().stroke(Color.driveGold.opacity(0.5), lineWidth: 1))
+                    .padding(.bottom, 118)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
-        .padding(.horizontal, 12)
-        .padding(.top, 12)
-        .padding(.bottom, 16)
-        .background(
-            Color.black.opacity(0.88)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(DrivePalette.goldGradient)
-                        .frame(height: 1)
-                }
-        )
+        .animation(.easeInOut(duration: 0.2), value: statusMessage)
     }
 
     private var driveDivider: some View {
@@ -355,37 +370,26 @@ struct ActiveTripDriveView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func driveRoundButton(icon: String, title: String) -> some View {
-        Button {
-            selectedTool = .navigation
-        } label: {
+    private func driveRoundButton(icon: String, title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
             Image(systemName: icon)
                 .font(.title3.weight(.bold))
                 .foregroundStyle(DrivePalette.goldGradient)
-                .frame(width: 54, height: 54)
-                .background(Circle().fill(Color.black.opacity(0.6)))
+                .frame(width: 50, height: 50)
+                .background(Circle().fill(Color.black.opacity(0.68)))
                 .overlay(Circle().stroke(Color.driveGold.opacity(0.64), lineWidth: 1))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
     }
 
-    private func driveTab(_ tool: DriveTool, _ title: String, _ icon: String) -> some View {
-        Button {
-            selectedTool = tool
-        } label: {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.title3)
-                Text(title)
-                    .font(.caption2.weight(.semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+    private func showStatus(_ message: String) {
+        statusMessage = message
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+            if statusMessage == message {
+                statusMessage = nil
             }
-            .foregroundStyle(selectedTool == tool ? Color.driveGold : .white.opacity(0.72))
-            .frame(maxWidth: .infinity, minHeight: 50)
         }
-        .buttonStyle(.plain)
     }
 
     private func driveNode(icon: String, x: CGFloat, y: CGFloat, emphasized: Bool = false) -> some View {
@@ -400,14 +404,6 @@ struct ActiveTripDriveView: View {
                 .position(x: proxy.size.width * x, y: proxy.size.height * y)
         }
     }
-}
-
-private enum DriveTool {
-    case weather
-    case discover
-    case navigation
-    case community
-    case profile
 }
 
 private struct TripGlowPath: Shape {

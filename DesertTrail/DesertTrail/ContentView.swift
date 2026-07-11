@@ -129,13 +129,17 @@ struct ContentView: View {
     }
 
     private var languagePicker: some View {
-        Picker("Language", selection: $appState.language) {
-            ForEach(AppLanguage.allCases) { language in
-                Text(language.title).tag(language)
+        Menu {
+            Picker("Language", selection: $appState.language) {
+                ForEach(AppLanguage.allCases) { language in
+                    Text(language.title).tag(language)
+                }
             }
+        } label: {
+            Label(appState.language.title, systemImage: "globe")
+                .font(.caption.weight(.semibold))
+                .labelStyle(.titleAndIcon)
         }
-        .pickerStyle(.segmented)
-        .frame(width: 172)
     }
 }
 

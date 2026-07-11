@@ -25,6 +25,7 @@ struct AdvancedToolsView: View {
     @State private var fuelEfficiency = 7.5
     @State private var equipmentWeightKG = 180.0
     @State private var offlineLayerOptions = OfflineMapLayerOption.samples
+    @State private var toolStatusMessage: String?
 
     private var coordinate: CLLocationCoordinate2D {
         appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
@@ -44,6 +45,7 @@ struct AdvancedToolsView: View {
         ScrollView {
             LazyVStack(spacing: 14) {
                 activeDriveCard
+                toolStatusBanner
                 platformVisionCard
                 wildlifeGuideEntryCard
                 smartTripPlannerCard
@@ -102,6 +104,23 @@ struct AdvancedToolsView: View {
         }
         .sheet(isPresented: $showingTripCamera) {
             TripCameraPicker()
+        }
+    }
+
+    @ViewBuilder
+    private var toolStatusBanner: some View {
+        if let toolStatusMessage {
+            Text(toolStatusMessage)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(3)
+                .minimumScaleFactor(0.75)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
+                .background(Color.oasisTeal, in: RoundedRectangle(cornerRadius: 8))
+                .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
 
@@ -975,57 +994,120 @@ struct AdvancedToolsView: View {
     }
 
     private func metric(_ title: String, _ value: String, _ icon: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Image(systemName: icon)
-                .foregroundStyle(Color.desertCopper)
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-            Text(value)
-                .font(.subheadline.monospacedDigit().weight(.bold))
-                .lineLimit(2)
-                .minimumScaleFactor(0.62)
-                .fixedSize(horizontal: false, vertical: true)
+        Button {
+            handleToolShortcut(title: title, value: value)
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Image(systemName: icon)
+                    .foregroundStyle(Color.desertCopper)
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+                Text(value)
+                    .font(.subheadline.monospacedDigit().weight(.bold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.50)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+            .padding(9)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
         }
-        .frame(maxWidth: .infinity, minHeight: 84, alignment: .leading)
-        .padding(10)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title) \(value)")
     }
 
     private func row(icon: String, title: String, subtitle: String, trailing: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .foregroundStyle(Color.oasisTeal)
-                .frame(width: 34, height: 34)
-                .background(Color.oasisTeal.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.headline)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            if !trailing.isEmpty {
-                Text(trailing)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.desertCopper)
+        Button {
+            handleToolShortcut(title: title, value: trailing.isEmpty ? subtitle : trailing)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .foregroundStyle(Color.oasisTeal)
+                    .frame(width: 34, height: 34)
+                    .background(Color.oasisTeal.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.72)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.72)
+                }
+                Spacer()
+                if !trailing.isEmpty {
+                    Text(trailing)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.desertCopper)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.65)
+                }
             }
         }
+        .buttonStyle(.plain)
+        .contentShape(Rectangle())
     }
 
     private func tag(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 11, weight: .semibold))
-            .lineLimit(1)
-            .minimumScaleFactor(0.62)
-            .multilineTextAlignment(.center)
-            .frame(minWidth: 58, minHeight: 30)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 4)
-            .background(Color.desertSand.opacity(0.45), in: Capsule())
+        Button {
+            handleToolShortcut(title: text, value: "")
+        } label: {
+            Text(text)
+                .font(.system(size: 11, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+                .multilineTextAlignment(.center)
+                .frame(minWidth: 58, minHeight: 30)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(Color.desertSand.opacity(0.45), in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func handleToolShortcut(title: String, value: String) {
+        let combined = "\(title) \(value)"
+        if combined.contains("SOS") || combined.contains("سلامة") || combined.contains("طوارئ") {
+            showingSOS = true
+            showToolStatus("تم فتح أدوات السلامة والطوارئ")
+        } else if combined.contains("AI") || combined.contains("تخطيط") || combined.contains("اقتراح") || combined.contains("ذكاء") {
+            showingAssistant = true
+            showToolStatus("تم فتح المساعد الذكي للتخطيط")
+        } else if combined.contains("مجتمع") || combined.contains("مباشرة") || combined.contains("مشاركة") {
+            showingLiveShare = true
+            showToolStatus("تم فتح مشاركة الموقع المباشر")
+        } else if combined.contains("تصوير") || combined.contains("كاميرا") {
+            showingTripCamera = true
+            showToolStatus("تم فتح كاميرا الرحلات")
+        } else if combined.contains("خرائط") || combined.contains("أوفلاين") || combined.contains("طبقات") {
+            offlineLayerOptions = offlineLayerOptions.map { option in
+                var updated = option
+                updated.isEnabled = true
+                return updated
+            }
+            showToolStatus("تم تفعيل طبقات الخرائط والأوفلاين في الأدوات")
+        } else if combined.contains("فلك") || combined.contains("السماء") {
+            prayerAlertsEnabled.toggle()
+            showToolStatus(prayerAlertsEnabled ? "تم تفعيل تنبيهات الفلك والصلاة" : "تم إيقاف تنبيهات الفلك والصلاة")
+        } else {
+            showToolStatus("\(title): جاهزة للاستخدام ضمن أدوات الدرب")
+        }
+    }
+
+    private func showToolStatus(_ message: String) {
+        toolStatusMessage = message
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
+            if toolStatusMessage == message {
+                toolStatusMessage = nil
+            }
+        }
     }
 
     private func labeledSlider(title: String, value: Binding<Double>, range: ClosedRange<Double>, step: Double, suffix: String) -> some View {
