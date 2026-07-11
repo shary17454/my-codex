@@ -121,7 +121,7 @@ final class CoordinatePointStore: ObservableObject {
 
         return """
         <?xml version="1.0" encoding="UTF-8"?>
-        <gpx version="1.1" creator="الدروب" xmlns="http://www.topografix.com/GPX/1/1">
+        <gpx version="1.1" creator="البيد" xmlns="http://www.topografix.com/GPX/1/1">
         \(waypointXML)
         </gpx>
         """
