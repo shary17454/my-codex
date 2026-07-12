@@ -4,7 +4,7 @@ import SwiftUI
 import UIKit
 
 struct ActiveTripDriveView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var route = GPXParser.loadRoute(named: "SampleRoute")
     @State private var isTripStarted = false
     @State private var statusMessage: String?

@@ -3,7 +3,7 @@ import MapKit
 import SwiftUI
 
 struct DesertMapView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var route = GPXParser.loadRoute(named: "SampleRoute")
     @State private var showingAddPlace = false
     @State private var showingOfflineMaps = false

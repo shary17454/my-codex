@@ -2,7 +2,7 @@ import CoreLocation
 import SwiftUI
 
 struct HiddenPlaceForm: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var notes = ""

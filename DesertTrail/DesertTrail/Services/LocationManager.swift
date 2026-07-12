@@ -1,4 +1,4 @@
-import CoreLocation
+@preconcurrency import CoreLocation
 import Foundation
 import UserNotifications
 
@@ -6,7 +6,7 @@ import UserNotifications
 final class LocationManager: NSObject, ObservableObject {
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var currentLocation: CLLocation?
-    @Published var heading: CLHeading?
+    @Published var heading: CompassHeading?
     @Published var isTracking = false
     @Published var proximityAlertsEnabled = false
 
@@ -115,12 +115,19 @@ private struct ProximityRegion {
     var body: String
 }
 
+struct CompassHeading: Sendable {
+    let trueHeading: CLLocationDirection
+    let magneticHeading: CLLocationDirection
+    let headingAccuracy: CLLocationDirection
+}
+
 extension LocationManager: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
         Task { @MainActor in
-            authorizationStatus = manager.authorizationStatus
+            authorizationStatus = status
             if isTracking {
-                manager.startUpdatingLocation()
+                self.manager.startUpdatingLocation()
             }
         }
     }
@@ -133,22 +140,28 @@ extension LocationManager: CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        let headingReading = CompassHeading(
+            trueHeading: newHeading.trueHeading,
+            magneticHeading: newHeading.magneticHeading,
+            headingAccuracy: newHeading.headingAccuracy
+        )
         Task { @MainActor in
-            heading = newHeading
+            heading = headingReading
         }
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        let identifier = region.identifier
         Task { @MainActor in
             guard proximityAlertsEnabled else { return }
-            let message = proximityRegionMessages[region.identifier]
+            let message = proximityRegionMessages[identifier]
             let content = UNMutableNotificationContent()
             content.title = message?.title ?? "تنبيه قرب"
             content.body = message?.body ?? "اقتربت من منطقة تحتاج انتباه أثناء الرحلة."
             content.sound = .default
 
             let request = UNNotificationRequest(
-                identifier: "proximity-\(region.identifier)-\(Date().timeIntervalSince1970)",
+                identifier: "proximity-\(identifier)-\(Date().timeIntervalSince1970)",
                 content: content,
                 trigger: nil
             )

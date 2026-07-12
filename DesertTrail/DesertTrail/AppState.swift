@@ -1,13 +1,15 @@
 import Foundation
 import CoreLocation
+import Observation
 
 @MainActor
-final class AppState: ObservableObject {
-    @Published var language: AppLanguage = .arabic
-    @Published var selectedTrip: TripPlan = TripPlan.sample
-    @Published var hiddenPlaces: [HiddenPlace] = HiddenPlace.samples
-    @Published var environmentalReport: EnvironmentalReport = .placeholder
-    @Published var consentedToTripSharing = false
+@Observable
+final class AppState {
+    var language: AppLanguage = .arabic
+    var selectedTrip: TripPlan = TripPlan.sample
+    var hiddenPlaces: [HiddenPlace] = HiddenPlace.samples
+    var environmentalReport: EnvironmentalReport = .placeholder
+    var consentedToTripSharing = false
 
     let locationManager = LocationManager()
     let weatherService = WeatherService()

@@ -1,17 +1,16 @@
-import BackgroundTasks
+@preconcurrency import BackgroundTasks
 import CoreLocation
 import Foundation
 
+@MainActor
 final class WeatherService {
     static let backgroundTaskIdentifier = "com.codex.DesertTrail.environment.refresh"
     private let weatherEndpoint = URL(string: "https://api.open-meteo.com/v1/forecast") ?? URL(fileURLWithPath: "/")
     private let airQualityEndpoint = URL(string: "https://air-quality-api.open-meteo.com/v1/air-quality") ?? URL(fileURLWithPath: "/")
 
     func fetchReport(for coordinate: CLLocationCoordinate2D) async -> EnvironmentalReport {
-        async let weather = fetchWeather(for: coordinate)
-        async let aqi = fetchAirQuality(for: coordinate)
-        let weatherResult = await weather
-        let airQualityIndex = await aqi ?? simulatedAQI(from: weatherResult.temperatureCelsius, wind: weatherResult.windSpeedKPH)
+        let weatherResult = await fetchWeather(for: coordinate)
+        let airQualityIndex = await fetchAirQuality(for: coordinate) ?? simulatedAQI(from: weatherResult.temperatureCelsius, wind: weatherResult.windSpeedKPH)
 
         return EnvironmentalReport(
             temperatureCelsius: weatherResult.temperatureCelsius,
@@ -78,7 +77,7 @@ final class WeatherService {
         task.expirationHandler = {
             task.setTaskCompleted(success: false)
         }
-        Task {
+        Task { @MainActor in
             _ = await WeatherService().fetchReport(for: CLLocationCoordinate2D(latitude: 24.6028, longitude: 46.5535))
             task.setTaskCompleted(success: true)
         }

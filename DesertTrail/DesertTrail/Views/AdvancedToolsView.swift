@@ -4,7 +4,7 @@ import UIKit
 import UserNotifications
 
 struct AdvancedToolsView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var showingSOS = false
     @State private var showingLiveShare = false
     @State private var showingAssistant = false
@@ -1402,7 +1402,7 @@ struct TripReportView: View {
 
 struct WildlifeSafetyGuideView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var searchText = ""
     @State private var selectedDanger: WildlifeDangerLevel?
 

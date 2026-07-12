@@ -4,7 +4,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct CoordinateNavigationView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @Environment(\.openURL) private var openURL
     @StateObject private var store = CoordinatePointStore()
     @State private var selectedPointID: SavedCoordinatePoint.ID?

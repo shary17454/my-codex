@@ -3,7 +3,7 @@ import BackgroundTasks
 
 @main
 struct DesertTrailApp: App {
-    @StateObject private var appState = AppState()
+    @State private var appState = AppState()
 
     init() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: WeatherService.backgroundTaskIdentifier, using: nil) { task in
@@ -14,7 +14,7 @@ struct DesertTrailApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appState)
+                .environment(appState)
                 .environment(\.layoutDirection, appState.language == .arabic ? .rightToLeft : .leftToRight)
                 .task {
                     WeatherService.scheduleBackgroundRefresh()

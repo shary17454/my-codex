@@ -57,7 +57,7 @@ enum ScreenshotConfiguration {
 }
 
 struct ContentView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var selectedTab = ScreenshotConfiguration.initialTab
 
     var body: some View {
@@ -76,7 +76,7 @@ struct ContentView: View {
                     .navigationTitle(appState.text(.appTitle))
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            languagePicker
+                            LanguagePicker(appState: appState)
                         }
                     }
             }
@@ -128,7 +128,12 @@ struct ContentView: View {
         }
     }
 
-    private var languagePicker: some View {
+}
+
+private struct LanguagePicker: View {
+    @Bindable var appState: AppState
+
+    var body: some View {
         Menu {
             Picker("Language", selection: $appState.language) {
                 ForEach(AppLanguage.allCases) { language in

@@ -2,7 +2,7 @@ import MapKit
 import SwiftUI
 
 struct OfflineMapsView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @StateObject private var store = OfflineMapStore()
     @State private var isSaving = false

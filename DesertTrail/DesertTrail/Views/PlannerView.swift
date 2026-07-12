@@ -1,13 +1,15 @@
 import SwiftUI
 
 struct PlannerView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var startDate = TripPlan.sample.startDate
     @State private var endDate = TripPlan.sample.endDate
     @State private var notes = TripPlan.sample.notes
     @State private var showingQR = ScreenshotConfiguration.showTripQR
 
     var body: some View {
+        @Bindable var appState = appState
+
         Form {
             Section(appState.text(.tripDetails)) {
                 TextField(appState.text(.tripTitle), text: $appState.selectedTrip.title)

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CommunityView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var query = ""
     @State private var showingAddPlace = false
 

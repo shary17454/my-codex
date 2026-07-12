@@ -3,7 +3,7 @@ import CoreLocation
 import UIKit
 
 struct CompassPanel: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @State private var statusMessage: String?
     @State private var isRefreshingWeather = false
 

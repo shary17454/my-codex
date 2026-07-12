@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PDFSourceManagerView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var store: PDFMapStore
     let document: PDFMapDocument

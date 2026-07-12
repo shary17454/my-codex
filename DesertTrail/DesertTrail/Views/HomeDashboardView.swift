@@ -3,7 +3,7 @@ import MapKit
 import SwiftUI
 
 struct HomeDashboardView: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     @Binding var selectedTab: AppTab
     @State private var route = GPXParser.loadRoute(named: "SampleRoute")
     @State private var showingQR = false

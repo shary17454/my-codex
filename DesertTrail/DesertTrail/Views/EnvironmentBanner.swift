@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EnvironmentBanner: View {
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState: AppState
     let report: EnvironmentalReport
 
     var body: some View {
