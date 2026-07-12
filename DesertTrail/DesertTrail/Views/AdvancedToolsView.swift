@@ -106,6 +106,9 @@ struct AdvancedToolsView: View {
         .sheet(isPresented: $showingTripCamera) {
             TripCameraPicker()
         }
+        .onAppear {
+            appState.locationManager.startNavigation()
+        }
     }
 
     @ViewBuilder
@@ -621,6 +624,8 @@ struct AdvancedToolsView: View {
                 .buttonStyle(.bordered)
 
                 Button {
+                    showToolStatus("تم إرسال تنبيه تجريبي لأعضاء الرحلة")
+                    scheduleRiskNotification()
                 } label: {
                     Label("تنبيه جماعي", systemImage: "bell.badge")
                         .frame(maxWidth: .infinity)
@@ -1113,7 +1118,12 @@ struct AdvancedToolsView: View {
 
     private func handleToolShortcut(title: String, value: String) {
         let combined = "\(title) \(value)"
-        if combined.contains("SOS") || combined.contains("سلامة") || combined.contains("طوارئ") {
+        if combined.contains("GPS") || combined.contains("الارتفاع") || combined.contains("الاتجاه") || combined.contains("السرعة") {
+            appState.locationManager.startNavigation()
+            showToolStatus("تم تشغيل GPS والبوصلة وتحديث بيانات الرحلة")
+        } else if combined.contains("الطقس") || combined.contains("رياح") || combined.contains("جودة") || combined.contains("AQI") {
+            refreshEnvironmentFromTools()
+        } else if combined.contains("SOS") || combined.contains("سلامة") || combined.contains("طوارئ") {
             showingSOS = true
             showToolStatus("تم فتح أدوات السلامة والطوارئ")
         } else if combined.contains("AI") || combined.contains("تخطيط") || combined.contains("اقتراح") || combined.contains("ذكاء") {
@@ -1146,6 +1156,16 @@ struct AdvancedToolsView: View {
             if toolStatusMessage == message {
                 toolStatusMessage = nil
             }
+        }
+    }
+
+    private func refreshEnvironmentFromTools() {
+        appState.locationManager.startNavigation()
+        showToolStatus("جاري تحديث الطقس وجودة الهواء")
+        Task {
+            let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
+            appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
+            showToolStatus("تم تحديث الطقس وجودة الهواء")
         }
     }
 

@@ -9,6 +9,7 @@ struct DesertMapView: View {
     @State private var showingOfflineMaps = false
     @State private var showingPDFSourceManager = false
     @State private var showingGeospatialCatalog = false
+    @State private var mapStatusMessage: String?
     @StateObject private var pdfMapStore = PDFMapStore()
     @State private var mapLayer: DesertMapLayer = ScreenshotConfiguration.initialMapLayer
     @State private var ajajiImageIndex = ScreenshotConfiguration.initialAjajiImageIndex
@@ -112,6 +113,20 @@ struct DesertMapView: View {
 
                 EnvironmentBanner(report: appState.environmentalReport)
 
+                if let mapStatusMessage {
+                    Text(mapStatusMessage)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.75)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color.oasisTeal, in: RoundedRectangle(cornerRadius: 8))
+                        .transition(.opacity)
+                }
+
                 HStack(spacing: 10) {
                     metricTile(title: "GPS", value: appState.locationManager.isTracking ? appState.text(.gpsActive) : appState.text(.gpsReady), icon: "location")
                     metricTile(title: "ALT", value: altitudeText, icon: "mountain.2")
@@ -130,7 +145,13 @@ struct DesertMapView: View {
                         icon: "location.north.line",
                         isPrimary: true
                     ) {
-                        appState.locationManager.isTracking ? appState.locationManager.stopNavigation() : appState.locationManager.startNavigation()
+                        if appState.locationManager.isTracking {
+                            appState.locationManager.stopNavigation()
+                            showMapStatus("تم إيقاف الملاحة")
+                        } else {
+                            appState.locationManager.startNavigation()
+                            showMapStatus("تم تشغيل GPS والبوصلة")
+                        }
                     }
                     compactMapActionButton(title: appState.text(.addPlace), icon: "plus") {
                         showingAddPlace = true
@@ -152,6 +173,9 @@ struct DesertMapView: View {
         .task(id: appState.locationManager.currentLocation?.coordinate.latitude) {
             let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
             appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
+        }
+        .onAppear {
+            appState.locationManager.startNavigation()
         }
         .sheet(isPresented: $showingAddPlace) {
             HiddenPlaceForm()
@@ -236,13 +260,13 @@ struct DesertMapView: View {
             VStack(spacing: 5) {
                 Image(systemName: icon)
                     .font(.headline.weight(.bold))
-                Text(title)
-                    .font(.caption2.weight(.bold))
+            Text(title)
+                    .font(.system(size: 11, weight: .bold))
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.55)
+                    .minimumScaleFactor(0.45)
             }
-            .frame(maxWidth: .infinity, minHeight: 68)
+            .frame(maxWidth: .infinity, minHeight: 58)
             .padding(.horizontal, 4)
         }
         .buttonStyle(.plain)
@@ -256,6 +280,15 @@ struct DesertMapView: View {
                 .stroke(Color.desertCopper.opacity(isPrimary ? 0.0 : 0.35), lineWidth: 1)
         )
         .accessibilityLabel(title)
+    }
+
+    private func showMapStatus(_ message: String) {
+        mapStatusMessage = message
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            if mapStatusMessage == message {
+                mapStatusMessage = nil
+            }
+        }
     }
 }
 

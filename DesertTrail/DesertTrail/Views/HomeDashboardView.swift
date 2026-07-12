@@ -8,6 +8,8 @@ struct HomeDashboardView: View {
     @State private var route = GPXParser.loadRoute(named: "SampleRoute")
     @State private var showingQR = false
     @State private var showingActiveTrip = false
+    @State private var showingAddPlace = false
+    @State private var showingGeospatialCatalog = false
 
     private let dashboardRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
@@ -33,6 +35,12 @@ struct HomeDashboardView: View {
         .background(Color.desertBackground.ignoresSafeArea())
         .sheet(isPresented: $showingQR) {
             TripQRCodeSheet(trip: appState.selectedTrip)
+        }
+        .sheet(isPresented: $showingAddPlace) {
+            HiddenPlaceForm()
+        }
+        .sheet(isPresented: $showingGeospatialCatalog) {
+            GeospatialLayerCatalogView()
         }
         .navigationDestination(isPresented: $showingActiveTrip) {
             ActiveTripDriveView()
@@ -110,10 +118,18 @@ struct HomeDashboardView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
             VStack(spacing: 10) {
-                mapToolButton("square.3.layers.3d")
-                mapToolButton("location")
-                mapToolButton("plus")
-                mapToolButton("minus")
+                mapToolButton("square.3.layers.3d") {
+                    showingGeospatialCatalog = true
+                }
+                mapToolButton("location") {
+                    appState.locationManager.startNavigation()
+                }
+                mapToolButton("plus") {
+                    showingAddPlace = true
+                }
+                mapToolButton("minus") {
+                    selectedTab = .map
+                }
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -180,8 +196,8 @@ struct HomeDashboardView: View {
         HStack(spacing: 10) {
             quickAction(title: "البوصلة", icon: "safari") { selectedTab = .compass }
             quickAction(title: "لوحة القيادة", icon: "speedometer") { showingActiveTrip = true }
-            quickAction(title: "الطقس", icon: "cloud.sun.fill") { selectedTab = .tools }
-            quickAction(title: "جودة الهواء", icon: "leaf.fill") { selectedTab = .tools }
+            quickAction(title: "الطقس", icon: "cloud.sun.fill") { refreshWeather() }
+            quickAction(title: "جودة الهواء", icon: "leaf.fill") { refreshWeather() }
             quickAction(title: "أدوات الرحلة", icon: "briefcase.fill") { selectedTab = .planner }
         }
     }
@@ -387,13 +403,17 @@ struct HomeDashboardView: View {
         return String(format: "%.1f", current.distance(from: target) / 1000)
     }
 
-    private func mapToolButton(_ icon: String) -> some View {
-        Image(systemName: icon)
-            .font(.headline)
-            .foregroundStyle(Color.desertInk)
-            .frame(width: 38, height: 38)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
-            .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+    private func mapToolButton(_ icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.headline)
+                .foregroundStyle(Color.desertInk)
+                .frame(width: 38, height: 38)
+                .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
+                .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(icon)
     }
 
     private func dashboardMetric(title: String, value: String, subtitle: String, icon: String) -> some View {
@@ -461,6 +481,14 @@ struct HomeDashboardView: View {
             .frame(maxWidth: .infinity, minHeight: 44)
             .padding(.horizontal, 6)
             .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func refreshWeather() {
+        appState.locationManager.startNavigation()
+        Task {
+            let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
+            appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
+        }
     }
 }
 

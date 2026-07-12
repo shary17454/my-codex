@@ -1,16 +1,20 @@
 @preconcurrency import CoreLocation
 import Foundation
+import Observation
 import UserNotifications
 
 @MainActor
-final class LocationManager: NSObject, ObservableObject {
-    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
-    @Published var currentLocation: CLLocation?
-    @Published var heading: CompassHeading?
-    @Published var isTracking = false
-    @Published var proximityAlertsEnabled = false
+@Observable
+final class LocationManager: NSObject {
+    var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    var currentLocation: CLLocation?
+    var heading: CompassHeading?
+    var isTracking = false
+    var proximityAlertsEnabled = false
 
+    @ObservationIgnored
     private let manager = CLLocationManager()
+    @ObservationIgnored
     private let notificationCenter = UNUserNotificationCenter.current()
 
     override init() {
@@ -34,6 +38,7 @@ final class LocationManager: NSObject, ObservableObject {
             return
         }
         isTracking = true
+        manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         manager.startUpdatingLocation()
         if CLLocationManager.headingAvailable() {
             manager.startUpdatingHeading()
@@ -128,6 +133,9 @@ extension LocationManager: CLLocationManagerDelegate {
             authorizationStatus = status
             if isTracking {
                 self.manager.startUpdatingLocation()
+                if CLLocationManager.headingAvailable() {
+                    self.manager.startUpdatingHeading()
+                }
             }
         }
     }
