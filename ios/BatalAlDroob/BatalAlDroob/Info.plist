@@ -4,6 +4,11 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ar</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>ar</string>
+		<string>en</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>بطل الدروب</string>
 	<key>CFBundleExecutable</key>
@@ -25,26 +30,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We save images only when you choose to keep a captured catalog or part reference.</string>
+	<string>نحفظ الصور فقط عندما تختار حفظ مرجع كتالوج أو قطعة. We save images only when you choose to keep a catalog or part reference.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We use photo library access only if you choose an image as a catalog or part reference.</string>
-	<key>UIApplicationSceneManifest</key>
-	<dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<false/>
-		<key>UISceneConfigurations</key>
-		<dict>
-			<key>UIWindowSceneSessionRoleApplication</key>
-			<array>
-				<dict>
-					<key>UISceneConfigurationName</key>
-					<string>Default Configuration</string>
-					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-				</dict>
-			</array>
-		</dict>
-	</dict>
+	<string>نستخدم مكتبة الصور فقط إذا اخترت صورة كمرجع كتالوج أو قطعة. We use photo library access only if you choose an image as a catalog or part reference.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>نستخدم موقعك فقط لتشغيل التتبع والبوصلة وعرض الطقس المحلي داخل بطل الدروب. We use your location only for tracking, compass, and local weather inside Batal Al-Droob.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>
