@@ -2,6 +2,7 @@ import CloudKit
 import CoreLocation
 import Foundation
 
+@MainActor
 final class CloudKitStore {
     private let database = CKContainer(identifier: "iCloud.com.codex.DesertTrail").privateCloudDatabase
 

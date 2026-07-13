@@ -45,6 +45,7 @@ struct HiddenPlaceForm: View {
 
     private func save() async {
         isSaving = true
+        let cloudStore = appState.cloudStore
         let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
         let place = HiddenPlace(
             id: UUID(),
@@ -58,7 +59,7 @@ struct HiddenPlaceForm: View {
             points: 10
         )
         appState.hiddenPlaces.append(place)
-        try? await appState.cloudStore.saveHiddenPlaceForReview(place)
+        try? await cloudStore.saveHiddenPlaceForReview(place)
         isSaving = false
         dismiss()
     }
