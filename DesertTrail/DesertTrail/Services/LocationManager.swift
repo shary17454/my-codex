@@ -11,48 +11,71 @@ final class LocationManager: NSObject {
     var heading: CompassHeading?
     var isTracking = false
     var proximityAlertsEnabled = false
+    var locationErrorMessage: String?
 
     @ObservationIgnored
     private let manager = CLLocationManager()
     @ObservationIgnored
     private let notificationCenter = UNUserNotificationCenter.current()
+    private var shouldStartWhenAuthorized = false
 
     override init() {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         manager.distanceFilter = 10
+        manager.headingFilter = 2
+        manager.activityType = .otherNavigation
         authorizationStatus = manager.authorizationStatus
     }
 
     func requestWhenInUse() {
+        authorizationStatus = manager.authorizationStatus
         manager.requestWhenInUseAuthorization()
     }
 
     func startNavigation() {
-        if authorizationStatus == .notDetermined {
+        authorizationStatus = manager.authorizationStatus
+        switch authorizationStatus {
+        case .notDetermined:
+            shouldStartWhenAuthorized = true
             requestWhenInUse()
-        }
-        guard authorizationStatus != .denied, authorizationStatus != .restricted else {
-            isTracking = false
             return
+        case .denied, .restricted:
+            shouldStartWhenAuthorized = false
+            isTracking = false
+            locationErrorMessage = "صلاحية الموقع غير مفعلة."
+            return
+        default:
+            beginNavigationUpdates()
         }
+    }
+
+    private func beginNavigationUpdates() {
+        guard authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways else { return }
+        shouldStartWhenAuthorized = false
         isTracking = true
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        locationErrorMessage = nil
         manager.startUpdatingLocation()
         if CLLocationManager.headingAvailable() {
             manager.startUpdatingHeading()
+        } else {
+            locationErrorMessage = "البوصلة غير متاحة على هذا الجهاز."
         }
     }
 
     func stopNavigation() {
+        shouldStartWhenAuthorized = false
         isTracking = false
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
     }
 
     func requestBackgroundTripUpdates() {
+        authorizationStatus = manager.authorizationStatus
         if authorizationStatus == .notDetermined {
+            shouldStartWhenAuthorized = true
             manager.requestWhenInUseAuthorization()
         } else if authorizationStatus == .authorizedWhenInUse {
             manager.requestAlwaysAuthorization()
@@ -131,19 +154,45 @@ extension LocationManager: CLLocationManagerDelegate {
         let status = manager.authorizationStatus
         Task { @MainActor in
             authorizationStatus = status
-            if isTracking {
-                self.manager.startUpdatingLocation()
-                if CLLocationManager.headingAvailable() {
-                    self.manager.startUpdatingHeading()
+            manager.allowsBackgroundLocationUpdates = status == .authorizedAlways
+            switch status {
+            case .authorizedAlways, .authorizedWhenInUse:
+                locationErrorMessage = nil
+                if shouldStartWhenAuthorized || isTracking {
+                    beginNavigationUpdates()
                 }
+            case .denied, .restricted:
+                shouldStartWhenAuthorized = false
+                isTracking = false
+                locationErrorMessage = "صلاحية الموقع غير مفعلة."
+            default:
+                break
             }
         }
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let latest = locations.last else { return }
+        let latitude = latest.coordinate.latitude
+        let longitude = latest.coordinate.longitude
+        let altitude = latest.altitude
+        let horizontalAccuracy = latest.horizontalAccuracy
+        let verticalAccuracy = latest.verticalAccuracy
+        let course = latest.course
+        let speed = latest.speed
+        let timestamp = latest.timestamp
         Task { @MainActor in
-            currentLocation = latest
+            let location = CLLocation(
+                coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+                altitude: altitude,
+                horizontalAccuracy: horizontalAccuracy,
+                verticalAccuracy: verticalAccuracy,
+                course: course,
+                speed: speed,
+                timestamp: timestamp
+            )
+            currentLocation = location
+            locationErrorMessage = nil
         }
     }
 
@@ -155,6 +204,13 @@ extension LocationManager: CLLocationManagerDelegate {
         )
         Task { @MainActor in
             heading = headingReading
+        }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        let message = error.localizedDescription
+        Task { @MainActor in
+            locationErrorMessage = message
         }
     }
 

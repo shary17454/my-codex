@@ -38,8 +38,7 @@ struct ActiveTripDriveView: View {
         .toolbarBackground(Color.driveBlack, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
-            let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
-            appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
+            await appState.startLocationAndRefreshEnvironment()
         }
         .onAppear {
             UIDevice.current.isBatteryMonitoringEnabled = true

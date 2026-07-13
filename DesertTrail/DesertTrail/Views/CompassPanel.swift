@@ -56,6 +56,14 @@ struct CompassPanel: View {
                         .transition(.opacity.combined(with: .scale))
                 }
 
+                if let locationError = appState.locationManager.locationErrorMessage {
+                    Label(locationError, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+
                 Grid(horizontalSpacing: 12, verticalSpacing: 12) {
                     GridRow {
                         readingButton(title: appState.text(.altitude), value: altitudeText, icon: "mountain.2") {
@@ -237,8 +245,7 @@ struct CompassPanel: View {
         isRefreshingWeather = true
         showStatus("جاري تحديث الرياح والطقس")
         Task {
-            let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
-            appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
+            await appState.startLocationAndRefreshEnvironment()
             isRefreshingWeather = false
             showStatus("تم تحديث بيانات الرياح")
         }

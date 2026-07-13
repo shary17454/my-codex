@@ -15,6 +15,16 @@ final class AppState {
     let weatherService = WeatherService()
     let cloudStore = CloudKitStore()
 
+    func refreshEnvironmentReport() async {
+        let coordinate = locationManager.currentLocation?.coordinate ?? selectedTrip.meetingPoint
+        environmentalReport = await weatherService.fetchReport(for: coordinate)
+    }
+
+    func startLocationAndRefreshEnvironment() async {
+        locationManager.startNavigation()
+        await refreshEnvironmentReport()
+    }
+
     func text(_ key: LocalizedKey) -> String {
         key.value(for: language)
     }

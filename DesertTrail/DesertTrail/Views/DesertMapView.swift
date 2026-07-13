@@ -171,8 +171,7 @@ struct DesertMapView: View {
             .padding(.bottom, 76)
         }
         .task(id: appState.locationManager.currentLocation?.coordinate.latitude) {
-            let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
-            appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
+            await appState.startLocationAndRefreshEnvironment()
         }
         .onAppear {
             appState.locationManager.startNavigation()
