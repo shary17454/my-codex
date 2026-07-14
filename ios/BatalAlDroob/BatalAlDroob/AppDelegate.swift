@@ -429,7 +429,10 @@ final class CatalogViewModel {
     func text(ar: String, en: String) -> String { language == .arabic ? ar : en }
     func title(for part: Part) -> String { part.title(language: language) }
     func isUnlocked(_ part: Part) -> Bool { paidUnlocks.contains(part.partNumber) }
-    func protectedNumber(_ part: Part) -> String { isUnlocked(part) ? part.partNumber : masked(part.partNumber) }
+    func protectedNumber(_ part: Part) -> String { part.partNumber }
+    func premiumNumber(_ number: String, for part: Part) -> String {
+        number == part.partNumber || isUnlocked(part) ? number : masked(number)
+    }
 
     func toggleWishlist(_ part: Part) {
         if wishlist.contains(part.partNumber) { wishlist.remove(part.partNumber) } else { wishlist.insert(part.partNumber) }
@@ -513,6 +516,32 @@ final class CatalogViewModel {
         }
         let diff = ((new - old) / old) * 100
         return String(format: text(ar: "الفرق %.1f%%", en: "Difference %.1f%%"), diff)
+    }
+
+    func fitmentSummary(for query: String) -> String {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return text(ar: "أدخل رقم قطعة أو وصفًا مختصرًا.", en: "Enter a part number or short description.")
+        }
+        let normalizedQuery = normalized(trimmed)
+        let match = parts.first { part in
+            part.partNumber.localizedCaseInsensitiveContains(trimmed)
+                || part.allNumbers.contains { $0.localizedCaseInsensitiveContains(trimmed) }
+                || searchableText(for: part).contains(normalizedQuery)
+        }
+        guard let match else {
+            return text(
+                ar: "لم أجد تطابقًا مباشرًا. جرّب رقم قطعة مثل 21082-4W000 أو اسم القسم.",
+                en: "No direct match found. Try a part number such as 21082-4W000 or a category name."
+            )
+        }
+        return [
+            text(ar: "القطعة: \(title(for: match))", en: "Part: \(title(for: match))"),
+            text(ar: "الرقم الأساسي: \(match.partNumber)", en: "Primary number: \(match.partNumber)"),
+            text(ar: "السنوات: \(short(match.years))", en: "Years: \(short(match.years))"),
+            text(ar: "المحركات: \(short(match.engines))", en: "Engines: \(short(match.engines))"),
+            text(ar: "مصادر الكتالوج: \((match.sourceCount ?? match.evidence.count).formatted())", en: "Catalog sources: \((match.sourceCount ?? match.evidence.count).formatted())")
+        ].joined(separator: "\n")
     }
 
     func openStore(_ store: VerifiedStore, part: Part?) {
@@ -725,6 +754,8 @@ struct RootView: View {
     var body: some View {
         ZStack {
             TabView {
+                DashboardView(viewModel: viewModel)
+                    .tabItem { Label(viewModel.text(ar: "الرئيسية", en: "Home"), systemImage: "gauge.with.dots.needle.bottom.50percent") }
                 CatalogView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الكتالوج", en: "Catalog"), systemImage: "magnifyingglass") }
                 SharedFitmentView(viewModel: viewModel)
@@ -734,7 +765,7 @@ struct RootView: View {
                 MaintenanceView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الصيانة", en: "Maintenance"), systemImage: "wrench.adjustable") }
                 MoreView(viewModel: viewModel)
-                    .tabItem { Label(viewModel.text(ar: "المزيد", en: "More"), systemImage: "ellipsis.circle") }
+                    .tabItem { Label(viewModel.text(ar: "الأدوات", en: "Tools"), systemImage: "wrench.and.screwdriver") }
             }
             .overlay(alignment: .top) { PaymentBanner(message: viewModel.paymentMessage) }
 
@@ -746,6 +777,76 @@ struct RootView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
+    }
+}
+
+struct DashboardView: View {
+    @Bindable var viewModel: CatalogViewModel
+    @State private var fitmentQuery = "21082-4W000"
+    @State private var fitmentResult = ""
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("بطل الدروب")
+                            .font(.largeTitle.bold())
+                        Text(viewModel.text(
+                            ar: "تطبيق أصلي للبحث في قطع نيسان باترول، التحقق من التوافق، حفظ الصيانة، وتجهيز طلبات القطع.",
+                            en: "A native app for Nissan Patrol parts search, fitment checks, maintenance logging, and part request preparation."
+                        ))
+                        .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+
+                Section(viewModel.text(ar: "وظائف تعمل بدون شراء", en: "Included functionality")) {
+                    FeatureRow(symbol: "number.square", title: viewModel.text(ar: "إظهار رقم القطعة الأساسي", en: "Primary part number"), detail: viewModel.text(ar: "الرقم الأساسي وبيانات السنوات والمحركات ظاهرة مباشرة.", en: "The primary number, years, and engine data are visible immediately."))
+                    FeatureRow(symbol: "doc.text.magnifyingglass", title: viewModel.text(ar: "بحث كتالوج محلي", en: "Local catalog search"), detail: viewModel.text(ar: "يبحث داخل قاعدة مدمجة ولا يحتاج تسجيل دخول.", en: "Searches a bundled database without sign-in."))
+                    FeatureRow(symbol: "wrench.and.screwdriver", title: viewModel.text(ar: "سجل صيانة وأدوات", en: "Maintenance and tools"), detail: viewModel.text(ar: "حفظ صيانة السيارة، حساب الكفرات، تتبع الموقع، البوصلة، والطقس.", en: "Save maintenance, calculate tire changes, and use location, compass, and weather tools."))
+                }
+
+                Section(viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check")) {
+                    TextField(viewModel.text(ar: "رقم القطعة أو الوصف", en: "Part number or description"), text: $fitmentQuery)
+                        .textInputAutocapitalization(.characters)
+                    Button { fitmentResult = viewModel.fitmentSummary(for: fitmentQuery) } label: {
+                        Label(viewModel.text(ar: "تحقق الآن", en: "Check now"), systemImage: "checkmark.seal")
+                    }
+                    if !fitmentResult.isEmpty {
+                        Text(fitmentResult)
+                            .font(.callout.monospaced())
+                            .textSelection(.enabled)
+                    }
+                }
+            }
+            .navigationTitle(viewModel.text(ar: "الرئيسية", en: "Home"))
+            .toolbar { LanguageMenu(viewModel: viewModel) }
+            .onAppear {
+                if fitmentResult.isEmpty {
+                    fitmentResult = viewModel.fitmentSummary(for: fitmentQuery)
+                }
+            }
+        }
+    }
+}
+
+struct FeatureRow: View {
+    let symbol: String
+    let title: String
+    let detail: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .foregroundStyle(.tint)
+                .frame(width: 28)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).font(.headline)
+                Text(detail).font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
@@ -855,7 +956,7 @@ struct PartDetailView: View {
                     Text(viewModel.protectedNumber(part)).font(.title3.monospaced()).foregroundStyle(.tint)
                     if !viewModel.isUnlocked(part) {
                         Button { Task { await viewModel.unlock(part) } } label: {
-                            Label(viewModel.text(ar: "فتح الرقم المحمي بالشراء داخل التطبيق", en: "Unlock protected number with IAP"), systemImage: "lock.open")
+                            Label(viewModel.text(ar: "فتح الأرقام البديلة والأدلة المتقدمة", en: "Unlock alternate numbers and advanced evidence"), systemImage: "lock.open")
                         }
                         .buttonStyle(.borderedProminent)
                     }
@@ -870,7 +971,9 @@ struct PartDetailView: View {
                 LabeledContent(viewModel.text(ar: "الندرة", en: "Rarity"), value: part.rarity ?? "-")
             }
             Section(viewModel.text(ar: "أرقام القطعة", en: "Part numbers")) {
-                ForEach(part.allNumbers, id: \.self) { Text(viewModel.isUnlocked(part) ? $0 : masked($0)).font(.body.monospaced()) }
+                ForEach(part.allNumbers, id: \.self) { number in
+                    Text(viewModel.premiumNumber(number, for: part)).font(.body.monospaced())
+                }
             }
             Section(viewModel.text(ar: "رسم كتالوج تقريبي", en: "Catalog diagram")) {
                 NativeDiagramView(part: part, unlocked: viewModel.isUnlocked(part))
@@ -913,7 +1016,7 @@ struct NativeDiagramView: View {
             let callout = CGRect(x: size.width * 0.52, y: 82, width: 82, height: 42)
             context.fill(Path(roundedRect: callout, cornerRadius: 10), with: .color(.red.opacity(0.22)))
             context.stroke(Path(roundedRect: callout, cornerRadius: 10), with: .color(.red), lineWidth: 3)
-            let text = Text(unlocked ? part.partNumber : masked(part.partNumber)).font(.caption.monospaced().bold()).foregroundStyle(.primary)
+            let text = Text(part.partNumber).font(.caption.monospaced().bold()).foregroundStyle(.primary)
             context.draw(text, at: CGPoint(x: callout.midX, y: callout.midY), anchor: .center)
         }
         .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
