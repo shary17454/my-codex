@@ -359,6 +359,7 @@ final class CatalogViewModel {
     private(set) var recordCount = 0
     private(set) var sourceCount = 0
     private(set) var partCount = 0
+    private var partSearchIndex: [String: String] = [:]
 
     var vehicleProfile = UserDefaults.standard.codable(VehicleProfile.self, forKey: "batalVehicleProfile") ?? VehicleProfile() {
         didSet { UserDefaults.standard.setCodable(vehicleProfile, forKey: "batalVehicleProfile") }
@@ -397,6 +398,9 @@ final class CatalogViewModel {
             async let storesTask = repository.loadStores()
             let catalog = try await catalogTask
             parts = catalog.parts.filter { !$0.partNumber.isEmpty }
+            partSearchIndex = parts.reduce(into: [:]) { index, part in
+                index[part.partNumber] = searchableText(for: part)
+            }
             sources = catalog.sources
             generatedAt = catalog.generatedAt ?? ""
             recordCount = catalog.recordCount ?? parts.count
@@ -415,7 +419,7 @@ final class CatalogViewModel {
             let categoryMatch = self.selectedCategory == .all || part.categoryValue == self.selectedCategory
             guard categoryMatch else { return false }
             guard !query.isEmpty else { return true }
-            return self.searchableText(for: part).contains(query)
+            return (self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)).contains(query)
         }.prefix(250).map { $0 }
     }
 
@@ -533,6 +537,7 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     private var lastWeatherLocation: CLLocation?
     private var lastWeatherUpdate: Date?
     private var currentLanguage: AppLanguage = .arabic
+    private var weatherTask: Task<Void, Never>?
 
     var authorization: CLAuthorizationStatus = .notDetermined
     var coordinate: CLLocationCoordinate2D?
@@ -575,11 +580,18 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
         isTracking = true
         locationMessage = language == .arabic ? "التتبع يعمل" : "Tracking active"
         manager.startUpdatingLocation()
-        if CLLocationManager.headingAvailable() { manager.startUpdatingHeading() }
+        if CLLocationManager.headingAvailable() {
+            manager.startUpdatingHeading()
+        } else {
+            headingDegrees = nil
+            locationMessage = language == .arabic ? "التتبع يعمل. البوصلة غير متاحة على هذا الجهاز." : "Tracking active. Compass is not available on this device."
+        }
     }
 
     func stop(language: AppLanguage) {
         isTracking = false
+        weatherTask?.cancel()
+        weatherTask = nil
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
         locationMessage = language == .arabic ? "تم إيقاف التتبع" : "Tracking stopped"
@@ -612,7 +624,7 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
             self.altitude = altitude
             self.horizontalAccuracy = horizontalAccuracy
             self.cameraPosition = .region(MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)))
-            await self.loadWeather(for: CLLocation(latitude: latitude, longitude: longitude))
+            self.scheduleWeatherLoad(for: CLLocation(latitude: latitude, longitude: longitude))
         }
     }
 
@@ -625,6 +637,20 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         Task { @MainActor in self.locationMessage = error.localizedDescription }
+    }
+
+    private func scheduleWeatherLoad(for location: CLLocation) {
+        if let lastWeatherLocation, let lastWeatherUpdate {
+            let recentlyUpdated = Date().timeIntervalSince(lastWeatherUpdate) < 600
+            let nearby = location.distance(from: lastWeatherLocation) < 1_000
+            if recentlyUpdated && nearby { return }
+        }
+        weatherTask?.cancel()
+        weatherTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 750_000_000)
+            guard !Task.isCancelled else { return }
+            await self?.loadWeather(for: location)
+        }
     }
 
     func loadWeather(for location: CLLocation) async {
@@ -656,7 +682,8 @@ struct OpenMeteoWeatherService {
             URLQueryItem(name: "current", value: "temperature_2m,weather_code")
         ]
         guard let url = components?.url else { throw URLError(.badURL) }
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let request = URLRequest(url: url, timeoutInterval: 10)
+        let (data, response) = try await URLSession.shared.data(for: request)
         if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
             throw URLError(.badServerResponse)
         }
