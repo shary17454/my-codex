@@ -527,7 +527,7 @@ final class CatalogViewModel {
         let match = parts.first { part in
             part.partNumber.localizedCaseInsensitiveContains(trimmed)
                 || part.allNumbers.contains { $0.localizedCaseInsensitiveContains(trimmed) }
-                || searchableText(for: part).contains(normalizedQuery)
+                || self.searchableText(for: part).contains(normalizedQuery)
         }
         guard let match else {
             return text(
@@ -542,6 +542,19 @@ final class CatalogViewModel {
             text(ar: "المحركات: \(short(match.engines))", en: "Engines: \(short(match.engines))"),
             text(ar: "مصادر الكتالوج: \((match.sourceCount ?? match.evidence.count).formatted())", en: "Catalog sources: \((match.sourceCount ?? match.evidence.count).formatted())")
         ].joined(separator: "\n")
+    }
+
+    func fitmentMatches(for query: String) -> [Part] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+        let normalizedQuery = normalized(trimmed)
+        return parts.lazy.filter { part in
+            part.partNumber.localizedCaseInsensitiveContains(trimmed)
+                || part.allNumbers.contains { $0.localizedCaseInsensitiveContains(trimmed) }
+                || self.searchableText(for: part).contains(normalizedQuery)
+        }
+        .prefix(8)
+        .map { $0 }
     }
 
     func openStore(_ store: VerifiedStore, part: Part?) {
@@ -784,6 +797,7 @@ struct DashboardView: View {
     @Bindable var viewModel: CatalogViewModel
     @State private var fitmentQuery = "21082-4W000"
     @State private var fitmentResult = ""
+    @State private var fitmentMatches: [Part] = []
 
     var body: some View {
         NavigationStack {
@@ -810,7 +824,10 @@ struct DashboardView: View {
                 Section(viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check")) {
                     TextField(viewModel.text(ar: "رقم القطعة أو الوصف", en: "Part number or description"), text: $fitmentQuery)
                         .textInputAutocapitalization(.characters)
-                    Button { fitmentResult = viewModel.fitmentSummary(for: fitmentQuery) } label: {
+                    Button {
+                        fitmentResult = viewModel.fitmentSummary(for: fitmentQuery)
+                        fitmentMatches = viewModel.fitmentMatches(for: fitmentQuery)
+                    } label: {
                         Label(viewModel.text(ar: "تحقق الآن", en: "Check now"), systemImage: "checkmark.seal")
                     }
                     if !fitmentResult.isEmpty {
@@ -818,13 +835,20 @@ struct DashboardView: View {
                             .font(.callout.monospaced())
                             .textSelection(.enabled)
                     }
+                    ForEach(fitmentMatches) { part in
+                        NavigationLink(value: part) {
+                            PartRow(part: part, viewModel: viewModel)
+                        }
+                    }
                 }
             }
             .navigationTitle(viewModel.text(ar: "الرئيسية", en: "Home"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
+            .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
             .onAppear {
                 if fitmentResult.isEmpty {
                     fitmentResult = viewModel.fitmentSummary(for: fitmentQuery)
+                    fitmentMatches = viewModel.fitmentMatches(for: fitmentQuery)
                 }
             }
         }
