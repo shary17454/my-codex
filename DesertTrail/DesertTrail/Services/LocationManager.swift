@@ -73,16 +73,18 @@ final class LocationManager: NSObject {
     }
 
     func requestBackgroundTripUpdates() {
+        proximityAlertsEnabled = true
         authorizationStatus = manager.authorizationStatus
         if authorizationStatus == .notDetermined {
             shouldStartWhenAuthorized = true
             manager.requestWhenInUseAuthorization()
+            requestNotificationAccess()
+            return
         } else if authorizationStatus == .authorizedWhenInUse {
             manager.requestAlwaysAuthorization()
         }
         manager.allowsBackgroundLocationUpdates = authorizationStatus == .authorizedAlways
         manager.pausesLocationUpdatesAutomatically = true
-        proximityAlertsEnabled = true
         startNavigation()
         requestNotificationAccess()
         configureDefaultProximityAlerts()
@@ -154,6 +156,9 @@ extension LocationManager: CLLocationManagerDelegate {
         let status = manager.authorizationStatus
         Task { @MainActor in
             authorizationStatus = status
+            if proximityAlertsEnabled, status == .authorizedWhenInUse {
+                manager.requestAlwaysAuthorization()
+            }
             manager.allowsBackgroundLocationUpdates = status == .authorizedAlways
             switch status {
             case .authorizedAlways, .authorizedWhenInUse:
@@ -167,6 +172,9 @@ extension LocationManager: CLLocationManagerDelegate {
                 locationErrorMessage = "صلاحية الموقع غير مفعلة."
             default:
                 break
+            }
+            if proximityAlertsEnabled, (status == .authorizedAlways || status == .authorizedWhenInUse) {
+                configureDefaultProximityAlerts()
             }
         }
     }

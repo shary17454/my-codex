@@ -60,7 +60,7 @@ enum ReviewStatus: String {
     }
 }
 
-struct EnvironmentalReport: Hashable {
+struct EnvironmentalReport: Hashable, Sendable {
     var temperatureCelsius: Double
     var airQualityIndex: Int
     var weatherSummary: String

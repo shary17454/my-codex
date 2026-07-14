@@ -192,7 +192,7 @@ struct HomeDashboardView: View {
     }
 
     private var quickActions: some View {
-        HStack(spacing: 10) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
             quickAction(title: "البوصلة", icon: "safari") { selectedTab = .compass }
             quickAction(title: "لوحة القيادة", icon: "speedometer") { showingActiveTrip = true }
             quickAction(title: "الطقس", icon: "cloud.sun.fill") { refreshWeather() }
@@ -447,7 +447,7 @@ struct HomeDashboardView: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.7)
             }
-            .frame(maxWidth: .infinity, minHeight: 76)
+            .frame(maxWidth: .infinity, minHeight: 64)
             .padding(.horizontal, 4)
             .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
         }

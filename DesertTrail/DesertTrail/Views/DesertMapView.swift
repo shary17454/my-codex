@@ -133,13 +133,7 @@ struct DesertMapView: View {
                     metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
                 }
 
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(), spacing: 8),
-                        GridItem(.flexible(), spacing: 8)
-                    ],
-                    spacing: 8
-                ) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 128), spacing: 8)], spacing: 8) {
                     compactMapActionButton(
                         title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
                         icon: "location.north.line",
@@ -168,7 +162,7 @@ struct DesertMapView: View {
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.horizontal, 10)
-            .padding(.bottom, 76)
+            .padding(.bottom, 88)
         }
         .task(id: appState.locationManager.currentLocation?.coordinate.latitude) {
             await appState.startLocationAndRefreshEnvironment()
@@ -265,17 +259,17 @@ struct DesertMapView: View {
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.45)
             }
-            .frame(maxWidth: .infinity, minHeight: 58)
+            .frame(maxWidth: .infinity, minHeight: 50)
             .padding(.horizontal, 4)
         }
         .buttonStyle(.plain)
         .foregroundStyle(isPrimary ? .white : Color.desertCopper)
         .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(isPrimary ? Color.desertCopper : Color(.systemBackground).opacity(0.72))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(Color.desertCopper.opacity(isPrimary ? 0.0 : 0.35), lineWidth: 1)
         )
         .accessibilityLabel(title)
@@ -800,16 +794,30 @@ struct MapCanvasView: UIViewRepresentable {
         mapView.isScrollEnabled = true
         mapView.isPitchEnabled = true
         mapView.isRotateEnabled = true
-        mapView.mapType = .hybridFlyover
-        mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .realistic)
+        mapView.mapType = .hybrid
+        mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .flat)
         mapView.setRegion(region, animated: false)
         return mapView
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         context.coordinator.tileOpacity = tileOpacity
-        mapView.mapType = .hybridFlyover
-        mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .realistic)
+        mapView.mapType = .hybrid
+        mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .flat)
+        if !context.coordinator.didSetInitialRegion {
+            mapView.setRegion(region, animated: false)
+            context.coordinator.didSetInitialRegion = true
+        }
+
+        let nextSignature = context.coordinator.signature(
+            route: route,
+            places: places,
+            tileTemplateURL: tileTemplateURL
+        )
+        guard context.coordinator.renderSignature != nextSignature else {
+            return
+        }
+        context.coordinator.renderSignature = nextSignature
         mapView.removeOverlays(mapView.overlays)
         mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
 
@@ -845,9 +853,22 @@ struct MapCanvasView: UIViewRepresentable {
 
     final class Coordinator: NSObject, MKMapViewDelegate {
         var tileOpacity: Double
+        var didSetInitialRegion = false
+        var renderSignature = ""
 
         init(tileOpacity: Double) {
             self.tileOpacity = tileOpacity
+        }
+
+        func signature(
+            route: [CLLocationCoordinate2D],
+            places: [HiddenPlace],
+            tileTemplateURL: String?
+        ) -> String {
+            let routeStart = route.first.map { "\($0.latitude),\($0.longitude)" } ?? "none"
+            let routeEnd = route.last.map { "\($0.latitude),\($0.longitude)" } ?? "none"
+            let placeIDs = places.map(\.id.uuidString).sorted().joined(separator: ",")
+            return "\(tileTemplateURL ?? "none")|\(route.count)|\(routeStart)|\(routeEnd)|\(placeIDs)"
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
