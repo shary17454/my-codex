@@ -61,43 +61,26 @@ final class UserSession: ObservableObject {
 
 struct ContentView: View {
     @StateObject private var userSession = UserSession()
-    @State private var questions = AskDemoStore.questions
-    @State private var knowledgeItems = AskDemoStore.knowledgeItems
-    @State private var selectedCategory: AskCategory = .all
-    @State private var searchText = ""
+    @State private var homeViewModel = HomeViewModel()
     @State private var selectedQuestion: AskQuestion?
     @State private var selectedKnowledgeItem: KnowledgeItem?
     @State private var showingComposer = false
     @State private var showingSmartCompare = false
     @State private var composerTemplate: KnowledgeItem?
 
-    private var totalVotes: Int {
-        questions.reduce(0) { $0 + $1.totalVotes }
-    }
-
-    private var filteredQuestions: [AskQuestion] {
-        questions
-            .filter { selectedCategory == .all || $0.category == selectedCategory }
-            .filter { question in
-                let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !query.isEmpty else { return true }
-                return ([question.title, question.details, question.author] + question.options.map(\.title))
-                    .joined(separator: " ")
-                    .localizedCaseInsensitiveContains(query)
-            }
-    }
-
-    private var filteredKnowledge: [KnowledgeItem] {
-        KnowledgeSearchIndex.search(knowledgeItems, query: searchText, category: selectedCategory)
-    }
-
     var body: some View {
         TabView {
             NavigationStack {
                 DashboardView(
-                    questions: questions,
-                    knowledgeItems: knowledgeItems,
-                    totalVotes: totalVotes,
+                    questions: homeViewModel.questions,
+                    knowledgeItems: homeViewModel.knowledgeItems,
+                    totalVotes: homeViewModel.totalVotes,
+                    openQuestion: { question in
+                        selectedQuestion = question
+                    },
+                    openSmartCompare: {
+                        showingSmartCompare = true
+                    },
                     startQuestion: { item in
                         composerTemplate = item
                         showingComposer = true
@@ -110,9 +93,9 @@ struct ContentView: View {
 
             NavigationStack {
                 QuestionListView(
-                    questions: filteredQuestions,
-                    selectedCategory: $selectedCategory,
-                    searchText: $searchText,
+                    questions: homeViewModel.filteredQuestions,
+                    selectedCategory: $homeViewModel.selectedCategory,
+                    searchText: $homeViewModel.searchText,
                     selectedQuestion: $selectedQuestion,
                     showingComposer: $showingComposer
                 )
@@ -123,9 +106,9 @@ struct ContentView: View {
 
             NavigationStack {
                 KnowledgeLibraryView(
-                    items: filteredKnowledge,
-                    selectedCategory: $selectedCategory,
-                    searchText: $searchText,
+                    items: homeViewModel.filteredKnowledge,
+                    selectedCategory: $homeViewModel.selectedCategory,
+                    searchText: $homeViewModel.searchText,
                     selectedItem: $selectedKnowledgeItem,
                     useItem: { item in
                         composerTemplate = item
@@ -174,7 +157,7 @@ struct ContentView: View {
         .tint(.teal)
         .sheet(isPresented: $showingComposer) {
             NewQuestionView(template: composerTemplate, authorName: userSession.publicName) { question in
-                questions.insert(question, at: 0)
+                homeViewModel.insertPublishedQuestion(question)
                 selectedQuestion = question
                 composerTemplate = nil
             }
@@ -186,7 +169,9 @@ struct ContentView: View {
                     voteAction: vote,
                     voteWithReasonAction: voteWithReason,
                     commentAction: addComment,
-                    authorName: userSession.publicName
+                    authorName: userSession.publicName,
+                    isSaved: homeViewModel.savedQuestionIDs.contains(question.id),
+                    saveAction: toggleSavedQuestion
                 )
             }
             .environment(\.layoutDirection, .rightToLeft)
@@ -203,60 +188,62 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingSmartCompare) {
             NavigationStack {
-                SmartComparisonView(items: knowledgeItems)
+                SmartComparisonView(items: homeViewModel.knowledgeItems)
             }
             .environment(\.layoutDirection, .rightToLeft)
+        }
+        .task {
+            await homeViewModel.loadSavedQuestionIDs()
+        }
+        .alert("تنبيه", isPresented: Binding(
+            get: { homeViewModel.appErrorMessage != nil },
+            set: { if !$0 { homeViewModel.appErrorMessage = nil } }
+        )) {
+            Button("موافق") {
+                homeViewModel.appErrorMessage = nil
+            }
+        } message: {
+            Text(homeViewModel.appErrorMessage ?? "")
         }
     }
 
     private func vote(questionID: AskQuestion.ID, optionID: PollOption.ID) {
-        guard let questionIndex = questions.firstIndex(where: { $0.id == questionID }),
-              let optionIndex = questions[questionIndex].options.firstIndex(where: { $0.id == optionID }) else {
-            return
-        }
-
-        questions[questionIndex].options[optionIndex].votes += 1
-        selectedQuestion = questions[questionIndex]
+        selectedQuestion = homeViewModel.vote(questionID: questionID, optionID: optionID)
     }
 
     private func voteWithReason(questionID: AskQuestion.ID, optionID: PollOption.ID, reason: String) {
-        guard let questionIndex = questions.firstIndex(where: { $0.id == questionID }),
-              let optionIndex = questions[questionIndex].options.firstIndex(where: { $0.id == optionID }) else {
-            return
-        }
+        voteWithReason(questionID: questionID, optionID: optionID, reason: reason, reasonCategory: nil, isVerifiedExperience: false)
+    }
 
-        let option = questions[questionIndex].options[optionIndex]
-        questions[questionIndex].options[optionIndex].votes += 1
-
-        let cleanReason = reason.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !cleanReason.isEmpty {
-            questions[questionIndex].comments.insert(
-                AskComment(
-                    author: userSession.publicName,
-                    text: cleanReason,
-                    likes: 0,
-                    optionID: option.id,
-                    optionTitle: option.title
-                ),
-                at: 0
-            )
-        }
-
-        selectedQuestion = questions[questionIndex]
+    private func voteWithReason(
+        questionID: AskQuestion.ID,
+        optionID: PollOption.ID,
+        reason: String,
+        reasonCategory: String?,
+        isVerifiedExperience: Bool
+    ) {
+        selectedQuestion = homeViewModel.voteWithReason(
+            questionID: questionID,
+            optionID: optionID,
+            reason: reason,
+            authorName: userSession.publicName,
+            reasonCategory: reasonCategory,
+            isVerifiedExperience: isVerifiedExperience
+        )
     }
 
     private func addComment(questionID: AskQuestion.ID, text: String) {
-        let cleanText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanText.isEmpty,
-              let questionIndex = questions.firstIndex(where: { $0.id == questionID }) else {
-            return
-        }
-
-        questions[questionIndex].comments.insert(
-            AskComment(author: userSession.publicName, text: cleanText, likes: 0),
-            at: 0
+        selectedQuestion = homeViewModel.addComment(
+            questionID: questionID,
+            text: text,
+            authorName: userSession.publicName
         )
-        selectedQuestion = questions[questionIndex]
+    }
+
+    private func toggleSavedQuestion(questionID: AskQuestion.ID) {
+        Task {
+            await homeViewModel.toggleSavedQuestion(questionID: questionID)
+        }
     }
 }
 
@@ -516,6 +503,8 @@ struct DashboardView: View {
     let questions: [AskQuestion]
     let knowledgeItems: [KnowledgeItem]
     let totalVotes: Int
+    let openQuestion: (AskQuestion) -> Void
+    let openSmartCompare: () -> Void
     let startQuestion: (KnowledgeItem?) -> Void
 
     private var highlightedItems: [KnowledgeItem] {
@@ -537,11 +526,7 @@ struct DashboardView: View {
                     StatCard(value: "\(categoryCount)", title: "مجالات", icon: "square.grid.2x2.fill", color: .orange)
                 }
 
-                IntelligencePanel()
-
-                SmartDecisionRoadmap()
-
-                AdvancedDecisionSuite()
+                IntelligencePanel(openSmartCompare: openSmartCompare)
 
                 SectionHeader(title: "مقارنات جاهزة", subtitle: "ابدأ من فكرة ثم خل الناس يحسمونها")
 
@@ -557,13 +542,15 @@ struct DashboardView: View {
 
                 VStack(spacing: 10) {
                     ForEach(questions.prefix(4)) { question in
-                        DashboardQuestionCard(question: question)
+                        DashboardQuestionCard(question: question) {
+                            openQuestion(question)
+                        }
                     }
                 }
             }
             .padding(16)
         }
-        .navigationTitle("وش الراي")
+        .navigationTitle("وش الرأي")
         .background(AppBackground())
     }
 }
@@ -654,9 +641,14 @@ struct KnowledgeLibraryView: View {
     }
 }
 
+private enum ResearchBrowserDefaults {
+    static let searchURLString = "https://www.google.com/search?q=%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A9+%D8%A7%D9%84%D9%85%D9%86%D8%AA%D8%AC%D8%A7%D8%AA"
+    static let searchURL = URL(string: searchURLString) ?? URL(filePath: "/")
+}
+
 struct ResearchBrowserView: View {
-    @State private var address = "https://www.google.com/search?q=%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A9+%D8%A7%D9%84%D9%85%D9%86%D8%AA%D8%AC%D8%A7%D8%AA"
-    @State private var activeURL = URL(string: "https://www.google.com/search?q=%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A9+%D8%A7%D9%84%D9%85%D9%86%D8%AA%D8%AC%D8%A7%D8%AA")!
+    @State private var address = ResearchBrowserDefaults.searchURLString
+    @State private var activeURL = ResearchBrowserDefaults.searchURL
 
     var body: some View {
         VStack(spacing: 0) {
@@ -712,7 +704,7 @@ struct ResearchBrowserView: View {
         let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         let urlString = "https://www.google.com/search?q=\(encoded)"
         address = urlString
-        activeURL = URL(string: urlString)!
+        activeURL = URL(string: urlString) ?? ResearchBrowserDefaults.searchURL
     }
 }
 
@@ -737,14 +729,43 @@ struct WebView: UIViewRepresentable {
 struct QuestionDetail: View {
     let question: AskQuestion
     let voteAction: (AskQuestion.ID, PollOption.ID) -> Void
-    let voteWithReasonAction: (AskQuestion.ID, PollOption.ID, String) -> Void
+    let voteWithReasonAction: (AskQuestion.ID, PollOption.ID, String, String?, Bool) -> Void
     let commentAction: (AskQuestion.ID, String) -> Void
     let authorName: String
+    let isSaved: Bool
+    let saveAction: (AskQuestion.ID) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var commentText = ""
     @State private var selectedVoteOption: PollOption?
     @State private var voteReason = ""
+    @State private var selectedReasonCategory: String?
+    @State private var isVerifiedExperience = false
+    @State private var decisionMode: DecisionMode = .quick
+    @State private var commentFilter: CommentFilter = .all
+    @State private var savedDecisionState: SavedDecisionState = .comparing
+
+    private var visibleComments: [AskComment] {
+        switch commentFilter {
+        case .all:
+            return question.comments
+        case .verified:
+            return question.comments.filter { $0.trustBadge != nil }
+        case .reasons:
+            return question.comments.filter { $0.optionID != nil }
+        }
+    }
+
+    private var shareText: String {
+        let winner = question.winningOption?.title ?? "لم تتضح النتيجة بعد"
+        return """
+        وش الرأي؟
+        \(question.title)
+
+        النتيجة الحالية: \(winner)
+        \(question.smartSummary)
+        """
+    }
 
     var body: some View {
         ScrollView {
@@ -768,6 +789,17 @@ struct QuestionDetail: View {
 
                 DecisionSummaryCard(question: question)
 
+                Picker("نوع القرار", selection: $decisionMode) {
+                    ForEach(DecisionMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                if decisionMode == .deep {
+                    DecisionCriteriaCard(category: question.category)
+                }
+
                 VStack(alignment: .leading, spacing: 12) {
                     Text("التصويت")
                         .font(.title3.weight(.bold))
@@ -783,32 +815,55 @@ struct QuestionDetail: View {
                     }
                 }
 
-                ExperienceTrustPanel(question: question)
-
                 if let selectedVoteOption {
                     VoteReasonCard(
                         option: selectedVoteOption,
+                        category: question.category,
                         reason: $voteReason,
+                        selectedReasonCategory: $selectedReasonCategory,
+                        isVerifiedExperience: $isVerifiedExperience,
                         submitWithReason: {
-                            voteWithReasonAction(question.id, selectedVoteOption.id, voteReason)
+                            voteWithReasonAction(question.id, selectedVoteOption.id, voteReason, selectedReasonCategory, isVerifiedExperience)
                             self.selectedVoteOption = nil
                             voteReason = ""
+                            selectedReasonCategory = nil
+                            isVerifiedExperience = false
                         },
                         voteOnly: {
                             voteAction(question.id, selectedVoteOption.id)
                             self.selectedVoteOption = nil
                             voteReason = ""
+                            selectedReasonCategory = nil
+                            isVerifiedExperience = false
                         },
                         cancel: {
                             self.selectedVoteOption = nil
                             voteReason = ""
+                            selectedReasonCategory = nil
+                            isVerifiedExperience = false
                         }
                     )
                 }
 
+                SavedDecisionCard(selection: $savedDecisionState, shareText: shareText)
+
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("أسباب الناس وتعليقاتهم")
-                        .font(.title3.weight(.bold))
+                    HStack {
+                        Text("أسباب الناس وتعليقاتهم")
+                            .font(.title3.weight(.bold))
+                        Spacer()
+                        Menu {
+                            ForEach(CommentFilter.allCases) { filter in
+                                Button(filter.title) {
+                                    commentFilter = filter
+                                }
+                            }
+                        } label: {
+                            Label(commentFilter.title, systemImage: "line.3.horizontal.decrease.circle")
+                                .font(.caption.weight(.bold))
+                        }
+                    }
+
                     HStack(spacing: 8) {
                         TextField("تعليق عام على السؤال", text: $commentText, axis: .vertical)
                             .textFieldStyle(.roundedBorder)
@@ -830,8 +885,16 @@ struct QuestionDetail: View {
                         )
                         .frame(maxWidth: .infinity, minHeight: 150)
                         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    } else if visibleComments.isEmpty {
+                        ContentUnavailableView(
+                            "لا توجد نتائج لهذا الفلتر",
+                            systemImage: "line.3.horizontal.decrease.circle",
+                            description: Text("غيّر الفلتر أو أضف سبب تصويت بتجربة موثقة.")
+                        )
+                        .frame(maxWidth: .infinity, minHeight: 130)
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     } else {
-                        ForEach(question.comments) { comment in
+                        ForEach(visibleComments) { comment in
                             CommentRow(comment: comment)
                         }
                     }
@@ -846,6 +909,13 @@ struct QuestionDetail: View {
             ToolbarItem(placement: .topBarLeading) {
                 Button("تم") {
                     dismiss()
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    saveAction(question.id)
+                } label: {
+                    Label(isSaved ? "إلغاء الحفظ" : "حفظ", systemImage: isSaved ? "bookmark.fill" : "bookmark")
                 }
             }
         }
@@ -875,7 +945,6 @@ struct KnowledgeDetailView: View {
                 InfoTile(title: "نقاط قوة", values: item.strengths, color: .teal)
                 InfoTile(title: "انتبه لها", values: item.considerations, color: .orange)
                 InfoTile(title: "مناسب لمن", values: item.idealFor, color: .indigo)
-                LivingKnowledgeCard(item: item)
 
                 if !item.specs.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
@@ -1022,12 +1091,6 @@ struct VoteOptionRow: View {
                 Text("\(option.votes) تصويت")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-
-                HStack(spacing: 8) {
-                    MetricPill(title: "موثق", value: "\(option.verifiedVotes)", icon: "checkmark.seal.fill", color: .teal)
-                    MetricPill(title: "ندم", value: "\(option.regretRate)%", icon: "arrow.uturn.backward.circle.fill", color: .orange)
-                    MetricPill(title: "يعيد الشراء", value: "\(option.repurchaseRate)%", icon: "repeat.circle.fill", color: .indigo)
-                }
             }
             .padding()
             .background(.background, in: RoundedRectangle(cornerRadius: 16))
@@ -1036,9 +1099,157 @@ struct VoteOptionRow: View {
     }
 }
 
+struct DecisionSummaryCard: View {
+    let question: AskQuestion
+    private var summary: DecisionSummary {
+        DecisionSummaryService.makeSummary(for: question)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "wand.and.stars.inverse")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+                    .background(.teal, in: RoundedRectangle(cornerRadius: 14))
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("ملخص القرار")
+                        .font(.headline)
+                    Text(summary.recommendationText)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            HStack(spacing: 8) {
+                DecisionMetric(title: "الثقة", value: "\(question.decisionConfidence)%", icon: "shield.checkered", color: .teal)
+                DecisionMetric(title: "تجارب", value: "\(question.verifiedComments.count)", icon: "checkmark.seal.fill", color: .green)
+                DecisionMetric(title: "أسباب", value: "\(question.comments.filter { $0.optionID != nil }.count)", icon: "quote.bubble.fill", color: .indigo)
+            }
+
+            if let warning = summary.warningText {
+                Label(warning, systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.orange)
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+            }
+
+            if !question.repeatedCons.isEmpty {
+                Divider()
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("العيوب المتكررة", systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.orange)
+                    FlowTags(values: question.repeatedCons, color: .orange)
+                }
+            }
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(.teal.opacity(0.25), lineWidth: 1)
+        )
+    }
+}
+
+struct DecisionMetric: View {
+    let title: String
+    let value: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 5) {
+            Image(systemName: icon)
+                .foregroundStyle(color)
+            Text(value)
+                .font(.headline.monospacedDigit())
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(Color.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct DecisionCriteriaCard: View {
+    let category: AskCategory
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("معايير التقييم لهذا التصنيف", systemImage: "slider.horizontal.3")
+                    .font(.headline)
+                Spacer()
+                Text(category.title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.teal)
+            }
+
+            FlowTags(values: DecisionFeatureCatalog.criteria(for: category), color: .teal)
+
+            Text("استخدم هذه المعايير عند قراءة الأصوات: قد يكون الخيار الأعلى تصويتًا ليس الأفضل لك إذا كانت أولوياتك مختلفة.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(.background, in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+struct SavedDecisionCard: View {
+    @Binding var selection: SavedDecisionState
+    let shareText: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("احفظ قرارك", systemImage: "bookmark.fill")
+                    .font(.headline)
+                Spacer()
+                ShareLink(item: shareText) {
+                    Label("مشاركة", systemImage: "square.and.arrow.up")
+                        .font(.caption.weight(.bold))
+                }
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], spacing: 8) {
+                ForEach(SavedDecisionState.allCases) { state in
+                    Button {
+                        selection = state
+                    } label: {
+                        Label(state.title, systemImage: state.systemImage)
+                            .font(.caption.weight(.bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(selection == state ? .white : .primary)
+                    .background(selection == state ? Color.teal : Color.secondary.opacity(0.12), in: Capsule())
+                }
+            }
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+}
+
 struct VoteReasonCard: View {
     let option: PollOption
+    let category: AskCategory
     @Binding var reason: String
+    @Binding var selectedReasonCategory: String?
+    @Binding var isVerifiedExperience: Bool
     let submitWithReason: () -> Void
     let voteOnly: () -> Void
     let cancel: () -> Void
@@ -1062,9 +1273,29 @@ struct VoteReasonCard: View {
                 }
             }
 
+            VStack(alignment: .leading, spacing: 8) {
+                Text("أسباب جاهزة")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+                FlowTags(
+                    values: DecisionFeatureCatalog.voteReasons(for: category),
+                    color: .teal,
+                    action: { value in
+                        selectedReasonCategory = value
+                        reason = value
+                    }
+                )
+            }
+
             TextField("مثال: اخترته لأن سعره أفضل وضمانه أوضح", text: $reason, axis: .vertical)
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(2...5)
+
+            Toggle(isOn: $isVerifiedExperience) {
+                Label("جرّبت هذا الخيار فعليًا", systemImage: "checkmark.seal.fill")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .toggleStyle(.switch)
 
             HStack(spacing: 10) {
                 Button("إلغاء", action: cancel)
@@ -1104,12 +1335,26 @@ struct CommentRow: View {
                     .foregroundStyle(.secondary)
             }
             if let optionTitle = comment.optionTitle {
-                Label("صوّت لـ \(optionTitle)", systemImage: "checkmark.seal.fill")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.teal)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.teal.opacity(0.12), in: Capsule())
+                HStack(spacing: 6) {
+                    Label("صوّت لـ \(optionTitle)", systemImage: "checkmark.seal.fill")
+                        .foregroundStyle(.teal)
+                    if let trustBadge = comment.trustBadge {
+                        Label(trustBadge, systemImage: "shield.fill")
+                            .foregroundStyle(.green)
+                    }
+                }
+                .font(.caption.weight(.bold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.teal.opacity(0.10), in: Capsule())
+            }
+            if let reasonCategory = comment.reasonCategory {
+                Text(reasonCategory)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.indigo)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.indigo.opacity(0.10), in: Capsule())
             }
             Text(comment.text)
                 .font(.body)
@@ -1121,88 +1366,83 @@ struct CommentRow: View {
 
 struct NewQuestionView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var title: String
-    @State private var details: String
-    @State private var category: AskCategory
-    @State private var optionCount: Int
-    @State private var optionTitles: [String]
+    @State private var viewModel: CreateComparisonViewModel
 
     let authorName: String
     let saveAction: (AskQuestion) -> Void
 
     init(template: KnowledgeItem? = nil, authorName: String, saveAction: @escaping (AskQuestion) -> Void) {
-        _title = State(initialValue: template?.suggestedQuestion ?? "")
-        _details = State(initialValue: template?.summary ?? "")
-        _category = State(initialValue: template?.category ?? .phones)
-        _optionCount = State(initialValue: template == nil ? 2 : 3)
-        var options = Array(repeating: "", count: 10)
-        if let template {
-            options[0] = template.name
-            options[1] = "بديل مشابه"
-            options[2] = "أحتاج اقتراح ثالث"
-        }
-        _optionTitles = State(initialValue: options)
+        _viewModel = State(initialValue: CreateComparisonViewModel(template: template))
         self.authorName = authorName
         self.saveAction = saveAction
     }
 
-    private var completedOptions: [String] {
-        optionTitles
-            .prefix(optionCount)
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-    }
-
-    private var canSave: Bool {
-        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && completedOptions.count >= 2
-    }
-
     var body: some View {
+        @Bindable var viewModel = viewModel
+
         NavigationStack {
             Form {
                 Section("السؤال") {
-                    TextField("مثال: أشتري السيارة A أو B؟", text: $title, axis: .vertical)
-                    TextField("تفاصيل تساعد الناس يصوتون", text: $details, axis: .vertical)
-                    Picker("المجال", selection: $category) {
+                    TextField("مثال: أشتري السيارة A أو B؟", text: $viewModel.title, axis: .vertical)
+                    TextField("تفاصيل تساعد الناس يصوتون", text: $viewModel.details, axis: .vertical)
+                    Picker("المجال", selection: $viewModel.category) {
                         ForEach(AskCategory.allCases.filter { $0 != .all }) { category in
                             Label(category.title, systemImage: category.systemImage).tag(category)
                         }
                     }
+                    TextField("وسوم اختيارية مفصولة بفواصل", text: $viewModel.tagsText)
                 }
 
                 Section("خيارات المقارنة") {
-                    Stepper("عدد الخيارات: \(optionCount)", value: $optionCount, in: 2...10)
-                    ForEach(0..<optionCount, id: \.self) { index in
-                        TextField("الخيار \(index + 1)", text: $optionTitles[index])
+                    Stepper("عدد الخيارات: \(viewModel.optionCount)", value: $viewModel.optionCount, in: 2...10)
+                    ForEach(0..<viewModel.optionCount, id: \.self) { index in
+                        TextField("الخيار \(index + 1)", text: $viewModel.optionTitles[index])
+                    }
+                }
+
+                Section("إعدادات المشاركة") {
+                    Toggle("نشر السؤال باسم مجهول", isOn: $viewModel.isAnonymous)
+                    Toggle("السماح بأسباب التصويت", isOn: $viewModel.allowsVoteReasons)
+                    Toggle("السماح بالتعليقات", isOn: $viewModel.allowsComments)
+                }
+
+                if let validationMessage = viewModel.validationMessage {
+                    Section {
+                        Label(validationMessage, systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
                     }
                 }
             }
             .navigationTitle("سؤال جديد")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                viewModel.restoreDraftIfNeeded()
+            }
+            .onDisappear {
+                viewModel.saveDraftOnDismissIfNeeded()
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("إلغاء") {
                         dismiss()
                     }
                 }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("حفظ مسودة") {
+                        viewModel.saveDraft()
+                    }
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("نشر") {
-                        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-                        let cleanDetails = details.trimmingCharacters(in: .whitespacesAndNewlines)
-                        saveAction(
-                            AskQuestion(
-                                title: cleanTitle,
-                                details: cleanDetails.isEmpty ? "ساعد صاحب السؤال بالتصويت أو التعليق." : cleanDetails,
-                                category: category,
-                                author: authorName,
-                                timeAgo: "الآن",
-                                options: completedOptions.map { PollOption(title: $0, votes: 0) },
-                                comments: []
-                            )
-                        )
+                        do {
+                            let question = try viewModel.makeQuestion(authorName: authorName)
+                            saveAction(question)
+                        } catch {
+                            return
+                        }
                         dismiss()
                     }
-                    .disabled(!canSave)
+                    .disabled(!viewModel.canSave)
                 }
             }
         }
@@ -1321,7 +1561,7 @@ struct PremiumHeroCard: View {
                 .shadow(color: .black.opacity(0.28), radius: 18, y: 10)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("وش الراي")
+                Text("وش الرأي")
                     .font(.largeTitle.weight(.black))
                 Text("قرارك أوضح قبل الشراء. قارن بين خيارين أو عشرة، وافهم الفروقات من قاعدة معرفة منظمة وآراء قابلة للتصويت.")
                     .font(.body)
@@ -1349,6 +1589,8 @@ struct PremiumHeroCard: View {
 }
 
 struct IntelligencePanel: View {
+    let openSmartCompare: () -> Void
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
@@ -1372,6 +1614,14 @@ struct IntelligencePanel: View {
                 MiniFeature(title: "صوت", icon: "waveform")
                 MiniFeature(title: "سيناريو", icon: "play.rectangle")
             }
+
+            Button(action: openSmartCompare) {
+                Label("افتح المقارنة الذكية", systemImage: "brain.head.profile")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.indigo)
         }
         .padding()
         .background(.background, in: RoundedRectangle(cornerRadius: 18))
@@ -1382,255 +1632,6 @@ struct IntelligencePanel: View {
                     lineWidth: 1
                 )
         )
-    }
-}
-
-struct SmartDecisionRoadmap: View {
-    private let features: [(title: String, detail: String, icon: String, color: Color)] = [
-        ("يناسبك أنت", "محرك توصية يسأل عن الميزانية والاستخدام ثم يرتب الخيارات.", "wand.and.stars", .teal),
-        ("خبرة موثقة", "وزن أعلى للملاك، المجربين، والخبراء بدل مساواة كل الآراء.", "checkmark.seal.fill", .indigo),
-        ("نسبة الندم", "متابعة ما بعد الشراء لمعرفة الرضا وإعادة الشراء.", "arrow.uturn.backward.circle.fill", .orange),
-        ("قرار نهائي", "خلاصة تجمع التصويت، نقاط القوة، العيوب، وتجارب الناس.", "target", .blue)
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionHeader(title: "مركز القرار الذكي", subtitle: "ميزات تجعل المقارنة مرجعًا حيًا وليست تصويتًا مؤقتًا")
-
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
-                ForEach(features.indices, id: \.self) { index in
-                    let feature = features[index]
-                    VStack(alignment: .leading, spacing: 9) {
-                        Image(systemName: feature.icon)
-                            .font(.title3.weight(.bold))
-                            .foregroundStyle(feature.color)
-                        Text(feature.title)
-                            .font(.headline)
-                        Text(feature.detail)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(3)
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 122, alignment: .topLeading)
-                    .padding()
-                    .background(.background, in: RoundedRectangle(cornerRadius: 18))
-                }
-            }
-        }
-    }
-}
-
-struct AdvancedDecisionSuite: View {
-    private let sections: [(title: String, icon: String, color: Color, items: [String])] = [
-        (
-            "تخصيص القرار",
-            "slider.horizontal.3",
-            .teal,
-            ["محرك توصية حسب الميزانية والاستخدام", "زر ساعدني أقرر بعد التصويت", "مقارنات حسب فئة الاستخدام"]
-        ),
-        (
-            "توثيق التجربة",
-            "person.text.rectangle.fill",
-            .indigo,
-            ["مالك المنتج، مجرب، خبير، أو رأي عام", "نقاط ثقة وسمعة للمستخدم", "أرشيف اشتريت، جربت، أنصح، لا أنصح"]
-        ),
-        (
-            "معرفة متجددة",
-            "chart.xyaxis.line",
-            .orange,
-            ["نسبة الندم وإعادة الشراء", "ملخص ذكي لأسباب الاختيار", "صفحات معرفة حية لكل منتج"]
-        ),
-        (
-            "انتشار ومشاركة",
-            "person.3.sequence.fill",
-            .blue,
-            ["Battle للمقارنات السريعة", "قرار جماعي عبر رابط", "تنبيهات عند تغير الأسعار أو ظهور مشكلة"]
-        )
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionHeader(title: "منظومة وش الراي", subtitle: "النسخة الجديدة تجهز التطبيق ليكون منصة قرار كاملة")
-
-            VStack(spacing: 10) {
-                ForEach(sections.indices, id: \.self) { index in
-                    let section = sections[index]
-                    VStack(alignment: .leading, spacing: 10) {
-                        Label(section.title, systemImage: section.icon)
-                            .font(.headline.weight(.bold))
-                            .foregroundStyle(section.color)
-
-                        ForEach(section.items, id: \.self) { item in
-                            Label(item, systemImage: "checkmark.circle.fill")
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(section.color.opacity(0.09), in: RoundedRectangle(cornerRadius: 18))
-                }
-            }
-        }
-    }
-}
-
-struct DecisionSummaryCard: View {
-    let question: AskQuestion
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "sparkles.rectangle.stack.fill")
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 48, height: 48)
-                    .background(.teal, in: RoundedRectangle(cornerRadius: 14))
-
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("القرار النهائي")
-                        .font(.title3.weight(.black))
-                    Text(question.finalDecision)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Text(question.aiSummary)
-                .font(.callout.weight(.semibold))
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.teal.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
-        }
-        .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(.teal.opacity(0.24), lineWidth: 1)
-        )
-    }
-}
-
-struct ExperienceTrustPanel: View {
-    let question: AskQuestion
-
-    private var verifiedCount: Int {
-        question.options.reduce(0) { $0 + $1.verifiedVotes }
-    }
-
-    private var expertCount: Int {
-        question.options.reduce(0) { $0 + $1.expertVotes }
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("مصداقية الآراء")
-                .font(.title3.weight(.bold))
-
-            HStack(spacing: 8) {
-                TrustStatCard(value: "\(verifiedCount)", title: "تجارب موثقة", icon: "checkmark.seal.fill", color: .teal)
-                TrustStatCard(value: "\(expertCount)", title: "آراء خبراء", icon: "person.badge.shield.checkmark.fill", color: .indigo)
-                TrustStatCard(value: "\(question.verifiedShare)%", title: "وزن الخبرة", icon: "gauge.with.dots.needle.67percent", color: .orange)
-            }
-
-            if let lowestRegret = question.lowestRegretOption {
-                Label("أقل ندم بعد الشراء: \(lowestRegret.title) بنسبة \(lowestRegret.regretRate)%", systemImage: "arrow.down.forward.circle.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.orange)
-            }
-        }
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 18))
-    }
-}
-
-struct TrustStatCard: View {
-    let value: String
-    let title: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.headline.weight(.bold))
-                .foregroundStyle(color)
-            Text(value)
-                .font(.title3.weight(.black))
-                .monospacedDigit()
-            Text(title)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .background(color.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
-    }
-}
-
-struct MetricPill: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        Label {
-            Text("\(title) \(value)")
-        } icon: {
-            Image(systemName: icon)
-        }
-        .font(.caption2.weight(.bold))
-        .lineLimit(1)
-        .minimumScaleFactor(0.7)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .background(color.opacity(0.12), in: Capsule())
-        .foregroundStyle(color)
-    }
-}
-
-struct LivingKnowledgeCard: View {
-    let item: KnowledgeItem
-
-    private var derivedSatisfaction: Int {
-        let seed = abs(item.name.unicodeScalars.reduce(0) { $0 + Int($1.value) })
-        return 82 + (seed % 13)
-    }
-
-    private var derivedRegret: Int {
-        max(3, 100 - derivedSatisfaction - 2)
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("صفحة معرفة حية", systemImage: "chart.line.uptrend.xyaxis")
-                    .font(.headline)
-                Spacer()
-                Text("تحديث مستمر")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.teal)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.teal.opacity(0.12), in: Capsule())
-            }
-
-            HStack(spacing: 8) {
-                TrustStatCard(value: "\(derivedSatisfaction)%", title: "رضا", icon: "face.smiling.fill", color: .teal)
-                TrustStatCard(value: "\(derivedRegret)%", title: "ندم", icon: "arrow.uturn.backward.circle.fill", color: .orange)
-                TrustStatCard(value: "\(item.strengths.count + item.considerations.count)", title: "نقاط قرار", icon: "checklist.checked", color: .indigo)
-            }
-
-            Text("تعرض هذه الصفحة مؤشرات مثل الرضا، الندم، نقاط القوة، الملاحظات، وأفضل استخدام للعنصر لتتحول المقارنة إلى مرجع قابل للتحديث.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
-        .padding()
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -1798,26 +1799,35 @@ struct KnowledgeRow: View {
 
 struct DashboardQuestionCard: View {
     let question: AskQuestion
+    let open: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: question.category.systemImage)
-                .foregroundStyle(.white)
-                .frame(width: 42, height: 42)
-                .background(.teal, in: RoundedRectangle(cornerRadius: 12))
+        Button(action: open) {
+            HStack(spacing: 12) {
+                Image(systemName: question.category.systemImage)
+                    .foregroundStyle(.white)
+                    .frame(width: 42, height: 42)
+                    .background(.teal, in: RoundedRectangle(cornerRadius: 12))
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(question.title)
-                    .font(.subheadline.weight(.bold))
-                    .lineLimit(2)
-                Text("\(question.options.count) خيارات • \(question.totalVotes) تصويت")
-                    .font(.caption)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(question.title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(2)
+                    Text("\(question.options.count) خيارات • \(question.totalVotes) تصويت")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.left")
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(.secondary)
             }
-            Spacer()
+            .padding()
+            .background(.background, in: RoundedRectangle(cornerRadius: 16))
         }
-        .padding()
-        .background(.background, in: RoundedRectangle(cornerRadius: 16))
+        .buttonStyle(.plain)
+        .accessibilityLabel("فتح \(question.title)")
     }
 }
 
@@ -1841,21 +1851,40 @@ struct InfoTile: View {
 struct FlowTags: View {
     let values: [String]
     let color: Color
+    var action: ((String) -> Void)? = nil
 
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 8)], alignment: .leading, spacing: 8) {
             ForEach(values, id: \.self) { value in
-                Text(value)
-                    .font(.caption.weight(.bold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity)
-                    .background(color.opacity(0.12), in: Capsule())
-                    .foregroundStyle(color)
+                if let action {
+                    Button {
+                        action(value)
+                    } label: {
+                        FlowTagLabel(value: value, color: color)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    FlowTagLabel(value: value, color: color)
+                }
             }
         }
+    }
+}
+
+struct FlowTagLabel: View {
+    let value: String
+    let color: Color
+
+    var body: some View {
+        Text(value)
+            .font(.caption.weight(.bold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .frame(maxWidth: .infinity)
+            .background(color.opacity(0.12), in: Capsule())
+            .foregroundStyle(color)
     }
 }
 

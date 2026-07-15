@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>مركز دراسة SAIP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <aside class="rail" aria-label="لوحة الدراسة">
+      <a class="brand" href="#">
+        <span class="mark">SA</span>
+        <span>مركز الدراسة</span>
+      </a>
+
+      <nav class="rail-nav" aria-label="تصفية الملفات">
+        <button class="nav-pill active" type="button" data-filter="all">كل الملفات</button>
+        <button class="nav-pill" type="button" data-filter="final">المستندات النهائية</button>
+        <button class="nav-pill" type="button" data-filter="word">Word</button>
+        <button class="nav-pill" type="button" data-filter="pdf">PDF</button>
+        <button class="nav-pill" type="button" data-filter="data">البيانات</button>
+        <button class="nav-pill" type="button" data-filter="review">صور المراجعة</button>
+      </nav>
+
+      <a class="zip-link" href="../study-saip-saher2030.zip" download>
+        <strong>تحميل الحزمة</strong>
+        <span>study-saip-saher2030.zip</span>
+      </a>
+    </aside>
+
+    <main class="workspace">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">SAIP / Saher 2030 / Aman 2030</p>
+          <h1>تطبيق لإدارة ملفات الدراسة ومراجعتها من مكان واحد</h1>
+        </div>
+        <div class="hero-card">
+          <span id="totalFiles">0</span>
+          <strong>ملف مفهرس</strong>
+        </div>
+      </header>
+
+      <section class="metrics" aria-label="إحصاءات الملفات">
+        <div class="metric">
+          <strong id="wordCount">0</strong>
+          <span>Word</span>
+        </div>
+        <div class="metric">
+          <strong id="pdfCount">0</strong>
+          <span>PDF</span>
+        </div>
+        <div class="metric">
+          <strong id="dataCount">0</strong>
+          <span>JSON / HTML / MD</span>
+        </div>
+        <div class="metric">
+          <strong id="reviewCount">0</strong>
+          <span>صور مراجعة</span>
+        </div>
+      </section>
+
+      <section class="tools">
+        <label class="search-field">
+          <span>بحث</span>
+          <input id="searchInput" type="search" placeholder="ابحث باسم الملف أو نوعه أو وصفه..." />
+        </label>
+        <select id="sortSelect" aria-label="ترتيب الملفات">
+          <option value="priority">الأولوية</option>
+          <option value="name">الاسم</option>
+          <option value="type">النوع</option>
+        </select>
+      </section>
+
+      <section class="layout">
+        <div class="file-panel">
+          <div class="section-title">
+            <h2>ملفات الدراسة</h2>
+            <span id="visibleCount">0 ملف</span>
+          </div>
+          <div class="file-list" id="fileList" aria-live="polite"></div>
+        </div>
+
+        <article class="preview-panel" id="previewPanel">
+          <div class="preview-head">
+            <div>
+              <span class="type-tag" id="previewType">PDF</span>
+              <h2 id="previewTitle">اختر ملفًا للمعاينة</h2>
+              <p id="previewDescription">ستظهر هنا تفاصيل الملف وروابط الفتح والتحميل.</p>
+            </div>
+            <div class="preview-actions">
+              <a class="ghost-link" id="openLink" href="#" target="_blank" rel="noreferrer">فتح</a>
+              <a class="primary-link" id="downloadLink" href="#" download>تحميل</a>
+            </div>
+          </div>
+
+          <div class="preview-meta" id="previewMeta"></div>
+          <div class="preview-box" id="previewBox"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
