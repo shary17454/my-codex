@@ -11,7 +11,7 @@
 		101000000000000000000002 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000002 /* SceneDelegate.swift */; };
 		101000000000000000000003 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000003 /* WebViewController.swift */; };
 		101000000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000004 /* Assets.xcassets */; };
-		101000000000000000000005 /* Web in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000005 /* Web */; };
+		101000000000000000000007 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000009 /* data */; };
 		101000000000000000000006 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000008 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +24,7 @@
 		102000000000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		102000000000000000000007 /* BatalAlDroob.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BatalAlDroob.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		102000000000000000000008 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		102000000000000000000009 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Web/data; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,7 +53,7 @@
 				102000000000000000000002 /* SceneDelegate.swift */,
 				102000000000000000000003 /* WebViewController.swift */,
 				102000000000000000000004 /* Assets.xcassets */,
-				102000000000000000000005 /* Web */,
+				102000000000000000000009 /* data */,
 				102000000000000000000006 /* Info.plist */,
 				102000000000000000000008 /* PrivacyInfo.xcprivacy */,
 			);
@@ -128,7 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				101000000000000000000004 /* Assets.xcassets in Resources */,
-				101000000000000000000005 /* Web in Resources */,
+				101000000000000000000007 /* data in Resources */,
 				101000000000000000000006 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -298,7 +299,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 89;
+				CURRENT_PROJECT_VERSION = 90;
 				DEVELOPMENT_ASSET_PATHS = "";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BatalAlDroob/Info.plist;
@@ -317,7 +318,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 89;
+				CURRENT_PROJECT_VERSION = 90;
 				DEVELOPMENT_ASSET_PATHS = "";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BatalAlDroob/Info.plist;

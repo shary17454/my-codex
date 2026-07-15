@@ -280,16 +280,19 @@ protocol CatalogRepository: Sendable {
 
 struct BundledCatalogRepository: CatalogRepository {
     func loadCatalog() async throws -> CatalogPayload {
-        try await decodeBundledJSON(CatalogPayload.self, resource: "y60_app_catalog", subdirectory: "Web/data")
+        try await decodeBundledJSON(CatalogPayload.self, resource: "y60_app_catalog", subdirectories: ["data", "Web/data"])
     }
 
     func loadStores() async throws -> [VerifiedStore] {
-        let directory = try await decodeBundledJSON(StoreDirectory.self, resource: "store_directory", subdirectory: "Web/data")
+        let directory = try await decodeBundledJSON(StoreDirectory.self, resource: "store_directory", subdirectories: ["data", "Web/data"])
         return directory.verifiedStores
     }
 
-    private func decodeBundledJSON<T: Decodable & Sendable>(_ type: T.Type, resource: String, subdirectory: String) async throws -> T {
-        guard let url = Bundle.main.url(forResource: resource, withExtension: "json", subdirectory: subdirectory) else {
+    private func decodeBundledJSON<T: Decodable & Sendable>(_ type: T.Type, resource: String, subdirectories: [String]) async throws -> T {
+        let url = subdirectories.lazy.compactMap {
+            Bundle.main.url(forResource: resource, withExtension: "json", subdirectory: $0)
+        }.first
+        guard let url else {
             throw AppError.missingResource(resource)
         }
         return try await Task.detached(priority: .userInitiated) {
