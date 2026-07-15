@@ -425,6 +425,13 @@ final class CatalogViewModel {
 
     var sharedParts: [Part] { parts.filter(\.isSharedCandidate).prefix(80).map { $0 } }
     var wishlistParts: [Part] { parts.filter { wishlist.contains($0.partNumber) } }
+    var reviewReadyParts: [Part] {
+        parts
+            .filter { !$0.evidence.isEmpty && !$0.years.isEmpty && !$0.engines.isEmpty }
+            .sorted { ($0.confidence ?? 0) > ($1.confidence ?? 0) }
+            .prefix(8)
+            .map { $0 }
+    }
 
     func text(ar: String, en: String) -> String { language == .arabic ? ar : en }
     func title(for part: Part) -> String { part.title(language: language) }
@@ -555,6 +562,11 @@ final class CatalogViewModel {
         }
         .prefix(8)
         .map { $0 }
+    }
+
+    func categoryCount(_ category: CatalogCategory) -> Int {
+        guard category != .all else { return parts.count }
+        return parts.lazy.filter { $0.categoryValue == category }.count
     }
 
     func openStore(_ store: VerifiedStore, part: Part?) {
@@ -813,6 +825,21 @@ struct DashboardView: View {
                         .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 4)
+                }
+
+                Section(viewModel.text(ar: "لوحة الكتالوج المحلي", en: "Native catalog dashboard")) {
+                    StatsHeader(viewModel: viewModel)
+                    ForEach(CatalogCategory.allCases.filter { $0 != .all }.prefix(6)) { category in
+                        LabeledContent(category.title(viewModel.language), value: viewModel.categoryCount(category).formatted())
+                    }
+                }
+
+                Section(viewModel.text(ar: "عينات مدققة قابلة للفتح", en: "Verified native records")) {
+                    ForEach(viewModel.reviewReadyParts) { part in
+                        NavigationLink(value: part) {
+                            PartRow(part: part, viewModel: viewModel)
+                        }
+                    }
                 }
 
                 Section(viewModel.text(ar: "وظائف تعمل بدون شراء", en: "Included functionality")) {
