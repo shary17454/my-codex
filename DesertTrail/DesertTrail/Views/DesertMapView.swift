@@ -133,7 +133,13 @@ struct DesertMapView: View {
                     metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
                 }
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 128), spacing: 8)], spacing: 8) {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(minimum: 112), spacing: 8),
+                        GridItem(.flexible(minimum: 112), spacing: 8)
+                    ],
+                    spacing: 8
+                ) {
                     compactMapActionButton(
                         title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
                         icon: "location.north.line",
@@ -163,6 +169,7 @@ struct DesertMapView: View {
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.horizontal, 10)
             .padding(.bottom, 88)
+            .frame(maxHeight: 440, alignment: .bottom)
         }
         .task(id: appState.locationManager.currentLocation?.coordinate.latitude) {
             await appState.startLocationAndRefreshEnvironment()
@@ -250,17 +257,19 @@ struct DesertMapView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            VStack(spacing: 5) {
+            HStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.headline.weight(.bold))
+                    .font(.subheadline.weight(.bold))
+                    .frame(width: 20)
             Text(title)
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.system(size: 12, weight: .bold))
                     .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.45)
+                    .multilineTextAlignment(.leading)
+                    .minimumScaleFactor(0.62)
+                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, minHeight: 50)
-            .padding(.horizontal, 4)
+            .frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
+            .padding(.horizontal, 10)
         }
         .buttonStyle(.plain)
         .foregroundStyle(isPrimary ? .white : Color.desertCopper)
@@ -272,6 +281,7 @@ struct DesertMapView: View {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(Color.desertCopper.opacity(isPrimary ? 0.0 : 0.35), lineWidth: 1)
         )
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .accessibilityLabel(title)
     }
 
@@ -444,12 +454,19 @@ struct GeospatialLayerCatalogView: View {
                     .foregroundStyle(isTileTemplateValid ? Color.green : Color.orange)
                     .lineLimit(2)
                     .minimumScaleFactor(0.72)
-                HStack(spacing: 8) {
-                    mapSourceSmallButton("تجربة") { applyDemoTileTemplate() }
-                    mapSourceSmallButton("تطبيق") { applyTileTemplate() }
-                        .disabled(!isTileTemplateValid)
-                    mapSourceSmallButton("إيقاف") { disableTileOverlay() }
-                }
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(), spacing: 8),
+                            GridItem(.flexible(), spacing: 8),
+                            GridItem(.flexible(), spacing: 8)
+                        ],
+                        spacing: 8
+                    ) {
+                        mapSourceSmallButton("تجربة") { applyDemoTileTemplate() }
+                        mapSourceSmallButton("تطبيق") { applyTileTemplate() }
+                            .disabled(!isTileTemplateValid)
+                        mapSourceSmallButton("إيقاف") { disableTileOverlay() }
+                    }
             }
             .font(.caption)
 
@@ -656,7 +673,7 @@ struct GeospatialLayerCatalogView: View {
             Text(title)
                 .font(.caption.weight(.bold))
                 .lineLimit(1)
-                .minimumScaleFactor(0.75)
+                .minimumScaleFactor(0.60)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
                 .foregroundStyle(isSelected ? .white : .primary)
@@ -669,9 +686,10 @@ struct GeospatialLayerCatalogView: View {
         Button(action: action) {
             Text(title)
                 .font(.caption2.weight(.bold))
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-                .frame(maxWidth: .infinity, minHeight: 30)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.58)
+                .frame(maxWidth: .infinity, minHeight: 34)
         }
         .buttonStyle(.bordered)
     }
@@ -812,7 +830,8 @@ struct MapCanvasView: UIViewRepresentable {
         let nextSignature = context.coordinator.signature(
             route: route,
             places: places,
-            tileTemplateURL: tileTemplateURL
+            tileTemplateURL: tileTemplateURL,
+            tileOpacity: tileOpacity
         )
         guard context.coordinator.renderSignature != nextSignature else {
             return
@@ -863,12 +882,13 @@ struct MapCanvasView: UIViewRepresentable {
         func signature(
             route: [CLLocationCoordinate2D],
             places: [HiddenPlace],
-            tileTemplateURL: String?
+            tileTemplateURL: String?,
+            tileOpacity: Double
         ) -> String {
             let routeStart = route.first.map { "\($0.latitude),\($0.longitude)" } ?? "none"
             let routeEnd = route.last.map { "\($0.latitude),\($0.longitude)" } ?? "none"
             let placeIDs = places.map(\.id.uuidString).sorted().joined(separator: ",")
-            return "\(tileTemplateURL ?? "none")|\(route.count)|\(routeStart)|\(routeEnd)|\(placeIDs)"
+            return "\(tileTemplateURL ?? "none")|\(tileOpacity)|\(route.count)|\(routeStart)|\(routeEnd)|\(placeIDs)"
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {

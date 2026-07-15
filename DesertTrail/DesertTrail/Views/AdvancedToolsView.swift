@@ -243,7 +243,7 @@ struct AdvancedToolsView: View {
                 }
             }
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 74), spacing: 8)], alignment: .leading, spacing: 8) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 86), spacing: 8)], alignment: .leading, spacing: 8) {
                 tag("خرائط")
                 tag("سلامة")
                 tag("مجتمع")
@@ -1104,13 +1104,13 @@ struct AdvancedToolsView: View {
             handleToolShortcut(title: text, value: "")
         } label: {
             Text(text)
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 11, weight: .semibold))
                 .lineLimit(2)
-                .minimumScaleFactor(0.52)
+                .minimumScaleFactor(0.62)
                 .multilineTextAlignment(.center)
-                .frame(minWidth: 68, minHeight: 34)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
+                .frame(maxWidth: .infinity, minHeight: 36)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 .background(Color.desertSand.opacity(0.45), in: Capsule())
         }
         .buttonStyle(.plain)

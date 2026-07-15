@@ -220,7 +220,7 @@ struct ActiveTripDriveView: View {
 
     private var sideControls: some View {
         HStack {
-            VStack(spacing: 14) {
+            VStack(spacing: 10) {
                 driveRoundButton(icon: "location.fill", title: "موقعي") {
                     appState.locationManager.requestWhenInUse()
                     appState.locationManager.startNavigation()
@@ -237,7 +237,7 @@ struct ActiveTripDriveView: View {
 
             Spacer()
 
-            VStack(spacing: 14) {
+            VStack(spacing: 10) {
                 driveRoundButton(icon: "arrow.up.right.navigation.fill", title: "اتجاه") {
                     appState.locationManager.startNavigation()
                     showStatus("تم تشغيل التوجيه")
@@ -252,7 +252,7 @@ struct ActiveTripDriveView: View {
             }
         }
         .padding(.horizontal, 18)
-        .padding(.bottom, 132)
+        .padding(.bottom, 142)
         .frame(maxHeight: .infinity, alignment: .bottom)
     }
 
@@ -371,14 +371,23 @@ struct ActiveTripDriveView: View {
 
     private func driveRoundButton(icon: String, title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Image(systemName: icon)
-                .font(.title3.weight(.bold))
-                .foregroundStyle(DrivePalette.goldGradient)
-                .frame(width: 50, height: 50)
-                .background(Circle().fill(Color.black.opacity(0.68)))
-                .overlay(Circle().stroke(Color.driveGold.opacity(0.64), lineWidth: 1))
+            VStack(spacing: 3) {
+                Image(systemName: icon)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(DrivePalette.goldGradient)
+                    .frame(width: 42, height: 38)
+                    .background(Circle().fill(Color.black.opacity(0.68)))
+                    .overlay(Circle().stroke(Color.driveGold.opacity(0.64), lineWidth: 1))
+                Text(title)
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.86))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+            }
+            .frame(width: 58, height: 56)
         }
         .buttonStyle(.plain)
+        .contentShape(Rectangle())
         .accessibilityLabel(title)
     }
 
