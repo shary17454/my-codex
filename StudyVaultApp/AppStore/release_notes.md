@@ -1,3 +1,17 @@
+# ملاحظات الإصدار 1.9.0
+
+- تجهيز إصدار إنتاجي جديد برقم بناء أعلى لتفادي إعادة استخدام مسارات إصدارات أو Builds مغلقة في App Store Connect.
+- مراجعة إعدادات المشروع، الخصوصية، وبيانات الإصدار مع الحفاظ على Bundle ID والتوقيع كما هي.
+- التحقق من نجاح بناء Debug وRelease بدون توقيع داخل بيئة Xcode المحلية.
+- تحديث وثائق الاستعداد للإصدار وقائمة التحقق قبل تشغيل Xcode Cloud أو الإرسال للمراجعة.
+
+## English Release Notes 1.9.0
+
+- Prepared a new production release with an increased build number to avoid reusing closed App Store Connect trains or builds.
+- Reviewed project configuration, privacy metadata, and release settings while preserving the existing bundle identifier and signing setup.
+- Verified local unsigned Debug and Release builds with Xcode.
+- Updated release readiness documentation and the checklist for Xcode Cloud or review submission.
+
 # ملاحظات الإصدار 1.8.0
 
 - تحسين استقرار المتصفح الداخلي عند فتح روابط البحث أو إدخال عبارات بحث مخصصة.
