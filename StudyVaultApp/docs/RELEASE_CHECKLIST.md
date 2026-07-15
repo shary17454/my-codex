@@ -4,12 +4,13 @@
 
 - App name: وش الرأي.
 - Bundle ID: `com.shary17454.esal`.
-- Marketing version: `1.9.0`.
-- Build number: `30`.
+- Marketing version: `1.10.0`.
+- Build number: `36`.
 - Release action: `PREPARE_ONLY`، بدون رفع وبدون إرسال للمراجعة من هذه المهمة.
 - Scheme: `StudyVault`.
 - Target: `StudyVault`.
-- Xcode: 26.4.1.
+- Xcode Cloud required: Xcode 26.6 `17F113` أو أحدث إصدار إنتاجي تسمح به Apple.
+- Local Xcode observed: 26.4.1 `17E202`، صالح للبناء المحلي فقط ولا يعتمد كبيئة رفع لهذا الإصدار.
 - Swift: 6.0.
 - Deployment target: iOS 17.0.
 
@@ -35,9 +36,12 @@
 
 ## App Store Connect
 
-- [ ] التأكد من أن الإصدار `1.9.0` أعلى من آخر إصدار مقبول.
-- [ ] التأكد من أن Build `30` أعلى من آخر Build مرفوض/مرفوع.
+- [ ] التأكد من أن الإصدار `1.10.0` أعلى من آخر إصدار مقبول ومن آخر محاولة `1.9.0`.
+- [ ] التأكد من أن Build `36` أعلى من كل Build ظاهر في TestFlight / Build Uploads، خصوصًا Build `35`.
 - [ ] التأكد أن Xcode Cloud workflow يحتوي `Archive - iOS` مع Distribution Preparation = App Store Connect.
+- [ ] ضبط Xcode Cloud > Workflow > Environment > Xcode Version على Xcode 26.6 `17F113` أو إصدار إنتاجي أحدث مسموح.
+- [ ] ضبط Xcode Cloud > Next Build Number على `36` أو رقم أعلى إن ظهر Build أحدث في Build Uploads.
+- [ ] عدم اختيار Latest Beta أو Xcode 27 beta.
 - [ ] عدم اختيار Build مرفوض أو train مغلق.
 - [ ] مراجعة What’s New بالعربية والإنجليزية.
 - [ ] مراجعة Screenshots وApp Preview إن وجدت.
