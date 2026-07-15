@@ -11,6 +11,46 @@ struct OfflineMap: Identifiable, Hashable {
     var centerLongitude: Double
 }
 
+struct OfflineMapPreset: Identifiable {
+    let id = UUID()
+    var title: String
+    var subtitle: String
+    var region: MKCoordinateRegion
+
+    static let samples: [OfflineMapPreset] = [
+        OfflineMapPreset(
+            title: "وادي حنيفة",
+            subtitle: "الرياض - أودية ومتنزهات",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730), span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08))
+        ),
+        OfflineMapPreset(
+            title: "حافة العالم",
+            subtitle: "طويق - طرق برية وحواف صخرية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 24.9530, longitude: 45.9960), span: MKCoordinateSpan(latitudeDelta: 0.12, longitudeDelta: 0.12))
+        ),
+        OfflineMapPreset(
+            title: "روضة خريم",
+            subtitle: "ربيع ومناطق عائلية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.3828, longitude: 47.2552), span: MKCoordinateSpan(latitudeDelta: 0.11, longitudeDelta: 0.11))
+        ),
+        OfflineMapPreset(
+            title: "نفود الثويرات",
+            subtitle: "كثبان رملية ومناطق تطعيس",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 26.0900, longitude: 44.1500), span: MKCoordinateSpan(latitudeDelta: 0.18, longitudeDelta: 0.18))
+        ),
+        OfflineMapPreset(
+            title: "العلا",
+            subtitle: "جبال وتكوينات صخرية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 26.6085, longitude: 37.9232), span: MKCoordinateSpan(latitudeDelta: 0.16, longitudeDelta: 0.16))
+        ),
+        OfflineMapPreset(
+            title: "الربع الخالي",
+            subtitle: "منطقة صحراوية واسعة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 20.2000, longitude: 50.0000), span: MKCoordinateSpan(latitudeDelta: 0.45, longitudeDelta: 0.45))
+        )
+    ]
+}
+
 @MainActor
 final class OfflineMapStore: ObservableObject {
     @Published private(set) var maps: [OfflineMap] = []

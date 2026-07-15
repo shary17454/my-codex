@@ -1,5 +1,27 @@
 # سجل إصدار البيد
 
+## 1.9.1 (68) - 2026-07-15
+
+### العربية - What's New
+
+- إصلاح إنشاء الرحلات الجديدة وحفظها وتعديل المشاركين والوجهة.
+- تحسين البوصلة واتجاه الشمال وربطها بطلب الموقع عند الحاجة.
+- إصلاح أزرار الطقس وجودة الهواء ولوحة القيادة وإضافة الموقع لتظهر حالة واضحة عند الاستخدام.
+- توسيع البحث المحلي عن المواقع المعتمدة وإضافة اقتراحات وجهات برية أكثر.
+- تحسين خرائط بلا إنترنت بإظهار خيارات مناطق متعددة بدل تكرار موقع واحد.
+- تحسين الخريطة وإعادة تمركزها عند تغيير الطبقة أو الوجهة.
+- تحسين وضوح النصوص والبطاقات على الشاشات الصغيرة.
+
+### English - What's New
+
+- Fixed trip creation, saved trip editing, participants, and destination selection.
+- Improved compass heading behavior and location permission flow.
+- Fixed weather, air quality, driving dashboard, and add-place actions with clearer status feedback.
+- Expanded local destination search with more approved desert locations.
+- Improved offline maps with multiple region choices instead of repeated saved entries.
+- Improved map recentering when changing layers or destinations.
+- Improved text and card readability on smaller screens.
+
 ## 1.9.0 (67) - 2026-07-15
 
 ### العربية - What's New

@@ -10,6 +10,7 @@ struct HomeDashboardView: View {
     @State private var showingActiveTrip = false
     @State private var showingAddPlace = false
     @State private var showingGeospatialCatalog = false
+    @State private var statusMessage: String?
 
     private let dashboardRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
@@ -23,6 +24,18 @@ struct HomeDashboardView: View {
                 mapHero
                 tripMetricBar
                 quickActions
+                if let statusMessage {
+                    Text(statusMessage)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(Color.oasisTeal, in: RoundedRectangle(cornerRadius: 8))
+                }
                 contentCards
                 primaryActions
                 communitySummary
@@ -235,16 +248,17 @@ struct HomeDashboardView: View {
                         .frame(width: 82, height: 82)
 
                     VStack(alignment: .leading, spacing: 5) {
-                        Text("رحلة النفود الكبير")
+                        Text(appState.selectedTrip.title)
                             .font(.subheadline.weight(.bold))
-                        Label("الرياض - النفود", systemImage: "mappin")
-                        Label("5 مشاركين", systemImage: "person.2")
+                            .lineLimit(2)
+                        Label(String(format: "%.3f, %.3f", appState.selectedTrip.meetingPoint.latitude, appState.selectedTrip.meetingPoint.longitude), systemImage: "mappin")
+                        Label("\(appState.selectedTrip.participants.count) مشاركين", systemImage: "person.2")
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }
 
-                ProgressView(value: 0.6)
+                ProgressView(value: tripProgress)
                     .tint(Color.desertCopper)
 
                 Button {
@@ -267,7 +281,8 @@ struct HomeDashboardView: View {
     }
 
     private var featuredPlaceCard: some View {
-        DashboardCard {
+        let place = appState.hiddenPlaces.first { $0.status == .approved } ?? HiddenPlace.samples[0]
+        return DashboardCard {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text("اكتشف مواقع جديدة")
@@ -286,10 +301,12 @@ struct HomeDashboardView: View {
                     )
                     .overlay(alignment: .bottomLeading) {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("جبل عروق بني معارض")
+                            Text(place.name)
                                 .font(.subheadline.weight(.bold))
-                            Text("منطقة خلابة")
+                                .lineLimit(2)
+                            Text(place.notes)
                                 .font(.caption)
+                                .lineLimit(2)
                         }
                         .foregroundStyle(.white)
                         .padding(10)
@@ -297,10 +314,10 @@ struct HomeDashboardView: View {
                     .frame(height: 110)
 
                 HStack {
-                    Text("4.7")
+                    Text("\(place.rating).0")
                     Image(systemName: "star.fill")
                         .foregroundStyle(.yellow)
-                    Text("(128)")
+                    Text("(\(place.points))")
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
@@ -355,8 +372,8 @@ struct HomeDashboardView: View {
 
                 HStack(spacing: 8) {
                     communityStat("المستخدمون", "12.4K", "person")
-                    communityStat("المواقع", "2.1K", "mappin")
-                    communityStat("الرحلات", "3.8K", "figure.hiking")
+                    communityStat("المواقع", "\(appState.hiddenPlaces.count)", "mappin")
+                    communityStat("الرحلات", "\(appState.trips.count)", "figure.hiking")
                     communityStat("النقاط", "18,760", "trophy")
                 }
             }
@@ -370,9 +387,9 @@ struct HomeDashboardView: View {
                 .foregroundStyle(Color.desertCopper)
 
             HStack(spacing: 8) {
-                alertChip("جودة الهواء جيدة", "leaf.fill", .green)
-                alertChip("رياح قوية", "wind", .orange)
-                alertChip("ارتفاع حرارة", "thermometer.sun", .yellow)
+                alertChip("AQI \(appState.environmentalReport.airQualityIndex)", "leaf.fill", appState.environmentalReport.airQualityIndex > 150 ? .red : .green)
+                alertChip("\(Int(appState.environmentalReport.windSpeedKPH)) كم/س", "wind", appState.environmentalReport.windSpeedKPH > 35 ? .orange : .green)
+                alertChip("\(Int(appState.environmentalReport.temperatureCelsius))°C", "thermometer.sun", appState.environmentalReport.temperatureCelsius > 42 ? .red : .yellow)
                 alertChip("احتمال سيول منخفض", "cloud.rain", .blue)
             }
         }
@@ -400,6 +417,12 @@ struct HomeDashboardView: View {
         guard let current = appState.locationManager.currentLocation else { return "12.4" }
         let target = CLLocation(latitude: appState.selectedTrip.meetingPoint.latitude, longitude: appState.selectedTrip.meetingPoint.longitude)
         return String(format: "%.1f", current.distance(from: target) / 1000)
+    }
+
+    private var tripProgress: Double {
+        let total = max(appState.selectedTrip.endDate.timeIntervalSince(appState.selectedTrip.startDate), 1)
+        let elapsed = Date().timeIntervalSince(appState.selectedTrip.startDate)
+        return min(max(elapsed / total, 0.08), 1)
     }
 
     private func mapToolButton(_ icon: String, action: @escaping () -> Void) -> some View {
@@ -484,9 +507,20 @@ struct HomeDashboardView: View {
 
     private func refreshWeather() {
         appState.locationManager.startNavigation()
+        showStatus("جاري تحديث بيانات الطقس وجودة الهواء")
         Task {
             let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
             appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
+            showStatus("تم تحديث الطقس: \(Int(appState.environmentalReport.temperatureCelsius))°C و AQI \(appState.environmentalReport.airQualityIndex)")
+        }
+    }
+
+    private func showStatus(_ message: String) {
+        statusMessage = message
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
+            if statusMessage == message {
+                statusMessage = nil
+            }
         }
     }
 }
@@ -498,7 +532,7 @@ private struct DashboardCard<Content: View>: View {
         content
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .topLeading)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
             .shadow(color: .black.opacity(0.04), radius: 8, y: 3)
     }
 }

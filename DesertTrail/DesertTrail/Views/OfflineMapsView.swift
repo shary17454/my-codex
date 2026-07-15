@@ -5,7 +5,7 @@ struct OfflineMapsView: View {
     @Environment(AppState.self) private var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @StateObject private var store = OfflineMapStore()
-    @State private var isSaving = false
+    @State private var savingPresetID: UUID?
     @State private var errorMessage: String?
 
     let region: MKCoordinateRegion
@@ -15,45 +15,61 @@ struct OfflineMapsView: View {
             List {
                 Section {
                     Button {
-                        Task { await saveCurrentRegion() }
+                        Task { await save(title: "موقعي الحالي", region: region, presetID: nil) }
                     } label: {
-                        Label(isSaving ? "Saving..." : appState.text(.offline), systemImage: "icloud.and.arrow.down")
+                        Label("حفظ الخريطة الحالية", systemImage: "location.viewfinder")
                     }
-                    .disabled(isSaving)
+                    .disabled(savingPresetID != nil)
 
                     if let errorMessage {
-                        Text(errorMessage)
+                        Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
+                } footer: {
+                    Text("يتم حفظ صورة خرائط Apple محليًا لاستخدامها كمرجع سريع عند ضعف الاتصال. لا يتم تنزيل بيانات ملاحة كاملة من Apple.")
                 }
 
-                Section(store.maps.isEmpty ? "No Saved Maps" : "Saved Maps") {
-                    ForEach(store.maps) { map in
-                        HStack(spacing: 12) {
-                            if let image = UIImage(contentsOfFile: map.fileURL.path) {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 72, height: 72)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            } else {
-                                Image(systemName: "map")
-                                    .frame(width: 72, height: 72)
-                                    .background(Color.desertSand.opacity(0.4), in: RoundedRectangle(cornerRadius: 8))
-                            }
+                Section("اختر منطقة للتحميل") {
+                    ForEach(OfflineMapPreset.samples) { preset in
+                        Button {
+                            Task { await save(title: preset.title, region: preset.region, presetID: preset.id) }
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: "map.fill")
+                                    .foregroundStyle(Color.desertCopper)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.desertCopper.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(map.title)
-                                    .font(.headline)
-                                Text(map.createdAt, style: .date)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text(String(format: "%.4f, %.4f", map.centerLatitude, map.centerLongitude))
-                                    .font(.caption2.monospacedDigit())
-                                    .foregroundStyle(.secondary)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(preset.title)
+                                        .font(.headline)
+                                    Text(preset.subtitle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Text(String(format: "%.4f, %.4f", preset.region.center.latitude, preset.region.center.longitude))
+                                        .font(.caption2.monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
+
+                                if savingPresetID == preset.id {
+                                    ProgressView()
+                                } else {
+                                    Image(systemName: "icloud.and.arrow.down")
+                                        .foregroundStyle(Color.oasisTeal)
+                                }
                             }
                         }
+                        .buttonStyle(.plain)
+                        .disabled(savingPresetID != nil)
+                    }
+                }
+
+                Section(store.maps.isEmpty ? "لا توجد خرائط محفوظة" : "الخرائط المحفوظة") {
+                    ForEach(store.maps) { map in
+                        SavedOfflineMapRow(map: map)
                     }
                     .onDelete { offsets in
                         for index in offsets {
@@ -73,14 +89,48 @@ struct OfflineMapsView: View {
         }
     }
 
-    private func saveCurrentRegion() async {
-        isSaving = true
+    private func save(title: String, region: MKCoordinateRegion, presetID: UUID?) async {
+        savingPresetID = presetID ?? UUID()
         errorMessage = nil
         do {
-            try await store.saveSnapshot(title: appState.selectedTrip.title, region: region)
+            let timestamp = Date().formatted(date: .abbreviated, time: .omitted)
+            try await store.saveSnapshot(title: "\(title) - \(timestamp)", region: region)
+            appState.statusMessage = "تم حفظ خريطة \(title)"
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = "تعذر حفظ الخريطة: \(error.localizedDescription)"
         }
-        isSaving = false
+        savingPresetID = nil
+    }
+}
+
+private struct SavedOfflineMapRow: View {
+    let map: OfflineMap
+
+    var body: some View {
+        HStack(spacing: 12) {
+            if let image = UIImage(contentsOfFile: map.fileURL.path) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 72, height: 72)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else {
+                Image(systemName: "map")
+                    .frame(width: 72, height: 72)
+                    .background(Color.desertSand.opacity(0.4), in: RoundedRectangle(cornerRadius: 8))
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(map.title)
+                    .font(.headline)
+                    .lineLimit(2)
+                Text(map.createdAt, style: .date)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(String(format: "%.4f, %.4f", map.centerLatitude, map.centerLongitude))
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 }

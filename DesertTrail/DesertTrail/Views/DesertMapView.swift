@@ -295,6 +295,13 @@ struct DesertMapView: View {
     }
 }
 
+private extension Double {
+    func rounded(toPlaces places: Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return (self * divisor).rounded() / divisor
+    }
+}
+
 struct LicensedMapPlaceholderView: View {
     var title: String
     var message: String
@@ -822,12 +829,14 @@ struct MapCanvasView: UIViewRepresentable {
         context.coordinator.tileOpacity = tileOpacity
         mapView.mapType = .hybrid
         mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .flat)
-        if !context.coordinator.didSetInitialRegion {
+        let nextRegionKey = context.coordinator.regionKey(region)
+        if context.coordinator.regionRenderKey != nextRegionKey {
             mapView.setRegion(region, animated: false)
-            context.coordinator.didSetInitialRegion = true
+            context.coordinator.regionRenderKey = nextRegionKey
         }
 
         let nextSignature = context.coordinator.signature(
+            region: region,
             route: route,
             places: places,
             tileTemplateURL: tileTemplateURL,
@@ -872,14 +881,19 @@ struct MapCanvasView: UIViewRepresentable {
 
     final class Coordinator: NSObject, MKMapViewDelegate {
         var tileOpacity: Double
-        var didSetInitialRegion = false
+        var regionRenderKey = ""
         var renderSignature = ""
 
         init(tileOpacity: Double) {
             self.tileOpacity = tileOpacity
         }
 
+        func regionKey(_ region: MKCoordinateRegion) -> String {
+            "\(region.center.latitude.rounded(toPlaces: 5)),\(region.center.longitude.rounded(toPlaces: 5)),\(region.span.latitudeDelta.rounded(toPlaces: 5)),\(region.span.longitudeDelta.rounded(toPlaces: 5))"
+        }
+
         func signature(
+            region: MKCoordinateRegion,
             route: [CLLocationCoordinate2D],
             places: [HiddenPlace],
             tileTemplateURL: String?,
@@ -888,7 +902,7 @@ struct MapCanvasView: UIViewRepresentable {
             let routeStart = route.first.map { "\($0.latitude),\($0.longitude)" } ?? "none"
             let routeEnd = route.last.map { "\($0.latitude),\($0.longitude)" } ?? "none"
             let placeIDs = places.map(\.id.uuidString).sorted().joined(separator: ",")
-            return "\(tileTemplateURL ?? "none")|\(tileOpacity)|\(route.count)|\(routeStart)|\(routeEnd)|\(placeIDs)"
+            return "\(regionKey(region))|\(tileTemplateURL ?? "none")|\(tileOpacity)|\(route.count)|\(routeStart)|\(routeEnd)|\(placeIDs)"
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
