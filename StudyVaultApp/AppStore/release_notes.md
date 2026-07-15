@@ -1,3 +1,17 @@
+# ملاحظات الإصدار 1.10.0
+
+- تحديث إعدادات الإصدار والبناء لتفادي مسارات App Store Connect المغلقة أو أرقام البناء المستخدمة سابقًا.
+- إضافة فحص مبكر في Xcode Cloud يمنع استخدام Xcode Beta أو SDK غير مناسب قبل مرحلة الأرشفة.
+- توحيد مصدر أرقام الإصدار والبناء عبر `MARKETING_VERSION` و`CURRENT_PROJECT_VERSION`.
+- تحسين وثائق التحقق قبل الرفع لضمان استخدام Archive جديد من Commit الصحيح.
+
+## English Release Notes 1.10.0
+
+- Updated release and build settings to avoid closed App Store Connect trains and previously used build numbers.
+- Added an early Xcode Cloud preflight check that blocks Beta Xcode or unsupported SDKs before archiving.
+- Unified version and build values through `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`.
+- Improved release verification documentation to require a fresh archive from the correct commit.
+
 # ملاحظات الإصدار 1.9.0
 
 - تجهيز إصدار إنتاجي جديد برقم بناء أعلى لتفادي إعادة استخدام مسارات إصدارات أو Builds مغلقة في App Store Connect.
