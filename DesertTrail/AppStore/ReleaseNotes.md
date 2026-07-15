@@ -1,9 +1,10 @@
-# سجل إصدار البيد
+# سجل إصدار الدرب
 
 ## 1.9.1 (68) - 2026-07-15
 
 ### العربية - What's New
 
+- تثبيت اسم التطبيق المعروض داخل النظام والمتجر إلى "الدرب".
 - إصلاح إنشاء الرحلات الجديدة وحفظها وتعديل المشاركين والوجهة.
 - تحسين البوصلة واتجاه الشمال وربطها بطلب الموقع عند الحاجة.
 - إصلاح أزرار الطقس وجودة الهواء ولوحة القيادة وإضافة الموقع لتظهر حالة واضحة عند الاستخدام.
@@ -14,6 +15,7 @@
 
 ### English - What's New
 
+- Set the displayed app name consistently to "Al Darb".
 - Fixed trip creation, saved trip editing, participants, and destination selection.
 - Improved compass heading behavior and location permission flow.
 - Fixed weather, air quality, driving dashboard, and add-place actions with clearer status feedback.
@@ -42,7 +44,7 @@
 
 ## 1.6 (56) - 2026-07-11
 
-- تغيير اسم التطبيق المعروض إلى "البيد".
+- تغيير اسم التطبيق المعروض إلى "الدرب".
 - رفع رقم البناء إلى 56 لتجهيز بناء جديد في App Store Connect.
 
 ## 1.6 (55) - 2026-07-11

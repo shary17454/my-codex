@@ -448,7 +448,7 @@
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "البيد";
+				INFOPLIST_KEY_CFBundleDisplayName = "الدرب";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -473,7 +473,7 @@
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "البيد";
+				INFOPLIST_KEY_CFBundleDisplayName = "الدرب";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

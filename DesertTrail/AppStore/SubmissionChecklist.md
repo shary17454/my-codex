@@ -10,7 +10,7 @@
 
 ## Current Prepared Release
 
-- Display name: `البيد`
+- Display name: `الدرب`
 - Marketing version: `1.9.0`
 - Build number: `67`
 - Bundle ID: `com.codex.DesertTrail`
