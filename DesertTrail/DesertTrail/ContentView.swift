@@ -141,9 +141,9 @@ private struct LanguagePicker: View {
                 }
             }
         } label: {
-            Label(appState.language.title, systemImage: "globe")
-                .font(.caption.weight(.semibold))
-                .labelStyle(.titleAndIcon)
+            Image(systemName: "globe")
+                .font(.headline.weight(.semibold))
+                .accessibilityLabel("Language")
         }
     }
 }

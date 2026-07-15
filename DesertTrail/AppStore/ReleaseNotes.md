@@ -1,5 +1,23 @@
 # سجل إصدار البيد
 
+## 1.9.0 (67) - 2026-07-15
+
+### العربية - What's New
+
+- تحسين وضوح أزرار الخريطة والطبقات حتى تظهر النصوص كاملة داخل الإطارات على الشاشات الصغيرة.
+- تحسين أزرار وضع القيادة والبوصلة لتكون أوضح وأسهل ضغطًا مع تسميات وصول مناسبة.
+- تحسين محدد اللغة في شريط التطبيق لتقليل الازدحام مع إبقاء العربية والإنجليزية والفرنسية والإسبانية والصينية.
+- تحسين إعادة رسم طبقات الخرائط عند تغيير شفافية طبقة Tiles.
+- رفع رقم الإصدار والبناء وتجهيز التطبيق لبناء إصدار جديد.
+
+### English - What's New
+
+- Improved map and layer controls so labels fit better on small screens.
+- Improved driving and compass controls with clearer tap targets and accessibility labels.
+- Reduced toolbar crowding in the language selector while keeping Arabic, English, French, Spanish, and Chinese.
+- Improved map tile overlay refresh when changing layer opacity.
+- Bumped version and build number for the next release build.
+
 ## 1.6 (56) - 2026-07-11
 
 - تغيير اسم التطبيق المعروض إلى "البيد".

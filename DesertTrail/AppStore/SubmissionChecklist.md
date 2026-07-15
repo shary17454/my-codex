@@ -3,10 +3,18 @@
 ## Required Apple Account Items
 
 - Apple Developer Team ID.
-- Bundle ID matching the App Store Connect app record for app `6786065206`.
+- Bundle ID matching the App Store Connect app record for `com.codex.DesertTrail`.
 - iCloud container enabled for that Bundle ID.
 - CloudKit schema deployed to production.
 - Apple Distribution certificate and App Store provisioning profile.
+
+## Current Prepared Release
+
+- Display name: `البيد`
+- Marketing version: `1.9.0`
+- Build number: `67`
+- Bundle ID: `com.codex.DesertTrail`
+- Release action in Codex task: `PREPARE_ONLY` - do not submit automatically.
 
 ## Local Commands
 
