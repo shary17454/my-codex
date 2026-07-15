@@ -5,7 +5,7 @@
 - الاسم المعروض: `الدرب`
 - Bundle ID: `com.codex.DesertTrail`
 - الإصدار: `1.9.1`
-- البناء: `68`
+- البناء: `76`
 - Swift: `6.0`
 - iOS Deployment Target: `17.0`
 
@@ -23,7 +23,8 @@
 - [ ] مراجعة App Privacy داخل App Store Connect.
 - [ ] مراجعة Screenshots في App Store Connect.
 - [ ] ملء حقل `What's New in This Version` للغة العربية.
-- [ ] اختيار أحدث Build صالح من App Store Connect.
+- [ ] اختيار Build `76` أو أعلى بعد اكتمال معالجته في App Store Connect.
+- [ ] ضبط Xcode Cloud على Xcode إنتاجي، ويفضل `Xcode 26.6 (17F113)`، وليس `Latest Beta`.
 - [ ] التأكد من عدم وجود اتفاقيات Apple معلقة.
 
 ## نص What's New المقترح

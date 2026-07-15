@@ -1,6 +1,6 @@
 # سجل إصدار الدرب
 
-## 1.9.1 (68) - 2026-07-15
+## 1.9.1 (76) - 2026-07-15
 
 ### العربية - What's New
 
@@ -12,6 +12,7 @@
 - تحسين خرائط بلا إنترنت بإظهار خيارات مناطق متعددة بدل تكرار موقع واحد.
 - تحسين الخريطة وإعادة تمركزها عند تغيير الطبقة أو الوجهة.
 - تحسين وضوح النصوص والبطاقات على الشاشات الصغيرة.
+- توحيد إعدادات الإصدار والبناء وتجهيز حماية Xcode Cloud لمنع استخدام Xcode beta أو SDK غير مدعوم في أرشيف App Store.
 
 ### English - What's New
 
@@ -23,6 +24,7 @@
 - Improved offline maps with multiple region choices instead of repeated saved entries.
 - Improved map recentering when changing layers or destinations.
 - Improved text and card readability on smaller screens.
+- Unified release/build settings and added an Xcode Cloud guard to prevent App Store archives from using beta Xcode or unsupported SDKs.
 
 ## 1.9.0 (67) - 2026-07-15
 

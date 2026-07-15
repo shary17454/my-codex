@@ -11,10 +11,11 @@
 ## Current Prepared Release
 
 - Display name: `الدرب`
-- Marketing version: `1.9.0`
-- Build number: `67`
+- Marketing version: `1.9.1`
+- Build number: `76`
 - Bundle ID: `com.codex.DesertTrail`
 - Release action in Codex task: `PREPARE_ONLY` - do not submit automatically.
+- Xcode Cloud environment: use production `Xcode 26.6 (17F113)` or a newer production Xcode explicitly accepted by Apple. Do not use `Latest Beta`.
 
 ## Local Commands
 
