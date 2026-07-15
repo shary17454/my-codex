@@ -8,11 +8,16 @@ struct ActiveTripDriveView: View {
     @State private var route = GPXParser.loadRoute(named: "SampleRoute")
     @State private var isTripStarted = false
     @State private var statusMessage: String?
+    @State private var showingOfflineMaps = false
+    @State private var showingAddPlace = false
+    @State private var showingDestinationPicker = false
 
-    private let driveRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
-        span: MKCoordinateSpan(latitudeDelta: 0.075, longitudeDelta: 0.075)
-    )
+    private var driveRegion: MKCoordinateRegion {
+        MKCoordinateRegion(
+            center: appState.selectedTrip.meetingPoint,
+            span: MKCoordinateSpan(latitudeDelta: 0.075, longitudeDelta: 0.075)
+        )
+    }
 
     var body: some View {
         ZStack {
@@ -42,6 +47,15 @@ struct ActiveTripDriveView: View {
         }
         .onAppear {
             UIDevice.current.isBatteryMonitoringEnabled = true
+        }
+        .sheet(isPresented: $showingOfflineMaps) {
+            OfflineMapsView(region: driveRegion)
+        }
+        .sheet(isPresented: $showingAddPlace) {
+            HiddenPlaceForm()
+        }
+        .sheet(isPresented: $showingDestinationPicker) {
+            DestinationPickerSheet()
         }
     }
 
@@ -231,7 +245,7 @@ struct ActiveTripDriveView: View {
                     showStatus("تنبيهات الأودية والخدمات مفعلة")
                 }
                 driveRoundButton(icon: "map.fill", title: "خرائط") {
-                    showStatus("وضع الخريطة")
+                    showingOfflineMaps = true
                 }
             }
 
@@ -240,7 +254,7 @@ struct ActiveTripDriveView: View {
             VStack(spacing: 10) {
                 driveRoundButton(icon: "arrow.up.right.navigation.fill", title: "اتجاه") {
                     appState.locationManager.startNavigation()
-                    showStatus("تم تشغيل التوجيه")
+                    showingDestinationPicker = true
                 }
                 driveRoundButton(icon: "scope", title: "تتبع") {
                     appState.locationManager.startNavigation()
@@ -252,7 +266,7 @@ struct ActiveTripDriveView: View {
             }
         }
         .padding(.horizontal, 18)
-        .padding(.bottom, 142)
+        .padding(.bottom, 126)
         .frame(maxHeight: .infinity, alignment: .bottom)
     }
 
@@ -328,25 +342,25 @@ struct ActiveTripDriveView: View {
     }
 
     private var speedText: String {
-        guard let speed = appState.locationManager.currentLocation?.speed, speed > 0 else { return "65 km/h" }
+        guard let speed = appState.locationManager.currentLocation?.speed, speed > 0 else { return "-- km/h" }
         return "\(Int(speed * 3.6)) km/h"
     }
 
     private var altitudeText: String {
-        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "840 m" }
+        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "-- m" }
         return "\(Int(altitude)) m"
     }
 
     private var distanceText: String {
-        guard let current = appState.locationManager.currentLocation else { return "127 km" }
+        guard let current = appState.locationManager.currentLocation else { return "-- km" }
         let target = CLLocation(latitude: appState.selectedTrip.meetingPoint.latitude, longitude: appState.selectedTrip.meetingPoint.longitude)
         return String(format: "%.0f km", current.distance(from: target) / 1000)
     }
 
     private var headingDegrees: Double {
-        guard let heading = appState.locationManager.heading else { return 315 }
-        let value = heading.trueHeading > 0 ? heading.trueHeading : heading.magneticHeading
-        return value > 0 ? value : 315
+        guard let heading = appState.locationManager.heading else { return 0 }
+        let value = heading.trueHeading >= 0 ? heading.trueHeading : heading.magneticHeading
+        return value >= 0 ? -value : 0
     }
 
     private var weatherIcon: String {
@@ -384,7 +398,7 @@ struct ActiveTripDriveView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
             }
-            .frame(width: 58, height: 56)
+            .frame(width: 54, height: 54)
         }
         .buttonStyle(.plain)
         .contentShape(Rectangle())
@@ -439,6 +453,65 @@ private struct TripGlowPath: Shape {
             control2: CGPoint(x: rect.minX + rect.width * 0.77, y: rect.maxY - rect.height * 0.79)
         )
         return path
+    }
+}
+
+private struct DestinationPickerSheet: View {
+    @Environment(AppState.self) private var appState: AppState
+    @Environment(\.dismiss) private var dismiss
+    @State private var query = ""
+
+    private var places: [HiddenPlace] {
+        let approved = appState.hiddenPlaces.filter { $0.status == .approved }
+        let cleanQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanQuery.isEmpty else { return approved }
+        return approved.filter {
+            $0.name.localizedCaseInsensitiveContains(cleanQuery) ||
+            $0.notes.localizedCaseInsensitiveContains(cleanQuery)
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    TextField("ابحث عن وجهة أو وادي أو جبل", text: $query)
+                }
+
+                Section("اختر وجهة التوجيه") {
+                    ForEach(places) { place in
+                        Button {
+                            appState.setTripDestination(to: place)
+                            appState.locationManager.startNavigation()
+                            dismiss()
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: place.imageSystemName)
+                                    .foregroundStyle(Color.driveGold)
+                                    .frame(width: 32)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(place.name)
+                                        .font(.headline)
+                                    Text(place.notes)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(2)
+                                    Text(String(format: "%.4f, %.4f", place.coordinate.latitude, place.coordinate.longitude))
+                                        .font(.caption2.monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("تحديد الوجهة")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(appState.text(.done)) { dismiss() }
+                }
+            }
+        }
     }
 }
 

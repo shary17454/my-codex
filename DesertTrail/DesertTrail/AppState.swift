@@ -7,9 +7,11 @@ import Observation
 final class AppState {
     var language: AppLanguage = .arabic
     var selectedTrip: TripPlan = TripPlan.sample
+    var trips: [TripPlan] = TripPlan.samples
     var hiddenPlaces: [HiddenPlace] = HiddenPlace.samples
     var environmentalReport: EnvironmentalReport = .placeholder
     var consentedToTripSharing = false
+    var statusMessage: String?
 
     let locationManager = LocationManager()
     let weatherService = WeatherService()
@@ -23,6 +25,64 @@ final class AppState {
     func startLocationAndRefreshEnvironment() async {
         locationManager.startNavigation()
         await refreshEnvironmentReport()
+    }
+
+    func selectTrip(_ trip: TripPlan) {
+        selectedTrip = trip
+    }
+
+    func saveSelectedTrip() {
+        if let index = trips.firstIndex(where: { $0.id == selectedTrip.id }) {
+            trips[index] = selectedTrip
+        } else {
+            trips.insert(selectedTrip, at: 0)
+        }
+    }
+
+    @discardableResult
+    func createTrip(title: String, startDate: Date, endDate: Date, notes: String) -> TripPlan {
+        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let coordinate = locationManager.currentLocation?.coordinate ?? selectedTrip.meetingPoint
+        let trip = TripPlan(
+            id: UUID(),
+            title: cleanTitle.isEmpty ? "رحلة جديدة" : cleanTitle,
+            startDate: startDate,
+            endDate: max(endDate, startDate),
+            meetingPoint: coordinate,
+            routeName: "SampleRoute",
+            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
+            participants: []
+        )
+        trips.insert(trip, at: 0)
+        selectedTrip = trip
+        statusMessage = "تم إنشاء الرحلة"
+        return trip
+    }
+
+    func addParticipant(_ name: String) {
+        let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanName.isEmpty else { return }
+        if !selectedTrip.participants.contains(cleanName) {
+            selectedTrip.participants.append(cleanName)
+            saveSelectedTrip()
+        }
+    }
+
+    func removeParticipants(at offsets: IndexSet) {
+        selectedTrip.participants.remove(atOffsets: offsets)
+        saveSelectedTrip()
+    }
+
+    func addHiddenPlace(_ place: HiddenPlace) {
+        hiddenPlaces.insert(place, at: 0)
+        statusMessage = "تم حفظ الموقع وإرساله للمراجعة"
+    }
+
+    func setTripDestination(to place: HiddenPlace) {
+        selectedTrip.meetingPoint = place.coordinate
+        selectedTrip.title = selectedTrip.title.isEmpty ? place.name : selectedTrip.title
+        saveSelectedTrip()
+        statusMessage = "تم تحديد الوجهة: \(place.name)"
     }
 
     func text(_ key: LocalizedKey) -> String {

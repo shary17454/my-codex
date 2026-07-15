@@ -16,19 +16,26 @@ struct CompassPanel: View {
                         .overlay(Circle().stroke(Color.desertCopper, lineWidth: 3))
                         .shadow(radius: 8)
 
-                    ForEach(0..<12) { tick in
-                        Rectangle()
-                            .fill(tick % 3 == 0 ? Color.desertRock : Color.secondary)
-                            .frame(width: tick % 3 == 0 ? 4 : 2, height: tick % 3 == 0 ? 24 : 12)
-                            .offset(y: -122)
-                            .rotationEffect(.degrees(Double(tick) * 30))
+                    ZStack {
+                        ForEach(0..<12) { tick in
+                            Rectangle()
+                                .fill(tick % 3 == 0 ? Color.desertRock : Color.secondary)
+                                .frame(width: tick % 3 == 0 ? 4 : 2, height: tick % 3 == 0 ? 24 : 12)
+                                .offset(y: -122)
+                                .rotationEffect(.degrees(Double(tick) * 30))
+                        }
+
+                        compassCardinal("N", y: -98)
+                        compassCardinal("S", y: 98)
+                        compassCardinal("E", x: 98)
+                        compassCardinal("W", x: -98)
                     }
+                    .rotationEffect(.degrees(headingDegrees))
 
                     VStack(spacing: 10) {
                         Image(systemName: "location.north.fill")
                             .font(.system(size: 66))
                             .foregroundStyle(Color.oasisTeal)
-                            .rotationEffect(.degrees(headingDegrees))
                         Text("\(Int(normalizedHeading))°")
                             .font(.system(.largeTitle, design: .rounded).monospacedDigit().weight(.bold))
                             .foregroundStyle(.primary)
@@ -130,6 +137,14 @@ struct CompassPanel: View {
         -normalizedHeading
     }
 
+    private func compassCardinal(_ text: String, x: CGFloat = 0, y: CGFloat = 0) -> some View {
+        Text(text)
+            .font(.headline.weight(.black))
+            .foregroundStyle(Color.desertRock)
+            .offset(x: x, y: y)
+            .rotationEffect(.degrees(-headingDegrees))
+    }
+
     private var directionName: String {
         let directions = [
             appState.text(.north),
@@ -149,7 +164,7 @@ struct CompassPanel: View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: permissionIcon)
                 .foregroundStyle(permissionColor)
-        VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(permissionTitle)
                     .font(.caption.weight(.bold))
                 Text(headingAccuracyText)
