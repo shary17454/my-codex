@@ -22,6 +22,14 @@ struct BatalAlDroobApp: App {
     }
 }
 
+// MARK: - Design Tokens
+
+enum BatalDesign {
+    static let cardRadius: CGFloat = 8
+    static let compactSpacing: CGFloat = 8
+    static let sectionSpacing: CGFloat = 12
+}
+
 // MARK: - Models
 
 enum AppLanguage: String, CaseIterable, Identifiable {
@@ -602,6 +610,7 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     var locationMessage = ""
     var weatherSummary = ""
     var weatherError: String?
+    var isLoadingWeather = false
     var cameraPosition = MapCameraPosition.region(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753), span: MKCoordinateSpan(latitudeDelta: 8, longitudeDelta: 8)))
 
     override init() {
@@ -713,6 +722,8 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
             let nearby = location.distance(from: lastWeatherLocation) < 1_000
             if recentlyUpdated && nearby { return }
         }
+        isLoadingWeather = true
+        defer { isLoadingWeather = false }
         do {
             let weather = try await OpenMeteoWeatherService.fetch(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
             let temp = Measurement(value: weather.current.temperature2m, unit: UnitTemperature.celsius)
@@ -722,7 +733,7 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
             lastWeatherLocation = location
             lastWeatherUpdate = Date()
         } catch {
-            weatherError = error.localizedDescription
+            weatherError = currentLanguage == .arabic ? "تعذر تحديث الطقس. تحقق من الاتصال ثم حاول مرة أخرى." : "Weather could not be updated. Check your connection and try again."
         }
     }
 }
@@ -795,7 +806,7 @@ struct RootView: View {
             .overlay(alignment: .top) { PaymentBanner(message: viewModel.paymentMessage) }
 
             if viewModel.isLoading { LoadingOverlay(message: viewModel.loadingMessage) }
-            if viewModel.isPrivacyShieldVisible { PrivacyShieldView() }
+            if viewModel.isPrivacyShieldVisible { PrivacyShieldView(language: viewModel.language) }
         }
         .alert(viewModel.text(ar: "تنبيه", en: "Notice"), isPresented: Binding(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.errorMessage = nil } })) {
             Button(viewModel.text(ar: "حسنًا", en: "OK"), role: .cancel) { viewModel.errorMessage = nil }
@@ -851,6 +862,7 @@ struct DashboardView: View {
                 Section(viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check")) {
                     TextField(viewModel.text(ar: "رقم القطعة أو الوصف", en: "Part number or description"), text: $fitmentQuery)
                         .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
                     Button {
                         fitmentResult = viewModel.fitmentSummary(for: fitmentQuery)
                         fitmentMatches = viewModel.fitmentMatches(for: fitmentQuery)
@@ -917,8 +929,16 @@ struct CatalogView: View {
                     .pickerStyle(.menu)
                 }
                 Section(viewModel.text(ar: "النتائج", en: "Results")) {
-                    ForEach(viewModel.filteredParts) { part in
-                        NavigationLink(value: part) { PartRow(part: part, viewModel: viewModel) }
+                    if viewModel.filteredParts.isEmpty {
+                        EmptyStateView(
+                            symbol: "magnifyingglass",
+                            title: viewModel.text(ar: "لا توجد نتائج", en: "No results"),
+                            message: viewModel.text(ar: "جرّب رقم قطعة، اسم قسم، سنة، أو محرك مختلف.", en: "Try another part number, category, year, or engine.")
+                        )
+                    } else {
+                        ForEach(viewModel.filteredParts) { part in
+                            NavigationLink(value: part) { PartRow(part: part, viewModel: viewModel) }
+                        }
                     }
                 }
             }
@@ -959,7 +979,7 @@ struct StatCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
     }
 }
 
@@ -1032,11 +1052,19 @@ struct PartDetailView: View {
                     .accessibilityLabel(viewModel.text(ar: "رسم يوضح رقم النداء التقريبي للقطعة", en: "Diagram showing the approximate part callout"))
             }
             Section(viewModel.text(ar: "الأدلة", en: "Evidence")) {
-                ForEach(Array(part.evidence.prefix(8).enumerated()), id: \.offset) { _, evidence in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text([evidence.sourceID, evidence.year, evidence.page.map { "p.\($0)" }, evidence.reference].compactMap { $0 }.joined(separator: " · "))
-                            .font(.subheadline.bold())
-                        if let context = evidence.context { Text(context).font(.caption).foregroundStyle(.secondary).lineLimit(4) }
+                if part.evidence.isEmpty {
+                    EmptyStateView(
+                        symbol: "doc.text.magnifyingglass",
+                        title: viewModel.text(ar: "لا توجد أدلة مفصلة", en: "No detailed evidence"),
+                        message: viewModel.text(ar: "يعرض التطبيق البيانات الأساسية المتاحة لهذه القطعة.", en: "The app shows the available basic data for this part.")
+                    )
+                } else {
+                    ForEach(Array(part.evidence.prefix(8).enumerated()), id: \.offset) { _, evidence in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text([evidence.sourceID, evidence.year, evidence.page.map { "p.\($0)" }, evidence.reference].compactMap { $0 }.joined(separator: " · "))
+                                .font(.subheadline.bold())
+                            if let context = evidence.context { Text(context).font(.caption).foregroundStyle(.secondary).lineLimit(4) }
+                        }
                     }
                 }
             }
@@ -1070,7 +1098,7 @@ struct NativeDiagramView: View {
             let text = Text(part.partNumber).font(.caption.monospaced().bold()).foregroundStyle(.primary)
             context.draw(text, at: CGPoint(x: callout.midX, y: callout.midY), anchor: .center)
         }
-        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
     }
 }
 
@@ -1107,12 +1135,17 @@ struct RequestView: View {
                 Section(viewModel.text(ar: "بيانات السيارة", en: "Vehicle")) {
                     TextField("Y60", text: $request.generation)
                     TextField(viewModel.text(ar: "سنة الصنع", en: "Year"), text: $request.year)
+                        .keyboardType(.numberPad)
                     TextField("VIN", text: $request.vin)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
                     TextField(viewModel.text(ar: "المحرك", en: "Engine"), text: $request.engine)
                     TextField(viewModel.text(ar: "القير", en: "Transmission"), text: $request.transmission)
                 }
                 Section(viewModel.text(ar: "بيانات القطعة", en: "Part")) {
                     TextField(viewModel.text(ar: "رقم القطعة", en: "Part number"), text: $request.partNumber)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
                     TextField(viewModel.text(ar: "اسم القطعة", en: "Part name"), text: $request.partName)
                     TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $request.notes, axis: .vertical)
                     Button { Task { await viewModel.buyRequestPlan(selectedPlan, request: request) } } label: {
@@ -1121,10 +1154,18 @@ struct RequestView: View {
                     .disabled(request.partNumber.isEmpty && request.partName.isEmpty)
                 }
                 Section(viewModel.text(ar: "طلبات محفوظة", en: "Saved requests")) {
-                    ForEach(viewModel.savedRequests) { saved in
-                        VStack(alignment: .leading) {
-                            Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber).font(.headline)
-                            Text(saved.draft).font(.caption).foregroundStyle(.secondary).lineLimit(4)
+                    if viewModel.savedRequests.isEmpty {
+                        EmptyStateView(
+                            symbol: "tray",
+                            title: viewModel.text(ar: "لا توجد طلبات محفوظة", en: "No saved requests"),
+                            message: viewModel.text(ar: "بعد الدفع وتجهيز الطلب سيظهر هنا نص الطلب المحفوظ.", en: "Paid and prepared part requests will appear here.")
+                        )
+                    } else {
+                        ForEach(viewModel.savedRequests) { saved in
+                            VStack(alignment: .leading) {
+                                Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber).font(.headline)
+                                Text(saved.draft).font(.caption).foregroundStyle(.secondary).lineLimit(4)
+                            }
                         }
                     }
                 }
@@ -1147,13 +1188,17 @@ struct MaintenanceView: View {
                 Section(viewModel.text(ar: "ملف السيارة", en: "Vehicle profile")) {
                     TextField("Y60", text: $viewModel.vehicleProfile.generation)
                     TextField(viewModel.text(ar: "السنة", en: "Year"), text: $viewModel.vehicleProfile.year)
+                        .keyboardType(.numberPad)
                     TextField("VIN", text: $viewModel.vehicleProfile.vin)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
                     TextField(viewModel.text(ar: "المحرك", en: "Engine"), text: $viewModel.vehicleProfile.engine)
                     TextField(viewModel.text(ar: "القير", en: "Transmission"), text: $viewModel.vehicleProfile.transmission)
                 }
                 Section(viewModel.text(ar: "إضافة صيانة", en: "Add maintenance")) {
                     TextField(viewModel.text(ar: "العنوان", en: "Title"), text: $title)
                     TextField(viewModel.text(ar: "العداد", en: "Odometer"), text: $odometer)
+                        .keyboardType(.numberPad)
                     TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $notes, axis: .vertical)
                     Button(viewModel.text(ar: "حفظ", en: "Save")) {
                         viewModel.addMaintenance(title: title, odometer: odometer, notes: notes)
@@ -1161,10 +1206,18 @@ struct MaintenanceView: View {
                     }
                 }
                 Section(viewModel.text(ar: "السجل", en: "Log")) {
-                    ForEach(viewModel.maintenanceItems) { item in
-                        VStack(alignment: .leading) {
-                            Text(item.title).font(.headline)
-                            Text([item.odometer, item.notes].filter { !$0.isEmpty }.joined(separator: " · ")).font(.caption).foregroundStyle(.secondary)
+                    if viewModel.maintenanceItems.isEmpty {
+                        EmptyStateView(
+                            symbol: "wrench.adjustable",
+                            title: viewModel.text(ar: "لا توجد صيانة محفوظة", en: "No maintenance yet"),
+                            message: viewModel.text(ar: "أضف أول عملية صيانة لحفظ سجل السيارة محليًا.", en: "Add the first service entry to keep a local vehicle log.")
+                        )
+                    } else {
+                        ForEach(viewModel.maintenanceItems) { item in
+                            VStack(alignment: .leading) {
+                                Text(item.title).font(.headline)
+                                Text([item.odometer, item.notes].filter { !$0.isEmpty }.joined(separator: " · ")).font(.caption).foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
@@ -1214,7 +1267,15 @@ struct MoreView: View {
                     if !tireResult.isEmpty { Text(tireResult).font(.headline) }
                 }
                 Section(viewModel.text(ar: "قائمة الرغبات", en: "Wishlist")) {
-                    ForEach(viewModel.wishlistParts) { part in PartRow(part: part, viewModel: viewModel) }
+                    if viewModel.wishlistParts.isEmpty {
+                        EmptyStateView(
+                            symbol: "heart",
+                            title: viewModel.text(ar: "قائمة الرغبات فارغة", en: "Wishlist is empty"),
+                            message: viewModel.text(ar: "افتح أي قطعة واضغط القلب لحفظها هنا.", en: "Open a part and tap the heart to save it here.")
+                        )
+                    } else {
+                        ForEach(viewModel.wishlistParts) { part in PartRow(part: part, viewModel: viewModel) }
+                    }
                 }
                 Section(viewModel.text(ar: "المتاجر الموثقة", en: "Verified stores")) {
                     ForEach(viewModel.stores) { store in
@@ -1228,7 +1289,7 @@ struct MoreView: View {
                         }
                     }
                     .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
 
                     HStack {
                         Button { locationWeather.requestAndStart(language: viewModel.language) } label: {
@@ -1249,6 +1310,14 @@ struct MoreView: View {
                     }
                     if !locationWeather.weatherSummary.isEmpty {
                         LabeledContent(viewModel.text(ar: "الطقس", en: "Weather"), value: locationWeather.weatherSummary)
+                    }
+                    if locationWeather.isLoadingWeather {
+                        HStack {
+                            ProgressView()
+                            Text(viewModel.text(ar: "جاري تحديث الطقس...", en: "Updating weather..."))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     if let weatherError = locationWeather.weatherError {
                         Text(viewModel.text(ar: "تعذر تحميل الطقس: ", en: "Weather unavailable: ") + weatherError)
@@ -1320,21 +1389,51 @@ struct LoadingOverlay: View {
         ZStack {
             Rectangle().fill(.black.opacity(0.25)).ignoresSafeArea()
             VStack(spacing: 14) { ProgressView(); Text(message).font(.headline) }
-                .padding(24).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                .padding(24).background(.regularMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
         }
     }
 }
 
 struct PrivacyShieldView: View {
+    let language: AppLanguage
+
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "eye.slash.fill").font(.largeTitle)
-            Text("المحتوى محمي").font(.title.bold())
-            Text("تم حجب الكتالوج عندما لا يكون التطبيق نشطًا.").font(.subheadline).foregroundStyle(.secondary)
+            Text(language == .arabic ? "المحتوى محمي" : "Content protected").font(.title.bold())
+            Text(language == .arabic ? "تم حجب الكتالوج عندما لا يكون التطبيق نشطًا." : "The catalog is hidden while the app is inactive.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
+        .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black.ignoresSafeArea())
         .foregroundStyle(.white)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct EmptyStateView: View {
+    let symbol: String
+    let title: String
+    let message: String
+
+    var body: some View {
+        VStack(alignment: .center, spacing: BatalDesign.compactSpacing) {
+            Image(systemName: symbol)
+                .font(.title2)
+                .foregroundStyle(.secondary)
+            Text(title)
+                .font(.headline)
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, BatalDesign.sectionSpacing)
+        .accessibilityElement(children: .combine)
     }
 }
 
