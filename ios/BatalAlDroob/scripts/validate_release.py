@@ -14,7 +14,7 @@ APP_SWIFT = APP_ROOT / "BatalAlDroob" / "AppDelegate.swift"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
 EXPECTED_MARKETING_VERSION = "1.1.0"
-EXPECTED_BUILD = "92"
+EXPECTED_BUILD = "95"
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.unlock"}
 
@@ -65,7 +65,17 @@ def main() -> None:
         "priceSAR",
         "priceSar",
         "رسوم الطلب",
+        "رسوم العميل",
+        "طلب قطعة مدفوع",
+        "ادفع رسوم طلب",
+        "10 ر.س",
+        "20 ر.س",
+        "50 ر.س",
         "Request fee",
+        "Paid Part Request",
+        "Pay a small request fee",
+        "Customer fee",
+        "part request fee",
         "دفع الرسوم",
         "Pay and prepare request",
         "Pay fee and prepare request",
