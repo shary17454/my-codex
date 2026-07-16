@@ -304,12 +304,19 @@ struct BundledCatalogRepository: CatalogRepository {
 }
 
 protocol PurchaseService: Sendable {
+    func availableProductIDs(for productIDs: [String]) async throws -> Set<String>
     func purchase(productID: String) async throws -> PurchaseOutcome
+    func restorePurchasedProductIDs() async throws -> Set<String>
 }
 
 enum PurchaseOutcome: Equatable, Sendable { case success, cancelled, pending }
 
 struct StoreKitPurchaseService: PurchaseService {
+    func availableProductIDs(for productIDs: [String]) async throws -> Set<String> {
+        let products = try await Product.products(for: productIDs)
+        return Set(products.map(\.id))
+    }
+
     func purchase(productID: String) async throws -> PurchaseOutcome {
         let products = try await Product.products(for: [productID])
         guard let product = products.first else { throw AppError.productUnavailable }
@@ -327,6 +334,15 @@ struct StoreKitPurchaseService: PurchaseService {
             throw AppError.unknownPurchaseResult
         }
     }
+
+    func restorePurchasedProductIDs() async throws -> Set<String> {
+        var restored = Set<String>()
+        for await result in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result else { continue }
+            restored.insert(transaction.productID)
+        }
+        return restored
+    }
 }
 
 enum AppError: LocalizedError, Sendable {
@@ -334,7 +350,7 @@ enum AppError: LocalizedError, Sendable {
     var errorDescription: String? {
         switch self {
         case .missingResource(let name): "Missing bundled resource: \(name)"
-        case .productUnavailable: "Product is not available in App Store Connect."
+        case .productUnavailable: "In-app purchase is not ready yet."
         case .unverifiedTransaction: "Transaction verification failed."
         case .unknownPurchaseResult: "Unknown purchase result."
         }
@@ -348,6 +364,7 @@ enum AppError: LocalizedError, Sendable {
 final class CatalogViewModel {
     private let repository: CatalogRepository
     private let store: PurchaseService
+    private let catalogUnlockToken = "__catalog_unlock__"
 
     var language: AppLanguage = AppLanguage(rawValue: UserDefaults.standard.string(forKey: "batalLang") ?? "ar") ?? .arabic {
         didSet { UserDefaults.standard.set(language.rawValue, forKey: "batalLang") }
@@ -362,6 +379,8 @@ final class CatalogViewModel {
     var isPrivacyShieldVisible = false
     var selectedPhoto: PhotosPickerItem?
     var selectedPhotoName: String?
+    var isLoadingPurchases = false
+    var availableProductIDs = Set<String>()
 
     private(set) var parts: [Part] = []
     private(set) var sources: [CatalogSource] = []
@@ -393,6 +412,7 @@ final class CatalogViewModel {
         .init(id: "urgent", productID: "batal.parts.request.urgent", priceSAR: 20, titleAr: "طلب مستعجل", titleEn: "Urgent request", descriptionAr: "أولوية أعلى وصياغة طلب جاهز للواتساب والبريد.", descriptionEn: "Higher priority with a ready message for WhatsApp and email."),
         .init(id: "rare", productID: "batal.parts.request.rare", priceSAR: 50, titleAr: "طلب قطعة نادرة / NOS", titleEn: "Rare / NOS request", descriptionAr: "بحث مركز للقطع النادرة أو المستعملة الأصلية.", descriptionEn: "Focused request for rare, used original, or NOS parts.")
     ]
+    var purchaseProductIDs: [String] { ["batal.catalog.unlock"] + plans.map(\.productID) }
 
     init(repository: CatalogRepository, store: PurchaseService) {
         self.repository = repository
@@ -419,6 +439,7 @@ final class CatalogViewModel {
             partCount = catalog.partCount ?? parts.count
             stores = try await storesTask
             selectedPart = filteredParts.first
+            await refreshPurchaseProducts()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -446,7 +467,20 @@ final class CatalogViewModel {
 
     func text(ar: String, en: String) -> String { language == .arabic ? ar : en }
     func title(for part: Part) -> String { part.title(language: language) }
-    func isUnlocked(_ part: Part) -> Bool { paidUnlocks.contains(part.partNumber) }
+    func isUnlocked(_ part: Part) -> Bool { paidUnlocks.contains(catalogUnlockToken) || paidUnlocks.contains(part.partNumber) }
+    func isProductAvailable(_ productID: String) -> Bool { availableProductIDs.contains(productID) }
+    var purchaseSetupMessage: String {
+        if isLoadingPurchases {
+            return text(ar: "جاري التحقق من منتجات الشراء داخل التطبيق...", en: "Checking in-app purchase products...")
+        }
+        if availableProductIDs.isEmpty {
+            return text(
+                ar: "الدفع داخل التطبيق غير جاهز حاليًا. يمكنك استخدام البحث والكتالوج والأدوات المجانية، وسيتم تفعيل الشراء عند اعتماد منتجات App Store.",
+                en: "In-app purchase is not ready yet. Free catalog search and tools remain available, and purchases will activate when App Store products are approved."
+            )
+        }
+        return text(ar: "الدفع داخل التطبيق جاهز عبر Apple.", en: "In-app purchase is ready through Apple.")
+    }
     func protectedNumber(_ part: Part) -> String { part.partNumber }
     func premiumNumber(_ number: String, for part: Part) -> String {
         number == part.partNumber || isUnlocked(part) ? number : masked(number)
@@ -457,11 +491,16 @@ final class CatalogViewModel {
     }
 
     func unlock(_ part: Part) async {
+        guard isProductAvailable("batal.catalog.unlock") else {
+            paymentMessage = purchaseSetupMessage
+            return
+        }
         paymentMessage = text(ar: "جاري طلب الدفع...", en: "Requesting purchase...")
         do {
             let outcome = try await store.purchase(productID: "batal.catalog.unlock")
             switch outcome {
             case .success:
+                paidUnlocks.insert(catalogUnlockToken)
                 paidUnlocks.insert(part.partNumber)
                 paymentMessage = text(ar: "تم الدفع وفتح المحتوى", en: "Payment complete. Content unlocked.")
             case .cancelled:
@@ -470,11 +509,15 @@ final class CatalogViewModel {
                 paymentMessage = text(ar: "عملية الدفع معلقة.", en: "Purchase is pending.")
             }
         } catch {
-            paymentMessage = error.localizedDescription
+            paymentMessage = purchaseErrorMessage(error)
         }
     }
 
     func buyRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) async {
+        guard isProductAvailable(plan.productID) else {
+            paymentMessage = purchaseSetupMessage
+            return
+        }
         paymentMessage = text(ar: "جاري طلب الدفع...", en: "Requesting purchase...")
         do {
             let outcome = try await store.purchase(productID: plan.productID)
@@ -488,8 +531,40 @@ final class CatalogViewModel {
             savedRequests.insert(saved, at: 0)
             paymentMessage = text(ar: "تم حفظ طلب القطعة بعد الدفع.", en: "Part request saved after payment.")
         } catch {
-            paymentMessage = error.localizedDescription
+            paymentMessage = purchaseErrorMessage(error)
         }
+    }
+
+    func refreshPurchaseProducts() async {
+        isLoadingPurchases = true
+        defer { isLoadingPurchases = false }
+        do {
+            availableProductIDs = try await store.availableProductIDs(for: purchaseProductIDs)
+        } catch {
+            availableProductIDs = []
+        }
+    }
+
+    func restorePurchases() async {
+        paymentMessage = text(ar: "جاري استعادة المشتريات...", en: "Restoring purchases...")
+        do {
+            let restored = try await store.restorePurchasedProductIDs()
+            if restored.contains("batal.catalog.unlock") {
+                paidUnlocks.insert(catalogUnlockToken)
+                paymentMessage = text(ar: "تمت استعادة فتح الكتالوج.", en: "Catalog unlock was restored.")
+            } else {
+                paymentMessage = text(ar: "لا توجد مشتريات مؤهلة للاستعادة.", en: "No eligible purchases were found to restore.")
+            }
+        } catch {
+            paymentMessage = purchaseErrorMessage(error)
+        }
+    }
+
+    private func purchaseErrorMessage(_ error: Error) -> String {
+        if case AppError.productUnavailable = error {
+            return purchaseSetupMessage
+        }
+        return text(ar: "تعذر إكمال عملية الشراء. حاول مرة أخرى أو استخدم الاستعادة إذا كنت اشتريت سابقًا.", en: "The purchase could not be completed. Try again, or use Restore Purchases if you purchased before.")
     }
 
     func buildDraft(for request: SavedPartRequest, plan: PartRequestPlan) -> String {
@@ -1029,10 +1104,17 @@ struct PartDetailView: View {
                     Text(viewModel.title(for: part)).font(.title2.bold())
                     Text(viewModel.protectedNumber(part)).font(.title3.monospaced()).foregroundStyle(.tint)
                     if !viewModel.isUnlocked(part) {
+                        Text(viewModel.purchaseSetupMessage)
+                            .font(.caption)
+                            .foregroundStyle(viewModel.availableProductIDs.isEmpty ? .orange : .secondary)
                         Button { Task { await viewModel.unlock(part) } } label: {
                             Label(viewModel.text(ar: "فتح الأرقام البديلة والأدلة المتقدمة", en: "Unlock alternate numbers and advanced evidence"), systemImage: "lock.open")
                         }
                         .buttonStyle(.borderedProminent)
+                        .disabled(!viewModel.isProductAvailable("batal.catalog.unlock") || viewModel.isLoadingPurchases)
+                        Button { Task { await viewModel.restorePurchases() } } label: {
+                            Label(viewModel.text(ar: "استعادة المشتريات", en: "Restore Purchases"), systemImage: "arrow.clockwise")
+                        }
                     }
                 }
             }
@@ -1134,6 +1216,12 @@ struct RequestView: View {
                         ForEach(viewModel.plans) { plan in Text("\(plan.title(viewModel.language)) · \(plan.priceSAR) SAR").tag(plan.id) }
                     }
                     Text(selectedPlan.description(viewModel.language)).font(.caption).foregroundStyle(.secondary)
+                    Text(viewModel.purchaseSetupMessage)
+                        .font(.caption)
+                        .foregroundStyle(viewModel.availableProductIDs.isEmpty ? .orange : .secondary)
+                    Button { Task { await viewModel.refreshPurchaseProducts() } } label: {
+                        Label(viewModel.text(ar: "إعادة فحص منتجات الشراء", en: "Refresh purchase products"), systemImage: "arrow.clockwise")
+                    }
                 }
                 Section(viewModel.text(ar: "بيانات السيارة", en: "Vehicle")) {
                     TextField("Y60", text: $request.generation)
@@ -1154,7 +1242,7 @@ struct RequestView: View {
                     Button { Task { await viewModel.buyRequestPlan(selectedPlan, request: request) } } label: {
                         Label(viewModel.text(ar: "دفع الرسوم وتجهيز الطلب", en: "Pay and prepare request"), systemImage: "creditcard")
                     }
-                    .disabled(request.partNumber.isEmpty && request.partName.isEmpty)
+                    .disabled((request.partNumber.isEmpty && request.partName.isEmpty) || !viewModel.isProductAvailable(selectedPlan.productID) || viewModel.isLoadingPurchases)
                 }
                 Section(viewModel.text(ar: "طلبات محفوظة", en: "Saved requests")) {
                     if viewModel.savedRequests.isEmpty {
