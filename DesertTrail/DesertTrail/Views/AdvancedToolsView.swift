@@ -1030,6 +1030,8 @@ struct AdvancedToolsView: View {
             Label(title, systemImage: icon)
                 .font(.title3.weight(.bold))
                 .foregroundStyle(color)
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
             content()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1108,7 +1110,7 @@ struct AdvancedToolsView: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.62)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity, minHeight: 36)
+                .frame(minWidth: 74, minHeight: 36)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(Color.desertSand.opacity(0.45), in: Capsule())

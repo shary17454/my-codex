@@ -73,6 +73,22 @@ struct HiddenPlaceForm: View {
                     Label(appState.text(.reviewMessage), systemImage: "checkmark.seal")
                         .foregroundStyle(.secondary)
                         .font(.caption)
+
+                    Button {
+                        Task { await save() }
+                    } label: {
+                        HStack {
+                            if isSaving {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                            Text(appState.text(.submit))
+                                .font(.headline.weight(.bold))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!canSubmit)
                 }
             }
             .navigationTitle(appState.text(.addPlace))
@@ -87,6 +103,11 @@ struct HiddenPlaceForm: View {
                         Task { await save() }
                     }
                     .disabled(!canSubmit)
+                }
+            }
+            .onAppear {
+                if includeCurrentLocation {
+                    appState.locationManager.startNavigation()
                 }
             }
         }

@@ -5,17 +5,41 @@ import Observation
 @MainActor
 @Observable
 final class AppState {
-    var language: AppLanguage = .arabic
+    var language: AppLanguage = .arabic {
+        didSet { UserDefaults.standard.set(language.rawValue, forKey: AppStorageKey.language) }
+    }
     var selectedTrip: TripPlan = TripPlan.sample
     var trips: [TripPlan] = TripPlan.samples
     var hiddenPlaces: [HiddenPlace] = HiddenPlace.samples
     var environmentalReport: EnvironmentalReport = .placeholder
-    var consentedToTripSharing = false
+    var consentedToTripSharing = false {
+        didSet { UserDefaults.standard.set(consentedToTripSharing, forKey: AppStorageKey.tripSharingConsent) }
+    }
     var statusMessage: String?
 
     let locationManager = LocationManager()
     let weatherService = WeatherService()
     let cloudStore = CloudKitStore()
+
+    init() {
+        let defaults = UserDefaults.standard
+        if let rawLanguage = defaults.string(forKey: AppStorageKey.language),
+           let storedLanguage = AppLanguage(rawValue: rawLanguage) {
+            language = storedLanguage
+        }
+
+        trips = AppStateStorage.loadTrips() ?? TripPlan.samples
+        hiddenPlaces = AppStateStorage.loadHiddenPlaces() ?? HiddenPlace.samples
+
+        if let selectedID = defaults.string(forKey: AppStorageKey.selectedTripID),
+           let uuid = UUID(uuidString: selectedID),
+           let storedTrip = trips.first(where: { $0.id == uuid }) {
+            selectedTrip = storedTrip
+        } else {
+            selectedTrip = trips.first ?? TripPlan.sample
+        }
+        consentedToTripSharing = defaults.bool(forKey: AppStorageKey.tripSharingConsent)
+    }
 
     func refreshEnvironmentReport() async {
         let coordinate = locationManager.currentLocation?.coordinate ?? selectedTrip.meetingPoint
@@ -29,6 +53,7 @@ final class AppState {
 
     func selectTrip(_ trip: TripPlan) {
         selectedTrip = trip
+        persistSelectedTripID()
     }
 
     func saveSelectedTrip() {
@@ -37,6 +62,8 @@ final class AppState {
         } else {
             trips.insert(selectedTrip, at: 0)
         }
+        persistTrips()
+        persistSelectedTripID()
     }
 
     @discardableResult
@@ -56,6 +83,8 @@ final class AppState {
         trips.insert(trip, at: 0)
         selectedTrip = trip
         statusMessage = "تم إنشاء الرحلة"
+        persistTrips()
+        persistSelectedTripID()
         return trip
     }
 
@@ -76,6 +105,7 @@ final class AppState {
     func addHiddenPlace(_ place: HiddenPlace) {
         hiddenPlaces.insert(place, at: 0)
         statusMessage = "تم حفظ الموقع وإرساله للمراجعة"
+        persistHiddenPlaces()
     }
 
     func setTripDestination(to place: HiddenPlace) {
@@ -87,6 +117,135 @@ final class AppState {
 
     func text(_ key: LocalizedKey) -> String {
         key.value(for: language)
+    }
+
+    private func persistTrips() {
+        AppStateStorage.saveTrips(trips)
+    }
+
+    private func persistHiddenPlaces() {
+        AppStateStorage.saveHiddenPlaces(hiddenPlaces)
+    }
+
+    private func persistSelectedTripID() {
+        UserDefaults.standard.set(selectedTrip.id.uuidString, forKey: AppStorageKey.selectedTripID)
+    }
+}
+
+private enum AppStorageKey {
+    static let language = "desertTrail.language"
+    static let selectedTripID = "desertTrail.selectedTripID"
+    static let trips = "desertTrail.trips.v1"
+    static let hiddenPlaces = "desertTrail.hiddenPlaces.v1"
+    static let tripSharingConsent = "desertTrail.tripSharingConsent"
+}
+
+private enum AppStateStorage {
+    static func loadTrips() -> [TripPlan]? {
+        guard let data = UserDefaults.standard.data(forKey: AppStorageKey.trips) else { return nil }
+        return try? JSONDecoder().decode([StoredTripPlan].self, from: data).map(\.trip)
+    }
+
+    static func saveTrips(_ trips: [TripPlan]) {
+        guard let data = try? JSONEncoder().encode(trips.map(StoredTripPlan.init)) else { return }
+        UserDefaults.standard.set(data, forKey: AppStorageKey.trips)
+    }
+
+    static func loadHiddenPlaces() -> [HiddenPlace]? {
+        guard let data = UserDefaults.standard.data(forKey: AppStorageKey.hiddenPlaces) else { return nil }
+        return try? JSONDecoder().decode([StoredHiddenPlace].self, from: data).map(\.place)
+    }
+
+    static func saveHiddenPlaces(_ places: [HiddenPlace]) {
+        guard let data = try? JSONEncoder().encode(places.map(StoredHiddenPlace.init)) else { return }
+        UserDefaults.standard.set(data, forKey: AppStorageKey.hiddenPlaces)
+    }
+}
+
+private struct StoredCoordinate: Codable {
+    let latitude: Double
+    let longitude: Double
+
+    init(_ coordinate: CLLocationCoordinate2D) {
+        latitude = coordinate.latitude
+        longitude = coordinate.longitude
+    }
+
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+}
+
+private struct StoredTripPlan: Codable {
+    let id: UUID
+    let title: String
+    let startDate: Date
+    let endDate: Date
+    let meetingPoint: StoredCoordinate
+    let routeName: String
+    let notes: String
+    let participants: [String]
+
+    init(_ trip: TripPlan) {
+        id = trip.id
+        title = trip.title
+        startDate = trip.startDate
+        endDate = trip.endDate
+        meetingPoint = StoredCoordinate(trip.meetingPoint)
+        routeName = trip.routeName
+        notes = trip.notes
+        participants = trip.participants
+    }
+
+    var trip: TripPlan {
+        TripPlan(
+            id: id,
+            title: title,
+            startDate: startDate,
+            endDate: endDate,
+            meetingPoint: meetingPoint.coordinate,
+            routeName: routeName,
+            notes: notes,
+            participants: participants
+        )
+    }
+}
+
+private struct StoredHiddenPlace: Codable {
+    let id: UUID
+    let name: String
+    let coordinate: StoredCoordinate
+    let rating: Int
+    let imageSystemName: String
+    let notes: String
+    let status: String
+    let contributor: String
+    let points: Int
+
+    init(_ place: HiddenPlace) {
+        id = place.id
+        name = place.name
+        coordinate = StoredCoordinate(place.coordinate)
+        rating = place.rating
+        imageSystemName = place.imageSystemName
+        notes = place.notes
+        status = place.status.rawValue
+        contributor = place.contributor
+        points = place.points
+    }
+
+    var place: HiddenPlace {
+        HiddenPlace(
+            id: id,
+            name: name,
+            coordinate: coordinate.coordinate,
+            rating: rating,
+            imageSystemName: imageSystemName,
+            notes: notes,
+            status: ReviewStatus(rawValue: status) ?? .pending,
+            contributor: contributor,
+            points: points
+        )
     }
 }
 

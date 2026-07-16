@@ -11,6 +11,7 @@ struct ActiveTripDriveView: View {
     @State private var showingOfflineMaps = false
     @State private var showingAddPlace = false
     @State private var showingDestinationPicker = false
+    @State private var showingSOS = false
 
     private var driveRegion: MKCoordinateRegion {
         MKCoordinateRegion(
@@ -56,6 +57,9 @@ struct ActiveTripDriveView: View {
         }
         .sheet(isPresented: $showingDestinationPicker) {
             DestinationPickerSheet()
+        }
+        .sheet(isPresented: $showingSOS) {
+            SOSView(coordinate: appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint)
         }
     }
 
@@ -261,7 +265,8 @@ struct ActiveTripDriveView: View {
                     showStatus("تم تشغيل التتبع")
                 }
                 driveRoundButton(icon: "sos.circle.fill", title: "SOS") {
-                    showStatus("تم تجهيز طلب SOS عند الحاجة")
+                    showingSOS = true
+                    showStatus("تم فتح بطاقة الاستغاثة")
                 }
             }
         }
@@ -360,7 +365,7 @@ struct ActiveTripDriveView: View {
     private var headingDegrees: Double {
         guard let heading = appState.locationManager.heading else { return 0 }
         let value = heading.trueHeading >= 0 ? heading.trueHeading : heading.magneticHeading
-        return value >= 0 ? -value : 0
+        return value >= 0 ? value : 0
     }
 
     private var weatherIcon: String {

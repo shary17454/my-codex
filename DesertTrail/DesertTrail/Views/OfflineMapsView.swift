@@ -7,6 +7,7 @@ struct OfflineMapsView: View {
     @StateObject private var store = OfflineMapStore()
     @State private var savingPresetID: UUID?
     @State private var errorMessage: String?
+    @State private var searchText = ""
 
     let region: MKCoordinateRegion
 
@@ -31,7 +32,11 @@ struct OfflineMapsView: View {
                 }
 
                 Section("اختر منطقة للتحميل") {
-                    ForEach(OfflineMapPreset.samples) { preset in
+                    TextField("ابحث عن منطقة مثل: طويق، العلا، الربع الخالي", text: $searchText)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+
+                    ForEach(filteredPresets) { preset in
                         Button {
                             Task { await save(title: preset.title, region: preset.region, presetID: preset.id) }
                         } label: {
@@ -89,12 +94,20 @@ struct OfflineMapsView: View {
         }
     }
 
+    private var filteredPresets: [OfflineMapPreset] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return OfflineMapPreset.samples }
+        return OfflineMapPreset.samples.filter {
+            $0.title.localizedCaseInsensitiveContains(query) ||
+            $0.subtitle.localizedCaseInsensitiveContains(query)
+        }
+    }
+
     private func save(title: String, region: MKCoordinateRegion, presetID: UUID?) async {
         savingPresetID = presetID ?? UUID()
         errorMessage = nil
         do {
-            let timestamp = Date().formatted(date: .abbreviated, time: .omitted)
-            try await store.saveSnapshot(title: "\(title) - \(timestamp)", region: region)
+            try await store.saveSnapshot(title: title, region: region)
             appState.statusMessage = "تم حفظ خريطة \(title)"
         } catch {
             errorMessage = "تعذر حفظ الخريطة: \(error.localizedDescription)"

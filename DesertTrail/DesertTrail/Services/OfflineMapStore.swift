@@ -47,6 +47,26 @@ struct OfflineMapPreset: Identifiable {
             title: "الربع الخالي",
             subtitle: "منطقة صحراوية واسعة",
             region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 20.2000, longitude: 50.0000), span: MKCoordinateSpan(latitudeDelta: 0.45, longitudeDelta: 0.45))
+        ),
+        OfflineMapPreset(
+            title: "جبل اللوز",
+            subtitle: "تبوك - جبال ومرتفعات باردة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 28.6640, longitude: 35.2980), span: MKCoordinateSpan(latitudeDelta: 0.16, longitudeDelta: 0.16))
+        ),
+        OfflineMapPreset(
+            title: "جبة حائل",
+            subtitle: "نفود وآثار ومواقع صحراوية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 28.0030, longitude: 40.9390), span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15))
+        ),
+        OfflineMapPreset(
+            title: "وادي الدواسر",
+            subtitle: "طرق برية وأودية جنوب نجد",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 20.4607, longitude: 44.7879), span: MKCoordinateSpan(latitudeDelta: 0.22, longitudeDelta: 0.22))
+        ),
+        OfflineMapPreset(
+            title: "الصمان",
+            subtitle: "دحول وكثبان ومسارات برية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 26.6320, longitude: 47.2130), span: MKCoordinateSpan(latitudeDelta: 0.24, longitudeDelta: 0.24))
         )
     ]
 }

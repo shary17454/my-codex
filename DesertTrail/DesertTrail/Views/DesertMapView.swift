@@ -133,13 +133,7 @@ struct DesertMapView: View {
                     metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
                 }
 
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(minimum: 112), spacing: 8),
-                        GridItem(.flexible(minimum: 112), spacing: 8)
-                    ],
-                    spacing: 8
-                ) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 108), spacing: 8)], spacing: 8) {
                     compactMapActionButton(
                         title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
                         icon: "location.north.line",
@@ -168,8 +162,8 @@ struct DesertMapView: View {
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.horizontal, 10)
-            .padding(.bottom, 88)
-            .frame(maxHeight: 440, alignment: .bottom)
+            .padding(.bottom, 104)
+            .frame(maxHeight: 520, alignment: .bottom)
         }
         .task(id: appState.locationManager.currentLocation?.coordinate.latitude) {
             await appState.startLocationAndRefreshEnvironment()
@@ -257,19 +251,18 @@ struct DesertMapView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: 8) {
+            VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.subheadline.weight(.bold))
-                    .frame(width: 20)
-            Text(title)
-                    .font(.system(size: 12, weight: .bold))
+                Text(title)
+                    .font(.system(size: 11, weight: .bold))
                     .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                    .minimumScaleFactor(0.62)
-                Spacer(minLength: 0)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.58)
             }
-            .frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
-            .padding(.horizontal, 10)
+            .frame(maxWidth: .infinity, minHeight: 58)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
         }
         .buttonStyle(.plain)
         .foregroundStyle(isPrimary ? .white : Color.desertCopper)

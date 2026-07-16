@@ -30,12 +30,12 @@ struct CompassPanel: View {
                         compassCardinal("E", x: 98)
                         compassCardinal("W", x: -98)
                     }
-                    .rotationEffect(.degrees(headingDegrees))
 
                     VStack(spacing: 10) {
                         Image(systemName: "location.north.fill")
                             .font(.system(size: 66))
                             .foregroundStyle(Color.oasisTeal)
+                            .rotationEffect(.degrees(normalizedHeading))
                         Text("\(Int(normalizedHeading))°")
                             .font(.system(.largeTitle, design: .rounded).monospacedDigit().weight(.bold))
                             .foregroundStyle(.primary)
@@ -134,7 +134,7 @@ struct CompassPanel: View {
     }
 
     private var headingDegrees: Double {
-        -normalizedHeading
+        normalizedHeading
     }
 
     private func compassCardinal(_ text: String, x: CGFloat = 0, y: CGFloat = 0) -> some View {
@@ -142,7 +142,6 @@ struct CompassPanel: View {
             .font(.headline.weight(.black))
             .foregroundStyle(Color.desertRock)
             .offset(x: x, y: y)
-            .rotationEffect(.degrees(-headingDegrees))
     }
 
     private var directionName: String {

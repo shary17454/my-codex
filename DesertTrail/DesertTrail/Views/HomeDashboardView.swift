@@ -43,7 +43,7 @@ struct HomeDashboardView: View {
             }
             .padding(.horizontal, 16)
             .padding(.top, 18)
-            .padding(.bottom, 28)
+            .padding(.bottom, 110)
         }
         .background(Color.desertBackground.ignoresSafeArea())
         .sheet(isPresented: $showingQR) {
@@ -189,7 +189,7 @@ struct HomeDashboardView: View {
 
     private var tripMetricBar: some View {
         HStack(spacing: 0) {
-            dashboardMetric(title: "الاتجاه", value: headingText, subtitle: "315°", icon: "safari")
+            dashboardMetric(title: "الاتجاه", value: headingText, subtitle: headingSubtitle, icon: "safari")
             Divider().frame(height: 54)
             dashboardMetric(title: "الارتفاع", value: altitudeText, subtitle: "متر", icon: "mountain.2")
             Divider().frame(height: 54)
@@ -197,7 +197,7 @@ struct HomeDashboardView: View {
             Divider().frame(height: 54)
             dashboardMetric(title: "المسافة", value: distanceText, subtitle: "كم", icon: "mappin")
             Divider().frame(height: 54)
-            dashboardMetric(title: "حالة الموقع", value: "جيد", subtitle: "12/13", icon: "location.north")
+            dashboardMetric(title: "حالة الموقع", value: gpsStatusText, subtitle: appState.locationManager.isTracking ? "نشط" : "جاهز", icon: "location.north")
         }
         .padding(.vertical, 14)
         .background(Color.desertPanel, in: RoundedRectangle(cornerRadius: 8))
@@ -215,7 +215,7 @@ struct HomeDashboardView: View {
     }
 
     private var contentCards: some View {
-        HStack(alignment: .top, spacing: 12) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 250), spacing: 12)], spacing: 12) {
             upcomingTripCard
             featuredPlaceCard
         }
@@ -398,25 +398,41 @@ struct HomeDashboardView: View {
     }
 
     private var headingText: String {
-        guard let heading = appState.locationManager.heading else { return "NW" }
-        let value = heading.trueHeading > 0 ? heading.trueHeading : heading.magneticHeading
-        return value > 0 ? "\(Int(value))°" : "NW"
+        guard let heading = appState.locationManager.heading else { return "--" }
+        let value = heading.trueHeading >= 0 ? heading.trueHeading : heading.magneticHeading
+        return value >= 0 ? "\(Int(value))°" : "--"
+    }
+
+    private var headingSubtitle: String {
+        guard let heading = appState.locationManager.heading, heading.headingAccuracy >= 0 else { return "معايرة" }
+        return "±\(Int(heading.headingAccuracy))°"
     }
 
     private var altitudeText: String {
-        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "842" }
+        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "--" }
         return "\(Int(altitude))"
     }
 
     private var speedText: String {
-        guard let speed = appState.locationManager.currentLocation?.speed, speed > 0 else { return "32" }
+        guard let speed = appState.locationManager.currentLocation?.speed, speed > 0 else { return "--" }
         return "\(Int(speed * 3.6))"
     }
 
     private var distanceText: String {
-        guard let current = appState.locationManager.currentLocation else { return "12.4" }
+        guard let current = appState.locationManager.currentLocation else { return "--" }
         let target = CLLocation(latitude: appState.selectedTrip.meetingPoint.latitude, longitude: appState.selectedTrip.meetingPoint.longitude)
         return String(format: "%.1f", current.distance(from: target) / 1000)
+    }
+
+    private var gpsStatusText: String {
+        switch appState.locationManager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            return appState.locationManager.currentLocation == nil ? "ينتظر" : "جيد"
+        case .denied, .restricted:
+            return "مرفوض"
+        default:
+            return "اطلب"
+        }
     }
 
     private var tripProgress: Double {

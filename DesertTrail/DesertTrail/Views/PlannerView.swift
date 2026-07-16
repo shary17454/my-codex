@@ -186,7 +186,6 @@ private struct CreateTripSheet: View {
                         appState.createTrip(title: title, startDate: startDate, endDate: endDate, notes: notes)
                         dismiss()
                     }
-                    .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
