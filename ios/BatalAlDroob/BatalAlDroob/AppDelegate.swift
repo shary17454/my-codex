@@ -229,8 +229,6 @@ struct VerifiedStore: Decodable, Identifiable, Hashable, Sendable {
 
 struct PartRequestPlan: Identifiable, Hashable, Sendable {
     let id: String
-    let productID: String
-    let priceSAR: Int
     let titleAr: String
     let titleEn: String
     let descriptionAr: String
@@ -408,11 +406,11 @@ final class CatalogViewModel {
     }
 
     let plans: [PartRequestPlan] = [
-        .init(id: "basic", productID: "batal.parts.request.basic", priceSAR: 10, titleAr: "طلب عادي", titleEn: "Basic request", descriptionAr: "تجهيز الطلب وإرساله للمتاجر المناسبة.", descriptionEn: "Prepare the request and route it to suitable stores."),
-        .init(id: "urgent", productID: "batal.parts.request.urgent", priceSAR: 20, titleAr: "طلب مستعجل", titleEn: "Urgent request", descriptionAr: "أولوية أعلى وصياغة طلب جاهز للواتساب والبريد.", descriptionEn: "Higher priority with a ready message for WhatsApp and email."),
-        .init(id: "rare", productID: "batal.parts.request.rare", priceSAR: 50, titleAr: "طلب قطعة نادرة / NOS", titleEn: "Rare / NOS request", descriptionAr: "بحث مركز للقطع النادرة أو المستعملة الأصلية.", descriptionEn: "Focused request for rare, used original, or NOS parts.")
+        .init(id: "basic", titleAr: "طلب عادي", titleEn: "Basic request", descriptionAr: "صياغة طلب القطعة وحفظه داخل التطبيق.", descriptionEn: "Prepare and save the part request inside the app."),
+        .init(id: "urgent", titleAr: "طلب مستعجل", titleEn: "Urgent request", descriptionAr: "صياغة طلب مختصر وجاهز للمشاركة السريعة.", descriptionEn: "Prepare a concise request ready for quick sharing."),
+        .init(id: "rare", titleAr: "طلب قطعة نادرة / NOS", titleEn: "Rare / NOS request", descriptionAr: "صياغة طلب مفصل للقطع النادرة أو المستعملة الأصلية.", descriptionEn: "Prepare a detailed request for rare, original used, or NOS parts.")
     ]
-    var purchaseProductIDs: [String] { ["batal.catalog.unlock"] + plans.map(\.productID) }
+    var purchaseProductIDs: [String] { ["batal.catalog.unlock"] }
 
     init(repository: CatalogRepository, store: PurchaseService) {
         self.repository = repository
@@ -513,26 +511,12 @@ final class CatalogViewModel {
         }
     }
 
-    func buyRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) async {
-        guard isProductAvailable(plan.productID) else {
-            paymentMessage = purchaseSetupMessage
-            return
-        }
-        paymentMessage = text(ar: "جاري طلب الدفع...", en: "Requesting purchase...")
-        do {
-            let outcome = try await store.purchase(productID: plan.productID)
-            guard outcome == .success else {
-                paymentMessage = outcome == .cancelled ? text(ar: "تم إلغاء عملية الدفع.", en: "Purchase was cancelled.") : text(ar: "الدفع معلق.", en: "Payment is pending.")
-                return
-            }
-            var saved = request
-            saved.planID = plan.id
-            saved.draft = buildDraft(for: saved, plan: plan)
-            savedRequests.insert(saved, at: 0)
-            paymentMessage = text(ar: "تم حفظ طلب القطعة بعد الدفع.", en: "Part request saved after payment.")
-        } catch {
-            paymentMessage = purchaseErrorMessage(error)
-        }
+    func saveRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) {
+        var saved = request
+        saved.planID = plan.id
+        saved.draft = buildDraft(for: saved, plan: plan)
+        savedRequests.insert(saved, at: 0)
+        paymentMessage = text(ar: "تم تجهيز طلب القطعة وحفظه.", en: "Part request was prepared and saved.")
     }
 
     func refreshPurchaseProducts() async {
@@ -1211,17 +1195,14 @@ struct RequestView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(viewModel.text(ar: "رسوم الطلب", en: "Request fee")) {
+                Section(viewModel.text(ar: "نوع الطلب", en: "Request type")) {
                     Picker(viewModel.text(ar: "الخطة", en: "Plan"), selection: $selectedPlanID) {
-                        ForEach(viewModel.plans) { plan in Text("\(plan.title(viewModel.language)) · \(plan.priceSAR) SAR").tag(plan.id) }
+                        ForEach(viewModel.plans) { plan in Text(plan.title(viewModel.language)).tag(plan.id) }
                     }
                     Text(selectedPlan.description(viewModel.language)).font(.caption).foregroundStyle(.secondary)
-                    Text(viewModel.purchaseSetupMessage)
+                    Text(viewModel.text(ar: "طلب القطعة هنا لا يتطلب دفعًا. الشراء داخل التطبيق مخصص فقط لفتح الكتالوج المحمي عند توفره.", en: "Part requests do not require payment. In-app purchase is used only for protected catalog unlock when available."))
                         .font(.caption)
-                        .foregroundStyle(viewModel.availableProductIDs.isEmpty ? .orange : .secondary)
-                    Button { Task { await viewModel.refreshPurchaseProducts() } } label: {
-                        Label(viewModel.text(ar: "إعادة فحص منتجات الشراء", en: "Refresh purchase products"), systemImage: "arrow.clockwise")
-                    }
+                        .foregroundStyle(.secondary)
                 }
                 Section(viewModel.text(ar: "بيانات السيارة", en: "Vehicle")) {
                     TextField("Y60", text: $request.generation)
@@ -1239,17 +1220,17 @@ struct RequestView: View {
                         .autocorrectionDisabled()
                     TextField(viewModel.text(ar: "اسم القطعة", en: "Part name"), text: $request.partName)
                     TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $request.notes, axis: .vertical)
-                    Button { Task { await viewModel.buyRequestPlan(selectedPlan, request: request) } } label: {
-                        Label(viewModel.text(ar: "دفع الرسوم وتجهيز الطلب", en: "Pay and prepare request"), systemImage: "creditcard")
+                    Button { viewModel.saveRequestPlan(selectedPlan, request: request) } label: {
+                        Label(viewModel.text(ar: "تجهيز الطلب وحفظه", en: "Prepare and save request"), systemImage: "square.and.pencil")
                     }
-                    .disabled((request.partNumber.isEmpty && request.partName.isEmpty) || !viewModel.isProductAvailable(selectedPlan.productID) || viewModel.isLoadingPurchases)
+                    .disabled(request.partNumber.isEmpty && request.partName.isEmpty)
                 }
                 Section(viewModel.text(ar: "طلبات محفوظة", en: "Saved requests")) {
                     if viewModel.savedRequests.isEmpty {
                         EmptyStateView(
                             symbol: "tray",
                             title: viewModel.text(ar: "لا توجد طلبات محفوظة", en: "No saved requests"),
-                            message: viewModel.text(ar: "بعد الدفع وتجهيز الطلب سيظهر هنا نص الطلب المحفوظ.", en: "Paid and prepared part requests will appear here.")
+                            message: viewModel.text(ar: "بعد تجهيز الطلب سيظهر هنا نص الطلب المحفوظ.", en: "Prepared part requests will appear here.")
                         )
                     } else {
                         ForEach(viewModel.savedRequests) { saved in

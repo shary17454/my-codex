@@ -21,22 +21,16 @@ const catalogUnlockProductId = "batal.catalog.unlock";
 const partRequestPlans = [
   {
     id: "basic",
-    productId: "batal.parts.request.basic",
-    priceSar: 10,
     titleKey: "requestBasicTitle",
     textKey: "requestBasicText"
   },
   {
     id: "urgent",
-    productId: "batal.parts.request.urgent",
-    priceSar: 20,
     titleKey: "requestUrgentTitle",
     textKey: "requestUrgentText"
   },
   {
     id: "rare",
-    productId: "batal.parts.request.rare",
-    priceSar: 50,
     titleKey: "requestRareTitle",
     textKey: "requestRareText"
   }
@@ -211,11 +205,11 @@ const translations = {
     requestPartType: "نوع القطعة المطلوبة",
     requestGoal: "هدف الطلب",
     requestNotes: "ملاحظات إضافية",
-    requestSubmit: "دفع الرسوم وتجهيز الطلب",
+    requestSubmit: "تجهيز الطلب وحفظه",
     requestDraftTitle: "نص الطلب الجاهز للمتاجر",
     requestRequired: "أدخل اسم القطعة أو رقم القطعة على الأقل.",
-    requestSubmitted: "تم حفظ طلب القطعة بعد الدفع. يمكنك نسخ النص وإرساله للمتاجر.",
-    requestPlanLabel: "رسوم الطلب",
+    requestSubmitted: "تم حفظ طلب القطعة. يمكنك نسخ النص وإرساله للمتاجر.",
+    requestPlanLabel: "نوع الطلب",
     requestHistoryTitle: "طلبات القطع المحفوظة",
     requestHistorySubtitle: "تظهر آخر الطلبات المحفوظة محلياً أو عبر API المحلي.",
     requestHistoryEmpty: "لا توجد طلبات محفوظة بعد.",
@@ -473,11 +467,11 @@ const translations = {
     requestPartType: "Requested part type",
     requestGoal: "Request goal",
     requestNotes: "Additional notes",
-    requestSubmit: "Pay fee and prepare request",
+    requestSubmit: "Prepare and save request",
     requestDraftTitle: "Store-ready request text",
     requestRequired: "Enter either the part name or part number.",
-    requestSubmitted: "Part request saved after payment. You can copy the text and send it to stores.",
-    requestPlanLabel: "Request fee",
+    requestSubmitted: "Part request saved. You can copy the text and send it to stores.",
+    requestPlanLabel: "Request type",
     requestHistoryTitle: "Saved part requests",
     requestHistorySubtitle: "Shows the latest requests saved locally or through the local API.",
     requestHistoryEmpty: "No saved requests yet.",
@@ -1015,7 +1009,7 @@ function updatePartRequestPlans() {
     const plan = partRequestPlans.find((item) => item.id === button.dataset.requestPlan);
     if (!plan) return;
     const price = button.querySelector("strong");
-    if (price) price.textContent = formatMoney(plan.priceSar);
+    if (price) price.textContent = t(plan.titleKey);
   });
 }
 
@@ -1432,7 +1426,7 @@ function selectedPartRequestPlan() {
 }
 
 function requestPlanLine(plan) {
-  return `${t(plan.titleKey)} · ${formatMoney(plan.priceSar)}`;
+  return t(plan.titleKey);
 }
 
 function collectPartRequest(form) {
@@ -1489,10 +1483,10 @@ function savePartRequest(request, plan) {
     id: `REQ-${Date.now()}`,
     created_at: new Date().toISOString(),
     plan_id: plan.id,
-    product_id: plan.productId,
-    fee_sar: plan.priceSar,
+    product_id: "",
+    fee_sar: 0,
     currency: "SAR",
-    status: "paid_saved_locally",
+    status: "saved_locally",
     request,
     draft
   };
@@ -2204,14 +2198,7 @@ partRequestForm?.addEventListener("submit", (event) => {
 
   const plan = selectedPartRequestPlan();
   const draft = buildPartRequestDraft(request, plan);
-  requestPaidAccess({
-    type: "submit-part-request",
-    productId: plan.productId,
-    request,
-    plan,
-    confirmTitle: t("partRequestTitle"),
-    confirmText: `${requestPlanLine(plan)}\n\n${draft}`
-  });
+  savePartRequest(request, plan);
 });
 
 document.querySelectorAll(".model-chip").forEach((chip) => {

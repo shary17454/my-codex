@@ -25,9 +25,10 @@ XCODE_FULL="$(xcodebuild -version)"
 
 EXPECTED_XCODE_VERSION="${EXPECTED_XCODE_VERSION:-26.6}"
 EXPECTED_XCODE_BUILD="${EXPECTED_XCODE_BUILD:-17F113}"
-EXPECTED_MARKETING_VERSION="${EXPECTED_MARKETING_VERSION:-1.9.1}"
-EXPECTED_PROJECT_BUILD="${EXPECTED_PROJECT_BUILD:-77}"
+EXPECTED_MARKETING_VERSION="${EXPECTED_MARKETING_VERSION:-1.1.0}"
+EXPECTED_PROJECT_BUILD="${EXPECTED_PROJECT_BUILD:-92}"
 MIN_IPHONEOS_SDK_MAJOR="${MIN_IPHONEOS_SDK_MAJOR:-26}"
+BATAL_PROJECT_FILE="ios/BatalAlDroob/BatalAlDroob.xcodeproj/project.pbxproj"
 
 if echo "${XCODE_FULL}" | grep -Eiq 'beta'; then
   echo "error: Xcode Cloud is using a beta Xcode. App Store submission must use a production Xcode." >&2
@@ -56,7 +57,13 @@ if [ -n "${SDKROOT:-}" ] && echo "${SDKROOT}" | grep -Eiq 'beta|iPhoneOS(1[0-9]|
   exit 1
 fi
 
-PROJECT_FILE="DesertTrail/DesertTrail.xcodeproj/project.pbxproj"
+if [ -n "${CI_PRODUCT:-}" ] && [ "${CI_PRODUCT}" != "BatalAlDroob" ]; then
+  echo "Skipping Batal Al-Droob version guard for CI_PRODUCT=${CI_PRODUCT}."
+  echo "Xcode toolchain guard passed."
+  exit 0
+fi
+
+PROJECT_FILE="${BATAL_PROJECT_FILE}"
 if [ ! -f "${PROJECT_FILE}" ]; then
   echo "error: Expected project file is missing: ${PROJECT_FILE}" >&2
   exit 1

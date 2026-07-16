@@ -1,36 +1,34 @@
 {
-  "schema_version": 1,
-  "updated_at": "2026-07-02",
-  "customer_paid_requests": [
+  "schema_version": 2,
+  "updated_at": "2026-07-16",
+  "part_request_service": {
+    "is_paid": false,
+    "purchase_product_id": null,
+    "description_ar": "طلبات القطع داخل بطل الدروب تحفظ كمسودات جاهزة للتواصل مع المتاجر ولا تتطلب شراءً داخل التطبيق.",
+    "description_en": "Part requests in Batal Al-Droob are saved as ready-to-send drafts for contacting stores and do not require an in-app purchase."
+  },
+  "available_request_types": [
     {
       "id": "basic",
-      "product_id": "batal.parts.request.basic",
-      "price_sar": 10,
       "title_ar": "طلب عادي",
-      "description_ar": "تجهيز طلب القطعة بصيغة احترافية وإرساله للمتاجر المناسبة."
+      "description_ar": "تجهيز طلب القطعة بصيغة واضحة يمكن نسخها وإرسالها للمتاجر المناسبة."
     },
     {
       "id": "urgent",
-      "product_id": "batal.parts.request.urgent",
-      "price_sar": 20,
       "title_ar": "طلب مستعجل",
-      "description_ar": "أولوية أعلى وصياغة طلب جاهز للواتساب والبريد."
+      "description_ar": "صياغة طلب مختصر ومباشر مناسب للإرسال السريع عبر واتساب أو البريد."
     },
     {
       "id": "rare",
-      "product_id": "batal.parts.request.rare",
-      "price_sar": 50,
       "title_ar": "طلب قطعة نادرة / NOS",
-      "description_ar": "بحث مركز للقطع النادرة، المستعملة الأصلية، أو وكالة قديمة جديدة."
+      "description_ar": "تجهيز وصف أكثر تفصيلًا للقطع النادرة أو المستعملة الأصلية أو وكالة قديمة جديدة."
     }
   ],
-  "app_store_connect_products_to_create": [
-    "batal.parts.request.basic",
-    "batal.parts.request.urgent",
-    "batal.parts.request.rare"
+  "app_store_connect_products": [
+    "batal.catalog.unlock"
   ],
   "policy": {
     "do_not_claim_price_or_availability_without_store_source": true,
-    "customer_fee_covers_request_preparation_not_guaranteed_availability": true
+    "part_request_does_not_unlock_paid_digital_content": true
   }
 }
