@@ -14,7 +14,7 @@ APP_SWIFT = APP_ROOT / "BatalAlDroob" / "AppDelegate.swift"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
 EXPECTED_MARKETING_VERSION = "1.1.0"
-EXPECTED_BUILD = "95"
+EXPECTED_BUILD = "96"
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.unlock"}
 
