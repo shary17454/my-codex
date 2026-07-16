@@ -1,6 +1,6 @@
 # Batal Al-Droob iOS
 
-Native SwiftUI iOS app for Nissan Patrol catalog lookup, fitment evidence, saved part requests, maintenance notes, compass/trip tools, and a protected catalog unlock through Apple In-App Purchase.
+Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence, saved part requests, maintenance notes, compass/trip tools, and a protected catalog unlock through Apple In-App Purchase.
 
 ## Project
 
@@ -11,9 +11,46 @@ Native SwiftUI iOS app for Nissan Patrol catalog lookup, fitment evidence, saved
 - App Store version: `1.1.0`
 - Build: `92`
 
+The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
+
+## Requirements
+
+- Xcode 26.6 stable, build `17F113`
+- Swift 6
+- iOS deployment target 17.0
+- No CocoaPods, Swift Package Manager, or third-party dependency install step
+
+For App Store archives, keep signing managed by Xcode/Xcode Cloud and use Xcode 26.6 build 17F113 or a newer non-beta Xcode accepted by Apple.
+
 ## Build
 
-Use the production Xcode selected for App Store submission:
+Debug simulator build:
+
+```sh
+/Applications/Xcode-26.6-duplicate.app/Contents/Developer/usr/bin/xcodebuild \
+  -project BatalAlDroob.xcodeproj \
+  -scheme BatalAlDroob \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath /tmp/BatalAlDroobDerivedData \
+  build
+```
+
+Release simulator validation:
+
+```sh
+/Applications/Xcode-26.6-duplicate.app/Contents/Developer/usr/bin/xcodebuild \
+  -project BatalAlDroob.xcodeproj \
+  -scheme BatalAlDroob \
+  -configuration Release \
+  -sdk iphonesimulator \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath /tmp/BatalAlDroobReleaseDerivedData \
+  build
+```
+
+Release device validation without local signing:
 
 ```sh
 /Applications/Xcode-26.6-duplicate.app/Contents/Developer/usr/bin/xcodebuild \
@@ -27,7 +64,17 @@ Use the production Xcode selected for App Store submission:
   build
 ```
 
-For App Store archives, keep signing managed by Xcode/Xcode Cloud and use Xcode 26.6 build 17F113 or a newer non-beta Xcode accepted by Apple.
+Run regression tests:
+
+```sh
+/Applications/Xcode-26.6-duplicate.app/Contents/Developer/usr/bin/xcodebuild \
+  test \
+  -project BatalAlDroob.xcodeproj \
+  -scheme BatalAlDroob \
+  -sdk iphonesimulator \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
+  -derivedDataPath /tmp/BatalAlDroobTestDerivedData
+```
 
 ## Xcode Cloud
 
@@ -48,6 +95,4 @@ Only one StoreKit product is referenced by the app:
 
 Part requests are prepared and saved inside the app without a separate purchase product.
 
-## Bundled Data
-
-The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
+If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/data/` and run the regression tests before archiving.

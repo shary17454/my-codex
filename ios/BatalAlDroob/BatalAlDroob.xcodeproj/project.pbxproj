@@ -13,7 +13,19 @@
 		101000000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000004 /* Assets.xcassets */; };
 		101000000000000000000007 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000009 /* data */; };
 		101000000000000000000006 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000008 /* PrivacyInfo.xcprivacy */; };
+		101000000000000000000008 /* BatalCatalogResourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10200000000000000000000A /* BatalCatalogResourceTests.swift */; };
+		101000000000000000000009 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000009 /* data */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		10B000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 108000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 105000000000000000000001;
+			remoteInfo = BatalAlDroob;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		102000000000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -25,10 +37,19 @@
 		102000000000000000000007 /* BatalAlDroob.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BatalAlDroob.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		102000000000000000000008 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		102000000000000000000009 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Web/data; sourceTree = "<group>"; };
+		10200000000000000000000A /* BatalCatalogResourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatalCatalogResourceTests.swift; sourceTree = "<group>"; };
+		10200000000000000000000B /* BatalAlDroobTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BatalAlDroobTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		103000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		103000000000000000000002 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -42,6 +63,7 @@
 			isa = PBXGroup;
 			children = (
 				104000000000000000000002 /* BatalAlDroob */,
+				104000000000000000000004 /* BatalAlDroobTests */,
 				104000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -64,8 +86,17 @@
 			isa = PBXGroup;
 			children = (
 				102000000000000000000007 /* BatalAlDroob.app */,
+				10200000000000000000000B /* BatalAlDroobTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		104000000000000000000004 /* BatalAlDroobTests */ = {
+			isa = PBXGroup;
+			children = (
+				10200000000000000000000A /* BatalCatalogResourceTests.swift */,
+			);
+			path = BatalAlDroobTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -89,6 +120,24 @@
 			productReference = 102000000000000000000007 /* BatalAlDroob.app */;
 			productType = "com.apple.product-type.application";
 		};
+		105000000000000000000002 /* BatalAlDroobTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 109000000000000000000003 /* Build configuration list for PBXNativeTarget "BatalAlDroobTests" */;
+			buildPhases = (
+				106000000000000000000002 /* Sources */,
+				103000000000000000000002 /* Frameworks */,
+				107000000000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				10C000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = BatalAlDroobTests;
+			productName = BatalAlDroobTests;
+			productReference = 10200000000000000000000B /* BatalAlDroobTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -101,6 +150,10 @@
 				TargetAttributes = {
 					105000000000000000000001 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					105000000000000000000002 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 105000000000000000000001;
 					};
 				};
 			};
@@ -119,6 +172,7 @@
 			projectRoot = "";
 			targets = (
 				105000000000000000000001 /* BatalAlDroob */,
+				105000000000000000000002 /* BatalAlDroobTests */,
 			);
 		};
 /* End PBXProject section */
@@ -131,6 +185,14 @@
 				101000000000000000000004 /* Assets.xcassets in Resources */,
 				101000000000000000000007 /* data in Resources */,
 				101000000000000000000006 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		107000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				101000000000000000000009 /* data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,7 +231,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		106000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				101000000000000000000008 /* BatalCatalogResourceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		10C000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 105000000000000000000001 /* BatalAlDroob */;
+			targetProxy = 10B000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		110000000000000000000001 /* Debug */ = {
@@ -332,6 +410,38 @@
 			};
 			name = Release;
 		};
+		110000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 91;
+				DEVELOPMENT_TEAM = 4HM66AD594;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.batalaldroob.parts.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		110000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 91;
+				DEVELOPMENT_TEAM = 4HM66AD594;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.batalaldroob.parts.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -349,6 +459,15 @@
 			buildConfigurations = (
 				110000000000000000000003 /* Debug */,
 				110000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		109000000000000000000003 /* Build configuration list for PBXNativeTarget "BatalAlDroobTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				110000000000000000000005 /* Debug */,
+				110000000000000000000006 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
