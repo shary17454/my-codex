@@ -1,2 +1,2 @@
 [lfs]
-	fetchexclude = data/app_database.sqlite,flutter_y60_catalog/assets/catalog/pdfs/**
+	fetchexclude = StudyVaultApp/**,data/app_database.sqlite,deliverables/**,flutter_y60_catalog/assets/catalog/pdfs/**,output/**,study-saip-saher2030/**
