@@ -1105,6 +1105,23 @@ struct DecisionSummaryCard: View {
         DecisionSummaryService.makeSummary(for: question)
     }
 
+    private var confidencePercent: Int {
+        switch summary.confidenceLevel {
+        case .low: min(49, question.decisionConfidence)
+        case .medium: min(74, max(50, question.decisionConfidence))
+        case .high: max(75, question.decisionConfidence)
+        }
+    }
+
+    private var clarityColor: Color {
+        switch summary.clarity {
+        case .insufficientData: .secondary
+        case .close: .orange
+        case .leaning: .teal
+        case .decisive: .green
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 12) {
@@ -1125,9 +1142,37 @@ struct DecisionSummaryCard: View {
             }
 
             HStack(spacing: 8) {
-                DecisionMetric(title: "الثقة", value: "\(question.decisionConfidence)%", icon: "shield.checkered", color: .teal)
-                DecisionMetric(title: "تجارب", value: "\(question.verifiedComments.count)", icon: "checkmark.seal.fill", color: .green)
-                DecisionMetric(title: "أسباب", value: "\(question.comments.filter { $0.optionID != nil }.count)", icon: "quote.bubble.fill", color: .indigo)
+                DecisionMetric(title: "الثقة", value: "\(confidencePercent)%", icon: "shield.checkered", color: .teal)
+                DecisionMetric(title: "المتصدر", value: "\(summary.leadingVotePercentage)%", icon: "chart.pie.fill", color: .blue)
+                DecisionMetric(title: "الفارق", value: "\(Int(summary.voteGapPercentage.rounded()))%", icon: "arrow.left.and.right", color: .indigo)
+            }
+
+            Label(summary.clarity.arabicTitle, systemImage: summary.clarity.systemImage)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(clarityColor)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(clarityColor.opacity(0.12), in: Capsule())
+
+            if !summary.highlights.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("أبرز ما تقوله النتيجة")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.secondary)
+                    ForEach(summary.highlights) { highlight in
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(highlight.title)
+                                .font(.subheadline.weight(.bold))
+                            Text(highlight.details)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                    }
+                }
             }
 
             if let warning = summary.warningText {
@@ -1139,13 +1184,16 @@ struct DecisionSummaryCard: View {
                     .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
             }
 
-            if !question.repeatedCons.isEmpty {
+            if !summary.optionInsights.isEmpty {
                 Divider()
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("العيوب المتكررة", systemImage: "exclamationmark.triangle.fill")
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("تحليل الأسباب حسب الخيار", systemImage: "list.bullet.clipboard")
                         .font(.caption.weight(.bold))
-                        .foregroundStyle(.orange)
-                    FlowTags(values: question.repeatedCons, color: .orange)
+                        .foregroundStyle(.teal)
+
+                    ForEach(summary.optionInsights) { insight in
+                        OptionInsightView(insight: insight)
+                    }
                 }
             }
         }
@@ -1155,6 +1203,66 @@ struct DecisionSummaryCard: View {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(.teal.opacity(0.25), lineWidth: 1)
         )
+    }
+}
+
+struct OptionInsightView: View {
+    let insight: OptionDecisionInsight
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(insight.optionTitle)
+                    .font(.subheadline.weight(.bold))
+                Spacer()
+                Text("\(insight.votePercentage)%")
+                    .font(.caption.monospacedDigit().weight(.bold))
+                    .foregroundStyle(.secondary)
+            }
+
+            if !insight.topReasons.isEmpty {
+                FlowTags(values: Array(insight.topReasons.prefix(3)), color: .teal)
+            }
+
+            HStack(alignment: .top, spacing: 8) {
+                if !insight.positives.isEmpty {
+                    InsightList(title: "إيجابيات", values: insight.positives, color: .green, icon: "plus.circle.fill")
+                }
+                if !insight.negatives.isEmpty {
+                    InsightList(title: "سلبيات", values: insight.negatives, color: .orange, icon: "minus.circle.fill")
+                }
+            }
+
+            if insight.evidenceCount == 0 {
+                Text("لا توجد أسباب مكتوبة كافية لهذا الخيار بعد.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(10)
+        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct InsightList: View {
+    let title: String
+    let values: [String]
+    let color: Color
+    let icon: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Label(title, systemImage: icon)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(color)
+            ForEach(values.prefix(3), id: \.self) { value in
+                Text(value)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

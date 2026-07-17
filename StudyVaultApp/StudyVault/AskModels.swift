@@ -835,6 +835,14 @@ enum DecisionConfidenceLevel: String, Codable {
         case .high: "عالية"
         }
     }
+
+    var percentageRange: ClosedRange<Int> {
+        switch self {
+        case .low: 0...49
+        case .medium: 50...74
+        case .high: 75...100
+        }
+    }
 }
 
 struct DecisionHighlight: Identifiable, Codable {
@@ -844,12 +852,51 @@ struct DecisionHighlight: Identifiable, Codable {
     let details: String
 }
 
+enum DecisionClarity: String, Codable {
+    case insufficientData
+    case close
+    case leaning
+    case decisive
+
+    var arabicTitle: String {
+        switch self {
+        case .insufficientData: "لا توجد بيانات كافية"
+        case .close: "النتيجة متقاربة"
+        case .leaning: "يميل الناس لخيار"
+        case .decisive: "يوجد فائز واضح"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .insufficientData: "chart.bar.doc.horizontal"
+        case .close: "equal.circle"
+        case .leaning: "arrow.up.forward.circle"
+        case .decisive: "checkmark.seal"
+        }
+    }
+}
+
+struct OptionDecisionInsight: Identifiable, Codable, Hashable {
+    let id: UUID
+    let optionID: UUID
+    let optionTitle: String
+    let votePercentage: Int
+    let topReasons: [String]
+    let positives: [String]
+    let negatives: [String]
+    let evidenceCount: Int
+}
+
 struct DecisionSummary: Codable {
     let winningOptionID: UUID?
     let confidenceLevel: DecisionConfidenceLevel
     let totalVotes: Int
     let voteGapPercentage: Double
+    let leadingVotePercentage: Int
+    let clarity: DecisionClarity
     let highlights: [DecisionHighlight]
+    let optionInsights: [OptionDecisionInsight]
     let recommendationText: String
     let warningText: String?
 }
@@ -1104,6 +1151,7 @@ enum DecisionSummaryService {
         let winner = sorted.first
         let runnerUp = sorted.dropFirst().first
         let totalVotes = question.totalVotes
+        let leadingPercentage = winner.map { votePercentage(option: $0, totalVotes: totalVotes) } ?? 0
         let gap: Double
         if let winner, let runnerUp, totalVotes > 0 {
             gap = (Double(winner.votes - runnerUp.votes) / Double(totalVotes)) * 100
@@ -1120,10 +1168,26 @@ enum DecisionSummaryService {
             confidence = .high
         }
 
+        let clarity: DecisionClarity
+        if totalVotes < 10 {
+            clarity = .insufficientData
+        } else if gap < 5 {
+            clarity = .close
+        } else if gap >= 18 && totalVotes >= 25 {
+            clarity = .decisive
+        } else {
+            clarity = .leaning
+        }
+
+        let optionInsights = sorted.map { option in
+            makeOptionInsight(for: option, in: question)
+        }
+
         let recommendation: String
         if let winner, totalVotes > 0 {
-            let percent = Int((Double(winner.votes) / Double(max(totalVotes, 1))) * 100)
-            recommendation = "يميل المصوتون إلى \(winner.title) بنسبة \(percent)%. راجع الأسباب ونقاط القوة قبل اتخاذ القرار النهائي."
+            let reasons = optionInsights.first { $0.optionID == winner.id }?.topReasons.prefix(2).joined(separator: " و") ?? ""
+            let reasonSuffix = reasons.isEmpty ? "لكن الأسباب المكتوبة ما زالت محدودة." : "وأكثر ما يدعم هذا الاتجاه: \(reasons)."
+            recommendation = "يميل المصوتون إلى \(winner.title) بنسبة \(leadingPercentage)%. \(reasonSuffix) لا تعتبرها حقيقة مطلقة؛ طابقها مع احتياجك قبل القرار."
         } else {
             recommendation = "النتيجة غير حاسمة بعد. أضف تصويتات وأسبابًا حتى يظهر اتجاه أوضح."
         }
@@ -1138,11 +1202,16 @@ enum DecisionSummaryService {
         }
 
         let highlights = sorted.prefix(3).map { option in
-            DecisionHighlight(
+            let insight = optionInsights.first { $0.optionID == option.id }
+            let reasons = insight?.topReasons.prefix(2).joined(separator: "، ") ?? ""
+            let detail = reasons.isEmpty
+                ? "\(option.votes) صوت، ولا توجد أسباب كافية بعد لهذا الخيار."
+                : "\(option.votes) صوت، وأبرز الأسباب: \(reasons)."
+            return DecisionHighlight(
                 id: UUID(),
                 optionID: option.id,
                 title: option.title,
-                details: "\(option.votes) صوت، مع مراجعة الأسباب المكتوبة لمعرفة الملاءمة الفعلية."
+                details: detail
             )
         }
 
@@ -1151,10 +1220,71 @@ enum DecisionSummaryService {
             confidenceLevel: confidence,
             totalVotes: totalVotes,
             voteGapPercentage: gap,
+            leadingVotePercentage: leadingPercentage,
+            clarity: clarity,
             highlights: highlights,
+            optionInsights: optionInsights,
             recommendationText: recommendation,
             warningText: warning
         )
+    }
+
+    private static func makeOptionInsight(for option: PollOption, in question: AskQuestion) -> OptionDecisionInsight {
+        let relatedComments = question.comments.filter { comment in
+            comment.optionID == option.id || comment.optionTitle == option.title
+        }
+        let topReasons = rankedReasons(from: relatedComments, category: question.category)
+        let positives = rankedKeywords(
+            from: relatedComments,
+            keywords: ["جودة", "سعر", "ضمان", "بطارية", "كاميرا", "راحة", "اعتمادية", "خدمة", "عملي", "قيمة", "أداء", "توفير"]
+        )
+        let negatives = rankedKeywords(
+            from: relatedComments,
+            keywords: ["غالي", "صيانة", "استهلاك", "ضعيف", "بطء", "حرارة", "قطع", "زحمة", "عيب", "تأخير", "وزن", "محدود"]
+        )
+
+        return OptionDecisionInsight(
+            id: UUID(),
+            optionID: option.id,
+            optionTitle: option.title,
+            votePercentage: votePercentage(option: option, totalVotes: question.totalVotes),
+            topReasons: topReasons,
+            positives: positives,
+            negatives: negatives,
+            evidenceCount: relatedComments.count
+        )
+    }
+
+    private static func votePercentage(option: PollOption, totalVotes: Int) -> Int {
+        guard totalVotes > 0 else { return 0 }
+        return Int((Double(option.votes) / Double(totalVotes)) * 100)
+    }
+
+    private static func rankedReasons(from comments: [AskComment], category: AskCategory) -> [String] {
+        let explicitReasons = comments.compactMap { $0.reasonCategory?.trimmingCharacters(in: .whitespacesAndNewlines) }
+        var counts = Dictionary(grouping: explicitReasons.filter { !$0.isEmpty }, by: { $0 }).mapValues(\.count)
+
+        let fallbackReasons = DecisionFeatureCatalog.voteReasons(for: category)
+        let blob = comments.map(\.text).joined(separator: " ")
+        for reason in fallbackReasons where blob.localizedCaseInsensitiveContains(reason) {
+            counts[reason, default: 0] += 1
+        }
+
+        return counts.sorted { lhs, rhs in
+            if lhs.value == rhs.value {
+                return lhs.key < rhs.key
+            }
+            return lhs.value > rhs.value
+        }
+        .map(\.key)
+    }
+
+    private static func rankedKeywords(from comments: [AskComment], keywords: [String]) -> [String] {
+        let blob = comments.map { [$0.text, $0.reasonCategory ?? ""].joined(separator: " ") }.joined(separator: " ")
+        return keywords
+            .filter { blob.localizedCaseInsensitiveContains($0) }
+            .prefix(4)
+            .map { $0 }
     }
 }
 
