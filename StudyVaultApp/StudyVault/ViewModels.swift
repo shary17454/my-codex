@@ -58,6 +58,39 @@ final class HomeViewModel {
         )
     }
 
+    func relatedQuestions(to question: AskQuestion, limit: Int = 4) -> [AskQuestion] {
+        let sourceTokens = Set(
+            KnowledgeSearchIndex.normalize(([question.title, question.details] + question.options.map(\.title)).joined(separator: " "))
+                .split(separator: " ")
+                .map(String.init)
+                .filter { $0.count > 2 }
+        )
+
+        return questions
+            .filter { $0.id != question.id }
+            .map { candidate in
+                let candidateTokens = Set(
+                    KnowledgeSearchIndex.normalize(([candidate.title, candidate.details] + candidate.options.map(\.title)).joined(separator: " "))
+                        .split(separator: " ")
+                        .map(String.init)
+                        .filter { $0.count > 2 }
+                )
+                let sharedTokens = sourceTokens.intersection(candidateTokens).count
+                let categoryScore = candidate.category == question.category ? 8 : 0
+                let voteScore = min(candidate.totalVotes / 10, 6)
+                return (question: candidate, score: sharedTokens + categoryScore + voteScore)
+            }
+            .filter { $0.score > 0 }
+            .sorted { lhs, rhs in
+                if lhs.score == rhs.score {
+                    return lhs.question.totalVotes > rhs.question.totalVotes
+                }
+                return lhs.score > rhs.score
+            }
+            .prefix(limit)
+            .map(\.question)
+    }
+
     func loadSavedQuestionIDs() async {
         savedQuestionIDs = (try? await LocalBookmarkRepository.shared.fetchSavedComparisonIDs()) ?? []
     }

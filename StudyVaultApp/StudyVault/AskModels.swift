@@ -1341,6 +1341,69 @@ enum ComparisonScoringService {
     }
 }
 
+struct ComparisonSpecificationRow: Identifiable, Hashable {
+    let id = UUID()
+    let criterion: String
+    let values: [UUID: String]
+    let leadingOptionID: UUID?
+}
+
+enum ComparisonSpecificationService {
+    static func rows(for question: AskQuestion) -> [ComparisonSpecificationRow] {
+        DecisionFeatureCatalog.criteria(for: question.category).prefix(6).map { criterion in
+            let scoredOptions = question.options.map { option in
+                (option: option, score: score(option: option, criterion: criterion, question: question))
+            }
+            let best = scoredOptions.max { $0.score < $1.score }?.option.id
+            let values = Dictionary(uniqueKeysWithValues: scoredOptions.map { item in
+                (item.option.id, label(for: item.score))
+            })
+
+            return ComparisonSpecificationRow(
+                criterion: criterion,
+                values: values,
+                leadingOptionID: best
+            )
+        }
+    }
+
+    private static func score(option: PollOption, criterion: String, question: AskQuestion) -> Int {
+        let relatedComments = question.comments.filter { $0.optionID == option.id || $0.optionTitle == option.title }
+        let evidence = KnowledgeSearchIndex.normalize(
+            ([option.title, criterion] + relatedComments.flatMap { [$0.text, $0.reasonCategory ?? ""] })
+                .joined(separator: " ")
+        )
+
+        var score = 50
+        if question.totalVotes > 0 {
+            score += Int((Double(option.votes) / Double(question.totalVotes)) * 25)
+        }
+        if evidence.contains(KnowledgeSearchIndex.normalize(criterion)) {
+            score += 14
+        }
+        if evidence.contains("افضل") || evidence.contains("اعلي") || evidence.contains("اقوي") || evidence.contains("ممتاز") {
+            score += 8
+        }
+        if evidence.contains("غالي") || evidence.contains("ضعيف") || evidence.contains("عيب") || evidence.contains("تاخير") {
+            score -= 10
+        }
+        return min(100, max(0, score))
+    }
+
+    private static func label(for score: Int) -> String {
+        switch score {
+        case 82...100:
+            return "قوي جدًا"
+        case 68..<82:
+            return "قوي"
+        case 52..<68:
+            return "متوسط"
+        default:
+            return "يحتاج آراء"
+        }
+    }
+}
+
 enum ComparisonTemplateLibrary {
     static let quickPrompts: [String] = [
         "آيفون أم سامسونج؟",

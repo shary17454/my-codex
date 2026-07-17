@@ -166,12 +166,16 @@ struct ContentView: View {
             NavigationStack {
                 QuestionDetail(
                     question: question,
+                    relatedQuestions: homeViewModel.relatedQuestions(to: question),
                     voteAction: vote,
                     voteWithReasonAction: voteWithReason,
                     commentAction: addComment,
                     authorName: userSession.publicName,
                     isSaved: homeViewModel.savedQuestionIDs.contains(question.id),
-                    saveAction: toggleSavedQuestion
+                    saveAction: toggleSavedQuestion,
+                    openRelatedQuestion: { related in
+                        selectedQuestion = related
+                    }
                 )
             }
             .environment(\.layoutDirection, .rightToLeft)
@@ -728,12 +732,14 @@ struct WebView: UIViewRepresentable {
 
 struct QuestionDetail: View {
     let question: AskQuestion
+    let relatedQuestions: [AskQuestion]
     let voteAction: (AskQuestion.ID, PollOption.ID) -> Void
     let voteWithReasonAction: (AskQuestion.ID, PollOption.ID, String, String?, Bool) -> Void
     let commentAction: (AskQuestion.ID, String) -> Void
     let authorName: String
     let isSaved: Bool
     let saveAction: (AskQuestion.ID) -> Void
+    let openRelatedQuestion: (AskQuestion) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var commentText = ""
@@ -798,6 +804,7 @@ struct QuestionDetail: View {
 
                 if decisionMode == .deep {
                     DecisionCriteriaCard(category: question.category)
+                    SpecificationComparisonCard(question: question)
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -846,6 +853,10 @@ struct QuestionDetail: View {
                 }
 
                 SavedDecisionCard(selection: $savedDecisionState, shareText: shareText)
+
+                if !relatedQuestions.isEmpty {
+                    SimilarQuestionsCard(questions: relatedQuestions, openQuestion: openRelatedQuestion)
+                }
 
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
@@ -1313,6 +1324,81 @@ struct DecisionCriteriaCard: View {
     }
 }
 
+struct SpecificationComparisonCard: View {
+    let question: AskQuestion
+
+    private var rows: [ComparisonSpecificationRow] {
+        ComparisonSpecificationService.rows(for: question)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("جدول المواصفات", systemImage: "tablecells")
+                    .font(.headline)
+                Spacer()
+                Text("\(question.options.count) خيارات")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.teal)
+            }
+
+            Text("تقييم إرشادي يجمع بين التصويت والأسباب المكتوبة حسب معايير هذا التصنيف. لا يغني عن قراءة التفاصيل.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 10) {
+                    GridRow {
+                        Text("المعيار")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.secondary)
+                            .frame(minWidth: 90, alignment: .leading)
+                        ForEach(question.options) { option in
+                            Text(option.title)
+                                .font(.caption.weight(.bold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                                .frame(width: 105, alignment: .leading)
+                        }
+                    }
+
+                    ForEach(rows) { row in
+                        GridRow {
+                            Text(row.criterion)
+                                .font(.caption.weight(.bold))
+                                .frame(minWidth: 90, alignment: .leading)
+                            ForEach(question.options) { option in
+                                SpecValueLabel(
+                                    value: row.values[option.id] ?? "غير واضح",
+                                    isLeading: row.leadingOptionID == option.id
+                                )
+                                .frame(width: 105, alignment: .leading)
+                            }
+                        }
+                    }
+                }
+                .padding(10)
+                .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+            }
+        }
+        .padding()
+        .background(.background, in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+struct SpecValueLabel: View {
+    let value: String
+    let isLeading: Bool
+
+    var body: some View {
+        Label(value, systemImage: isLeading ? "checkmark.seal.fill" : "circle")
+            .font(.caption2.weight(.semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .foregroundStyle(isLeading ? .teal : .secondary)
+    }
+}
+
 struct SavedDecisionCard: View {
     @Binding var selection: SavedDecisionState
     let shareText: String
@@ -1345,6 +1431,54 @@ struct SavedDecisionCard: View {
                     .foregroundStyle(selection == state ? .white : .primary)
                     .background(selection == state ? Color.teal : Color.secondary.opacity(0.12), in: Capsule())
                 }
+            }
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+}
+
+struct SimilarQuestionsCard: View {
+    let questions: [AskQuestion]
+    let openQuestion: (AskQuestion) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("مقارنات مشابهة", systemImage: "rectangle.stack.badge.plus")
+                    .font(.headline)
+                Spacer()
+                Text("تجنب التكرار")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+            }
+
+            ForEach(questions) { question in
+                Button {
+                    openQuestion(question)
+                } label: {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: question.category.systemImage)
+                            .foregroundStyle(.teal)
+                            .frame(width: 30, height: 30)
+                            .background(Color.teal.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(question.title)
+                                .font(.subheadline.weight(.bold))
+                                .lineLimit(2)
+                            Text("\(question.totalVotes) تصويت • \(question.comments.count) سبب أو تعليق")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.backward")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(10)
+                    .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
             }
         }
         .padding()
