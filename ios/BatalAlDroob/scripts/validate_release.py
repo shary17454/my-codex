@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import plistlib
 import re
 import sys
 from pathlib import Path
@@ -14,8 +15,13 @@ APP_SWIFT = APP_ROOT / "BatalAlDroob" / "AppDelegate.swift"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
 EXPECTED_MARKETING_VERSION = "1.1.0"
-EXPECTED_BUILD = "96"
+MIN_EXPECTED_BUILD = 105
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
+EXPECTED_PROJECT_BUNDLE_IDS = {
+    "com.batalaldroob.parts",
+    "com.batalaldroob.parts.tests",
+}
+EXPECTED_DEPLOYMENT_TARGET = "17.0"
 ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.unlock"}
 
 
@@ -30,7 +36,8 @@ def unique_setting_values(project_text: str, key: str) -> set[str]:
 
 def main() -> None:
     project_text = PROJECT.read_text(encoding="utf-8")
-    info_text = INFO_PLIST.read_text(encoding="utf-8")
+    with INFO_PLIST.open("rb") as stream:
+        info = plistlib.load(stream)
     app_text = APP_SWIFT.read_text(encoding="utf-8")
     web_text = "\n".join(
         path.read_text(encoding="utf-8")
@@ -41,18 +48,43 @@ def main() -> None:
     marketing_values = unique_setting_values(project_text, "MARKETING_VERSION")
     build_values = unique_setting_values(project_text, "CURRENT_PROJECT_VERSION")
     bundle_values = unique_setting_values(project_text, "PRODUCT_BUNDLE_IDENTIFIER")
+    deployment_values = unique_setting_values(project_text, "IPHONEOS_DEPLOYMENT_TARGET")
+    sdkroot_values = unique_setting_values(project_text, "SDKROOT")
 
     if marketing_values != {EXPECTED_MARKETING_VERSION}:
         fail(f"MARKETING_VERSION must be {EXPECTED_MARKETING_VERSION}; found {sorted(marketing_values)}")
-    if build_values != {EXPECTED_BUILD}:
-        fail(f"CURRENT_PROJECT_VERSION must be {EXPECTED_BUILD}; found {sorted(build_values)}")
-    if EXPECTED_BUNDLE_ID not in bundle_values:
-        fail(f"Expected bundle id {EXPECTED_BUNDLE_ID}; found {sorted(bundle_values)}")
+    if len(build_values) != 1:
+        fail(f"CURRENT_PROJECT_VERSION must be unified; found {sorted(build_values)}")
+    build_value = next(iter(build_values))
+    if not build_value.isdigit() or int(build_value) < MIN_EXPECTED_BUILD:
+        fail(f"CURRENT_PROJECT_VERSION must be numeric and >= {MIN_EXPECTED_BUILD}; found {build_value}")
+    if bundle_values != EXPECTED_PROJECT_BUNDLE_IDS:
+        fail(f"Unexpected project bundle ids; found {sorted(bundle_values)}")
+    if deployment_values != {EXPECTED_DEPLOYMENT_TARGET}:
+        fail(f"IPHONEOS_DEPLOYMENT_TARGET must remain {EXPECTED_DEPLOYMENT_TARGET}; found {sorted(deployment_values)}")
+    if sdkroot_values != {"iphoneos"}:
+        fail(f"SDKROOT must be iphoneos; found {sorted(sdkroot_values)}")
 
-    if "$(MARKETING_VERSION)" not in info_text:
+    if info.get("CFBundleIdentifier") != "$(PRODUCT_BUNDLE_IDENTIFIER)":
+        fail("Info.plist must derive CFBundleIdentifier from PRODUCT_BUNDLE_IDENTIFIER")
+    if info.get("CFBundleShortVersionString") != "$(MARKETING_VERSION)":
         fail("Info.plist must derive CFBundleShortVersionString from MARKETING_VERSION")
-    if "$(CURRENT_PROJECT_VERSION)" not in info_text:
+    if info.get("CFBundleVersion") != "$(CURRENT_PROJECT_VERSION)":
         fail("Info.plist must derive CFBundleVersion from CURRENT_PROJECT_VERSION")
+
+    forbidden_version_mutators = [
+        r"\bagvtool\b",
+        r"PlistBuddy.*\bSet\b.*CFBundle(?:ShortVersionString|Version)",
+        r"defaults\s+write.*CFBundle(?:ShortVersionString|Version)",
+    ]
+    ci_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (ROOT / "ci_scripts").glob("*.sh")
+        if path.is_file()
+    )
+    for pattern in forbidden_version_mutators:
+        if re.search(pattern, ci_text, flags=re.IGNORECASE):
+            fail(f"CI must not mutate app version or build using pattern: {pattern}")
 
     product_ids = set(re.findall(r'"(batal\.[a-zA-Z0-9_.-]+)"', app_text + "\n" + web_text))
     unexpected_products = {pid for pid in product_ids if pid.startswith("batal.")} - ALLOWED_STOREKIT_PRODUCTS

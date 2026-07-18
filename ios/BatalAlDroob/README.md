@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `1.1.0`
-- Build: `96`
+- Next build: `105`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -83,9 +83,14 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
 - verifies `MARKETING_VERSION = 1.1.0`,
-- verifies `CURRENT_PROJECT_VERSION = 96`.
+- verifies `CURRENT_PROJECT_VERSION >= 105`,
+- rejects beta Xcode and SDKs below iPhoneOS 26.5.
+
+After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
+
+Before starting a new App Store build, set Xcode Cloud > Workflow > Next Build Number to `105` or higher. Build `104` has already been used, so do not reuse it.
 
 ## In-App Purchase
 
@@ -96,3 +101,7 @@ Only one StoreKit product is referenced by the app:
 Part requests are prepared and saved inside the app without a separate purchase product.
 
 If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/data/` and run the regression tests before archiving.
+
+## Supplier Partnerships
+
+Supplier and outreach research for Nissan Patrol parts providers is tracked in `Partnerships/`. Do not send outreach or mark a supplier as approved without human review and written permission.

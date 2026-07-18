@@ -1,46 +1,40 @@
 # Repository Notes
 
-## Structure
+## Current Scope
 
-- `DesertTrail/` contains the native iOS app for تطبيق الدروب only.
-- `DesertTrail/DesertTrail.xcodeproj` is the Xcode project.
-- `DesertTrail/DesertTrail/` contains the SwiftUI app, models, services, and views.
-- `DesertTrail/DesertTrail/Resources/` contains bundled GPX and image resources.
-- `ci_scripts/` contains Xcode Cloud scripts for this app.
+- Work on `ios/BatalAlDroob/` only for تطبيق بطل الدروب.
+- App Store Connect app ID: `6786117376`.
+- Bundle ID: `com.batalaldroob.parts`.
+- Xcode project: `ios/BatalAlDroob/BatalAlDroob.xcodeproj`.
+- Scheme: `BatalAlDroob`.
+- Shared Xcode Cloud script: `ci_scripts/ci_post_clone.sh`.
 
 ## Build
 
-Use the installed stable Xcode used by Xcode Cloud:
+Use the production Xcode selected in Xcode Cloud. For App Store builds, the workflow must use Xcode `26.6` build `17F113` or a newer non-beta Xcode accepted by Apple.
+
+Local validation can use:
 
 ```sh
-/Applications/Xcode-26.6-duplicate.app/Contents/Developer/usr/bin/xcodebuild \
-  -project DesertTrail/DesertTrail.xcodeproj \
-  -scheme DesertTrail \
-  -configuration Debug \
-  -sdk iphonesimulator \
-  -destination 'generic/platform=iOS Simulator' \
-  -derivedDataPath /tmp/DesertTrailDerivedData \
-  build
-```
-
-Release simulator validation:
-
-```sh
-/Applications/Xcode-26.6-duplicate.app/Contents/Developer/usr/bin/xcodebuild \
-  -project DesertTrail/DesertTrail.xcodeproj \
-  -scheme DesertTrail \
+xcodebuild -project ios/BatalAlDroob/BatalAlDroob.xcodeproj \
+  -scheme BatalAlDroob \
   -configuration Release \
   -sdk iphonesimulator \
   -destination 'generic/platform=iOS Simulator' \
-  -derivedDataPath /tmp/DesertTrailReleaseDerivedData \
+  -derivedDataPath /tmp/BatalAlDroobReleaseDerivedData \
   build
+```
+
+Release settings check:
+
+```sh
+python3 ios/BatalAlDroob/scripts/validate_release.py
 ```
 
 ## Constraints
 
-- Work on تطبيق الدروب only. Do not modify any other app or project path.
-- Do not change bundle identifier, signing team, certificates, provisioning profiles, or entitlements unless explicitly requested.
-- Do not remove bundled route/map data without confirming feature impact.
-- Do not add third-party dependencies unless there is a documented need.
+- Do not modify other apps in this repository unless the user explicitly asks.
+- Do not change Bundle ID, Development Team, signing, certificates, provisioning profiles, entitlements, or capabilities.
+- Do not upload to App Store Connect or submit for review unless explicitly requested in the current turn.
 - Do not commit generated build outputs, archives, DerivedData, or `.xcresult` bundles.
-- Preserve existing UserDefaults keys because they store trips, hidden places, language, and sharing preferences.
+- Keep `Info.plist` deriving `CFBundleShortVersionString` and `CFBundleVersion` from Xcode build settings.

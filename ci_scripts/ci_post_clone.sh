@@ -8,6 +8,9 @@ echo "Workflow: ${CI_WORKFLOW:-unknown}"
 echo "CI_XCODE_PROJECT: ${CI_XCODE_PROJECT:-unset}"
 echo "CI_XCODE_WORKSPACE: ${CI_XCODE_WORKSPACE:-unset}"
 echo "CI_PRODUCT: ${CI_PRODUCT:-unset}"
+echo "CI_BUNDLE_ID: ${CI_BUNDLE_ID:-unset}"
+echo "CI_PROJECT_FILE_PATH: ${CI_PROJECT_FILE_PATH:-unset}"
+echo "CI_COMMIT: ${CI_COMMIT:-$(git rev-parse HEAD 2>/dev/null || echo unknown)}"
 echo "CI_BUILD_NUMBER: ${CI_BUILD_NUMBER:-unset}"
 
 echo "== Toolchain =="
@@ -26,9 +29,25 @@ XCODE_FULL="$(xcodebuild -version)"
 EXPECTED_XCODE_VERSION="${EXPECTED_XCODE_VERSION:-26.6}"
 EXPECTED_XCODE_BUILD="${EXPECTED_XCODE_BUILD:-17F113}"
 EXPECTED_MARKETING_VERSION="${EXPECTED_MARKETING_VERSION:-1.1.0}"
-EXPECTED_PROJECT_BUILD="${EXPECTED_PROJECT_BUILD:-96}"
+MIN_PROJECT_BUILD="${MIN_PROJECT_BUILD:-105}"
 MIN_IPHONEOS_SDK_MAJOR="${MIN_IPHONEOS_SDK_MAJOR:-26}"
+MIN_IPHONEOS_SDK_MINOR="${MIN_IPHONEOS_SDK_MINOR:-5}"
+BATAL_BUNDLE_ID="com.batalaldroob.parts"
 BATAL_PROJECT_FILE="ios/BatalAlDroob/BatalAlDroob.xcodeproj/project.pbxproj"
+
+IS_BATAL_BUILD="false"
+if [ "${BATAL_RELEASE_GUARD:-0}" = "1" ] || [ "${CI_BUNDLE_ID:-}" = "${BATAL_BUNDLE_ID}" ] || [ "${CI_PRODUCT:-}" = "BatalAlDroob" ]; then
+  IS_BATAL_BUILD="true"
+elif [ -n "${CI_PROJECT_FILE_PATH:-}" ] && echo "${CI_PROJECT_FILE_PATH}" | grep -Eq '(^|/)BatalAlDroob\.xcodeproj$'; then
+  IS_BATAL_BUILD="true"
+elif [ -n "${CI_XCODE_PROJECT:-}" ] && echo "${CI_XCODE_PROJECT}" | grep -Eq '(^|/)BatalAlDroob(\.xcodeproj)?$'; then
+  IS_BATAL_BUILD="true"
+fi
+
+if [ "${IS_BATAL_BUILD}" != "true" ]; then
+  echo "Skipping Batal Al-Droob release guard for bundle ${CI_BUNDLE_ID:-unset} and product ${CI_PRODUCT:-unset}."
+  exit 0
+fi
 
 if echo "${XCODE_FULL}" | grep -Eiq 'beta'; then
   echo "error: Xcode Cloud is using a beta Xcode. App Store submission must use a production Xcode." >&2
@@ -47,20 +66,19 @@ if [ "${XCODE_VERSION}" != "${EXPECTED_XCODE_VERSION}" ] || [ "${XCODE_BUILD}" !
 fi
 
 SDK_MAJOR="${SDK_VERSION%%.*}"
+SDK_MINOR="$(echo "${SDK_VERSION}" | awk -F. '{print $2 + 0}')"
 if [ -z "${SDK_MAJOR}" ] || [ "${SDK_MAJOR}" -lt "${MIN_IPHONEOS_SDK_MAJOR}" ]; then
   echo "error: iPhoneOS SDK ${SDK_VERSION} is below required major ${MIN_IPHONEOS_SDK_MAJOR}." >&2
+  exit 1
+fi
+if [ "${SDK_MAJOR}" = "${MIN_IPHONEOS_SDK_MAJOR}" ] && [ "${SDK_MINOR}" -lt "${MIN_IPHONEOS_SDK_MINOR}" ]; then
+  echo "error: iPhoneOS SDK ${SDK_VERSION} is below required ${MIN_IPHONEOS_SDK_MAJOR}.${MIN_IPHONEOS_SDK_MINOR}." >&2
   exit 1
 fi
 
 if [ -n "${SDKROOT:-}" ] && echo "${SDKROOT}" | grep -Eiq 'beta|iPhoneOS(1[0-9]|2[0-5])\.'; then
   echo "error: SDKROOT appears pinned to an unsupported or beta SDK: ${SDKROOT}" >&2
   exit 1
-fi
-
-if [ -n "${CI_PRODUCT:-}" ] && [ "${CI_PRODUCT}" != "BatalAlDroob" ]; then
-  echo "Skipping Batal Al-Droob version guard for CI_PRODUCT=${CI_PRODUCT}."
-  echo "Xcode toolchain guard passed."
-  exit 0
 fi
 
 PROJECT_FILE="${BATAL_PROJECT_FILE}"
@@ -88,10 +106,27 @@ if [ "${MARKETING_VALUES% }" != "${EXPECTED_MARKETING_VERSION}" ]; then
   echo "error: MARKETING_VERSION must be ${EXPECTED_MARKETING_VERSION} for this release train. Found: ${MARKETING_VALUES}" >&2
   exit 1
 fi
-if [ "${BUILD_VALUES% }" != "${EXPECTED_PROJECT_BUILD}" ]; then
-  echo "error: CURRENT_PROJECT_VERSION must be ${EXPECTED_PROJECT_BUILD} before Xcode Cloud archive. Found: ${BUILD_VALUES}" >&2
-  echo "If Xcode Cloud uses Next Build Number, set it to ${EXPECTED_PROJECT_BUILD} or higher and keep project values synchronized." >&2
+PROJECT_BUILD_VALUE="${BUILD_VALUES% }"
+if ! echo "${PROJECT_BUILD_VALUE}" | grep -Eq '^[0-9]+$'; then
+  echo "error: CURRENT_PROJECT_VERSION must be a numeric build number. Found: ${PROJECT_BUILD_VALUE}" >&2
   exit 1
+fi
+if [ "${PROJECT_BUILD_VALUE}" -lt "${MIN_PROJECT_BUILD}" ]; then
+  echo "error: CURRENT_PROJECT_VERSION must be ${MIN_PROJECT_BUILD} or higher before Xcode Cloud archive. Found: ${PROJECT_BUILD_VALUE}" >&2
+  echo "Set Xcode Cloud Next Build Number to ${MIN_PROJECT_BUILD} or higher and keep project values synchronized." >&2
+  exit 1
+fi
+
+if [ -n "${CI_BUILD_NUMBER:-}" ]; then
+  if ! echo "${CI_BUILD_NUMBER}" | grep -Eq '^[0-9]+$'; then
+    echo "error: Xcode Cloud CI_BUILD_NUMBER must be numeric. Found: ${CI_BUILD_NUMBER}" >&2
+    exit 1
+  fi
+  if [ "${CI_BUILD_NUMBER}" -lt "${MIN_PROJECT_BUILD}" ]; then
+    echo "error: Xcode Cloud Next Build Number must be ${MIN_PROJECT_BUILD} or higher. Found: ${CI_BUILD_NUMBER}" >&2
+    echo "Manual step: App Store Connect > Batal Al-Droob > Xcode Cloud > Workflow > Edit > Next Build Number." >&2
+    exit 1
+  fi
 fi
 
 echo "Xcode Cloud release guard passed."
