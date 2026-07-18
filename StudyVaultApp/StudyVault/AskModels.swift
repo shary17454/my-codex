@@ -216,6 +216,71 @@ enum CommentFilter: String, CaseIterable, Identifiable {
     }
 }
 
+enum QuestionSortMode: String, CaseIterable, Identifiable {
+    case newest
+    case mostVoted
+    case mostDiscussed
+    case clearestDecision
+    case closeResults
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .newest: "الأحدث"
+        case .mostVoted: "الأكثر تصويتًا"
+        case .mostDiscussed: "الأكثر نقاشًا"
+        case .clearestDecision: "الأوضح قرارًا"
+        case .closeResults: "النتائج المتقاربة"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .newest: "clock"
+        case .mostVoted: "chart.bar.fill"
+        case .mostDiscussed: "text.bubble.fill"
+        case .clearestDecision: "checkmark.seal.fill"
+        case .closeResults: "equal.circle.fill"
+        }
+    }
+}
+
+enum VoteDurationOption: Int, CaseIterable, Identifiable, Codable {
+    case oneDay = 1
+    case threeDays = 3
+    case oneWeek = 7
+    case twoWeeks = 14
+    case open = 0
+
+    var id: Int { rawValue }
+
+    var title: String {
+        switch self {
+        case .oneDay: "يوم واحد"
+        case .threeDays: "3 أيام"
+        case .oneWeek: "أسبوع"
+        case .twoWeeks: "أسبوعان"
+        case .open: "مفتوحة"
+        }
+    }
+
+    var expiryDate: Date? {
+        guard rawValue > 0 else { return nil }
+        return Calendar.current.date(byAdding: .day, value: rawValue, to: Date())
+    }
+}
+
+struct DashboardStatistics: Hashable {
+    let totalComparisons: Int
+    let totalVotes: Int
+    let totalReasons: Int
+    let savedCount: Int
+    let topCategory: AskCategory
+    let mostVotedTitle: String
+    let closeResultCount: Int
+}
+
 enum SavedDecisionState: String, CaseIterable, Identifiable {
     case thinking
     case comparing

@@ -26,6 +26,7 @@ final class HomeViewModel {
     var questions: [AskQuestion]
     var knowledgeItems: [KnowledgeItem]
     var selectedCategory: AskCategory = .all
+    var selectedSortMode: QuestionSortMode = .newest
     var searchText = ""
     var savedQuestionIDs: Set<UUID> = []
     var appErrorMessage: String?
@@ -42,12 +43,42 @@ final class HomeViewModel {
         questions.reduce(0) { $0 + $1.totalVotes }
     }
 
+    var dashboardStatistics: DashboardStatistics {
+        let categoryGroups = Dictionary(grouping: questions, by: \.category)
+        let topCategory = categoryGroups
+            .filter { $0.key != .all }
+            .max { lhs, rhs in
+                if lhs.value.count == rhs.value.count {
+                    return lhs.value.reduce(0) { $0 + $1.totalVotes } < rhs.value.reduce(0) { $0 + $1.totalVotes }
+                }
+                return lhs.value.count < rhs.value.count
+            }?
+            .key ?? .other
+
+        let mostVoted = questions.max { $0.totalVotes < $1.totalVotes }?.title ?? "لا توجد بيانات"
+        let closeCount = questions.filter {
+            let summary = DecisionSummaryService.makeSummary(for: $0)
+            return summary.clarity == .close || summary.clarity == .insufficientData
+        }.count
+
+        return DashboardStatistics(
+            totalComparisons: questions.count,
+            totalVotes: totalVotes,
+            totalReasons: questions.reduce(0) { $0 + $1.comments.filter { $0.optionID != nil }.count },
+            savedCount: savedQuestionIDs.count,
+            topCategory: topCategory,
+            mostVotedTitle: mostVoted,
+            closeResultCount: closeCount
+        )
+    }
+
     var filteredQuestions: [AskQuestion] {
-        ComparisonSearchService.filterQuestions(
+        let filtered = ComparisonSearchService.filterQuestions(
             questions,
             category: selectedCategory,
             query: searchText
         )
+        return sortedQuestions(filtered)
     }
 
     var filteredKnowledge: [KnowledgeItem] {
@@ -89,6 +120,25 @@ final class HomeViewModel {
             }
             .prefix(limit)
             .map(\.question)
+    }
+
+    private func sortedQuestions(_ questions: [AskQuestion]) -> [AskQuestion] {
+        switch selectedSortMode {
+        case .newest:
+            return questions
+        case .mostVoted:
+            return questions.sorted { $0.totalVotes > $1.totalVotes }
+        case .mostDiscussed:
+            return questions.sorted { $0.comments.count > $1.comments.count }
+        case .clearestDecision:
+            return questions.sorted {
+                DecisionSummaryService.makeSummary(for: $0).voteGapPercentage > DecisionSummaryService.makeSummary(for: $1).voteGapPercentage
+            }
+        case .closeResults:
+            return questions.sorted {
+                DecisionSummaryService.makeSummary(for: $0).voteGapPercentage < DecisionSummaryService.makeSummary(for: $1).voteGapPercentage
+            }
+        }
     }
 
     func loadSavedQuestionIDs() async {
@@ -185,6 +235,7 @@ final class CreateComparisonViewModel {
     var isAnonymous = false
     var allowsComments = true
     var allowsVoteReasons = true
+    var voteDuration: VoteDurationOption = .oneWeek
     var validationMessage: String?
     var didPublish = false
 
@@ -222,7 +273,7 @@ final class CreateComparisonViewModel {
             options: optionTitles
                 .prefix(optionCount)
                 .map { ComparisonOptionDraft(title: $0) },
-            expiresAt: nil,
+            expiresAt: voteDuration.expiryDate,
             isAnonymous: isAnonymous,
             allowsComments: allowsComments,
             allowsVoteReasons: allowsVoteReasons,
@@ -244,6 +295,7 @@ final class CreateComparisonViewModel {
         isAnonymous = draft.isAnonymous
         allowsComments = draft.allowsComments
         allowsVoteReasons = draft.allowsVoteReasons
+        voteDuration = durationOption(for: draft.expiresAt)
         optionCount = min(max(draft.options.count, 2), 10)
 
         var restored = Array(repeating: "", count: 10)
@@ -256,6 +308,26 @@ final class CreateComparisonViewModel {
     func saveDraft() {
         LocalDraftStore.shared.save(currentDraft)
         validationMessage = "تم حفظ المسودة محليًا."
+    }
+
+    func applyQuickPrompt(_ prompt: String) {
+        title = prompt
+        let parts = prompt
+            .replacingOccurrences(of: "؟", with: "")
+            .components(separatedBy: " أم ")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+        if parts.count >= 2 {
+            optionCount = min(max(parts.count, 2), 10)
+            for index in 0..<optionTitles.count {
+                optionTitles[index] = index < parts.count ? parts[index] : optionTitles[index]
+            }
+        }
+
+        category = inferredCategory(from: prompt)
+        if details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            details = "ساعدني أقرر بناءً على التجربة والسعر والجودة والقيمة."
+        }
     }
 
     func saveDraftOnDismissIfNeeded() {
@@ -286,5 +358,36 @@ final class CreateComparisonViewModel {
             options: completedOptions.map { PollOption(title: $0, votes: 0) },
             comments: []
         )
+    }
+
+    private func durationOption(for expiryDate: Date?) -> VoteDurationOption {
+        guard let expiryDate else { return .open }
+        let days = Calendar.current.dateComponents([.day], from: Date(), to: expiryDate).day ?? 7
+        return VoteDurationOption.allCases.min { lhs, rhs in
+            abs(lhs.rawValue - days) < abs(rhs.rawValue - days)
+        } ?? .oneWeek
+    }
+
+    private func inferredCategory(from prompt: String) -> AskCategory {
+        let normalized = KnowledgeSearchIndex.normalize(prompt)
+        if normalized.contains("ايفون") || normalized.contains("سامسونج") || normalized.contains("جوال") {
+            return .phones
+        }
+        if normalized.contains("كامري") || normalized.contains("اكورد") || normalized.contains("سياره") {
+            return .cars
+        }
+        if normalized.contains("مطعم") || normalized.contains("برجر") {
+            return .restaurants
+        }
+        if normalized.contains("لابتوب") || normalized.contains("ماك") || normalized.contains("ويندوز") {
+            return .laptops
+        }
+        if normalized.contains("شحن") || normalized.contains("خدمه") {
+            return .services
+        }
+        if normalized.contains("بث") || normalized.contains("اشتراك") {
+            return .subscriptions
+        }
+        return category
     }
 }

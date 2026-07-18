@@ -75,6 +75,7 @@ struct ContentView: View {
                     questions: homeViewModel.questions,
                     knowledgeItems: homeViewModel.knowledgeItems,
                     totalVotes: homeViewModel.totalVotes,
+                    statistics: homeViewModel.dashboardStatistics,
                     openQuestion: { question in
                         selectedQuestion = question
                     },
@@ -95,6 +96,7 @@ struct ContentView: View {
                 QuestionListView(
                     questions: homeViewModel.filteredQuestions,
                     selectedCategory: $homeViewModel.selectedCategory,
+                    selectedSortMode: $homeViewModel.selectedSortMode,
                     searchText: $homeViewModel.searchText,
                     selectedQuestion: $selectedQuestion,
                     showingComposer: $showingComposer
@@ -128,7 +130,7 @@ struct ContentView: View {
             }
 
             NavigationStack {
-                AccountView(userSession: userSession)
+                AccountView(userSession: userSession, statistics: homeViewModel.dashboardStatistics)
             }
             .tabItem {
                 Label("الحساب", systemImage: "person.crop.circle")
@@ -507,6 +509,7 @@ struct DashboardView: View {
     let questions: [AskQuestion]
     let knowledgeItems: [KnowledgeItem]
     let totalVotes: Int
+    let statistics: DashboardStatistics
     let openQuestion: (AskQuestion) -> Void
     let openSmartCompare: () -> Void
     let startQuestion: (KnowledgeItem?) -> Void
@@ -531,6 +534,8 @@ struct DashboardView: View {
                 }
 
                 IntelligencePanel(openSmartCompare: openSmartCompare)
+
+                DashboardInsightsCard(statistics: statistics)
 
                 SectionHeader(title: "مقارنات جاهزة", subtitle: "ابدأ من فكرة ثم خل الناس يحسمونها")
 
@@ -559,9 +564,101 @@ struct DashboardView: View {
     }
 }
 
+struct DashboardInsightsCard: View {
+    let statistics: DashboardStatistics
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("مركز الإحصائيات", systemImage: "chart.xyaxis.line")
+                    .font(.headline)
+                Spacer()
+                Label(statistics.topCategory.title, systemImage: statistics.topCategory.systemImage)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.teal)
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 125), spacing: 10)], spacing: 10) {
+                InsightMetric(title: "المقارنات", value: "\(statistics.totalComparisons)", icon: "square.stack.3d.up.fill", color: .teal)
+                InsightMetric(title: "الأصوات", value: "\(statistics.totalVotes)", icon: "chart.bar.fill", color: .indigo)
+                InsightMetric(title: "الأسباب", value: "\(statistics.totalReasons)", icon: "quote.bubble.fill", color: .orange)
+                InsightMetric(title: "المحفوظة", value: "\(statistics.savedCount)", icon: "bookmark.fill", color: .green)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Label("أكثر مقارنة تصويتًا", systemImage: "flame.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+                Text(statistics.mostVotedTitle)
+                    .font(.subheadline.weight(.bold))
+                    .lineLimit(2)
+                Label("\(statistics.closeResultCount) مقارنة تحتاج آراء أكثر", systemImage: "equal.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+}
+
+struct InsightMetric: View {
+    let title: String
+    let value: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(color)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(value)
+                    .font(.headline.monospacedDigit())
+                Text(title)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(10)
+        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct SortModePicker: View {
+    @Binding var selectedSortMode: QuestionSortMode
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(QuestionSortMode.allCases) { mode in
+                    Button {
+                        selectedSortMode = mode
+                    } label: {
+                        Label(mode.title, systemImage: mode.systemImage)
+                            .font(.caption.weight(.bold))
+                            .lineLimit(1)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .foregroundStyle(selectedSortMode == mode ? .white : .primary)
+                            .background(selectedSortMode == mode ? Color.teal : Color.secondary.opacity(0.12), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+}
+
 struct QuestionListView: View {
     let questions: [AskQuestion]
     @Binding var selectedCategory: AskCategory
+    @Binding var selectedSortMode: QuestionSortMode
     @Binding var searchText: String
     @Binding var selectedQuestion: AskQuestion?
     @Binding var showingComposer: Bool
@@ -571,6 +668,11 @@ struct QuestionListView: View {
             Section {
                 CategoryScroller(selectedCategory: $selectedCategory)
                     .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+
+                SortModePicker(selectedSortMode: $selectedSortMode)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
             }
@@ -1624,6 +1726,27 @@ struct NewQuestionView: View {
 
         NavigationStack {
             Form {
+                Section("ابدأ بسرعة") {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(ComparisonTemplateLibrary.quickPrompts, id: \.self) { prompt in
+                                Button {
+                                    viewModel.applyQuickPrompt(prompt)
+                                } label: {
+                                    Text(prompt)
+                                        .font(.caption.weight(.bold))
+                                        .lineLimit(1)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 8)
+                                        .background(Color.teal.opacity(0.12), in: Capsule())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                }
+
                 Section("السؤال") {
                     TextField("مثال: أشتري السيارة A أو B؟", text: $viewModel.title, axis: .vertical)
                     TextField("تفاصيل تساعد الناس يصوتون", text: $viewModel.details, axis: .vertical)
@@ -1646,6 +1769,11 @@ struct NewQuestionView: View {
                     Toggle("نشر السؤال باسم مجهول", isOn: $viewModel.isAnonymous)
                     Toggle("السماح بأسباب التصويت", isOn: $viewModel.allowsVoteReasons)
                     Toggle("السماح بالتعليقات", isOn: $viewModel.allowsComments)
+                    Picker("مدة التصويت", selection: $viewModel.voteDuration) {
+                        ForEach(VoteDurationOption.allCases) { duration in
+                            Text(duration.title).tag(duration)
+                        }
+                    }
                 }
 
                 if let validationMessage = viewModel.validationMessage {
@@ -1693,7 +1821,11 @@ struct NewQuestionView: View {
 
 struct AccountView: View {
     @ObservedObject var userSession: UserSession
+    let statistics: DashboardStatistics
     @State private var alias = ""
+    @State private var selectedInterests: Set<AskCategory> = []
+
+    private let interestsKey = "wash_alray_user_interests"
 
     private var isAliasValid: Bool {
         !alias.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -1763,6 +1895,46 @@ struct AccountView: View {
                 .padding()
                 .background(.background, in: RoundedRectangle(cornerRadius: 18))
 
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("لوحتك الشخصية")
+                        .font(.title3.weight(.bold))
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 125), spacing: 10)], spacing: 10) {
+                        InsightMetric(title: "المقارنات", value: "\(statistics.totalComparisons)", icon: "bubble.left.and.bubble.right.fill", color: .teal)
+                        InsightMetric(title: "الأصوات", value: "\(statistics.totalVotes)", icon: "chart.bar.fill", color: .indigo)
+                        InsightMetric(title: "الأسباب", value: "\(statistics.totalReasons)", icon: "quote.bubble.fill", color: .orange)
+                        InsightMetric(title: "المحفوظة", value: "\(statistics.savedCount)", icon: "bookmark.fill", color: .green)
+                    }
+                }
+                .padding()
+                .background(.background, in: RoundedRectangle(cornerRadius: 18))
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("اهتماماتك")
+                        .font(.title3.weight(.bold))
+                    Text("تُحفظ محليًا لتخصيص المقارنات والتنبيهات لاحقًا عند توفر Backend.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    FlowTags(
+                        values: AskCategory.allCases.filter { $0 != .all }.map(\.title),
+                        color: .teal,
+                        action: { title in
+                            if let category = AskCategory.allCases.first(where: { $0.title == title }) {
+                                toggleInterest(category)
+                            }
+                        }
+                    )
+
+                    if !selectedInterests.isEmpty {
+                        Text("المحدد: \(selectedInterests.map(\.title).sorted().joined(separator: "، "))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding()
+                .background(.background, in: RoundedRectangle(cornerRadius: 18))
+
                 if userSession.isSignedIn {
                     Button(role: .destructive) {
                         userSession.signOut()
@@ -1781,7 +1953,22 @@ struct AccountView: View {
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             alias = userSession.displayName
+            loadInterests()
         }
+    }
+
+    private func toggleInterest(_ category: AskCategory) {
+        if selectedInterests.contains(category) {
+            selectedInterests.remove(category)
+        } else {
+            selectedInterests.insert(category)
+        }
+        UserDefaults.standard.set(selectedInterests.map(\.rawValue), forKey: interestsKey)
+    }
+
+    private func loadInterests() {
+        let rawValues = UserDefaults.standard.stringArray(forKey: interestsKey) ?? []
+        selectedInterests = Set(rawValues.compactMap(AskCategory.init(rawValue:)))
     }
 }
 
