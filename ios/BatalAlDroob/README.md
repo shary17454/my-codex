@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `1.1.0`
-- Next build: `105`
+- Next build: `106`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -83,20 +83,22 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
 - verifies `MARKETING_VERSION = 1.1.0`,
-- verifies `CURRENT_PROJECT_VERSION >= 105`,
+- verifies `CURRENT_PROJECT_VERSION >= 106`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-Before starting a new App Store build, set Xcode Cloud > Workflow > Next Build Number to `105` or higher. Build `104` has already been used, so do not reuse it.
+Before starting a new App Store build, set Xcode Cloud > Workflow > Next Build Number to `106` or higher. Build `105` was reviewed and rejected, so do not reuse it.
 
 ## In-App Purchase
 
 Only one StoreKit product is referenced by the app:
 
 - `batal.catalog.unlock`
+
+For the first review of this product, add the In-App Purchase and the matching new app version to the same App Review submission. Apple requires an App Review screenshot for the product and a new binary when the product was omitted from an earlier submission.
 
 Part requests are prepared and saved inside the app without a separate purchase product.
 

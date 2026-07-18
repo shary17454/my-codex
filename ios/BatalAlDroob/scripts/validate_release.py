@@ -15,7 +15,7 @@ APP_SWIFT = APP_ROOT / "BatalAlDroob" / "AppDelegate.swift"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
 EXPECTED_MARKETING_VERSION = "1.1.0"
-MIN_EXPECTED_BUILD = 105
+MIN_EXPECTED_BUILD = 106
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts",
