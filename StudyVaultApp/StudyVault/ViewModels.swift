@@ -30,6 +30,8 @@ final class HomeViewModel {
     var searchText = ""
     var savedQuestionIDs: Set<UUID> = []
     var appErrorMessage: String?
+    var isBackendEnabled: Bool
+    var backendBaseURLText: String
 
     init(
         questions: [AskQuestion] = AskDemoStore.questions,
@@ -37,6 +39,8 @@ final class HomeViewModel {
     ) {
         self.questions = questions
         self.knowledgeItems = knowledgeItems
+        self.isBackendEnabled = BackendSettingsStore.shared.isEnabled
+        self.backendBaseURLText = BackendSettingsStore.shared.baseURLText
     }
 
     var totalVotes: Int {
@@ -155,6 +159,39 @@ final class HomeViewModel {
         savedQuestionIDs = (try? await LocalBookmarkRepository.shared.fetchSavedComparisonIDs()) ?? []
     }
 
+    func saveBackendSettings() {
+        BackendSettingsStore.shared.save(isEnabled: isBackendEnabled, baseURLText: backendBaseURLText)
+    }
+
+    func refreshFromBackend() async {
+        guard isBackendEnabled, let client = makeBackendClient() else { return }
+        do {
+            let remoteQuestions = try await client.fetchComparisons(category: selectedCategory == .all ? nil : selectedCategory)
+            questions = remoteQuestions.isEmpty ? questions : remoteQuestions
+            appErrorMessage = nil
+        } catch {
+            appErrorMessage = AppError.unknown(error).errorDescription
+        }
+    }
+
+    func publishQuestion(_ question: AskQuestion) async -> AskQuestion {
+        guard isBackendEnabled, let client = makeBackendClient() else {
+            insertPublishedQuestion(question)
+            return question
+        }
+
+        do {
+            let remote = try await client.createComparison(question: question)
+            questions.insert(remote, at: 0)
+            appErrorMessage = nil
+            return remote
+        } catch {
+            appErrorMessage = AppError.unknown(error).errorDescription
+            insertPublishedQuestion(question)
+            return question
+        }
+    }
+
     func insertPublishedQuestion(_ question: AskQuestion) {
         questions.insert(question, at: 0)
     }
@@ -166,6 +203,7 @@ final class HomeViewModel {
         }
 
         questions[questionIndex].options[optionIndex].votes += 1
+        pushVoteIfNeeded(questionID: questionID, optionID: optionID, reason: nil, authorName: "مستخدم", reasonCategory: nil, isVerifiedExperience: false)
         return questions[questionIndex]
     }
 
@@ -201,6 +239,14 @@ final class HomeViewModel {
             )
         }
 
+        pushVoteIfNeeded(
+            questionID: questionID,
+            optionID: optionID,
+            reason: cleanReason.isEmpty ? nil : cleanReason,
+            authorName: authorName,
+            reasonCategory: reasonCategory,
+            isVerifiedExperience: isVerifiedExperience
+        )
         return questions[questionIndex]
     }
 
@@ -215,6 +261,7 @@ final class HomeViewModel {
             AskComment(author: authorName, text: cleanText, likes: 0),
             at: 0
         )
+        pushCommentIfNeeded(questionID: questionID, text: cleanText, authorName: authorName)
         return questions[questionIndex]
     }
 
@@ -231,6 +278,270 @@ final class HomeViewModel {
             appErrorMessage = AppError.unknown(error).errorDescription
         }
     }
+
+    private func makeBackendClient() -> WeshAlrayAPIClient? {
+        guard let url = URL(string: backendBaseURLText.trimmingCharacters(in: .whitespacesAndNewlines)) else {
+            appErrorMessage = "عنوان Backend غير صحيح."
+            return nil
+        }
+        return WeshAlrayAPIClient(baseURL: url)
+    }
+
+    private func pushVoteIfNeeded(
+        questionID: AskQuestion.ID,
+        optionID: PollOption.ID,
+        reason: String?,
+        authorName: String,
+        reasonCategory: String?,
+        isVerifiedExperience: Bool
+    ) {
+        guard isBackendEnabled, let client = makeBackendClient() else { return }
+        Task {
+            do {
+                _ = try await client.vote(
+                    comparisonID: questionID,
+                    optionID: optionID,
+                    authorName: authorName,
+                    reason: reason,
+                    reasonCategory: reasonCategory,
+                    isVerifiedExperience: isVerifiedExperience
+                )
+            } catch {
+                await MainActor.run {
+                    appErrorMessage = AppError.unknown(error).errorDescription
+                }
+            }
+        }
+    }
+
+    private func pushCommentIfNeeded(questionID: AskQuestion.ID, text: String, authorName: String) {
+        guard isBackendEnabled, let client = makeBackendClient() else { return }
+        Task {
+            do {
+                _ = try await client.addComment(comparisonID: questionID, text: text, authorName: authorName)
+            } catch {
+                await MainActor.run {
+                    appErrorMessage = AppError.unknown(error).errorDescription
+                }
+            }
+        }
+    }
+}
+
+final class BackendSettingsStore: @unchecked Sendable {
+    static let shared = BackendSettingsStore()
+    private let enabledKey = "wash_alray_backend_enabled"
+    private let baseURLKey = "wash_alray_backend_base_url"
+
+    private init() {}
+
+    var isEnabled: Bool {
+        UserDefaults.standard.bool(forKey: enabledKey)
+    }
+
+    var baseURLText: String {
+        UserDefaults.standard.string(forKey: baseURLKey) ?? "http://localhost:8787"
+    }
+
+    func save(isEnabled: Bool, baseURLText: String) {
+        UserDefaults.standard.set(isEnabled, forKey: enabledKey)
+        UserDefaults.standard.set(baseURLText.trimmingCharacters(in: .whitespacesAndNewlines), forKey: baseURLKey)
+    }
+}
+
+struct WeshAlrayAPIClient: Sendable {
+    let baseURL: URL
+    private let session: URLSession = .shared
+    private let decoder = JSONDecoder()
+    private let encoder = JSONEncoder()
+
+    func fetchComparisons(category: AskCategory?) async throws -> [AskQuestion] {
+        var components = URLComponents(url: baseURL.appendingPathComponent("/api/v1/comparisons"), resolvingAgainstBaseURL: false)
+        if let category {
+            components?.queryItems = [URLQueryItem(name: "category", value: category.rawValue)]
+        }
+        guard let url = components?.url else { throw AppError.invalidInput("عنوان Backend غير صحيح.") }
+        let response: ComparisonListResponse = try await get(url)
+        return response.comparisons.map(\.askQuestion)
+    }
+
+    func createComparison(question: AskQuestion) async throws -> AskQuestion {
+        let request = CreateComparisonRequest(
+            title: question.title,
+            details: question.details,
+            category: question.category.rawValue,
+            author: question.author,
+            isAnonymous: question.author == "مجهول",
+            allowsComments: true,
+            allowsVoteReasons: true,
+            tags: [],
+            options: question.options.map { CreateOptionRequest(title: $0.title) }
+        )
+        let response: RemoteComparison = try await post(path: "/api/v1/comparisons", body: request)
+        return response.askQuestion
+    }
+
+    func vote(
+        comparisonID: UUID,
+        optionID: UUID,
+        authorName: String,
+        reason: String?,
+        reasonCategory: String?,
+        isVerifiedExperience: Bool
+    ) async throws -> AskQuestion {
+        let request = VoteRequest(
+            optionID: optionID.uuidString,
+            author: authorName,
+            reason: reason,
+            reasonCategory: reasonCategory,
+            isVerifiedExperience: isVerifiedExperience,
+            isAnonymous: false
+        )
+        let response: VoteResponse = try await post(path: "/api/v1/comparisons/\(comparisonID.uuidString)/votes", body: request)
+        return response.comparison.askQuestion
+    }
+
+    func addComment(comparisonID: UUID, text: String, authorName: String) async throws -> RemoteComment {
+        try await post(path: "/api/v1/comparisons/\(comparisonID.uuidString)/comments", body: CommentRequest(author: authorName, text: text))
+    }
+
+    private func get<T: Decodable>(_ url: URL) async throws -> T {
+        let (data, response) = try await session.data(from: url)
+        try validate(response: response, data: data)
+        return try decoder.decode(T.self, from: data)
+    }
+
+    private func post<Body: Encodable, Response: Decodable>(path: String, body: Body) async throws -> Response {
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        request.setValue(DeviceClientID.value, forHTTPHeaderField: "x-client-id")
+        request.httpBody = try encoder.encode(body)
+        let (data, response) = try await session.data(for: request)
+        try validate(response: response, data: data)
+        return try decoder.decode(Response.self, from: data)
+    }
+
+    private func validate(response: URLResponse, data: Data) throws {
+        guard let http = response as? HTTPURLResponse else { throw AppError.serviceUnavailable }
+        guard (200..<300).contains(http.statusCode) else {
+            let apiError = try? decoder.decode(APIErrorResponse.self, from: data)
+            throw AppError.invalidInput(apiError?.error.message ?? "تعذر الاتصال بالـBackend.")
+        }
+    }
+}
+
+enum DeviceClientID {
+    private static let key = "wash_alray_device_client_id"
+
+    static var value: String {
+        if let existing = UserDefaults.standard.string(forKey: key) {
+            return existing
+        }
+        let created = UUID().uuidString
+        UserDefaults.standard.set(created, forKey: key)
+        return created
+    }
+}
+
+private struct APIErrorResponse: Decodable {
+    let error: APIErrorBody
+}
+
+private struct APIErrorBody: Decodable {
+    let message: String
+}
+
+private struct ComparisonListResponse: Decodable {
+    let comparisons: [RemoteComparison]
+}
+
+private struct RemoteComparison: Decodable {
+    let id: UUID
+    let title: String
+    let details: String
+    let category: String
+    let author: String
+    let createdAt: String
+    let options: [RemoteOption]
+    let comments: [RemoteComment]
+
+    var askQuestion: AskQuestion {
+        AskQuestion(
+            id: id,
+            title: title,
+            details: details,
+            category: AskCategory(rawValue: category) ?? .other,
+            author: author,
+            timeAgo: "من الخادم",
+            options: options.map { PollOption(id: $0.id, title: $0.title, votes: $0.votes) },
+            comments: comments.map(\.askComment)
+        )
+    }
+}
+
+private struct RemoteOption: Decodable {
+    let id: UUID
+    let title: String
+    let votes: Int
+}
+
+struct RemoteComment: Decodable {
+    let id: UUID
+    let optionID: UUID?
+    let optionTitle: String?
+    let author: String
+    let text: String
+    let likes: Int
+    let trustBadge: String?
+    let reasonCategory: String?
+
+    var askComment: AskComment {
+        AskComment(
+            id: id,
+            author: author,
+            text: text,
+            likes: likes,
+            optionID: optionID,
+            optionTitle: optionTitle,
+            trustBadge: trustBadge,
+            reasonCategory: reasonCategory
+        )
+    }
+}
+
+private struct CreateComparisonRequest: Encodable {
+    let title: String
+    let details: String
+    let category: String
+    let author: String
+    let isAnonymous: Bool
+    let allowsComments: Bool
+    let allowsVoteReasons: Bool
+    let tags: [String]
+    let options: [CreateOptionRequest]
+}
+
+private struct CreateOptionRequest: Encodable {
+    let title: String
+}
+
+private struct VoteRequest: Encodable {
+    let optionID: String
+    let author: String
+    let reason: String?
+    let reasonCategory: String?
+    let isVerifiedExperience: Bool
+    let isAnonymous: Bool
+}
+
+private struct VoteResponse: Decodable {
+    let comparison: RemoteComparison
+}
+
+private struct CommentRequest: Encodable {
+    let author: String
+    let text: String
 }
 
 final class LocalReportStore: @unchecked Sendable {

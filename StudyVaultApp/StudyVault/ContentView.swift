@@ -133,7 +133,20 @@ struct ContentView: View {
             }
 
             NavigationStack {
-                AccountView(userSession: userSession, statistics: homeViewModel.dashboardStatistics)
+                AccountView(
+                    userSession: userSession,
+                    statistics: homeViewModel.dashboardStatistics,
+                    isBackendEnabled: $homeViewModel.isBackendEnabled,
+                    backendBaseURLText: $homeViewModel.backendBaseURLText,
+                    saveBackendSettings: {
+                        homeViewModel.saveBackendSettings()
+                    },
+                    refreshBackend: {
+                        Task {
+                            await homeViewModel.refreshFromBackend()
+                        }
+                    }
+                )
             }
             .tabItem {
                 Label("الحساب", systemImage: "person.crop.circle")
@@ -162,9 +175,11 @@ struct ContentView: View {
         .tint(.teal)
         .sheet(isPresented: $showingComposer) {
             NewQuestionView(template: composerTemplate, authorName: userSession.publicName) { question in
-                homeViewModel.insertPublishedQuestion(question)
-                selectedQuestion = question
-                composerTemplate = nil
+                Task {
+                    let published = await homeViewModel.publishQuestion(question)
+                    selectedQuestion = published
+                    composerTemplate = nil
+                }
             }
         }
         .sheet(item: $selectedQuestion) { question in
@@ -203,6 +218,7 @@ struct ContentView: View {
         }
         .task {
             await homeViewModel.loadSavedQuestionIDs()
+            await homeViewModel.refreshFromBackend()
         }
         .onOpenURL { url in
             if let question = homeViewModel.question(fromDeepLink: url) {
@@ -2090,6 +2106,10 @@ struct NewQuestionView: View {
 struct AccountView: View {
     @ObservedObject var userSession: UserSession
     let statistics: DashboardStatistics
+    @Binding var isBackendEnabled: Bool
+    @Binding var backendBaseURLText: String
+    let saveBackendSettings: () -> Void
+    let refreshBackend: () -> Void
     @State private var alias = ""
     @State private var selectedInterests: Set<AskCategory> = []
 
@@ -2156,6 +2176,40 @@ struct AccountView: View {
                     .disabled(!isAliasValid)
 
                     Text("الاسم الحقيقي والبريد لا يظهران للمستخدمين. التعليقات والأسئلة تستخدم الاسم المستعار فقط.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding()
+                .background(.background, in: RoundedRectangle(cornerRadius: 18))
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Backend")
+                        .font(.title3.weight(.bold))
+                    Toggle("تفعيل المزامنة مع الخادم", isOn: $isBackendEnabled)
+                    TextField("مثال: http://localhost:8787", text: $backendBaseURLText)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.URL)
+                        .textFieldStyle(.roundedBorder)
+
+                    HStack {
+                        Button {
+                            saveBackendSettings()
+                        } label: {
+                            Label("حفظ الإعداد", systemImage: "checkmark.circle.fill")
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        Button {
+                            saveBackendSettings()
+                            refreshBackend()
+                        } label: {
+                            Label("مزامنة", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+
+                    Text("عند إيقافه يعمل التطبيق محليًا. عند تفعيله يرسل إنشاء المقارنات والتصويت والتعليقات إلى Backend المحدد.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
