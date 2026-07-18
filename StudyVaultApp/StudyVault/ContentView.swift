@@ -138,6 +138,7 @@ struct ContentView: View {
                     statistics: homeViewModel.dashboardStatistics,
                     isBackendEnabled: $homeViewModel.isBackendEnabled,
                     backendBaseURLText: $homeViewModel.backendBaseURLText,
+                    backendAPITokenText: $homeViewModel.backendAPITokenText,
                     saveBackendSettings: {
                         homeViewModel.saveBackendSettings()
                     },
@@ -2108,6 +2109,7 @@ struct AccountView: View {
     let statistics: DashboardStatistics
     @Binding var isBackendEnabled: Bool
     @Binding var backendBaseURLText: String
+    @Binding var backendAPITokenText: String
     let saveBackendSettings: () -> Void
     let refreshBackend: () -> Void
     @State private var alias = ""
@@ -2191,6 +2193,9 @@ struct AccountView: View {
                         .textInputAutocapitalization(.never)
                         .keyboardType(.URL)
                         .textFieldStyle(.roundedBorder)
+                    SecureField("API token للتطوير أو الاختبار", text: $backendAPITokenText)
+                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
 
                     HStack {
                         Button {
@@ -2212,6 +2217,10 @@ struct AccountView: View {
                     Text("عند إيقافه يعمل التطبيق محليًا. عند تفعيله يرسل إنشاء المقارنات والتصويت والتعليقات إلى Backend المحدد.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text("لا تستخدم رمزًا ثابتًا داخل نسخة App Store كبديل لتسجيل دخول المستخدمين. هذا الحقل مناسب للتطوير والاختبار الداخلي فقط.")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding()

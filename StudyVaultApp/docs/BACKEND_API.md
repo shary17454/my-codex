@@ -6,6 +6,12 @@ Base URL للتطوير:
 http://localhost:8787
 ```
 
+إذا كان الخادم مضبوطًا بمتغير `WESH_ALRAY_API_TOKEN`، يجب إرسال الهيدر التالي مع طلبات الكتابة:
+
+```http
+Authorization: Bearer <token>
+```
+
 ## Health
 
 ```http
@@ -25,6 +31,7 @@ GET /api/v1/comparisons/{comparisonID}
 ```http
 POST /api/v1/comparisons
 Content-Type: application/json
+Authorization: Bearer <token>
 
 {
   "title": "آيفون أم سامسونج؟",
@@ -48,6 +55,7 @@ Content-Type: application/json
 POST /api/v1/comparisons/{comparisonID}/votes
 Content-Type: application/json
 X-Client-ID: local-device-id
+Authorization: Bearer <token>
 
 {
   "optionID": "option-uuid",
@@ -64,6 +72,7 @@ X-Client-ID: local-device-id
 ```http
 POST /api/v1/comparisons/{comparisonID}/comments
 Content-Type: application/json
+Authorization: Bearer <token>
 
 {
   "author": "ضيف",
@@ -76,6 +85,7 @@ Content-Type: application/json
 ```http
 POST /api/v1/reports
 Content-Type: application/json
+Authorization: Bearer <token>
 
 {
   "contentID": "uuid",
@@ -94,3 +104,4 @@ Content-Type: application/json
 - مراجعة وإشراف البلاغات.
 - Push Notifications عبر APNs.
 - Universal Links بملف `apple-app-site-association`.
+- استبدال رمز الكتابة المشترك بمصادقة مستخدمين حقيقية قبل إصدار عام يعتمد على Backend.

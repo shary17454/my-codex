@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import Security
 
 struct ComparisonSearchService {
     static func filterQuestions(
@@ -32,6 +33,7 @@ final class HomeViewModel {
     var appErrorMessage: String?
     var isBackendEnabled: Bool
     var backendBaseURLText: String
+    var backendAPITokenText: String
 
     init(
         questions: [AskQuestion] = AskDemoStore.questions,
@@ -41,6 +43,7 @@ final class HomeViewModel {
         self.knowledgeItems = knowledgeItems
         self.isBackendEnabled = BackendSettingsStore.shared.isEnabled
         self.backendBaseURLText = BackendSettingsStore.shared.baseURLText
+        self.backendAPITokenText = BackendSettingsStore.shared.apiTokenText
     }
 
     var totalVotes: Int {
@@ -160,7 +163,11 @@ final class HomeViewModel {
     }
 
     func saveBackendSettings() {
-        BackendSettingsStore.shared.save(isEnabled: isBackendEnabled, baseURLText: backendBaseURLText)
+        BackendSettingsStore.shared.save(
+            isEnabled: isBackendEnabled,
+            baseURLText: backendBaseURLText,
+            apiTokenText: backendAPITokenText
+        )
     }
 
     func refreshFromBackend() async {
@@ -284,7 +291,8 @@ final class HomeViewModel {
             appErrorMessage = "عنوان Backend غير صحيح."
             return nil
         }
-        return WeshAlrayAPIClient(baseURL: url)
+        let cleanToken = backendAPITokenText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return WeshAlrayAPIClient(baseURL: url, apiToken: cleanToken.isEmpty ? nil : cleanToken)
     }
 
     private func pushVoteIfNeeded(
@@ -343,14 +351,61 @@ final class BackendSettingsStore: @unchecked Sendable {
         UserDefaults.standard.string(forKey: baseURLKey) ?? "http://localhost:8787"
     }
 
-    func save(isEnabled: Bool, baseURLText: String) {
+    var apiTokenText: String {
+        BackendAPITokenStore.load()
+    }
+
+    func save(isEnabled: Bool, baseURLText: String, apiTokenText: String) {
         UserDefaults.standard.set(isEnabled, forKey: enabledKey)
         UserDefaults.standard.set(baseURLText.trimmingCharacters(in: .whitespacesAndNewlines), forKey: baseURLKey)
+        BackendAPITokenStore.save(apiTokenText.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+}
+
+enum BackendAPITokenStore {
+    private static let service = "com.weshalray.backend"
+    private static let account = "api-token"
+
+    static func load() -> String {
+        var query: [String: Any] = baseQuery
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess,
+              let data = result as? Data,
+              let token = String(data: data, encoding: .utf8) else {
+            return ""
+        }
+        return token
+    }
+
+    static func save(_ token: String) {
+        delete()
+        guard !token.isEmpty, let data = token.data(using: .utf8) else { return }
+        var attributes: [String: Any] = baseQuery
+        attributes[kSecValueData as String] = data
+        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        SecItemAdd(attributes as CFDictionary, nil)
+    }
+
+    private static func delete() {
+        SecItemDelete(baseQuery as CFDictionary)
+    }
+
+    private static var baseQuery: [String: Any] {
+        [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
     }
 }
 
 struct WeshAlrayAPIClient: Sendable {
     let baseURL: URL
+    let apiToken: String?
     private let session: URLSession = .shared
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
@@ -416,6 +471,9 @@ struct WeshAlrayAPIClient: Sendable {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "content-type")
         request.setValue(DeviceClientID.value, forHTTPHeaderField: "x-client-id")
+        if let apiToken, !apiToken.isEmpty {
+            request.setValue("Bearer \(apiToken)", forHTTPHeaderField: "authorization")
+        }
         request.httpBody = try encoder.encode(body)
         let (data, response) = try await session.data(for: request)
         try validate(response: response, data: data)
