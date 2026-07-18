@@ -2,6 +2,9 @@ import SwiftUI
 import WebKit
 import AVFoundation
 import AuthenticationServices
+import CoreImage.CIFilterBuiltins
+import UserNotifications
+import UIKit
 
 final class UserSession: ObservableObject {
     @Published var isSignedIn: Bool
@@ -200,6 +203,11 @@ struct ContentView: View {
         }
         .task {
             await homeViewModel.loadSavedQuestionIDs()
+        }
+        .onOpenURL { url in
+            if let question = homeViewModel.question(fromDeepLink: url) {
+                selectedQuestion = question
+            }
         }
         .alert("تنبيه", isPresented: Binding(
             get: { homeViewModel.appErrorMessage != nil },
@@ -852,6 +860,9 @@ struct QuestionDetail: View {
     @State private var decisionMode: DecisionMode = .quick
     @State private var commentFilter: CommentFilter = .all
     @State private var savedDecisionState: SavedDecisionState = .comparing
+    @State private var showingQRCode = false
+    @State private var showingReportSheet = false
+    @State private var localMessage: String?
 
     private var visibleComments: [AskComment] {
         switch commentFilter {
@@ -865,14 +876,7 @@ struct QuestionDetail: View {
     }
 
     private var shareText: String {
-        let winner = question.winningOption?.title ?? "لم تتضح النتيجة بعد"
-        return """
-        وش الرأي؟
-        \(question.title)
-
-        النتيجة الحالية: \(winner)
-        \(question.smartSummary)
-        """
+        ComparisonShareService.shareText(for: question)
     }
 
     var body: some View {
@@ -956,6 +960,23 @@ struct QuestionDetail: View {
 
                 SavedDecisionCard(selection: $savedDecisionState, shareText: shareText)
 
+                DecisionActionCard(
+                    question: question,
+                    shareText: shareText,
+                    showQRCode: { showingQRCode = true },
+                    report: { showingReportSheet = true },
+                    scheduleReminder: scheduleReminder
+                )
+
+                if let localMessage {
+                    Label(localMessage, systemImage: "checkmark.circle.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.teal)
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.teal.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+                }
+
                 if !relatedQuestions.isEmpty {
                     SimilarQuestionsCard(questions: relatedQuestions, openQuestion: openRelatedQuestion)
                 }
@@ -1025,10 +1046,54 @@ struct QuestionDetail: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    saveAction(question.id)
+                Menu {
+                    Button {
+                        saveAction(question.id)
+                    } label: {
+                        Label(isSaved ? "إلغاء الحفظ" : "حفظ", systemImage: isSaved ? "bookmark.fill" : "bookmark")
+                    }
+                    Button {
+                        showingQRCode = true
+                    } label: {
+                        Label("QR", systemImage: "qrcode")
+                    }
+                    Button {
+                        showingReportSheet = true
+                    } label: {
+                        Label("إبلاغ", systemImage: "exclamationmark.bubble")
+                    }
                 } label: {
-                    Label(isSaved ? "إلغاء الحفظ" : "حفظ", systemImage: isSaved ? "bookmark.fill" : "bookmark")
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
+        .sheet(isPresented: $showingQRCode) {
+            NavigationStack {
+                QRCodeShareView(question: question)
+            }
+            .environment(\.layoutDirection, .rightToLeft)
+        }
+        .sheet(isPresented: $showingReportSheet) {
+            NavigationStack {
+                ReportContentView(contentID: question.id, contentType: .comparison) {
+                    localMessage = "تم حفظ البلاغ محليًا. يتطلب إرساله للمراجعة Backend في النسخة الإنتاجية."
+                    showingReportSheet = false
+                }
+            }
+            .environment(\.layoutDirection, .rightToLeft)
+        }
+    }
+
+    private func scheduleReminder() {
+        Task {
+            do {
+                try await LocalNotificationScheduler.scheduleDecisionReminder(for: question)
+                await MainActor.run {
+                    localMessage = "تم تفعيل تذكير محلي لهذه المقارنة."
+                }
+            } catch {
+                await MainActor.run {
+                    localMessage = error.localizedDescription
                 }
             }
         }
@@ -1537,6 +1602,209 @@ struct SavedDecisionCard: View {
         }
         .padding()
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+}
+
+enum LocalNotificationScheduler {
+    static func scheduleDecisionReminder(for question: AskQuestion) async throws {
+        let center = UNUserNotificationCenter.current()
+        let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
+        guard granted else {
+            throw AppError.forbidden
+        }
+
+        let content = UNMutableNotificationContent()
+        content.title = "وش الرأي"
+        content.body = "راجع نتيجة: \(question.title)"
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3600, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "wash-alray-\(question.id.uuidString)",
+            content: content,
+            trigger: trigger
+        )
+        try await center.add(request)
+    }
+}
+
+struct DecisionActionCard: View {
+    let question: AskQuestion
+    let shareText: String
+    let showQRCode: () -> Void
+    let report: () -> Void
+    let scheduleReminder: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("أدوات القرار", systemImage: "square.grid.2x2")
+                .font(.headline)
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 135), spacing: 10)], spacing: 10) {
+                ShareLink(item: shareText) {
+                    DecisionToolButton(title: "مشاركة الرابط", icon: "square.and.arrow.up", color: .teal)
+                }
+                ShareLink(item: ComparisonShareService.csvText(for: question)) {
+                    DecisionToolButton(title: "تصدير CSV", icon: "tablecells", color: .indigo)
+                }
+                Button(action: showQRCode) {
+                    DecisionToolButton(title: "QR Code", icon: "qrcode", color: .orange)
+                }
+                .buttonStyle(.plain)
+                Button(action: scheduleReminder) {
+                    DecisionToolButton(title: "تذكير محلي", icon: "bell.badge", color: .green)
+                }
+                .buttonStyle(.plain)
+                Button(action: report) {
+                    DecisionToolButton(title: "إبلاغ", icon: "exclamationmark.bubble", color: .red)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+}
+
+struct DecisionToolButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        Label(title, systemImage: icon)
+            .font(.caption.weight(.bold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 10)
+            .foregroundStyle(color)
+            .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct QRCodeShareView: View {
+    let question: AskQuestion
+    @Environment(\.dismiss) private var dismiss
+
+    private var link: String {
+        ComparisonShareService.deepLink(for: question).absoluteString
+    }
+
+    var body: some View {
+        VStack(spacing: 18) {
+            Text(question.title)
+                .font(.title3.weight(.bold))
+                .multilineTextAlignment(.center)
+
+            if let image = QRCodeGenerator.image(from: link) {
+                Image(uiImage: image)
+                    .interpolation(.none)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 260)
+                    .padding()
+                    .background(.white, in: RoundedRectangle(cornerRadius: 18))
+                    .accessibilityLabel("رمز QR لرابط المقارنة")
+            }
+
+            Text(link)
+                .font(.caption.monospaced())
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
+            ShareLink(item: link) {
+                Label("مشاركة الرابط", systemImage: "square.and.arrow.up")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+
+            Text("الرابط العميق يفتح المقارنة داخل التطبيق عندما تكون المقارنة موجودة على نفس الجهاز. المشاركة العامة بين المستخدمين تحتاج Backend وروابط Universal Links.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(20)
+        .background(AppBackground())
+        .navigationTitle("QR المقارنة")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("إغلاق") {
+                    dismiss()
+                }
+            }
+        }
+    }
+}
+
+enum QRCodeGenerator {
+    static func image(from text: String) -> UIImage? {
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = Data(text.utf8)
+        filter.correctionLevel = "M"
+
+        guard let output = filter.outputImage else { return nil }
+        let scaled = output.transformed(by: CGAffineTransform(scaleX: 10, y: 10))
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(scaled, from: scaled.extent) else { return nil }
+        return UIImage(cgImage: cgImage)
+    }
+}
+
+struct ReportContentView: View {
+    let contentID: UUID
+    let contentType: ReportableContentType
+    let didSubmit: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var reason: ReportReason = .misleading
+    @State private var details = ""
+
+    var body: some View {
+        Form {
+            Section("سبب البلاغ") {
+                Picker("السبب", selection: $reason) {
+                    ForEach(ReportReason.allCases) { reason in
+                        Text(reason.arabicTitle).tag(reason)
+                    }
+                }
+            }
+
+            Section("تفاصيل اختيارية") {
+                TextField("اكتب ما يساعد فريق المراجعة", text: $details, axis: .vertical)
+                    .lineLimit(3...6)
+            }
+
+            Section {
+                Text("البلاغات تحفظ محليًا الآن. إرسالها لفريق إشراف فعلي يتطلب Backend مخصصًا.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("إبلاغ")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("إلغاء") {
+                    dismiss()
+                }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("حفظ البلاغ") {
+                    LocalReportStore.shared.save(
+                        ContentReport(
+                            contentID: contentID,
+                            contentType: contentType,
+                            reason: reason,
+                            details: details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : details
+                        )
+                    )
+                    didSubmit()
+                }
+            }
+        }
     }
 }
 

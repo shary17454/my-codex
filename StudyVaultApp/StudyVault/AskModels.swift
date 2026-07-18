@@ -281,6 +281,99 @@ struct DashboardStatistics: Hashable {
     let closeResultCount: Int
 }
 
+enum ReportableContentType: String, Codable, CaseIterable, Identifiable {
+    case comparison
+    case comment
+    case voteReason
+    case user
+
+    var id: String { rawValue }
+}
+
+enum ReportReason: String, Codable, CaseIterable, Identifiable {
+    case abusive
+    case spam
+    case misleading
+    case duplicate
+    case inappropriateImage
+    case impersonation
+    case other
+
+    var id: String { rawValue }
+
+    var arabicTitle: String {
+        switch self {
+        case .abusive: "محتوى مسيء"
+        case .spam: "إعلان أو إزعاج"
+        case .misleading: "معلومات مضللة"
+        case .duplicate: "مقارنة مكررة"
+        case .inappropriateImage: "صور غير مناسبة"
+        case .impersonation: "انتحال"
+        case .other: "مخالفة أخرى"
+        }
+    }
+}
+
+struct ContentReport: Identifiable, Codable, Hashable {
+    let id: UUID
+    let contentID: UUID
+    let contentType: ReportableContentType
+    let reason: ReportReason
+    let details: String?
+    let createdAt: Date
+
+    init(
+        id: UUID = UUID(),
+        contentID: UUID,
+        contentType: ReportableContentType,
+        reason: ReportReason,
+        details: String? = nil,
+        createdAt: Date = Date()
+    ) {
+        self.id = id
+        self.contentID = contentID
+        self.contentType = contentType
+        self.reason = reason
+        self.details = details
+        self.createdAt = createdAt
+    }
+}
+
+enum ComparisonShareService {
+    static func deepLink(for question: AskQuestion) -> URL {
+        URL(string: "weshalray://comparison/\(question.id.uuidString)") ?? URL(filePath: "/")
+    }
+
+    static func shareText(for question: AskQuestion) -> String {
+        let winner = question.winningOption?.title ?? "لم تتضح النتيجة بعد"
+        return """
+        وش الرأي؟
+        \(question.title)
+
+        الخيارات: \(question.options.map(\.title).joined(separator: "، "))
+        النتيجة الحالية: \(winner)
+        \(question.smartSummary)
+
+        افتح المقارنة:
+        \(deepLink(for: question).absoluteString)
+        """
+    }
+
+    static func csvText(for question: AskQuestion) -> String {
+        var lines = ["\"الخيار\",\"الأصوات\",\"النسبة\",\"أسباب مكتوبة\""]
+        for option in question.options {
+            let reasons = question.comments.filter { $0.optionID == option.id || $0.optionTitle == option.title }.count
+            let percent = question.totalVotes == 0 ? 0 : Int((Double(option.votes) / Double(question.totalVotes)) * 100)
+            lines.append("\"\(escape(option.title))\",\"\(option.votes)\",\"\(percent)%\",\"\(reasons)\"")
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private static func escape(_ value: String) -> String {
+        value.replacingOccurrences(of: "\"", with: "\"\"")
+    }
+}
+
 enum SavedDecisionState: String, CaseIterable, Identifiable {
     case thinking
     case comparing

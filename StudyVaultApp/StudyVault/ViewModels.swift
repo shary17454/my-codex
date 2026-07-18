@@ -122,6 +122,16 @@ final class HomeViewModel {
             .map(\.question)
     }
 
+    func question(fromDeepLink url: URL) -> AskQuestion? {
+        guard url.scheme == "weshalray",
+              url.host == "comparison",
+              let idString = url.pathComponents.dropFirst().first,
+              let questionID = UUID(uuidString: idString) else {
+            return nil
+        }
+        return questions.first { $0.id == questionID }
+    }
+
     private func sortedQuestions(_ questions: [AskQuestion]) -> [AskQuestion] {
         switch selectedSortMode {
         case .newest:
@@ -220,6 +230,30 @@ final class HomeViewModel {
         } catch {
             appErrorMessage = AppError.unknown(error).errorDescription
         }
+    }
+}
+
+final class LocalReportStore: @unchecked Sendable {
+    static let shared = LocalReportStore()
+    private let key = "wash_alray_content_reports"
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+
+    private init() {}
+
+    func save(_ report: ContentReport) {
+        var reports = load()
+        reports.append(report)
+        guard let data = try? encoder.encode(reports) else { return }
+        UserDefaults.standard.set(data, forKey: key)
+    }
+
+    func load() -> [ContentReport] {
+        guard let data = UserDefaults.standard.data(forKey: key),
+              let reports = try? decoder.decode([ContentReport].self, from: data) else {
+            return []
+        }
+        return reports
     }
 }
 
