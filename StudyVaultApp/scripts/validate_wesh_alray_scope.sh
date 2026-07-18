@@ -50,4 +50,6 @@ if ! grep -q "SWIFT_VERSION = 6.0;" "$PROJECT_FILE"; then
 fi
 pass "Swift 6 is configured"
 
+python3 "$APP_DIR/scripts/validate_wesh_alray_data.py"
+
 printf 'Wesh Alray scope validation complete.\n'

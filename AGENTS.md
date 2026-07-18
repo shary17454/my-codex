@@ -28,6 +28,7 @@ Native scope and backend checks:
 
 ```sh
 StudyVaultApp/scripts/validate_wesh_alray_scope.sh
+python3 StudyVaultApp/scripts/validate_wesh_alray_data.py
 cd StudyVaultApp/backend && npm run check
 ```
 

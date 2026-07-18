@@ -19,6 +19,8 @@
   - ثبات اسم العرض `وش الرأي`.
   - ثبات Bundle ID الحالي.
   - ضبط Swift 6.
+- تم إضافة فحص بيانات باسم `StudyVaultApp/scripts/validate_wesh_alray_data.py` للتحقق من JSON، إعدادات Info.plist، وإعدادات Xcode الأساسية.
+- تمت إزالة مفاتيح Live Activities من `Info.plist` لأنها لم تكن مدعومة بتنفيذ ActivityKit فعلي داخل وش الرأي.
 
 ## 2. File Manifest
 
@@ -48,10 +50,9 @@
 
 - URL Scheme:
   - `weshalray://comparison/{id}` للروابط العميقة المحلية.
-- Live Activities keys موجودة:
-  - `NSSupportsLiveActivities`
-  - `NSSupportsLiveActivitiesFrequentUpdates`
-  - يجب تفعيل Target/Capability منفصل فقط إذا تم تنفيذ Live Activity فعليًا.
+- Live Activities:
+  - غير مفعلة حاليًا في `Info.plist`.
+  - يجب إعادة تفعيلها فقط عند إضافة تنفيذ ActivityKit وTarget/Capability مناسبين.
 - Permissions:
   - لا توجد UsageDescriptions لكاميرا أو صور أو موقع أو ميكروفون في `Info.plist`.
 - Privacy Manifest:
@@ -89,6 +90,7 @@
 
 ```sh
 StudyVaultApp/scripts/validate_wesh_alray_scope.sh
+python3 StudyVaultApp/scripts/validate_wesh_alray_data.py
 xcodebuild -project StudyVaultApp/StudyVault.xcodeproj -scheme StudyVault -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/StudyVaultDerivedData build
 xcodebuild -project StudyVaultApp/StudyVault.xcodeproj -scheme StudyVault -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/StudyVaultReleaseDerivedData build
 cd StudyVaultApp/backend && npm run check

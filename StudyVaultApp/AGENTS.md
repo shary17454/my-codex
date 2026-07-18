@@ -22,6 +22,7 @@ From the repository root:
 
 ```sh
 StudyVaultApp/scripts/validate_wesh_alray_scope.sh
+python3 StudyVaultApp/scripts/validate_wesh_alray_data.py
 xcodebuild -project StudyVaultApp/StudyVault.xcodeproj -scheme StudyVault -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/StudyVaultDerivedData build
 xcodebuild -project StudyVaultApp/StudyVault.xcodeproj -scheme StudyVault -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/StudyVaultReleaseDerivedData build
 ```
