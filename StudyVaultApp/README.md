@@ -123,7 +123,18 @@ BASE_URL=http://localhost:8787 npm run smoke
 
 مصدر الإصدار هو `MARKETING_VERSION` و`CURRENT_PROJECT_VERSION` في إعدادات Target. تستمد قيم `CFBundleShortVersionString` و`CFBundleVersion` منهما.
 
-لا تغيّر Bundle ID أو Team أو Signing أو Entitlements من تعليمات التشغيل. الرفع إلى App Store Connect يحتاج Archive موقّع وبيئة Xcode Cloud إنتاجية مسموحة ومراجعة بيانات الخصوصية يدويًا.
+لا تغيّر Bundle ID أو Team أو Signing أو Entitlements من تعليمات التشغيل. البناء المحلي مخصص للتطوير والتحقق فقط؛ مسار Release وArchive والرفع المعتمد هو Xcode Cloud حصريًا. يفحص `ci_post_clone.sh` بيئة Xcode وSDK قبل البناء، ثم يتحقق `ci_post_xcodebuild.sh` من القيم الفعلية داخل الأرشيف قبل قبول Build الإنتاجي.
+
+إعداد Workflow المعتمد:
+
+- الفرع: `main`.
+- Scheme: `StudyVault`.
+- Xcode: `26.6 (17F113)` الإنتاجي، وليس Latest Beta.
+- Actions: Build ثم Archive مع App Store Connect distribution.
+- Build Number: تديره Xcode Cloud؛ لا تستخدم `agvtool` أو `PlistBuddy` أو سكربتًا محليًا لزيادته.
+- آخر بناء مثبت: `1.10.0 (58)` من commit `dda2ea7`، وحالته `Complete` في App Store Connect.
+
+راجع [XCODE_CLOUD_RELEASE.md](docs/XCODE_CLOUD_RELEASE.md) قبل أي إصدار.
 
 راجع:
 
