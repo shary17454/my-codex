@@ -9,62 +9,330 @@ struct QuestionListView: View {
     @Binding var selectedQuestion: AskQuestion?
     @Binding var showingComposer: Bool
     let refresh: () async -> Void
+    let joinPrivateRoom: (String) async -> AskQuestion?
+
+    @State private var showingFilters = false
+    @State private var showingRoomJoiner = false
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
-                WeshSectionHeader(
-                    "استكشف المقارنات",
-                    subtitle: "ابحث حسب المنتج أو المجال، ثم رتّب النتائج بالطريقة المناسبة لك",
-                    systemImage: "sparkle.magnifyingglass"
+            LazyVStack(alignment: .leading, spacing: 18) {
+                DiscoverHeader(
+                    resultCount: questions.count,
+                    showingFilters: $showingFilters
                 )
 
                 CategoryScroller(selectedCategory: $selectedCategory)
                 SortModePicker(selectedSortMode: $selectedSortMode)
 
                 if questions.isEmpty {
-                    ContentUnavailableView(
-                        "لا توجد نتائج",
+                    WeshEmptyState(
+                        title: "ما لقينا نتيجة مطابقة",
+                        message: "جرّب كلمة مختلفة أو وسّع خيارات التصفية.",
                         systemImage: "magnifyingglass",
-                        description: Text("غيّر عبارة البحث أو اختر مجالًا آخر.")
-                    )
-                    .frame(maxWidth: .infinity, minHeight: 320)
+                        actionTitle: "مسح التصفية"
+                    ) {
+                        clearFilters()
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 330)
                 } else {
-                    Text("\(questions.count) نتيجة")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                    HStack {
+                        Text("\(questions.count) نتيجة")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(WeshTheme.secondaryText)
+                        Spacer()
+                        Text(selectedSortMode.title)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(WeshTheme.accent)
+                    }
 
-                    ForEach(questions) { question in
-                        Button {
-                            selectedQuestion = question
-                        } label: {
-                            QuestionRow(question: question)
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 320), spacing: 14)],
+                        spacing: 14
+                    ) {
+                        ForEach(questions) { question in
+                            DashboardQuestionCard(question: question) {
+                                selectedQuestion = question
+                            }
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, WeshTheme.horizontalPadding)
+            .padding(.vertical, 18)
             .weshContentWidth()
         }
         .background(AppBackground())
-        .refreshable {
-            await refresh()
-        }
+        .refreshable { await refresh() }
         .navigationTitle("اكتشف")
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, prompt: "ابحث عن منتج أو سؤال")
+        .searchable(text: $searchText, prompt: "ابحث عن مقارنة، خيار، أو تصنيف")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    showingRoomJoiner = true
+                } label: {
+                    Image(systemName: "key.fill")
+                }
+                .accessibilityLabel("الانضمام إلى غرفة خاصة")
+
                 Button {
                     showingComposer = true
                 } label: {
-                    Label("سؤال جديد", systemImage: "plus.bubble.fill")
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel("مقارنة جديدة")
+            }
+        }
+        .sheet(isPresented: $showingFilters) {
+            DiscoveryFilterSheet(
+                selectedCategory: $selectedCategory,
+                selectedSortMode: $selectedSortMode,
+                clear: clearFilters
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showingRoomJoiner) {
+            JoinDecisionRoomView { code in
+                guard let room = await joinPrivateRoom(code) else { return false }
+                selectedQuestion = room
+                return true
+            }
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+    }
+
+    private func clearFilters() {
+        searchText = ""
+        selectedCategory = .all
+        selectedSortMode = .newest
+    }
+}
+
+private struct JoinDecisionRoomView: View {
+    @Environment(\.dismiss) private var dismiss
+    let joinAction: (String) async -> Bool
+
+    @State private var code = ""
+    @State private var isJoining = false
+    @State private var errorMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                AppBackground()
+                VStack(spacing: 20) {
+                    Image(systemName: "key.fill")
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(WeshTheme.goldBright)
+                        .frame(width: 66, height: 66)
+                        .background(WeshTheme.gold.opacity(0.12), in: Circle())
+                        .accessibilityHidden(true)
+
+                    VStack(spacing: 7) {
+                        Text("غرفة قرار خاصة")
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(WeshTheme.primaryText)
+                        Text("أدخل رمز الدعوة الذي شاركه معك منشئ المقارنة.")
+                            .font(.subheadline)
+                            .foregroundStyle(WeshTheme.secondaryText)
+                            .multilineTextAlignment(.center)
+                    }
+
+                    TextField("رمز الدعوة", text: $code)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                        .multilineTextAlignment(.center)
+                        .font(.title3.monospaced().weight(.bold))
+                        .weshField()
+                        .accessibilityIdentifier("room.inviteCode")
+
+                    if let errorMessage {
+                        WeshStatusBanner(text: errorMessage, kind: .warning)
+                    }
+
+                    Button {
+                        join()
+                    } label: {
+                        if isJoining {
+                            ProgressView()
+                                .tint(.white)
+                                .frame(maxWidth: .infinity)
+                        } else {
+                            Label("فتح الغرفة", systemImage: "arrow.left")
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .buttonStyle(WeshPrimaryButtonStyle())
+                    .disabled(cleanCode.isEmpty || isJoining)
+                    .accessibilityIdentifier("room.join")
+                }
+                .padding(24)
+                .weshContentWidth()
+            }
+            .navigationTitle("الانضمام برمز")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("إلغاء") { dismiss() }
+                }
+            }
+        }
+        .environment(\.layoutDirection, .rightToLeft)
+    }
+
+    private var cleanCode: String {
+        code
+            .components(separatedBy: .whitespacesAndNewlines)
+            .joined()
+            .uppercased()
+    }
+
+    private func join() {
+        guard !cleanCode.isEmpty else { return }
+        isJoining = true
+        errorMessage = nil
+        Task {
+            let succeeded = await joinAction(cleanCode)
+            isJoining = false
+            if succeeded {
+                dismiss()
+            } else {
+                errorMessage = "تعذر فتح الغرفة. تحقق من الرمز والاتصال ثم حاول مرة أخرى."
+            }
+        }
+    }
+}
+
+private struct DiscoverHeader: View {
+    let resultCount: Int
+    @Binding var showingFilters: Bool
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 14) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("اكتشف")
+                    .font(.largeTitle.weight(.bold))
+                    .foregroundStyle(WeshTheme.primaryText)
+                Text("آراء وتجارب تساعدك تشوف الصورة كاملة.")
+                    .font(.subheadline)
+                    .foregroundStyle(WeshTheme.secondaryText)
+            }
+            Spacer(minLength: 8)
+            Button {
+                showingFilters = true
+            } label: {
+                Label("تصفية", systemImage: "line.3.horizontal.decrease")
+                    .font(.subheadline.weight(.bold))
+                    .padding(.horizontal, 13)
+                    .frame(minHeight: 44)
+                    .background(WeshTheme.surface, in: Capsule())
+                    .overlay { Capsule().stroke(WeshTheme.hairline) }
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("يعرض خيارات التصنيف والترتيب")
+        }
+        .accessibilityElement(children: .contain)
+    }
+}
+
+private struct DiscoveryFilterSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var selectedCategory: AskCategory
+    @Binding var selectedSortMode: QuestionSortMode
+    let clear: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        WeshSectionHeader("التصنيف", subtitle: "اختر المجال الأقرب لقرارك")
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 135), spacing: 10)], spacing: 10) {
+                            ForEach(AskCategory.allCases) { category in
+                                FilterChoice(
+                                    title: category.title,
+                                    systemImage: category.systemImage,
+                                    isSelected: selectedCategory == category
+                                ) {
+                                    selectedCategory = category
+                                }
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        WeshSectionHeader("الترتيب", subtitle: "رتّب النتائج بالطريقة المناسبة لك")
+                        ForEach(QuestionSortMode.allCases) { mode in
+                            FilterChoice(
+                                title: mode.title,
+                                systemImage: mode.systemImage,
+                                isSelected: selectedSortMode == mode
+                            ) {
+                                selectedSortMode = mode
+                            }
+                        }
+                    }
+                }
+                .padding(18)
+            }
+            .background(AppBackground())
+            .navigationTitle("تصفية النتائج")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("مسح") {
+                        clear()
+                    }
+                    .foregroundStyle(WeshTheme.destructive)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("تم") { dismiss() }
+                        .fontWeight(.bold)
                 }
             }
         }
     }
 }
+
+private struct FilterChoice: View {
+    let title: String
+    let systemImage: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                Image(systemName: systemImage)
+                    .frame(width: 22)
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Spacer(minLength: 6)
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(WeshTheme.accent)
+                }
+            }
+            .foregroundStyle(WeshTheme.primaryText)
+            .padding(.horizontal, 13)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .background(
+                isSelected ? WeshTheme.accent.opacity(0.11) : WeshTheme.surface,
+                in: RoundedRectangle(cornerRadius: WeshTheme.controlRadius)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: WeshTheme.controlRadius)
+                    .stroke(isSelected ? WeshTheme.accent.opacity(0.6) : WeshTheme.hairline)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
 struct KnowledgeLibraryView: View {
     let items: [KnowledgeItem]
     @Binding var selectedCategory: AskCategory
@@ -74,26 +342,40 @@ struct KnowledgeLibraryView: View {
     let openResearch: () -> Void
     let refresh: () async -> Void
 
+    private var categoryCount: Int {
+        Set(items.map(\.category)).count
+    }
+
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
-                WeshSectionHeader(
-                    "دليل الخيارات",
-                    subtitle: "معلومات منظمة تساعدك على صياغة مقارنة أدق",
-                    systemImage: "books.vertical.fill"
-                )
+            LazyVStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("المكتبة")
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundStyle(WeshTheme.primaryText)
+                    Text("معلومات منظمة تساعدك على المقارنة بشكل أسرع.")
+                        .font(.subheadline)
+                        .foregroundStyle(WeshTheme.secondaryText)
+                    Label("\(items.count) عنصرًا في \(categoryCount) تصنيفًا", systemImage: "books.vertical.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(WeshTheme.accent)
+                        .padding(.top, 3)
+                }
 
                 CategoryScroller(selectedCategory: $selectedCategory)
 
                 if items.isEmpty {
-                    ContentUnavailableView(
-                        "لا توجد عناصر",
-                        systemImage: "books.vertical",
-                        description: Text("غيّر البحث أو المجال لعرض عناصر أخرى.")
+                    WeshEmptyState(
+                        title: "ما لقينا عنصرًا مطابقًا",
+                        message: "غيّر كلمة البحث أو اختر تصنيفًا آخر.",
+                        systemImage: "books.vertical"
                     )
-                    .frame(maxWidth: .infinity, minHeight: 320)
+                    .frame(maxWidth: .infinity, minHeight: 330)
                 } else {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 320), spacing: 10)], spacing: 10) {
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 330), spacing: 14)],
+                        spacing: 14
+                    ) {
                         ForEach(items) { item in
                             KnowledgeRow(item: item) {
                                 selectedItem = item
@@ -104,21 +386,21 @@ struct KnowledgeLibraryView: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, WeshTheme.horizontalPadding)
+            .padding(.vertical, 18)
             .weshContentWidth()
         }
         .background(AppBackground())
-        .refreshable {
-            await refresh()
-        }
+        .refreshable { await refresh() }
         .navigationTitle("المكتبة")
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, prompt: "ابحث عن جوال، سيارة، مطعم...")
+        .searchable(text: $searchText, prompt: "ابحث عن منتج، خدمة، أو خيار")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: openResearch) {
-                    Label("بحث خارجي", systemImage: "safari")
+                    Image(systemName: "safari")
                 }
+                .accessibilityLabel("بحث خارجي")
             }
         }
     }
@@ -133,21 +415,25 @@ struct ResearchBrowserView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var address = ResearchBrowserDefaults.searchURLString
     @State private var activeURL = ResearchBrowserDefaults.searchURL
+    @State private var validationMessage: String?
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 10) {
-                HStack(spacing: 8) {
-                    TextField("ابحث أو اكتب رابط", text: $address)
+            VStack(spacing: 12) {
+                HStack(spacing: 9) {
+                    TextField("ابحث أو اكتب رابطًا آمنًا", text: $address)
                         .textInputAutocapitalization(.never)
-                        .keyboardType(.URL)
+                        .keyboardType(.webSearch)
                         .submitLabel(.go)
-                        .textFieldStyle(.roundedBorder)
+                        .weshField()
                         .onSubmit(loadAddress)
 
                     Button(action: loadAddress) {
-                        Image(systemName: "arrow.up.forward.circle.fill")
-                            .font(.title2)
+                        Image(systemName: "arrow.up.forward")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(width: 50, height: 50)
+                            .background(WeshTheme.accent, in: RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("فتح")
@@ -158,22 +444,24 @@ struct ResearchBrowserView: View {
                     BrowserShortcut(title: "سيارات", query: "مقارنة سيارات اقتصادية") { openSearch($0) }
                     BrowserShortcut(title: "مطاعم", query: "أفضل مطاعم قريبة") { openSearch($0) }
                 }
+
+                if let validationMessage {
+                    WeshStatusBanner(text: validationMessage, kind: .warning)
+                }
             }
-            .padding()
-            .background(.background)
+            .padding(14)
+            .background(WeshTheme.surface)
 
             WebView(url: activeURL)
-                .clipShape(RoundedRectangle(cornerRadius: WeshTheme.cornerRadius))
-                .padding([.horizontal, .bottom], 12)
+                .clipShape(RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
+                .padding(12)
         }
-        .navigationTitle("متصفح المقارنة")
+        .navigationTitle("بحث المقارنة")
         .navigationBarTitleDisplayMode(.inline)
         .background(AppBackground())
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button("إغلاق") {
-                    dismiss()
-                }
+                Button("إغلاق") { dismiss() }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Link(destination: activeURL) {
@@ -188,7 +476,15 @@ struct ResearchBrowserView: View {
         let trimmed = address.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        if let url = URL(string: trimmed), url.scheme == "https" || url.scheme == "http" {
+        if let url = URL(string: trimmed), url.scheme?.lowercased() == "https" {
+            validationMessage = nil
+            activeURL = url
+            return
+        }
+
+        if let url = URL(string: "https://\(trimmed)"), url.host?.contains(".") == true {
+            validationMessage = nil
+            address = url.absoluteString
             activeURL = url
             return
         }
@@ -199,6 +495,7 @@ struct ResearchBrowserView: View {
     private func openSearch(_ query: String) {
         let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         let urlString = "https://www.google.com/search?q=\(encoded)"
+        validationMessage = nil
         address = urlString
         activeURL = URL(string: urlString) ?? ResearchBrowserDefaults.searchURL
     }
@@ -210,18 +507,18 @@ struct WebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.allowsInlineMediaPlayback = true
+        configuration.websiteDataStore = .nonPersistent()
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.allowsBackForwardNavigationGestures = true
-        webView.load(URLRequest(url: url))
+        webView.load(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 30))
         return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         guard webView.url != url else { return }
-        webView.load(URLRequest(url: url))
+        webView.load(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 30))
     }
 }
-
 
 struct KnowledgeDetailView: View {
     let item: KnowledgeItem
@@ -231,77 +528,106 @@ struct KnowledgeDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Label(item.category.title, systemImage: item.category.systemImage)
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(WeshTheme.accent)
-                    Text(item.name)
-                        .font(.title.weight(.bold))
-                    Text(item.summary)
-                        .foregroundStyle(.secondary)
-                }
+                KnowledgeDetailHero(item: item)
 
-                InfoTile(title: "نقاط قوة", values: item.strengths, color: WeshTheme.success)
-                InfoTile(title: "انتبه لها", values: item.considerations, color: WeshTheme.highlight)
-                InfoTile(title: "مناسب لمن", values: item.idealFor, color: WeshTheme.secondaryAccent)
+                if !item.idealFor.isEmpty {
+                    InfoTile(title: "الأنسب لـ", values: item.idealFor, color: WeshTheme.secondaryAccent)
+                }
+                InfoTile(title: "نقاط القوة", values: item.strengths, color: WeshTheme.accent)
+                InfoTile(title: "الملاحظات", values: item.considerations, color: WeshTheme.gold)
 
                 if !item.specs.isEmpty {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text("بطاقة بيانات")
-                                .font(.headline)
-                            Spacer()
-                            Text(item.dataQuality)
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(WeshTheme.accent)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(WeshTheme.accent.opacity(0.12), in: Capsule())
-                        }
-
-                        ForEach(item.specs.keys.sorted(), id: \.self) { key in
-                            HStack(alignment: .top) {
-                                Text(key)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.secondary)
-                                Spacer(minLength: 16)
-                                Text(item.specs[key] ?? "")
-                                    .font(.subheadline.weight(.bold))
-                                    .multilineTextAlignment(.leading)
-                            }
-                            Divider()
-                        }
-                    }
-                    .weshSurface()
+                    SpecificationCard(item: item)
                 }
+
+                VStack(alignment: .leading, spacing: 9) {
+                    HStack {
+                        Label("جودة البيانات", systemImage: "checkmark.shield.fill")
+                            .font(.headline)
+                        Spacer()
+                        WeshPill(item.dataQuality, color: WeshTheme.accent)
+                    }
+                    Text("المعلومات مناسبة للمقارنة العامة وقد لا تشمل جميع التفاصيل أو التحديثات.")
+                        .font(.footnote)
+                        .foregroundStyle(WeshTheme.secondaryText)
+                }
+                .weshSurface(goldAccent: true)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("سؤال مقترح")
                         .font(.headline)
                     Text(item.suggestedQuestion)
                         .font(.title3.weight(.semibold))
+                        .foregroundStyle(WeshTheme.primaryText)
                 }
                 .weshSurface()
 
-                Button {
-                    useItem()
-                } label: {
-                    Label("استخدم في مقارنة جديدة", systemImage: "plus.bubble.fill")
+                Button(action: useItem) {
+                    Label("إضافته إلى مقارنة", systemImage: "plus")
                 }
                 .buttonStyle(WeshPrimaryButtonStyle())
             }
-            .padding(16)
+            .padding(.horizontal, WeshTheme.horizontalPadding)
+            .padding(.vertical, 18)
             .weshContentWidth()
         }
         .background(AppBackground())
-        .navigationTitle("تفاصيل")
+        .navigationTitle("معلومات العنصر")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button("إغلاق") {
-                    dismiss()
+                Button("إغلاق") { dismiss() }
+            }
+        }
+    }
+}
+
+private struct KnowledgeDetailHero: View {
+    let item: KnowledgeItem
+
+    var body: some View {
+        let color = WeshTheme.categoryColor(item.category)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                WeshIconTile(systemImage: item.category.systemImage, color: color, size: 54)
+                Spacer()
+                WeshPill(item.category.title, color: color)
+            }
+            Text(item.name)
+                .font(.largeTitle.weight(.bold))
+                .foregroundStyle(WeshTheme.primaryText)
+            Text(item.summary)
+                .font(.body)
+                .foregroundStyle(WeshTheme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .weshSurface(emphasized: true)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private struct SpecificationCard: View {
+    let item: KnowledgeItem
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            WeshSectionHeader("المواصفات", systemImage: "list.bullet.rectangle")
+            ForEach(Array(item.specs.keys.sorted().enumerated()), id: \.element) { index, key in
+                HStack(alignment: .firstTextBaseline, spacing: 18) {
+                    Text(key)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(WeshTheme.secondaryText)
+                    Spacer(minLength: 12)
+                    Text(item.specs[key] ?? "")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(WeshTheme.primaryText)
+                        .multilineTextAlignment(.leading)
+                }
+                if index < item.specs.count - 1 {
+                    Divider().overlay(WeshTheme.hairline)
                 }
             }
         }
+        .weshSurface()
     }
 }

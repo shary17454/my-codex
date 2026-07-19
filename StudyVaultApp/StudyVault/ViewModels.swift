@@ -35,16 +35,23 @@ final class HomeViewModel {
     private(set) var isOffline = false
     private(set) var lastUpdatedAt: Date?
     private(set) var pendingVoteQuestionIDs: Set<UUID> = []
+    private(set) var votedQuestionIDs: Set<UUID> = []
+    private(set) var outcomesByComparisonID: [UUID: DecisionOutcomeSnapshot] = [:]
+    private(set) var voteTrendsByComparisonID: [UUID: [VoteTrendPoint]] = [:]
+    private(set) var personalEvaluationsByComparisonID: [UUID: PersonalDecisionEvaluation] = [:]
     var isBackendEnabled: Bool
     var backendBaseURLText: String
     var backendAPITokenText: String
+    private let persistence: WeshPersistenceStore?
 
     init(
         questions: [AskQuestion] = AskDemoStore.questions,
-        knowledgeItems: [KnowledgeItem] = AskDemoStore.knowledgeItems
+        knowledgeItems: [KnowledgeItem] = AskDemoStore.knowledgeItems,
+        persistence: WeshPersistenceStore? = nil
     ) {
         self.questions = questions
         self.knowledgeItems = knowledgeItems
+        self.persistence = persistence
         self.isBackendEnabled = BackendSettingsStore.shared.isEnabled
         self.backendBaseURLText = BackendSettingsStore.shared.baseURLText
         self.backendAPITokenText = BackendSettingsStore.shared.apiTokenText
@@ -151,6 +158,14 @@ final class HomeViewModel {
         return questions.first { $0.id == questionID }
     }
 
+    func inviteCode(fromDeepLink url: URL) -> String? {
+        guard url.scheme == "weshalray", url.host == "comparison" else { return nil }
+        return URLComponents(url: url, resolvingAgainstBaseURL: false)?
+            .queryItems?
+            .first(where: { $0.name == "invite" })?
+            .value
+    }
+
     private func sortedQuestions(_ questions: [AskQuestion]) -> [AskQuestion] {
         switch selectedSortMode {
         case .newest:
@@ -171,7 +186,31 @@ final class HomeViewModel {
     }
 
     func loadSavedQuestionIDs() async {
-        savedQuestionIDs = (try? await LocalBookmarkRepository.shared.fetchSavedComparisonIDs()) ?? []
+        if let persistence {
+            savedQuestionIDs = (try? persistence.savedComparisonIDs()) ?? []
+        } else {
+            savedQuestionIDs = (try? await LocalBookmarkRepository.shared.fetchSavedComparisonIDs()) ?? []
+        }
+    }
+
+    func loadPersistentState() {
+        guard let persistence else { return }
+        do {
+            questions = try persistence.bootstrap(seedQuestions: questions)
+            savedQuestionIDs = try persistence.savedComparisonIDs()
+            votedQuestionIDs = try persistence.votedComparisonIDs()
+            outcomesByComparisonID = Dictionary(
+                uniqueKeysWithValues: try persistence.outcomes().map { ($0.comparisonID, $0) }
+            )
+            for question in questions {
+                voteTrendsByComparisonID[question.id] = try persistence.voteTrend(comparisonID: question.id)
+                if let evaluation = persistence.personalEvaluation(comparisonID: question.id) {
+                    personalEvaluationsByComparisonID[question.id] = evaluation
+                }
+            }
+        } catch {
+            appErrorMessage = "تعذر تحميل بياناتك المحلية. لم نحذف أي بيانات."
+        }
     }
 
     func saveBackendSettings() {
@@ -190,7 +229,17 @@ final class HomeViewModel {
 
         do {
             let remoteQuestions = try await client.fetchComparisons(category: selectedCategory == .all ? nil : selectedCategory)
-            questions = remoteQuestions.isEmpty ? questions : remoteQuestions
+            if !remoteQuestions.isEmpty {
+                cacheRemoteTrends(remoteQuestions)
+                if let persistence {
+                    for question in remoteQuestions {
+                        try persistence.upsert(question: question)
+                    }
+                    questions = try persistence.questions()
+                } else {
+                    questions = remoteQuestions
+                }
+            }
             appErrorMessage = nil
             isOffline = false
             lastUpdatedAt = Date()
@@ -200,8 +249,44 @@ final class HomeViewModel {
         }
     }
 
+    func joinPrivateRoom(inviteCode: String) async -> AskQuestion? {
+        let cleanCode = inviteCode
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        guard !cleanCode.isEmpty else {
+            appErrorMessage = "اكتب رمز الدعوة."
+            return nil
+        }
+        guard isBackendEnabled, let client = makeBackendClient() else {
+            appErrorMessage = "فعّل الاتصال بالخادم من الحساب أولًا."
+            return nil
+        }
+
+        do {
+            let room = try await client.fetchRoom(inviteCode: cleanCode)
+            cacheRemoteTrends([room])
+            try persistence?.upsert(question: room)
+            if let index = questions.firstIndex(where: { $0.id == room.id }) {
+                questions[index] = room
+            } else {
+                questions.insert(room, at: 0)
+            }
+            appErrorMessage = nil
+            return room
+        } catch {
+            appErrorMessage = userFacingMessage(for: error)
+            return nil
+        }
+    }
+
     func publishQuestion(_ question: AskQuestion) async -> AskQuestion? {
         guard isBackendEnabled else {
+            do {
+                try persistence?.upsert(question: question)
+            } catch {
+                appErrorMessage = "تعذر حفظ المقارنة محليًا. احتفظنا بالمسودة."
+                return nil
+            }
             insertPublishedQuestion(question)
             return question
         }
@@ -209,6 +294,7 @@ final class HomeViewModel {
 
         do {
             let remote = try await client.createComparison(question: question)
+            try persistence?.upsert(question: remote)
             questions.insert(remote, at: 0)
             appErrorMessage = nil
             return remote
@@ -281,11 +367,24 @@ final class HomeViewModel {
                     authorName: authorName,
                     reason: cleanReason?.isEmpty == true ? nil : cleanReason,
                     reasonCategory: reasonCategory,
-                    isVerifiedExperience: isVerifiedExperience
+                    isVerifiedExperience: isVerifiedExperience,
+                    inviteCode: questions[questionIndex].inviteCode
                 )
                 if let updatedIndex = questions.firstIndex(where: { $0.id == questionID }) {
                     questions[updatedIndex] = remoteQuestion
                 }
+                cacheRemoteTrends([remoteQuestion])
+                if let persistence {
+                    try persistence.upsert(question: remoteQuestion)
+                    try persistence.recordRemoteVoteMarker(
+                        comparisonID: questionID,
+                        optionID: optionID,
+                        reason: cleanReason,
+                        triedOption: isVerifiedExperience,
+                        isAnonymous: authorName == "مجهول"
+                    )
+                }
+                votedQuestionIDs.insert(questionID)
                 appErrorMessage = nil
                 return remoteQuestion
             } catch {
@@ -295,12 +394,26 @@ final class HomeViewModel {
         }
 
         do {
-            _ = try await LocalVotingRepository.shared.vote(
-                comparisonID: questionID,
-                optionID: optionID,
-                reason: cleanReason?.isEmpty == true ? nil : cleanReason,
-                isAnonymous: authorName == "مجهول"
-            )
+            if let persistence {
+                try persistence.recordVote(
+                    comparisonID: questionID,
+                    optionID: optionID,
+                    reason: cleanReason?.isEmpty == true ? nil : cleanReason,
+                    authorName: authorName,
+                    reasonCategory: reasonCategory,
+                    triedOption: isVerifiedExperience,
+                    isAnonymous: authorName == "مجهول"
+                )
+                votedQuestionIDs.insert(questionID)
+                voteTrendsByComparisonID[questionID] = try persistence.voteTrend(comparisonID: questionID)
+            } else {
+                _ = try await LocalVotingRepository.shared.vote(
+                    comparisonID: questionID,
+                    optionID: optionID,
+                    reason: cleanReason?.isEmpty == true ? nil : cleanReason,
+                    isAnonymous: authorName == "مجهول"
+                )
+            }
             appErrorMessage = nil
             return applyLocalVote(
                 questionID: questionID,
@@ -358,17 +471,31 @@ final class HomeViewModel {
             return nil
         }
 
+        let comment = AskComment(author: authorName, text: cleanText, likes: 0, createdAt: Date())
         questions[questionIndex].comments.insert(
-            AskComment(author: authorName, text: cleanText, likes: 0),
+            comment,
             at: 0
         )
+        do {
+            try persistence?.addComment(comparisonID: questionID, comment: comment)
+        } catch {
+            appErrorMessage = "تعذر حفظ التعليق محليًا."
+        }
         pushCommentIfNeeded(questionID: questionID, text: cleanText, authorName: authorName)
         return questions[questionIndex]
     }
 
     func toggleSavedQuestion(questionID: AskQuestion.ID) async {
         do {
-            if savedQuestionIDs.contains(questionID) {
+            let shouldSave = !savedQuestionIDs.contains(questionID)
+            if let persistence {
+                try persistence.setSaved(shouldSave, comparisonID: questionID)
+                if shouldSave {
+                    savedQuestionIDs.insert(questionID)
+                } else {
+                    savedQuestionIDs.remove(questionID)
+                }
+            } else if !shouldSave {
                 try await LocalBookmarkRepository.shared.removeSavedComparison(id: questionID)
                 savedQuestionIDs.remove(questionID)
             } else {
@@ -380,6 +507,24 @@ final class HomeViewModel {
         }
     }
 
+    func saveOutcome(_ outcome: DecisionOutcomeSnapshot) {
+        do {
+            try persistence?.saveOutcome(outcome)
+            outcomesByComparisonID[outcome.comparisonID] = outcome
+        } catch {
+            appErrorMessage = "تعذر حفظ نتيجة تجربتك. حاول مرة أخرى."
+        }
+    }
+
+    func savePersonalEvaluation(_ evaluation: PersonalDecisionEvaluation, comparisonID: UUID) {
+        do {
+            try persistence?.savePersonalEvaluation(evaluation, comparisonID: comparisonID)
+            personalEvaluationsByComparisonID[comparisonID] = evaluation
+        } catch {
+            appErrorMessage = "تعذر حفظ تقييم معاييرك."
+        }
+    }
+
     private func makeBackendClient() -> WeshAlrayAPIClient? {
         guard let url = URL(string: backendBaseURLText.trimmingCharacters(in: .whitespacesAndNewlines)) else {
             appErrorMessage = "عنوان Backend غير صحيح."
@@ -387,6 +532,13 @@ final class HomeViewModel {
         }
         let cleanToken = backendAPITokenText.trimmingCharacters(in: .whitespacesAndNewlines)
         return WeshAlrayAPIClient(baseURL: url, apiToken: cleanToken.isEmpty ? nil : cleanToken)
+    }
+
+    private func cacheRemoteTrends(_ remoteQuestions: [AskQuestion]) {
+        for question in remoteQuestions {
+            guard let events = question.voteTrendEvents else { continue }
+            voteTrendsByComparisonID[question.id] = VoteTrendEngine.cumulativePoints(events: events)
+        }
     }
 
     private func userFacingMessage(for error: Error) -> String {
@@ -408,9 +560,15 @@ final class HomeViewModel {
 
     private func pushCommentIfNeeded(questionID: AskQuestion.ID, text: String, authorName: String) {
         guard isBackendEnabled, let client = makeBackendClient() else { return }
+        let inviteCode = questions.first(where: { $0.id == questionID })?.inviteCode
         Task {
             do {
-                _ = try await client.addComment(comparisonID: questionID, text: text, authorName: authorName)
+                _ = try await client.addComment(
+                    comparisonID: questionID,
+                    text: text,
+                    authorName: authorName,
+                    inviteCode: inviteCode
+                )
             } catch {
                 await MainActor.run {
                     appErrorMessage = userFacingMessage(for: error)
@@ -491,12 +649,15 @@ struct WeshAlrayAPIClient: Sendable {
     let baseURL: URL
     let apiToken: String?
     private let session: URLSession
-    private let decoder = JSONDecoder()
-    private let encoder = JSONEncoder()
+    private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
 
     init(baseURL: URL, apiToken: String?, session: URLSession? = nil) {
         self.baseURL = baseURL
         self.apiToken = apiToken
+        decoder = JSONDecoder()
+        encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
         if let session {
             self.session = session
         } else {
@@ -518,6 +679,18 @@ struct WeshAlrayAPIClient: Sendable {
         return response.comparisons.map(\.askQuestion)
     }
 
+    func fetchRoom(inviteCode: String) async throws -> AskQuestion {
+        let cleanCode = inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        guard !cleanCode.isEmpty else { throw AppError.invalidInput("اكتب رمز الدعوة.") }
+        let url = baseURL
+            .appendingPathComponent("api")
+            .appendingPathComponent("v1")
+            .appendingPathComponent("rooms")
+            .appendingPathComponent(cleanCode)
+        let response: RemoteComparison = try await get(url)
+        return response.askQuestion
+    }
+
     func createComparison(question: AskQuestion) async throws -> AskQuestion {
         let request = CreateComparisonRequest(
             title: question.title,
@@ -525,9 +698,12 @@ struct WeshAlrayAPIClient: Sendable {
             category: question.category.rawValue,
             author: question.author,
             isAnonymous: question.author == "مجهول",
-            allowsComments: true,
-            allowsVoteReasons: true,
-            tags: [],
+            allowsComments: question.allowsComments,
+            allowsVoteReasons: question.allowsReasons,
+            expiresAt: question.closesAt,
+            tags: question.tags,
+            visibility: question.visibility.rawValue,
+            hideResultsUntilVote: question.hideResultsUntilVote,
             options: question.options.map { CreateOptionRequest(title: $0.title) }
         )
         let response: RemoteComparison = try await post(path: "/api/v1/comparisons", body: request)
@@ -540,7 +716,8 @@ struct WeshAlrayAPIClient: Sendable {
         authorName: String,
         reason: String?,
         reasonCategory: String?,
-        isVerifiedExperience: Bool
+        isVerifiedExperience: Bool,
+        inviteCode: String?
     ) async throws -> AskQuestion {
         let request = VoteRequest(
             optionID: optionID.uuidString,
@@ -550,26 +727,49 @@ struct WeshAlrayAPIClient: Sendable {
             isVerifiedExperience: isVerifiedExperience,
             isAnonymous: false
         )
-        let response: VoteResponse = try await post(path: "/api/v1/comparisons/\(comparisonID.uuidString)/votes", body: request)
+        let response: VoteResponse = try await post(
+            path: "/api/v1/comparisons/\(comparisonID.uuidString)/votes",
+            body: request,
+            inviteCode: inviteCode
+        )
         return response.comparison.askQuestion
     }
 
-    func addComment(comparisonID: UUID, text: String, authorName: String) async throws -> RemoteComment {
-        try await post(path: "/api/v1/comparisons/\(comparisonID.uuidString)/comments", body: CommentRequest(author: authorName, text: text))
+    func addComment(
+        comparisonID: UUID,
+        text: String,
+        authorName: String,
+        inviteCode: String?
+    ) async throws -> RemoteComment {
+        try await post(
+            path: "/api/v1/comparisons/\(comparisonID.uuidString)/comments",
+            body: CommentRequest(author: authorName, text: text),
+            inviteCode: inviteCode
+        )
     }
 
     private func get<T: Decodable>(_ url: URL) async throws -> T {
-        let (data, response) = try await session.data(from: url)
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "accept")
+        request.setValue(DeviceClientID.value, forHTTPHeaderField: "x-client-id")
+        let (data, response) = try await session.data(for: request)
         try validate(response: response, data: data)
         return try decoder.decode(T.self, from: data)
     }
 
-    private func post<Body: Encodable, Response: Decodable>(path: String, body: Body) async throws -> Response {
+    private func post<Body: Encodable, Response: Decodable>(
+        path: String,
+        body: Body,
+        inviteCode: String? = nil
+    ) async throws -> Response {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "content-type")
         request.setValue("application/json", forHTTPHeaderField: "accept")
         request.setValue(DeviceClientID.value, forHTTPHeaderField: "x-client-id")
+        if let inviteCode, !inviteCode.isEmpty {
+            request.setValue(inviteCode, forHTTPHeaderField: "x-invite-code")
+        }
         if let apiToken, !apiToken.isEmpty {
             request.setValue("Bearer \(apiToken)", forHTTPHeaderField: "authorization")
         }
@@ -620,6 +820,15 @@ private struct RemoteComparison: Decodable {
     let category: String
     let author: String
     let createdAt: String
+    let expiresAt: String?
+    let isAnonymous: Bool?
+    let allowsComments: Bool?
+    let allowsVoteReasons: Bool?
+    let tags: [String]?
+    let visibility: String?
+    let inviteCode: String?
+    let hideResultsUntilVote: Bool?
+    let voteTrend: [RemoteVoteTrend]?
     let options: [RemoteOption]
     let comments: [RemoteComment]
 
@@ -632,7 +841,35 @@ private struct RemoteComparison: Decodable {
             author: author,
             timeAgo: "من الخادم",
             options: options.map { PollOption(id: $0.id, title: $0.title, votes: $0.votes) },
-            comments: comments.map(\.askComment)
+            comments: comments.map(\.askComment),
+            createdAt: ISO8601DateFormatter().date(from: createdAt) ?? Date(),
+            closesAt: expiresAt.flatMap { ISO8601DateFormatter().date(from: $0) },
+            isAnonymous: isAnonymous ?? false,
+            allowsReasons: allowsVoteReasons ?? true,
+            allowsComments: allowsComments ?? true,
+            tags: tags ?? [],
+            isPublished: true,
+            visibility: visibility.flatMap(ComparisonVisibility.init(rawValue:)) ?? .publicRoom,
+            inviteCode: inviteCode,
+            hideResultsUntilVote: hideResultsUntilVote ?? false,
+            voteTrendEvents: voteTrend?.map { $0.event(comparisonID: id) }
+        )
+    }
+}
+
+private struct RemoteVoteTrend: Decodable {
+    let id: UUID
+    let optionID: UUID
+    let optionName: String
+    let createdAt: String
+
+    func event(comparisonID: UUID) -> VoteTrendEvent {
+        VoteTrendEvent(
+            id: id,
+            comparisonID: comparisonID,
+            optionID: optionID,
+            optionName: optionName,
+            createdAt: ISO8601DateFormatter().date(from: createdAt) ?? Date()
         )
     }
 }
@@ -652,6 +889,7 @@ struct RemoteComment: Decodable {
     let likes: Int
     let trustBadge: String?
     let reasonCategory: String?
+    let createdAt: String?
 
     var askComment: AskComment {
         AskComment(
@@ -662,7 +900,8 @@ struct RemoteComment: Decodable {
             optionID: optionID,
             optionTitle: optionTitle,
             trustBadge: trustBadge,
-            reasonCategory: reasonCategory
+            reasonCategory: reasonCategory,
+            createdAt: createdAt.flatMap { ISO8601DateFormatter().date(from: $0) } ?? Date()
         )
     }
 }
@@ -675,7 +914,10 @@ private struct CreateComparisonRequest: Encodable {
     let isAnonymous: Bool
     let allowsComments: Bool
     let allowsVoteReasons: Bool
+    let expiresAt: Date?
     let tags: [String]
+    let visibility: String
+    let hideResultsUntilVote: Bool
     let options: [CreateOptionRequest]
 }
 
@@ -738,14 +980,23 @@ final class CreateComparisonViewModel {
     var allowsComments = true
     var allowsVoteReasons = true
     var voteDuration: VoteDurationOption = .oneWeek
+    var visibility: ComparisonVisibility = .publicRoom
+    var hideResultsUntilVote = false
     var validationMessage: String?
     var didPublish = false
+    private let persistence: WeshPersistenceStore?
 
-    init(template: KnowledgeItem? = nil) {
-        title = template?.suggestedQuestion ?? ""
+    init(
+        template: KnowledgeItem? = nil,
+        initialTitle: String = "",
+        persistence: WeshPersistenceStore? = nil
+    ) {
+        let cleanInitialTitle = initialTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        title = cleanInitialTitle.isEmpty ? template?.suggestedQuestion ?? "" : cleanInitialTitle
         details = template?.summary ?? ""
         category = template?.category ?? .phones
         optionCount = template == nil ? 2 : 3
+        self.persistence = persistence
 
         var options = Array(repeating: "", count: 10)
         if let template {
@@ -767,6 +1018,11 @@ final class CreateComparisonViewModel {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && completedOptions.count >= 2
     }
 
+    var hasDuplicateOptions: Bool {
+        let normalized = completedOptions.map(KnowledgeSearchIndex.normalize)
+        return Set(normalized).count != normalized.count
+    }
+
     var currentDraft: ComparisonDraft {
         ComparisonDraft(
             title: title,
@@ -782,13 +1038,15 @@ final class CreateComparisonViewModel {
             tags: tagsText
                 .split(separator: ",")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty }
+                .filter { !$0.isEmpty },
+            visibility: visibility,
+            hideResultsUntilVote: hideResultsUntilVote
         )
     }
 
     func restoreDraftIfNeeded() {
         guard title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              let draft = LocalDraftStore.shared.load() else { return }
+              let draft = loadDraft() else { return }
 
         title = draft.title
         details = draft.description
@@ -797,6 +1055,8 @@ final class CreateComparisonViewModel {
         isAnonymous = draft.isAnonymous
         allowsComments = draft.allowsComments
         allowsVoteReasons = draft.allowsVoteReasons
+        visibility = draft.visibility
+        hideResultsUntilVote = draft.hideResultsUntilVote
         voteDuration = durationOption(for: draft.expiresAt)
         optionCount = min(max(draft.options.count, 2), 10)
 
@@ -808,8 +1068,61 @@ final class CreateComparisonViewModel {
     }
 
     func saveDraft() {
-        LocalDraftStore.shared.save(currentDraft)
-        validationMessage = "تم حفظ المسودة محليًا."
+        do {
+            try persistDraft(currentDraft)
+            validationMessage = "تم حفظ المسودة محليًا."
+        } catch {
+            validationMessage = "تعذر حفظ المسودة. حاول مرة أخرى."
+        }
+    }
+
+    func saveDraftSilently() {
+        guard !didPublish else { return }
+        try? persistDraft(currentDraft)
+    }
+
+    func addOption() {
+        guard optionCount < optionTitles.count else { return }
+        optionCount += 1
+        validationMessage = nil
+    }
+
+    func removeOption(at index: Int) {
+        guard optionCount > 2, optionTitles.indices.contains(index), index < optionCount else { return }
+        for currentIndex in index..<(optionCount - 1) {
+            optionTitles[currentIndex] = optionTitles[currentIndex + 1]
+        }
+        optionTitles[optionCount - 1] = ""
+        optionCount -= 1
+        validationMessage = nil
+    }
+
+    func moveOption(at index: Int, offset: Int) {
+        let destination = index + offset
+        guard index >= 0, index < optionCount, destination >= 0, destination < optionCount else { return }
+        optionTitles.swapAt(index, destination)
+    }
+
+    func validateBasics() -> Bool {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            validationMessage = "عنوان المقارنة مطلوب."
+            return false
+        }
+        validationMessage = nil
+        return true
+    }
+
+    func validateOptions() -> Bool {
+        guard completedOptions.count >= 2 else {
+            validationMessage = "أضف خيارًا ثانيًا حتى تكتمل المقارنة."
+            return false
+        }
+        guard !hasDuplicateOptions else {
+            validationMessage = "هذا الخيار موجود بالفعل. استخدم اسمًا مختلفًا."
+            return false
+        }
+        validationMessage = nil
+        return true
     }
 
     func applyQuickPrompt(_ prompt: String) {
@@ -834,7 +1147,7 @@ final class CreateComparisonViewModel {
 
     func saveDraftOnDismissIfNeeded() {
         if !didPublish && (!canSave || !completedOptions.isEmpty) {
-            LocalDraftStore.shared.save(currentDraft)
+            try? persistDraft(currentDraft)
         }
     }
 
@@ -855,14 +1168,43 @@ final class CreateComparisonViewModel {
             author: isAnonymous ? "مجهول" : authorName,
             timeAgo: "الآن",
             options: completedOptions.map { PollOption(title: $0, votes: 0) },
-            comments: []
+            comments: [],
+            createdAt: Date(),
+            closesAt: voteDuration.expiryDate,
+            isAnonymous: isAnonymous,
+            allowsReasons: allowsVoteReasons,
+            allowsComments: allowsComments,
+            tags: currentDraft.tags,
+            isPublished: true,
+            visibility: visibility,
+            hideResultsUntilVote: hideResultsUntilVote
         )
     }
 
     func markPublished() {
         didPublish = true
         validationMessage = nil
-        LocalDraftStore.shared.clear()
+        clearDraft()
+    }
+
+    private func loadDraft() -> ComparisonDraft? {
+        persistence?.loadDraft() ?? LocalDraftStore.shared.load()
+    }
+
+    private func persistDraft(_ draft: ComparisonDraft) throws {
+        if let persistence {
+            try persistence.saveDraft(draft)
+        } else {
+            LocalDraftStore.shared.save(draft)
+        }
+    }
+
+    private func clearDraft() {
+        if let persistence {
+            try? persistence.clearDraft()
+        } else {
+            LocalDraftStore.shared.clear()
+        }
     }
 
     private func durationOption(for expiryDate: Date?) -> VoteDurationOption {

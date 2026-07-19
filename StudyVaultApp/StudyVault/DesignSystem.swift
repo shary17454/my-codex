@@ -1,70 +1,175 @@
 import SwiftUI
+import UIKit
 
 enum WeshTheme {
-    static let accent = Color(red: 0.02, green: 0.47, blue: 0.45)
-    static let secondaryAccent = Color(red: 0.24, green: 0.36, blue: 0.72)
-    static let highlight = Color(red: 0.86, green: 0.53, blue: 0.14)
-    static let success = Color(red: 0.16, green: 0.55, blue: 0.32)
-    static let cornerRadius: CGFloat = 8
-    static let contentMaxWidth: CGFloat = 980
+    static let accent = adaptiveColor(light: 0x168566, dark: 0x27B58A)
+    static let accentBright = adaptiveColor(light: 0x27A880, dark: 0x56D2AD)
+    static let gold = adaptiveColor(light: 0xB78738, dark: 0xD7AE63)
+    static let goldBright = adaptiveColor(light: 0xC79B51, dark: 0xE8C988)
+    static let warning = adaptiveColor(light: 0xB78738, dark: 0xE5B85C)
+    static let highlight = warning
+    static let destructive = adaptiveColor(light: 0xB95353, dark: 0xE27373)
+    static let success = accent
+    static let secondaryAccent = adaptiveColor(light: 0x496BA8, dark: 0x7397DD)
 
-    static var canvas: Color {
-        Color(uiColor: .systemGroupedBackground)
+    static let canvas = adaptiveColor(light: 0xF6F3ED, dark: 0x0B0E13)
+    static let canvasBottom = adaptiveColor(light: 0xEFEAE1, dark: 0x11151C)
+    static let surface = adaptiveColor(light: 0xFFFFFF, dark: 0x151A21)
+    static let elevatedSurface = adaptiveColor(light: 0xFFFFFF, dark: 0x1B212A)
+    static let primaryText = adaptiveColor(light: 0x171B21, dark: 0xF7F8FA)
+    static let secondaryText = adaptiveColor(light: 0x66707B, dark: 0xA8B0BA)
+    static let hairline = adaptiveColor(light: 0xE6E0D6, dark: 0x2B323D)
+
+    static let cardRadius: CGFloat = 22
+    static let controlRadius: CGFloat = 16
+    static let compactRadius: CGFloat = 12
+    static let cornerRadius = compactRadius
+    static let contentMaxWidth: CGFloat = 1180
+    static let horizontalPadding: CGFloat = 18
+
+    static var backgroundGradient: LinearGradient {
+        LinearGradient(
+            colors: [canvas, canvasBottom],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
-    static var surface: Color {
-        Color(uiColor: .secondarySystemGroupedBackground)
+    static var heroGradient: LinearGradient {
+        LinearGradient(
+            colors: [accent.opacity(0.98), adaptiveColor(light: 0x0F6650, dark: 0x0E4B3E)],
+            startPoint: .topTrailing,
+            endPoint: .bottomLeading
+        )
     }
 
-    static var elevatedSurface: Color {
-        Color(uiColor: .tertiarySystemGroupedBackground)
+    static var goldGradient: LinearGradient {
+        LinearGradient(
+            colors: [goldBright, gold],
+            startPoint: .topTrailing,
+            endPoint: .bottomLeading
+        )
     }
 
-    static var hairline: Color {
-        Color.primary.opacity(0.08)
+    static func categoryColor(_ category: AskCategory) -> Color {
+        switch category {
+        case .all: accent
+        case .phones, .laptops: secondaryAccent
+        case .cars, .travel: adaptiveColor(light: 0x2A7992, dark: 0x5DB2C9)
+        case .restaurants, .fashion: adaptiveColor(light: 0xA75C46, dark: 0xD88C73)
+        case .services, .education: adaptiveColor(light: 0x6A5EAB, dark: 0xA092DF)
+        case .subscriptions, .gaming: adaptiveColor(light: 0x8B568C, dark: 0xC58FC6)
+        case .home: adaptiveColor(light: 0x8A6B3D, dark: 0xC7A46A)
+        case .health: adaptiveColor(light: 0xA54E5D, dark: 0xDF8292)
+        case .other: secondaryText
+        }
+    }
+
+    private static func adaptiveColor(light: UInt32, dark: UInt32) -> Color {
+        Color(uiColor: UIColor { traits in
+            UIColor(hex: traits.userInterfaceStyle == .dark ? dark : light)
+        })
+    }
+}
+
+private extension UIColor {
+    convenience init(hex: UInt32) {
+        self.init(
+            red: CGFloat((hex >> 16) & 0xFF) / 255,
+            green: CGFloat((hex >> 8) & 0xFF) / 255,
+            blue: CGFloat(hex & 0xFF) / 255,
+            alpha: 1
+        )
     }
 }
 
 struct WeshSurfaceModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
     let padding: CGFloat
     let emphasized: Bool
+    let goldAccent: Bool
 
     func body(content: Content) -> some View {
         content
             .padding(padding)
             .background(
                 emphasized ? WeshTheme.elevatedSurface : WeshTheme.surface,
-                in: RoundedRectangle(cornerRadius: WeshTheme.cornerRadius, style: .continuous)
+                in: RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous)
             )
             .overlay {
-                RoundedRectangle(cornerRadius: WeshTheme.cornerRadius, style: .continuous)
-                    .stroke(WeshTheme.hairline, lineWidth: 1)
+                RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous)
+                    .stroke(
+                        goldAccent ? WeshTheme.gold.opacity(0.46) : WeshTheme.hairline,
+                        lineWidth: goldAccent ? 1.2 : 1
+                    )
             }
+            .shadow(
+                color: Color.black.opacity(colorScheme == .dark ? 0.18 : 0.055),
+                radius: emphasized ? 18 : 10,
+                y: emphasized ? 8 : 4
+            )
     }
 }
 
 extension View {
-    func weshSurface(padding: CGFloat = 16, emphasized: Bool = false) -> some View {
-        modifier(WeshSurfaceModifier(padding: padding, emphasized: emphasized))
+    func weshSurface(
+        padding: CGFloat = 18,
+        emphasized: Bool = false,
+        goldAccent: Bool = false
+    ) -> some View {
+        modifier(WeshSurfaceModifier(padding: padding, emphasized: emphasized, goldAccent: goldAccent))
     }
 
     func weshContentWidth(alignment: Alignment = .topLeading) -> some View {
         frame(maxWidth: WeshTheme.contentMaxWidth, alignment: alignment)
             .frame(maxWidth: .infinity, alignment: alignment)
     }
+
+    func weshField() -> some View {
+        padding(.horizontal, 14)
+            .frame(minHeight: 52)
+            .background(WeshTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
+            .overlay {
+                RoundedRectangle(cornerRadius: WeshTheme.controlRadius)
+                    .stroke(WeshTheme.hairline, lineWidth: 1)
+            }
+    }
+}
+
+struct WeshBrandMark: View {
+    var size: CGFloat = 56
+    var usesGold = false
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
+                .fill(usesGold ? WeshTheme.goldGradient : WeshTheme.heroGradient)
+            Image(systemName: "checkmark.bubble.fill")
+                .font(.system(size: size * 0.47, weight: .bold))
+                .foregroundStyle(.white)
+                .symbolRenderingMode(.hierarchical)
+        }
+        .frame(width: size, height: size)
+        .shadow(color: (usesGold ? WeshTheme.gold : WeshTheme.accent).opacity(0.24), radius: 12, y: 6)
+        .accessibilityHidden(true)
+    }
 }
 
 struct WeshIconTile: View {
     let systemImage: String
     var color = WeshTheme.accent
-    var size: CGFloat = 40
+    var size: CGFloat = 44
 
     var body: some View {
         Image(systemName: systemImage)
-            .font(.system(size: size * 0.42, weight: .semibold))
+            .font(.system(size: size * 0.4, weight: .semibold))
             .foregroundStyle(color)
             .frame(width: size, height: size)
-            .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: WeshTheme.cornerRadius))
+            .background(color.opacity(0.13), in: RoundedRectangle(cornerRadius: size * 0.31, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: size * 0.31, style: .continuous)
+                    .stroke(color.opacity(0.12), lineWidth: 1)
+            }
             .accessibilityHidden(true)
     }
 }
@@ -73,11 +178,21 @@ struct WeshSectionHeader: View {
     let title: String
     let subtitle: String?
     let systemImage: String?
+    var actionTitle: String?
+    var action: (() -> Void)?
 
-    init(_ title: String, subtitle: String? = nil, systemImage: String? = nil) {
+    init(
+        _ title: String,
+        subtitle: String? = nil,
+        systemImage: String? = nil,
+        actionTitle: String? = nil,
+        action: (() -> Void)? = nil
+    ) {
         self.title = title
         self.subtitle = subtitle
         self.systemImage = systemImage
+        self.actionTitle = actionTitle
+        self.action = action
     }
 
     var body: some View {
@@ -88,19 +203,25 @@ struct WeshSectionHeader: View {
                     .accessibilityHidden(true)
             }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.title3.weight(.bold))
+                    .foregroundStyle(WeshTheme.primaryText)
                 if let subtitle {
                     Text(subtitle)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(WeshTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            Spacer(minLength: 0)
+            Spacer(minLength: 8)
+            if let actionTitle, let action {
+                Button(actionTitle, action: action)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(WeshTheme.accent)
+            }
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: action == nil ? .combine : .contain)
     }
 }
 
@@ -109,12 +230,14 @@ struct WeshStatusBanner: View {
         case information
         case success
         case warning
+        case error
 
         var color: Color {
             switch self {
             case .information: WeshTheme.secondaryAccent
             case .success: WeshTheme.success
-            case .warning: WeshTheme.highlight
+            case .warning: WeshTheme.warning
+            case .error: WeshTheme.destructive
             }
         }
 
@@ -123,6 +246,7 @@ struct WeshStatusBanner: View {
             case .information: "info.circle.fill"
             case .success: "checkmark.circle.fill"
             case .warning: "exclamationmark.triangle.fill"
+            case .error: "xmark.octagon.fill"
             }
         }
     }
@@ -135,54 +259,79 @@ struct WeshStatusBanner: View {
             .font(.subheadline.weight(.medium))
             .foregroundStyle(kind.color)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
-            .background(kind.color.opacity(0.10), in: RoundedRectangle(cornerRadius: WeshTheme.cornerRadius))
+            .padding(14)
+            .background(kind.color.opacity(0.11), in: RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
+            .overlay {
+                RoundedRectangle(cornerRadius: WeshTheme.controlRadius)
+                    .stroke(kind.color.opacity(0.2), lineWidth: 1)
+            }
             .accessibilityElement(children: .combine)
     }
 }
 
 struct WeshPrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
-            .foregroundStyle(isEnabled ? .white : .secondary)
-            .frame(maxWidth: .infinity, minHeight: 50)
+            .foregroundStyle(isEnabled ? .white : WeshTheme.secondaryText)
+            .frame(maxWidth: .infinity, minHeight: 54)
             .padding(.horizontal, 16)
             .background(
-                isEnabled
-                    ? WeshTheme.accent.opacity(configuration.isPressed ? 0.78 : 1)
-                    : Color.secondary.opacity(0.14),
-                in: RoundedRectangle(cornerRadius: WeshTheme.cornerRadius, style: .continuous)
+                isEnabled ? WeshTheme.accent.opacity(configuration.isPressed ? 0.82 : 1) : WeshTheme.hairline,
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
             )
-            .scaleEffect(configuration.isPressed ? 0.985 : 1)
-            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+            .scaleEffect(reduceMotion ? 1 : (configuration.isPressed ? 0.98 : 1))
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: configuration.isPressed)
+    }
+}
+
+struct WeshGoldButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .foregroundStyle(isEnabled ? Color.black.opacity(0.82) : WeshTheme.secondaryText)
+            .frame(maxWidth: .infinity, minHeight: 54)
+            .padding(.horizontal, 16)
+            .background(
+                LinearGradient(
+                    colors: isEnabled ? [WeshTheme.goldBright, WeshTheme.gold] : [WeshTheme.hairline],
+                    startPoint: .topTrailing,
+                    endPoint: .bottomLeading
+                )
+                .opacity(configuration.isPressed ? 0.82 : 1),
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            )
+            .scaleEffect(reduceMotion ? 1 : (configuration.isPressed ? 0.98 : 1))
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: configuration.isPressed)
     }
 }
 
 struct WeshSecondaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
-            .foregroundStyle(isEnabled ? WeshTheme.accent : .secondary)
-            .frame(maxWidth: .infinity, minHeight: 50)
+            .foregroundStyle(isEnabled ? WeshTheme.primaryText : WeshTheme.secondaryText)
+            .frame(maxWidth: .infinity, minHeight: 54)
             .padding(.horizontal, 16)
             .background(
-                (isEnabled ? WeshTheme.accent : Color.secondary)
-                    .opacity(configuration.isPressed ? 0.16 : 0.09),
-                in: RoundedRectangle(cornerRadius: WeshTheme.cornerRadius, style: .continuous)
+                WeshTheme.surface.opacity(configuration.isPressed ? 0.72 : 1),
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
             )
             .overlay {
-                RoundedRectangle(cornerRadius: WeshTheme.cornerRadius, style: .continuous)
-                    .stroke(
-                        (isEnabled ? WeshTheme.accent : Color.secondary).opacity(0.22),
-                        lineWidth: 1
-                    )
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(WeshTheme.hairline, lineWidth: 1)
             }
-            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+            .scaleEffect(reduceMotion ? 1 : (configuration.isPressed ? 0.98 : 1))
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: configuration.isPressed)
     }
 }
 
@@ -193,19 +342,118 @@ struct WeshMetricTile: View {
     let color: Color
 
     var body: some View {
-        HStack(spacing: 10) {
-            WeshIconTile(systemImage: systemImage, color: color, size: 36)
+        HStack(spacing: 11) {
+            WeshIconTile(systemImage: systemImage, color: color, size: 40)
             VStack(alignment: .leading, spacing: 2) {
                 Text(value)
-                    .font(.headline.monospacedDigit())
-                    .foregroundStyle(.primary)
+                    .font(.title3.monospacedDigit().weight(.bold))
+                    .foregroundStyle(WeshTheme.primaryText)
                 Text(title)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .foregroundStyle(WeshTheme.secondaryText)
+                    .lineLimit(2)
             }
             Spacer(minLength: 0)
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+struct WeshPill: View {
+    let title: String
+    let systemImage: String?
+    let color: Color
+
+    init(_ title: String, systemImage: String? = nil, color: Color = WeshTheme.accent) {
+        self.title = title
+        self.systemImage = systemImage
+        self.color = color
+    }
+
+    var body: some View {
+        Group {
+            if let systemImage {
+                Label(title, systemImage: systemImage)
+            } else {
+                Text(title)
+            }
+        }
+        .font(.caption.weight(.bold))
+        .foregroundStyle(color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(color.opacity(0.12), in: Capsule())
+        .overlay { Capsule().stroke(color.opacity(0.15), lineWidth: 1) }
+    }
+}
+
+struct WeshEmptyState: View {
+    let title: String
+    let message: String
+    let systemImage: String
+    var actionTitle: String?
+    var action: (() -> Void)?
+
+    var body: some View {
+        VStack(spacing: 14) {
+            WeshIconTile(systemImage: systemImage, color: WeshTheme.secondaryText, size: 58)
+            Text(title)
+                .font(.title3.weight(.bold))
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(WeshTheme.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            if let actionTitle, let action {
+                Button(actionTitle, action: action)
+                    .buttonStyle(WeshSecondaryButtonStyle())
+                    .frame(maxWidth: 260)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 240)
+        .padding(24)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+struct WeshStepIndicator: View {
+    let current: Int
+    let titles: [String]
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(Array(titles.enumerated()), id: \.offset) { index, title in
+                VStack(spacing: 7) {
+                    ZStack {
+                        Circle()
+                            .fill(index <= current ? WeshTheme.accent : WeshTheme.elevatedSurface)
+                        if index < current {
+                            Image(systemName: "checkmark")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.white)
+                        } else {
+                            Text("\(index + 1)")
+                                .font(.caption.monospacedDigit().weight(.bold))
+                                .foregroundStyle(index == current ? .white : WeshTheme.secondaryText)
+                        }
+                    }
+                    .frame(width: 30, height: 30)
+                    Text(title)
+                        .font(.caption2.weight(index == current ? .bold : .medium))
+                        .foregroundStyle(index == current ? WeshTheme.primaryText : WeshTheme.secondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                .frame(maxWidth: .infinity)
+                if index < titles.count - 1 {
+                    Capsule()
+                        .fill(index < current ? WeshTheme.accent : WeshTheme.hairline)
+                        .frame(height: 2)
+                        .offset(y: -10)
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("المرحلة \(current + 1) من \(titles.count): \(titles[current])")
     }
 }

@@ -1,16 +1,8 @@
-# Wesh Alray Backend API
+# Wesh Alray Development Backend API
 
-Base URL للتطوير:
+Base URL الافتراضي: `http://localhost:8787`.
 
-```text
-http://localhost:8787
-```
-
-إذا كان الخادم مضبوطًا بمتغير `WESH_ALRAY_API_TOKEN`، يجب إرسال الهيدر التالي مع طلبات الكتابة:
-
-```http
-Authorization: Bearer <token>
-```
+طلبات الكتابة تستخدم `Authorization: Bearer <token>` إذا ضُبط `WESH_ALRAY_API_TOKEN`. التصويت يتطلب `X-Client-ID`، لكن هذا معرّف تطوير وليس مصادقة إنتاجية.
 
 ## Health
 
@@ -18,19 +10,19 @@ Authorization: Bearer <token>
 GET /health
 ```
 
-## المقارنات
+## المقارنات العامة
 
 ```http
 GET /api/v1/comparisons?category=phones&q=iphone
-```
-
-```http
 GET /api/v1/comparisons/{comparisonID}
 ```
+
+القائمة لا تعيد الغرف الخاصة. البحث يشمل العنوان والوصف والخيارات والوسوم بعد تطبيع العربية.
 
 ```http
 POST /api/v1/comparisons
 Content-Type: application/json
+X-Client-ID: local-device-id
 Authorization: Bearer <token>
 
 {
@@ -41,6 +33,9 @@ Authorization: Bearer <token>
   "isAnonymous": false,
   "allowsComments": true,
   "allowsVoteReasons": true,
+  "visibility": "inviteCode",
+  "hideResultsUntilVote": true,
+  "expiresAt": "2026-08-01T12:00:00Z",
   "tags": ["جوالات"],
   "options": [
     { "title": "آيفون" },
@@ -49,38 +44,54 @@ Authorization: Bearer <token>
 }
 ```
 
+قيم `visibility`: `publicRoom` أو`linkOnly` أو`inviteCode`. الغرفة غير العامة تعيد `inviteCode`.
+
+## فتح غرفة خاصة
+
+```http
+GET /api/v1/rooms/{inviteCode}
+X-Client-ID: local-device-id
+```
+
+أو للوصول المباشر بالمعرف:
+
+```http
+GET /api/v1/comparisons/{comparisonID}
+X-Invite-Code: ABC123DEF4
+X-Client-ID: local-device-id
+```
+
 ## التصويت
 
 ```http
 POST /api/v1/comparisons/{comparisonID}/votes
 Content-Type: application/json
 X-Client-ID: local-device-id
+X-Invite-Code: ABC123DEF4
 Authorization: Bearer <token>
 
 {
   "optionID": "option-uuid",
   "author": "ضيف",
   "reason": "الكاميرا أفضل",
-  "reasonCategory": "الكاميرا أفضل",
+  "reasonCategory": "الكاميرا",
   "isVerifiedExperience": true,
   "isAnonymous": false
 }
 ```
 
-## التعليقات
+يرد الخادم بـ`409` للصوت المكرر أو المقارنة المنتهية، و`400` إذا تجاوز السبب 300 حرف. `voteTrend` يحتوي وقت التصويت والخيار فقط ولا يحتوي هوية العميل.
+
+## التعليقات والبلاغات
 
 ```http
 POST /api/v1/comparisons/{comparisonID}/comments
 Content-Type: application/json
+X-Invite-Code: ABC123DEF4
 Authorization: Bearer <token>
 
-{
-  "author": "ضيف",
-  "text": "أحتاج تجارب أكثر عن الضمان"
-}
+{ "author": "ضيف", "text": "أحتاج تجارب أكثر عن الضمان" }
 ```
-
-## البلاغات
 
 ```http
 POST /api/v1/reports
@@ -95,13 +106,6 @@ Authorization: Bearer <token>
 }
 ```
 
-## متطلبات الإنتاج
+## حدود الإنتاج
 
-- مصادقة Apple Sign In على الخادم.
-- قاعدة بيانات دائمة.
-- قيود Rate Limiting.
-- سياسة منع تكرار التصويت.
-- مراجعة وإشراف البلاغات.
-- Push Notifications عبر APNs.
-- Universal Links بملف `apple-app-site-association`.
-- استبدال رمز الكتابة المشترك بمصادقة مستخدمين حقيقية قبل إصدار عام يعتمد على Backend.
+هذا العقد مختبر محليًا، لكن هوية الإنتاج غير منفذة. قبل النشر العام يجب استخدام PostgreSQL ومعاملات، والتحقق الخادمي من Sign in with Apple، وجلسات آمنة، وAPNs، وإشراف ونسخ احتياطية. لا يوضع API token مشترك داخل نسخة App Store.

@@ -148,6 +148,307 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertNil(LocalDraftStore.shared.load())
     }
 
+    func testCreateComparisonViewModelManagesOptionsAndRejectsDuplicates() {
+        let viewModel = CreateComparisonViewModel()
+        viewModel.optionTitles[0] = "آيفون"
+        viewModel.optionTitles[1] = "ايفون"
+
+        XCTAssertTrue(viewModel.hasDuplicateOptions)
+        XCTAssertFalse(viewModel.validateOptions())
+        XCTAssertEqual(viewModel.validationMessage, "هذا الخيار موجود بالفعل. استخدم اسمًا مختلفًا.")
+
+        viewModel.optionTitles[1] = "سامسونج"
+        viewModel.addOption()
+        viewModel.optionTitles[2] = "بيكسل"
+        viewModel.moveOption(at: 2, offset: -1)
+
+        XCTAssertEqual(viewModel.optionCount, 3)
+        XCTAssertEqual(viewModel.completedOptions, ["آيفون", "بيكسل", "سامسونج"])
+
+        viewModel.removeOption(at: 1)
+        XCTAssertEqual(viewModel.optionCount, 2)
+        XCTAssertEqual(viewModel.completedOptions, ["آيفون", "سامسونج"])
+        XCTAssertTrue(viewModel.validateOptions())
+    }
+
+    func testSmartComparisonPriorityChangesTheLeadingCandidate() {
+        let affordable = KnowledgeItem(
+            id: "affordable",
+            name: "الخيار الاقتصادي",
+            category: .phones,
+            summary: "سعر اقتصادي يقدم قيمة وتوفيرًا واضحًا.",
+            strengths: ["سعر مناسب"],
+            considerations: [],
+            suggestedQuestion: "هل الخيار الاقتصادي مناسب؟",
+            tags: ["قيمة"]
+        )
+        let powerful = KnowledgeItem(
+            id: "powerful",
+            name: "خيار الأداء",
+            category: .phones,
+            summary: "أداء قوي وسرعة ومعالج مناسب للاستخدام الاحترافي.",
+            strengths: ["أداء قوي"],
+            considerations: [],
+            suggestedQuestion: "هل خيار الأداء مناسب؟",
+            tags: ["سرعة"]
+        )
+
+        let priceReport = ComparisonEngine.buildReport(for: [affordable, powerful], priority: .price)
+        let performanceReport = ComparisonEngine.buildReport(for: [affordable, powerful], priority: .performance)
+
+        XCTAssertEqual(priceReport.candidates.first?.item.id, affordable.id)
+        XCTAssertEqual(performanceReport.candidates.first?.item.id, powerful.id)
+        XCTAssertTrue(priceReport.recommendation.contains(ComparisonPriority.price.title))
+        XCTAssertTrue(performanceReport.recommendation.contains(ComparisonPriority.performance.title))
+    }
+
+    func testWeightedDecisionEngineRespectsPersonalPriorities() {
+        let price = DecisionCriterion(title: "السعر", weight: 5)
+        let camera = DecisionCriterion(title: "الكاميرا", weight: 1)
+        let balanced = EvaluatedOption(
+            title: "الخيار الاقتصادي",
+            scores: [price.id: 9, camera.id: 4]
+        )
+        let cameraFirst = EvaluatedOption(
+            title: "خيار التصوير",
+            scores: [price.id: 5, camera.id: 10]
+        )
+
+        let ranking = WeightedDecisionEngine.rank(
+            options: [cameraFirst, balanced],
+            criteria: [price, camera]
+        )
+
+        XCTAssertEqual(ranking.first?.id, balanced.id)
+        XCTAssertEqual(ranking.first?.rank, 1)
+        XCTAssertEqual(ranking.first?.score ?? 0, 49.0 / 6.0, accuracy: 0.001)
+    }
+
+    func testDecisionStateSeparatesSampleSizeFromWinningMargin() {
+        let smallSample = DecisionStateEngine.evaluate(
+            totalVotes: 3,
+            firstPercentage: 100,
+            secondPercentage: 0,
+            reasonCount: 3,
+            triedOptionCount: 3
+        )
+        let decisiveSample = DecisionStateEngine.evaluate(
+            totalVotes: 80,
+            firstPercentage: 75,
+            secondPercentage: 25,
+            reasonCount: 40,
+            triedOptionCount: 20
+        )
+
+        XCTAssertEqual(smallSample.state, .insufficientData)
+        XCTAssertNotNil(smallSample.warning)
+        XCTAssertEqual(decisiveSample.state, .decisive)
+        XCTAssertEqual(decisiveSample.confidence, .high)
+    }
+
+    func testEvidenceQualityUsesParticipationReasonsExperienceAndFreshness() {
+        let now = Date(timeIntervalSince1970: 2_000_000)
+        let result = EvidenceQualityEngine.evaluate(
+            participantCount: 60,
+            reasonCount: 30,
+            triedOptionCount: 15,
+            lastActivityDate: now,
+            now: now
+        )
+
+        XCTAssertEqual(result.score, 78)
+        XCTAssertEqual(result.level, .good)
+        XCTAssertEqual(result.reasonCoverage, 0.5, accuracy: 0.001)
+        XCTAssertEqual(result.triedCoverage, 0.5, accuracy: 0.001)
+    }
+
+    func testArabicReasonAnalyzerNormalizesArabicAndKeepsOpposingSignals() {
+        XCTAssertEqual(
+            ArabicTextNormalizer.normalize("آيفون سَهل، وكاميرته ممتازة!"),
+            "ايفون سهل وكاميرته ممتازه"
+        )
+
+        let insights = ArabicReasonAnalyzer.analyze(reasons: [
+            "الكاميرا ممتازة والتصوير واضح",
+            "البطارية جيدة لكن السعر غالي",
+            "السعر مناسب وقيمة ممتازة"
+        ])
+
+        XCTAssertEqual(insights.first(where: { $0.id == "price" })?.mentionCount, 2)
+        XCTAssertEqual(insights.first(where: { $0.id == "camera" })?.sentimentLabel, "نقطة قوة")
+        XCTAssertEqual(insights.first(where: { $0.id == "battery" })?.mentionCount, 1)
+    }
+
+    func testRankedVotingAwardsThreeTwoOnePoints() {
+        let first = UUID()
+        let second = UUID()
+        let third = UUID()
+        let results = RankedVotingEngine.calculate(
+            optionIDs: [first, second, third],
+            ballots: [
+                RankedBallot(orderedOptionIDs: [first, second, third]),
+                RankedBallot(orderedOptionIDs: [first, second, third])
+            ]
+        )
+
+        XCTAssertEqual(results.first?.optionID, first)
+        XCTAssertEqual(results.first?.points, 6)
+        XCTAssertEqual(results.first?.rank, 1)
+        XCTAssertEqual(results.last?.points, 2)
+    }
+
+    func testSwiftDataPersistsComparisonVoteReasonAndBookmark() throws {
+        let container = try WeshPersistenceStore.makeContainer(inMemory: true)
+        let store = WeshPersistenceStore(container: container)
+        let question = makeQuestion(votes: [2, 1])
+        let optionID = try XCTUnwrap(question.options.first?.id)
+
+        try store.upsert(question: question)
+        try store.recordVote(
+            comparisonID: question.id,
+            optionID: optionID,
+            reason: "الكاميرا ممتازة",
+            authorName: "مختبر",
+            reasonCategory: "الكاميرا",
+            triedOption: true,
+            isAnonymous: false
+        )
+        try store.setSaved(true, comparisonID: question.id)
+
+        let reloadedStore = WeshPersistenceStore(container: container)
+        let restored = try XCTUnwrap(reloadedStore.questions().first(where: { $0.id == question.id }))
+        XCTAssertEqual(restored.totalVotes, 4)
+        XCTAssertEqual(restored.comments.first?.text, "الكاميرا ممتازة")
+        XCTAssertEqual(restored.comments.first?.trustBadge, "مجرّب فعليًا")
+        XCTAssertTrue(try reloadedStore.savedComparisonIDs().contains(question.id))
+        XCTAssertTrue(try reloadedStore.votedComparisonIDs().contains(question.id))
+        XCTAssertEqual(try reloadedStore.voteTrend(comparisonID: question.id).last?.cumulativeVotes, 1)
+
+        XCTAssertThrowsError(
+            try reloadedStore.recordVote(
+                comparisonID: question.id,
+                optionID: optionID,
+                reason: nil,
+                authorName: "مختبر",
+                reasonCategory: nil,
+                triedOption: false,
+                isAnonymous: false
+            )
+        ) { error in
+            guard case AppError.voteAlreadyExists = error else {
+                return XCTFail("يجب رفض التصويت المكرر، وليس إرجاع \(error).")
+            }
+        }
+    }
+
+    func testSwiftDataRestoresDraftOutcomeAndPersonalEvaluation() throws {
+        let container = try WeshPersistenceStore.makeContainer(inMemory: true)
+        let store = WeshPersistenceStore(container: container)
+        let draft = ComparisonDraft(
+            title: "قرار محفوظ",
+            options: [
+                ComparisonOptionDraft(title: "الأول"),
+                ComparisonOptionDraft(title: "الثاني")
+            ],
+            visibility: .linkOnly,
+            hideResultsUntilVote: true
+        )
+        let comparisonID = UUID()
+        let optionID = UUID()
+        let outcome = DecisionOutcomeSnapshot(
+            comparisonID: comparisonID,
+            chosenOptionID: optionID,
+            satisfactionScore: 5,
+            wouldChooseAgain: true,
+            note: "قرار موفق"
+        )
+        let criterion = DecisionCriterion(title: "الجودة", weight: 5)
+        let evaluation = PersonalDecisionEvaluation(
+            criteria: [criterion],
+            options: [EvaluatedOption(id: optionID, title: "الأول", scores: [criterion.id: 9])],
+            updatedAt: Date()
+        )
+
+        try store.saveDraft(draft)
+        try store.saveOutcome(outcome)
+        try store.savePersonalEvaluation(evaluation, comparisonID: comparisonID)
+
+        let reloadedStore = WeshPersistenceStore(container: container)
+        XCTAssertEqual(reloadedStore.loadDraft(), draft)
+        XCTAssertEqual(try reloadedStore.outcomes().first, outcome)
+        XCTAssertEqual(reloadedStore.personalEvaluation(comparisonID: comparisonID), evaluation)
+    }
+
+    func testRemoteVoteMarkerSurvivesRelaunchWithoutChangingServerTotals() throws {
+        let container = try WeshPersistenceStore.makeContainer(inMemory: true)
+        let store = WeshPersistenceStore(container: container)
+        let question = makeQuestion(votes: [5, 3])
+        let optionID = try XCTUnwrap(question.options.first?.id)
+
+        try store.upsert(question: question)
+        try store.recordRemoteVoteMarker(
+            comparisonID: question.id,
+            optionID: optionID,
+            reason: "تجربة فعلية",
+            triedOption: true,
+            isAnonymous: false
+        )
+        try store.recordRemoteVoteMarker(
+            comparisonID: question.id,
+            optionID: optionID,
+            reason: "إعادة استجابة",
+            triedOption: true,
+            isAnonymous: false
+        )
+
+        let reopenedStore = WeshPersistenceStore(container: container)
+        let restored = try XCTUnwrap(reopenedStore.questions().first(where: { $0.id == question.id }))
+        XCTAssertEqual(restored.totalVotes, 8)
+        XCTAssertTrue(try reopenedStore.votedComparisonIDs().contains(question.id))
+        XCTAssertTrue(try reopenedStore.voteTrend(comparisonID: question.id).isEmpty)
+    }
+
+    func testPrivateComparisonDeepLinkCarriesInviteCode() throws {
+        var question = makeQuestion(votes: [0, 0])
+        question.visibility = .inviteCode
+        question.inviteCode = "A1B2C3D4E5"
+        let link = ComparisonShareService.deepLink(for: question)
+        let viewModel = HomeViewModel(questions: [question], knowledgeItems: [])
+
+        XCTAssertEqual(link.scheme, "weshalray")
+        XCTAssertEqual(link.host, "comparison")
+        XCTAssertEqual(viewModel.question(fromDeepLink: link)?.id, question.id)
+        XCTAssertEqual(viewModel.inviteCode(fromDeepLink: link), "A1B2C3D4E5")
+    }
+
+    func testSwiftDataSurvivesRecreatedModelContainer() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("wesh-persistence-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storeURL = directory.appendingPathComponent("WeshAlRay.sqlite")
+        let question = makeQuestion(title: "مقارنة تبقى بعد إعادة الفتح", votes: [4, 2])
+
+        try autoreleasepool {
+            let container = try WeshPersistenceStore.makeContainer(storeURL: storeURL)
+            let store = WeshPersistenceStore(container: container)
+            try store.upsert(question: question)
+            try store.saveDraft(
+                ComparisonDraft(
+                    title: question.title,
+                    options: question.options.map { ComparisonOptionDraft(title: $0.title) }
+                )
+            )
+        }
+
+        try autoreleasepool {
+            let reopenedContainer = try WeshPersistenceStore.makeContainer(storeURL: storeURL)
+            let reopenedStore = WeshPersistenceStore(container: reopenedContainer)
+            XCTAssertEqual(try reopenedStore.questions().first?.id, question.id)
+            XCTAssertEqual(reopenedStore.loadDraft()?.title, question.title)
+        }
+    }
+
     private func makeQuestion(
         title: String = "أي خيار أفضل؟",
         category: AskCategory = .phones,

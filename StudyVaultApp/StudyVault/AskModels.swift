@@ -78,6 +78,7 @@ struct AskComment: Identifiable, Hashable, Codable {
     var optionTitle: String?
     var trustBadge: String?
     var reasonCategory: String?
+    var createdAt: Date
 
     init(
         id: UUID = UUID(),
@@ -87,7 +88,8 @@ struct AskComment: Identifiable, Hashable, Codable {
         optionID: UUID? = nil,
         optionTitle: String? = nil,
         trustBadge: String? = nil,
-        reasonCategory: String? = nil
+        reasonCategory: String? = nil,
+        createdAt: Date = Date()
     ) {
         self.id = id
         self.author = author
@@ -97,6 +99,7 @@ struct AskComment: Identifiable, Hashable, Codable {
         self.optionTitle = optionTitle
         self.trustBadge = trustBadge
         self.reasonCategory = reasonCategory
+        self.createdAt = createdAt
     }
 }
 
@@ -109,6 +112,17 @@ struct AskQuestion: Identifiable, Hashable, Codable {
     var timeAgo: String
     var options: [PollOption]
     var comments: [AskComment]
+    var createdAt: Date
+    var closesAt: Date?
+    var isAnonymous: Bool
+    var allowsReasons: Bool
+    var allowsComments: Bool
+    var tags: [String]
+    var isPublished: Bool
+    var visibility: ComparisonVisibility
+    var inviteCode: String?
+    var hideResultsUntilVote: Bool
+    var voteTrendEvents: [VoteTrendEvent]?
 
     init(
         id: UUID = UUID(),
@@ -118,7 +132,18 @@ struct AskQuestion: Identifiable, Hashable, Codable {
         author: String,
         timeAgo: String,
         options: [PollOption],
-        comments: [AskComment]
+        comments: [AskComment],
+        createdAt: Date = Date(),
+        closesAt: Date? = nil,
+        isAnonymous: Bool = false,
+        allowsReasons: Bool = true,
+        allowsComments: Bool = true,
+        tags: [String] = [],
+        isPublished: Bool = true,
+        visibility: ComparisonVisibility = .publicRoom,
+        inviteCode: String? = nil,
+        hideResultsUntilVote: Bool = false,
+        voteTrendEvents: [VoteTrendEvent]? = nil
     ) {
         self.id = id
         self.title = title
@@ -128,6 +153,17 @@ struct AskQuestion: Identifiable, Hashable, Codable {
         self.timeAgo = timeAgo
         self.options = options
         self.comments = comments
+        self.createdAt = createdAt
+        self.closesAt = closesAt
+        self.isAnonymous = isAnonymous
+        self.allowsReasons = allowsReasons
+        self.allowsComments = allowsComments
+        self.tags = tags
+        self.isPublished = isPublished
+        self.visibility = visibility
+        self.inviteCode = inviteCode
+        self.hideResultsUntilVote = hideResultsUntilVote
+        self.voteTrendEvents = voteTrendEvents
     }
 
     var totalVotes: Int {
@@ -146,11 +182,17 @@ struct AskQuestion: Identifiable, Hashable, Codable {
     }
 
     var decisionConfidence: Int {
-        guard totalVotes > 0, let winner = winningOption else { return 0 }
-        let lead = Double(winner.votes) / Double(max(totalVotes, 1))
-        let reasonDepth = min(comments.count * 4, 24)
-        let verifiedBoost = min(verifiedComments.count * 7, 21)
-        return min(96, max(55, Int(lead * 58) + reasonDepth + verifiedBoost))
+        let sorted = options.sorted { $0.votes > $1.votes }
+        let first = sorted.first.map { Double($0.votes) / Double(max(totalVotes, 1)) * 100 } ?? 0
+        let second = sorted.dropFirst().first.map { Double($0.votes) / Double(max(totalVotes, 1)) * 100 } ?? 0
+        let reasons = comments.filter { $0.optionID != nil }
+        return DecisionStateEngine.evaluate(
+            totalVotes: totalVotes,
+            firstPercentage: first,
+            secondPercentage: second,
+            reasonCount: reasons.count,
+            triedOptionCount: reasons.filter { $0.trustBadge != nil }.count
+        ).confidenceScore
     }
 
     var repeatedPros: [String] {
@@ -271,6 +313,30 @@ enum VoteDurationOption: Int, CaseIterable, Identifiable, Codable {
     }
 }
 
+enum ComparisonVisibility: String, CaseIterable, Identifiable, Codable, Hashable {
+    case publicRoom
+    case linkOnly
+    case inviteCode
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .publicRoom: "عامة"
+        case .linkOnly: "خاصة بالرابط"
+        case .inviteCode: "خاصة برمز"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .publicRoom: "globe"
+        case .linkOnly: "link"
+        case .inviteCode: "number.square"
+        }
+    }
+}
+
 struct DashboardStatistics: Hashable {
     let totalComparisons: Int
     let totalVotes: Int
@@ -341,7 +407,14 @@ struct ContentReport: Identifiable, Codable, Hashable {
 
 enum ComparisonShareService {
     static func deepLink(for question: AskQuestion) -> URL {
-        URL(string: "weshalray://comparison/\(question.id.uuidString)") ?? URL(filePath: "/")
+        var components = URLComponents()
+        components.scheme = "weshalray"
+        components.host = "comparison"
+        components.path = "/\(question.id.uuidString)"
+        if let inviteCode = question.inviteCode, question.visibility != .publicRoom {
+            components.queryItems = [URLQueryItem(name: "invite", value: inviteCode)]
+        }
+        return components.url ?? URL(filePath: "/")
     }
 
     static func shareText(for question: AskQuestion) -> String {
@@ -591,14 +664,7 @@ enum KnowledgeSearchIndex {
     }
 
     static func normalize(_ text: String) -> String {
-        text
-            .lowercased()
-            .replacingOccurrences(of: "أ", with: "ا")
-            .replacingOccurrences(of: "إ", with: "ا")
-            .replacingOccurrences(of: "آ", with: "ا")
-            .replacingOccurrences(of: "ى", with: "ي")
-            .replacingOccurrences(of: "ة", with: "ه")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        ArabicTextNormalizer.normalize(text)
     }
 }
 
@@ -717,6 +783,46 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
     }
 }
 
+enum ComparisonPriority: String, CaseIterable, Identifiable {
+    case balanced
+    case price
+    case performance
+    case dailyUse
+    case professional
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .balanced: "أفضل توازن"
+        case .price: "أفضل سعر"
+        case .performance: "أفضل أداء"
+        case .dailyUse: "للاستخدام اليومي"
+        case .professional: "للمحترفين"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .balanced: "scale.3d"
+        case .price: "tag.fill"
+        case .performance: "speedometer"
+        case .dailyUse: "sun.max.fill"
+        case .professional: "briefcase.fill"
+        }
+    }
+
+    fileprivate var keywords: [String] {
+        switch self {
+        case .balanced: []
+        case .price: ["سعر", "اقتصادي", "توفير", "قيمة", "رخيص"]
+        case .performance: ["أداء", "سرعة", "قوة", "معالج", "احترافي"]
+        case .dailyUse: ["يومي", "سهولة", "عملي", "بطارية", "راحة", "اعتمادية"]
+        case .professional: ["محترف", "احترافي", "إنتاج", "تصميم", "أعمال", "متقدم"]
+        }
+    }
+}
+
 struct ComparisonFactor: Identifiable, Hashable {
     let id = UUID()
     var title: String
@@ -743,12 +849,15 @@ struct ComparisonReport: Identifiable, Hashable {
 }
 
 enum ComparisonEngine {
-    static func buildReport(for items: [KnowledgeItem]) -> ComparisonReport {
+    static func buildReport(
+        for items: [KnowledgeItem],
+        priority: ComparisonPriority = .balanced
+    ) -> ComparisonReport {
         let normalizedItems = Array(items.prefix(10))
         let candidates = normalizedItems.enumerated().map { index, item in
             ComparisonCandidate(
                 item: item,
-                score: score(item: item, rank: index),
+                score: score(item: item, rank: index, priority: priority),
                 verdict: verdict(for: item)
             )
         }
@@ -760,7 +869,7 @@ enum ComparisonEngine {
         let names = normalizedItems.map(\.name).joined(separator: "، ")
         let recommendation: String
         if let winner, let runnerUp {
-            recommendation = "الأقرب للترشيح هو \(winner.item.name) بفارق \(max(1, winner.score - runnerUp.score)) نقطة؛ لأنه يجمع نقاط قوة أوضح وملاحظاته أقل تأثيرًا في قرار الشراء."
+            recommendation = "بحسب أولوية «\(priority.title)»، يتصدر \(winner.item.name) بفارق \(max(1, winner.score - runnerUp.score)) نقطة؛ لأنه يجمع مؤشرات ملاءمة أوضح وملاحظاته أقل تأثيرًا في القرار."
         } else if let winner {
             recommendation = "\(winner.item.name) خيار مناسب، لكن المقارنة تصبح أدق عند إضافة خيار آخر على الأقل."
         } else {
@@ -791,14 +900,18 @@ enum ComparisonEngine {
         )
     }
 
-    private static func score(item: KnowledgeItem, rank: Int) -> Int {
+    private static func score(item: KnowledgeItem, rank: Int, priority: ComparisonPriority) -> Int {
         let strengthScore = item.strengths.count * 12
         let tagScore = min(item.tags.count * 3, 24)
         let specScore = min(item.specs.count * 4, 20)
         let fitScore = min(item.idealFor.count * 5, 20)
         let cautionPenalty = item.considerations.count * 4
         let summaryScore = min(item.summary.count / 22, 16)
-        return max(45, min(98, 50 + strengthScore + tagScore + specScore + fitScore + summaryScore - cautionPenalty - rank))
+        let normalizedBlob = KnowledgeSearchIndex.normalize(item.searchBlob)
+        let priorityScore = priority.keywords.reduce(0) { partialResult, keyword in
+            partialResult + (normalizedBlob.contains(KnowledgeSearchIndex.normalize(keyword)) ? 7 : 0)
+        }
+        return max(45, min(98, 50 + strengthScore + tagScore + specScore + fitScore + summaryScore + priorityScore - cautionPenalty - rank))
     }
 
     private static func verdict(for item: KnowledgeItem) -> String {
@@ -954,6 +1067,64 @@ struct ComparisonDraft: Codable, Equatable {
     var allowsComments: Bool = true
     var allowsVoteReasons: Bool = true
     var tags: [String] = []
+    var visibility: ComparisonVisibility = .publicRoom
+    var hideResultsUntilVote: Bool = false
+
+    private enum CodingKeys: String, CodingKey {
+        case title
+        case description
+        case category
+        case options
+        case expiresAt
+        case isAnonymous
+        case allowsComments
+        case allowsVoteReasons
+        case tags
+        case visibility
+        case hideResultsUntilVote
+    }
+
+    init(
+        title: String = "",
+        description: String = "",
+        category: ComparisonCategory = .phones,
+        options: [ComparisonOptionDraft] = [ComparisonOptionDraft(title: ""), ComparisonOptionDraft(title: "")],
+        expiresAt: Date? = nil,
+        isAnonymous: Bool = false,
+        allowsComments: Bool = true,
+        allowsVoteReasons: Bool = true,
+        tags: [String] = [],
+        visibility: ComparisonVisibility = .publicRoom,
+        hideResultsUntilVote: Bool = false
+    ) {
+        self.title = title
+        self.description = description
+        self.category = category
+        self.options = options
+        self.expiresAt = expiresAt
+        self.isAnonymous = isAnonymous
+        self.allowsComments = allowsComments
+        self.allowsVoteReasons = allowsVoteReasons
+        self.tags = tags
+        self.visibility = visibility
+        self.hideResultsUntilVote = hideResultsUntilVote
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
+        description = try container.decodeIfPresent(String.self, forKey: .description) ?? ""
+        category = try container.decodeIfPresent(ComparisonCategory.self, forKey: .category) ?? .phones
+        options = try container.decodeIfPresent([ComparisonOptionDraft].self, forKey: .options)
+            ?? [ComparisonOptionDraft(title: ""), ComparisonOptionDraft(title: "")]
+        expiresAt = try container.decodeIfPresent(Date.self, forKey: .expiresAt)
+        isAnonymous = try container.decodeIfPresent(Bool.self, forKey: .isAnonymous) ?? false
+        allowsComments = try container.decodeIfPresent(Bool.self, forKey: .allowsComments) ?? true
+        allowsVoteReasons = try container.decodeIfPresent(Bool.self, forKey: .allowsVoteReasons) ?? true
+        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
+        visibility = try container.decodeIfPresent(ComparisonVisibility.self, forKey: .visibility) ?? .publicRoom
+        hideResultsUntilVote = try container.decodeIfPresent(Bool.self, forKey: .hideResultsUntilVote) ?? false
+    }
 }
 
 struct ComparisonOptionDraft: Identifiable, Codable, Equatable {
@@ -1049,10 +1220,13 @@ struct OptionDecisionInsight: Identifiable, Codable, Hashable {
 struct DecisionSummary: Codable {
     let winningOptionID: UUID?
     let confidenceLevel: DecisionConfidenceLevel
+    let confidenceScore: Int
     let totalVotes: Int
     let voteGapPercentage: Double
     let leadingVotePercentage: Int
     let clarity: DecisionClarity
+    let evidenceQuality: EvidenceQualityResult
+    let reasonThemes: [ReasonThemeResult]
     let highlights: [DecisionHighlight]
     let optionInsights: [OptionDecisionInsight]
     let recommendationText: String
@@ -1176,6 +1350,9 @@ enum ComparisonValidationService {
 
         guard optionNames.count >= 2 else {
             throw AppError.invalidInput("أضف خيارين على الأقل للمقارنة.")
+        }
+        guard optionNames.count <= 10 else {
+            throw AppError.invalidInput("لا يمكن إضافة أكثر من عشرة خيارات.")
         }
 
         let normalized = optionNames.map(KnowledgeSearchIndex.normalize)
@@ -1317,25 +1494,39 @@ enum DecisionSummaryService {
             gap = 0
         }
 
-        let confidence: DecisionConfidenceLevel
-        if totalVotes < 10 || gap < 5 {
-            confidence = .low
-        } else if totalVotes < 50 {
-            confidence = .medium
-        } else {
-            confidence = .high
+        let reasonComments = question.comments.filter { $0.optionID != nil }
+        let triedOptionCount = reasonComments.filter { $0.trustBadge != nil }.count
+        let firstPercentage = Double(leadingPercentage)
+        let secondPercentage = runnerUp.map { Double(votePercentage(option: $0, totalVotes: totalVotes)) } ?? 0
+        let stateResult = DecisionStateEngine.evaluate(
+            totalVotes: totalVotes,
+            firstPercentage: firstPercentage,
+            secondPercentage: secondPercentage,
+            reasonCount: reasonComments.count,
+            triedOptionCount: triedOptionCount
+        )
+
+        let confidence: DecisionConfidenceLevel = switch stateResult.confidence {
+        case .low: .low
+        case .medium: .medium
+        case .high: .high
         }
 
-        let clarity: DecisionClarity
-        if totalVotes < 10 {
-            clarity = .insufficientData
-        } else if gap < 5 {
-            clarity = .close
-        } else if gap >= 18 && totalVotes >= 25 {
-            clarity = .decisive
-        } else {
-            clarity = .leaning
+        let clarity: DecisionClarity = switch stateResult.state {
+        case .insufficientData: .insufficientData
+        case .closeResult: .close
+        case .clearLean: .leaning
+        case .decisive: .decisive
         }
+
+        let lastActivity = question.comments.map(\.createdAt).max() ?? question.createdAt
+        let evidenceQuality = EvidenceQualityEngine.evaluate(
+            participantCount: totalVotes,
+            reasonCount: reasonComments.count,
+            triedOptionCount: triedOptionCount,
+            lastActivityDate: lastActivity
+        )
+        let reasonThemes = ArabicReasonAnalyzer.analyze(reasons: reasonComments.map(\.text))
 
         let optionInsights = sorted.map { option in
             makeOptionInsight(for: option, in: question)
@@ -1350,14 +1541,7 @@ enum DecisionSummaryService {
             recommendation = "النتيجة غير حاسمة بعد. أضف تصويتات وأسبابًا حتى يظهر اتجاه أوضح."
         }
 
-        let warning: String?
-        if totalVotes < 10 {
-            warning = "عدد الأصوات قليل، لذلك لا تعتبر النتيجة نهائية."
-        } else if gap < 5 {
-            warning = "النتيجة متقاربة جدًا بين الخيارات."
-        } else {
-            warning = nil
-        }
+        let warning = stateResult.warning
 
         let highlights = sorted.prefix(3).map { option in
             let insight = optionInsights.first { $0.optionID == option.id }
@@ -1376,10 +1560,13 @@ enum DecisionSummaryService {
         return DecisionSummary(
             winningOptionID: winner?.id,
             confidenceLevel: confidence,
+            confidenceScore: stateResult.confidenceScore,
             totalVotes: totalVotes,
             voteGapPercentage: gap,
             leadingVotePercentage: leadingPercentage,
             clarity: clarity,
+            evidenceQuality: evidenceQuality,
+            reasonThemes: reasonThemes,
             highlights: highlights,
             optionInsights: optionInsights,
             recommendationText: recommendation,
@@ -1391,15 +1578,25 @@ enum DecisionSummaryService {
         let relatedComments = question.comments.filter { comment in
             comment.optionID == option.id || comment.optionTitle == option.title
         }
-        let topReasons = rankedReasons(from: relatedComments, category: question.category)
-        let positives = rankedKeywords(
+        let analyzedThemes = ArabicReasonAnalyzer.analyze(reasons: relatedComments.map(\.text))
+        let explicitReasons = rankedReasons(from: relatedComments, category: question.category)
+        let topReasons = Array(
+            (explicitReasons + analyzedThemes.map(\.title))
+                .reduce(into: [String]()) { values, value in
+                    if !values.contains(value) { values.append(value) }
+                }
+                .prefix(5)
+        )
+        let keywordPositives = rankedKeywords(
             from: relatedComments,
             keywords: ["جودة", "سعر", "ضمان", "بطارية", "كاميرا", "راحة", "اعتمادية", "خدمة", "عملي", "قيمة", "أداء", "توفير"]
         )
-        let negatives = rankedKeywords(
+        let keywordNegatives = rankedKeywords(
             from: relatedComments,
             keywords: ["غالي", "صيانة", "استهلاك", "ضعيف", "بطء", "حرارة", "قطع", "زحمة", "عيب", "تأخير", "وزن", "محدود"]
         )
+        let positives = Array((analyzedThemes.filter { $0.positiveCount > $0.negativeCount }.map(\.title) + keywordPositives).prefix(4))
+        let negatives = Array((analyzedThemes.filter { $0.negativeCount > $0.positiveCount }.map(\.title) + keywordNegatives).prefix(4))
 
         return OptionDecisionInsight(
             id: UUID(),

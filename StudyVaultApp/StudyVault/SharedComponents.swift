@@ -1,60 +1,220 @@
 import SwiftUI
 
 struct DashboardBrandHeader: View {
+    let userName: String
+    let isSignedIn: Bool
+    let showMenu: () -> Void
+    let showNotifications: () -> Void
+
     var body: some View {
-        HStack(spacing: 12) {
-            WeshIconTile(systemImage: "checkmark.bubble.fill", color: WeshTheme.accent, size: 52)
-            VStack(alignment: .leading, spacing: 3) {
-                Text("وش الرأي")
-                    .font(.largeTitle.weight(.bold))
-                Text("قارن، اسأل، وخذ قرارك على بينة")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+        ZStack {
+            HStack {
+                Button(action: showNotifications) {
+                    Image(systemName: "bell")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("الإشعارات")
+                Spacer()
+                Button(action: showMenu) {
+                    Image(systemName: "line.3.horizontal")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("القائمة")
             }
-            Spacer(minLength: 0)
+            .font(.headline)
+            .foregroundStyle(WeshTheme.primaryText)
+
+            VStack(spacing: 3) {
+                WeshDecisionLogo(size: 44)
+                Text("وش الرأي")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(WeshTheme.goldBright)
+                Text(isSignedIn ? "قرارك أوضح، \(userName)" : "قرارك أوضح... برأي الناس")
+                    .font(.caption2)
+                    .foregroundStyle(WeshTheme.secondaryText)
+            }
         }
-        .accessibilityElement(children: .combine)
+        .frame(minHeight: 92)
     }
 }
 
-struct DecisionLaunchPanel: View {
-    let startQuestion: () -> Void
-    let openSmartCompare: () -> Void
+struct WeshDecisionLogo: View {
+    var size: CGFloat = 48
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("ما القرار الذي يشغلك اليوم؟")
-                    .font(.title2.weight(.bold))
-                Text("اطرح الخيارات للناس أو قارنها فورًا حسب السعر والجودة والاحتياج.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 10) {
-                    launchButtons
-                }
-                VStack(spacing: 10) {
-                    launchButtons
-                }
-            }
+        ZStack {
+            Circle()
+                .stroke(WeshTheme.gold.opacity(0.42), lineWidth: 1)
+            Image(systemName: "checkmark.circle")
+                .font(.system(size: size * 0.62, weight: .semibold))
+                .foregroundStyle(WeshTheme.goldGradient)
         }
-        .weshSurface(padding: 18, emphasized: true)
+        .frame(width: size, height: size)
+        .shadow(color: WeshTheme.gold.opacity(0.28), radius: 12)
+        .accessibilityHidden(true)
+    }
+}
+
+struct WeshDecisionSeal: View {
+    var size: CGFloat = 104
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(WeshTheme.gold.opacity(0.08))
+                .frame(width: size * 1.05, height: size * 1.05)
+            Circle()
+                .stroke(WeshTheme.gold.opacity(0.18), lineWidth: 1)
+                .frame(width: size * 0.9, height: size * 0.9)
+            Image(systemName: "checkmark.shield.fill")
+                .font(.system(size: size * 0.68, weight: .bold))
+                .foregroundStyle(WeshTheme.goldGradient)
+                .symbolRenderingMode(.hierarchical)
+        }
+        .frame(width: size, height: size)
+        .shadow(color: WeshTheme.gold.opacity(0.32), radius: 18, y: 6)
+        .accessibilityHidden(true)
+    }
+}
+
+struct FeaturedDecisionCard: View {
+    let question: AskQuestion?
+    let openQuestion: () -> Void
+    let startQuestion: () -> Void
+
+    private var summary: DecisionSummary? {
+        question.map(DecisionSummaryService.makeSummary)
     }
 
-    @ViewBuilder
-    private var launchButtons: some View {
-        Button(action: startQuestion) {
-            Label("مقارنة جديدة", systemImage: "plus")
-        }
-        .buttonStyle(WeshPrimaryButtonStyle())
+    private var winnerName: String? {
+        guard let question,
+              let summary,
+              summary.totalVotes > 0,
+              let winningOptionID = summary.winningOptionID else { return nil }
+        return question.options.first(where: { $0.id == winningOptionID })?.title
+    }
 
-        Button(action: openSmartCompare) {
-            Label("قارن الآن", systemImage: "slider.horizontal.3")
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [WeshTheme.surface, WeshTheme.accent.opacity(0.12), WeshTheme.gold.opacity(0.08)],
+                startPoint: .topTrailing,
+                endPoint: .bottomLeading
+            )
+
+            HStack(alignment: .center, spacing: 14) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("ملخص القرار", systemImage: "chart.line.uptrend.xyaxis")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(WeshTheme.accentBright)
+
+                    Text(question?.title ?? "ابدأ قرارك الأول")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(WeshTheme.primaryText)
+                        .lineLimit(3)
+
+                    if let summary {
+                        Text(
+                            summary.totalVotes > 0
+                                ? "بناءً على آراء \(summary.totalVotes) مشاركًا"
+                                : "بانتظار أول الأصوات لإظهار الاتجاه"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(WeshTheme.secondaryText)
+
+                        Text(summary.totalVotes > 0 ? "\(summary.leadingVotePercentage)%" : "—")
+                            .font(.system(.largeTitle, design: .rounded, weight: .heavy))
+                            .foregroundStyle(WeshTheme.goldBright)
+
+                        Text(winnerName.map { "يفضلون \($0)" } ?? summary.clarity.arabicTitle)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(WeshTheme.secondaryText)
+                            .lineLimit(2)
+
+                        Button(action: openQuestion) {
+                            HStack {
+                                Text("عرض ملخص القرار")
+                                Spacer()
+                                Image(systemName: "chevron.backward")
+                            }
+                        }
+                        .buttonStyle(WeshSecondaryButtonStyle())
+                        .accessibilityIdentifier("home.featuredDecision")
+                    } else {
+                        Text("أنشئ مقارنة، اجمع الآراء، ثم راجع خلاصة واضحة تساعدك على الحسم.")
+                            .font(.subheadline)
+                            .foregroundStyle(WeshTheme.secondaryText)
+                        Button("أنشئ مقارنة", action: startQuestion)
+                            .buttonStyle(WeshGoldButtonStyle())
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                WeshDecisionSeal(size: 108)
+                    .frame(maxWidth: 120)
+            }
+            .padding(18)
         }
-        .buttonStyle(WeshSecondaryButtonStyle())
+        .clipShape(RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [WeshTheme.accent.opacity(0.48), WeshTheme.gold.opacity(0.28)],
+                        startPoint: .topTrailing,
+                        endPoint: .bottomLeading
+                    ),
+                    lineWidth: 1
+                )
+        }
+        .shadow(color: WeshTheme.accent.opacity(0.12), radius: 18, y: 8)
+    }
+}
+
+struct DashboardQuickActions: View {
+    let hasDraft: Bool
+    let startQuestion: () -> Void
+    let openSmartCompare: () -> Void
+    let restoreDraft: () -> Void
+
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 105), spacing: 10)], spacing: 10) {
+            QuickActionButton(title: "مقارنة جديدة", systemImage: "plus.bubble.fill", color: WeshTheme.accent, action: startQuestion)
+            QuickActionButton(title: "مقارنة ذكية", systemImage: "slider.horizontal.3", color: WeshTheme.secondaryAccent, action: openSmartCompare)
+            QuickActionButton(
+                title: hasDraft ? "استعادة مسودة" : "لا توجد مسودة",
+                systemImage: "doc.text.fill",
+                color: WeshTheme.gold,
+                isEnabled: hasDraft,
+                action: restoreDraft
+            )
+        }
+    }
+}
+
+private struct QuickActionButton: View {
+    let title: String
+    let systemImage: String
+    let color: Color
+    var isEnabled = true
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 12) {
+                WeshIconTile(systemImage: systemImage, color: color, size: 42)
+                Text(title)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(isEnabled ? WeshTheme.primaryText : WeshTheme.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(2)
+            }
+            .frame(maxWidth: .infinity, minHeight: 98, alignment: .topLeading)
+            .weshSurface(padding: 14)
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.68)
     }
 }
 
@@ -63,33 +223,54 @@ struct CategoryScroller: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: 9) {
                 ForEach(AskCategory.allCases) { category in
+                    let color = WeshTheme.categoryColor(category)
                     Button {
                         selectedCategory = category
                     } label: {
-                        HStack(spacing: 6) {
-                            if selectedCategory == category {
-                                Image(systemName: "checkmark")
-                                    .accessibilityHidden(true)
+                        Label(category.title, systemImage: category.systemImage)
+                            .font(.subheadline.weight(.semibold))
+                            .lineLimit(1)
+                            .padding(.horizontal, 13)
+                            .frame(minHeight: 42)
+                            .background(
+                                selectedCategory == category ? color : WeshTheme.surface,
+                                in: Capsule()
+                            )
+                            .overlay {
+                                Capsule().stroke(
+                                    selectedCategory == category ? color : WeshTheme.hairline,
+                                    lineWidth: 1
+                                )
                             }
-                            Label(category.title, systemImage: category.systemImage)
-                        }
-                        .font(.subheadline.weight(.semibold))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
-                        .background(
-                            selectedCategory == category ? WeshTheme.accent : WeshTheme.surface,
-                            in: RoundedRectangle(cornerRadius: WeshTheme.cornerRadius)
-                        )
-                        .foregroundStyle(selectedCategory == category ? .white : .primary)
+                            .foregroundStyle(selectedCategory == category ? .white : WeshTheme.primaryText)
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(selectedCategory == category ? .isSelected : [])
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, 5)
+            .padding(.horizontal, 1)
         }
+    }
+}
+
+struct ActiveCategoryCard: View {
+    let category: AskCategory
+
+    var body: some View {
+        let color = WeshTheme.categoryColor(category)
+        HStack(spacing: 10) {
+            WeshIconTile(systemImage: category.systemImage, color: color, size: 38)
+            Text(category.title)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(WeshTheme.primaryText)
+        }
+        .padding(.horizontal, 13)
+        .padding(.vertical, 11)
+        .background(WeshTheme.surface, in: RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
+        .overlay { RoundedRectangle(cornerRadius: WeshTheme.controlRadius).stroke(WeshTheme.hairline) }
     }
 }
 
@@ -98,23 +279,30 @@ struct KnowledgeCompactCard: View {
     let action: () -> Void
 
     var body: some View {
+        let color = WeshTheme.categoryColor(item.category)
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 10) {
-                Image(systemName: item.category.systemImage)
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(WeshTheme.accent)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    WeshIconTile(systemImage: item.category.systemImage, color: color, size: 42)
+                    Spacer()
+                    Image(systemName: "arrow.up.left")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(WeshTheme.secondaryText)
+                }
                 Text(item.name)
                     .font(.headline)
+                    .foregroundStyle(WeshTheme.primaryText)
                     .lineLimit(2)
-                Text(item.strengths.prefix(2).joined(separator: " • "))
+                Text(item.strengths.prefix(2).joined(separator: " · "))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .foregroundStyle(WeshTheme.secondaryText)
+                    .lineLimit(2)
             }
-            .frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading)
-            .weshSurface()
+            .frame(maxWidth: .infinity, minHeight: 132, alignment: .topLeading)
+            .weshSurface(padding: 15)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("ابدأ مقارنة عن \(item.name)")
     }
 }
 
@@ -124,46 +312,47 @@ struct KnowledgeRow: View {
     let useItem: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top) {
-                Image(systemName: item.category.systemImage)
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(WeshTheme.accent)
-                    .frame(width: 36, height: 36)
-                    .background(WeshTheme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: WeshTheme.cornerRadius))
+        let color = WeshTheme.categoryColor(item.category)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                WeshIconTile(systemImage: item.category.systemImage, color: color, size: 46)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(alignment: .firstTextBaseline) {
                         Text(item.name)
                             .font(.headline)
-                        Spacer()
-                        Text(item.dataQuality)
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(WeshTheme.accent)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 5)
-                            .background(WeshTheme.accent.opacity(0.12), in: Capsule())
+                            .foregroundStyle(WeshTheme.primaryText)
+                        Spacer(minLength: 8)
+                        WeshPill(item.dataQuality, systemImage: "checkmark.shield", color: WeshTheme.accent)
                     }
                     Text(item.summary)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                    if !item.specs.isEmpty {
-                        Text(item.specs.keys.sorted().prefix(3).map { "\($0): \(item.specs[$0] ?? "")" }.joined(separator: "  •  "))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
+                        .foregroundStyle(WeshTheme.secondaryText)
+                        .lineLimit(3)
                 }
-
-                Spacer()
             }
 
-            HStack {
-                Button("التفاصيل", action: open)
-                    .buttonStyle(.bordered)
-                Button("اسأل عنه", action: useItem)
-                    .buttonStyle(.borderedProminent)
+            if !item.idealFor.isEmpty {
+                Label("الأنسب لـ \(item.idealFor.prefix(2).joined(separator: "، "))", systemImage: "scope")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(WeshTheme.secondaryText)
+                    .lineLimit(2)
+            }
+
+            Text(item.strengths.prefix(3).joined(separator: " · "))
+                .font(.caption)
+                .foregroundStyle(color)
+                .lineLimit(2)
+
+            HStack(spacing: 10) {
+                Button(action: open) {
+                    Label("التفاصيل", systemImage: "doc.text.magnifyingglass")
+                }
+                .buttonStyle(WeshSecondaryButtonStyle())
+                Button(action: useItem) {
+                    Label("إضافته لمقارنة", systemImage: "plus")
+                }
+                .buttonStyle(WeshPrimaryButtonStyle())
             }
         }
         .weshSurface()
@@ -174,29 +363,130 @@ struct DashboardQuestionCard: View {
     let question: AskQuestion
     let open: () -> Void
 
+    private var summary: DecisionSummary {
+        DecisionSummaryService.makeSummary(for: question)
+    }
+
+    private var reasonCount: Int {
+        question.comments.filter { $0.optionID != nil }.count
+    }
+
+    private var discussionCount: Int {
+        question.comments.count - reasonCount
+    }
+
     var body: some View {
         Button(action: open) {
-            HStack(spacing: 12) {
-                WeshIconTile(systemImage: question.category.systemImage, color: WeshTheme.accent, size: 42)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(question.title)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(2)
-                    Text("\(question.options.count) خيارات • \(question.totalVotes) تصويت")
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    WeshPill(
+                        question.category.title,
+                        systemImage: question.category.systemImage,
+                        color: WeshTheme.categoryColor(question.category)
+                    )
+                    Spacer()
+                    Text(question.timeAgo)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(WeshTheme.secondaryText)
                 }
-                Spacer()
-                Image(systemName: "chevron.left")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.secondary)
+
+                Text(question.title)
+                    .font(.headline)
+                    .foregroundStyle(WeshTheme.primaryText)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(3)
+
+                VStack(spacing: 8) {
+                    ForEach(question.options.prefix(2)) { option in
+                        QuestionOptionMiniBar(option: option, totalVotes: question.totalVotes)
+                    }
+                }
+
+                if question.options.count > 2 {
+                    Text("+\(question.options.count - 2) خيارات")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(WeshTheme.secondaryText)
+                }
+
+                HStack(spacing: 12) {
+                    Label("\(question.totalVotes) مشاركًا", systemImage: "person.2.fill")
+                    Label("\(reasonCount) سببًا", systemImage: "quote.bubble.fill")
+                    if discussionCount > 0 {
+                        Label("\(discussionCount) تعليقًا", systemImage: "text.bubble.fill")
+                    }
+                    Spacer(minLength: 0)
+                }
+                .font(.caption)
+                .foregroundStyle(WeshTheme.secondaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+
+                HStack {
+                    DecisionClarityPill(clarity: summary.clarity)
+                    Spacer()
+                    Image(systemName: "chevron.backward")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(WeshTheme.secondaryText)
+                }
             }
-            .weshSurface(padding: 12)
+            .weshSurface()
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("فتح \(question.title)")
+        .accessibilityLabel("فتح مقارنة \(question.title)، \(summary.clarity.arabicTitle)")
+    }
+}
+
+private struct QuestionOptionMiniBar: View {
+    let option: PollOption
+    let totalVotes: Int
+
+    private var percent: Double {
+        guard totalVotes > 0 else { return 0 }
+        return Double(option.votes) / Double(totalVotes)
+    }
+
+    var body: some View {
+        VStack(spacing: 5) {
+            HStack {
+                Text(option.title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(WeshTheme.primaryText)
+                    .lineLimit(1)
+                Spacer()
+                Text("\(Int((percent * 100).rounded()))%")
+                    .font(.caption.monospacedDigit().weight(.bold))
+                    .foregroundStyle(WeshTheme.secondaryText)
+            }
+            ProgressView(value: percent)
+                .tint(WeshTheme.accent)
+        }
+    }
+}
+
+struct DecisionClarityPill: View {
+    let clarity: DecisionClarity
+
+    private var color: Color {
+        switch clarity {
+        case .insufficientData: WeshTheme.secondaryText
+        case .close: WeshTheme.gold
+        case .leaning: WeshTheme.accentBright
+        case .decisive: WeshTheme.accent
+        }
+    }
+
+    private var title: String {
+        switch clarity {
+        case .insufficientData: "بيانات غير كافية"
+        case .close: "نتيجة متقاربة"
+        case .leaning: "ميل واضح"
+        case .decisive: "نتيجة حاسمة"
+        }
+    }
+
+    var body: some View {
+        WeshPill(title, systemImage: clarity.systemImage, color: color)
     }
 }
 
@@ -206,7 +496,7 @@ struct InfoTile: View {
     let color: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 11) {
             Text(title)
                 .font(.headline)
             FlowTags(values: values, color: color)
@@ -221,15 +511,11 @@ struct FlowTags: View {
     var action: ((String) -> Void)? = nil
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 8)], alignment: .leading, spacing: 8) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 8)], alignment: .leading, spacing: 8) {
             ForEach(values, id: \.self) { value in
                 if let action {
-                    Button {
-                        action(value)
-                    } label: {
-                        FlowTagLabel(value: value, color: color)
-                    }
-                    .buttonStyle(.plain)
+                    Button { action(value) } label: { FlowTagLabel(value: value, color: color) }
+                        .buttonStyle(.plain)
                 } else {
                     FlowTagLabel(value: value, color: color)
                 }
@@ -245,12 +531,13 @@ struct FlowTagLabel: View {
     var body: some View {
         Text(value)
             .font(.caption.weight(.bold))
-            .lineLimit(1)
-            .minimumScaleFactor(0.75)
+            .lineLimit(2)
+            .minimumScaleFactor(0.76)
             .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .frame(maxWidth: .infinity)
-            .background(color.opacity(0.12), in: Capsule())
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, minHeight: 38)
+            .background(color.opacity(0.11), in: RoundedRectangle(cornerRadius: WeshTheme.compactRadius))
+            .overlay { RoundedRectangle(cornerRadius: WeshTheme.compactRadius).stroke(color.opacity(0.14)) }
             .foregroundStyle(color)
     }
 }
@@ -261,14 +548,13 @@ struct BrowserShortcut: View {
     let action: (String) -> Void
 
     var body: some View {
-        Button {
-            action(query)
-        } label: {
+        Button { action(query) } label: {
             Text(title)
                 .font(.caption.weight(.bold))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-                .background(Color.secondary.opacity(0.12), in: Capsule())
+                .padding(.vertical, 9)
+                .background(WeshTheme.surface, in: Capsule())
+                .overlay { Capsule().stroke(WeshTheme.hairline) }
         }
         .buttonStyle(.plain)
     }
@@ -276,7 +562,7 @@ struct BrowserShortcut: View {
 
 struct AppBackground: View {
     var body: some View {
-        WeshTheme.canvas
+        WeshTheme.backgroundGradient
             .ignoresSafeArea()
     }
 }

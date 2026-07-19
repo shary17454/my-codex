@@ -1,67 +1,72 @@
 # Backend وش الرأي
 
-Backend تطوير محلي لتطبيق وش الرأي بدون تبعيات خارجية. يستخدم Node.js المدمج وملف JSON محلي للتخزين.
+خادم تطوير محلي بلا تبعيات خارجية. يستخدم Node.js وملف JSON لتجربة عقد الشبكة قبل توفير PostgreSQL ومصادقة الإنتاج.
+
+## ما ينفذه
+
+- مقارنات عامة وغرف خاصة بالرابط أو رمز الدعوة.
+- إخفاء النتائج والأسباب حتى يصوّت العميل عند تفعيل السياسة.
+- منع صوت ثانٍ للعميل نفسه داخل المقارنة.
+- تجزئة `X-Client-ID` بـSHA-256 وعدم تخزين قيمته الأصلية.
+- أسباب حتى 300 حرف وتعليقات حتى 800 حرف.
+- أحداث تصويت زمنية مجهّلة للمخطط.
+- Rate limiting وسجل تدقيق محلي محدود.
+- كتابة JSON ذرية وتسلسل عمليات الكتابة لتجنب فقدان التحديثات المتزامنة.
+- فشل مبكر عند فساد ملف البيانات بدل استبداله بمتجر فارغ.
+
+`X-Client-ID` مناسب لمنع التكرار العرضي في التطوير فقط. لا يثبت هوية الشخص ويمكن تغييره؛ الإنتاج يجب أن يستخرج المستخدم من جلسة موثقة بعد التحقق من Sign in with Apple.
 
 ## التشغيل
+
+يتطلب Node.js 20 أو أحدث، ولا يحتاج `npm install` لعدم وجود dependencies.
 
 ```sh
 cd StudyVaultApp/backend
 npm run check
-PORT=8787 npm run dev
+PORT=8787 WESH_ALRAY_DATA_FILE=/tmp/wesh-alray-store.json npm run dev
 ```
 
-## الفحص
+في Terminal ثانٍ:
 
 ```sh
-curl http://localhost:8787/health
-```
-
-## المتغيرات
-
-| الاسم | الوصف | القيمة الافتراضية |
-|---|---|---|
-| `PORT` | منفذ الخادم المحلي | `8787` |
-| `WESH_ALRAY_DATA_FILE` | ملف تخزين JSON المحلي | `backend/data/store.json` |
-| `CORS_ORIGIN` | النطاق المسموح للطلبات | `*` |
-| `RATE_LIMIT_WINDOW_MS` | نافذة تحديد المعدل | `60000` |
-| `RATE_LIMIT_MAX` | أعلى عدد طلبات في النافذة | `120` |
-| `WESH_ALRAY_API_TOKEN` | توكن اختياري لحماية عمليات الكتابة | فارغ |
-
-## Smoke Test
-
-بعد تشغيل الخادم:
-
-```sh
+cd StudyVaultApp/backend
 BASE_URL=http://localhost:8787 npm run smoke
 ```
 
-إذا تم ضبط `WESH_ALRAY_API_TOKEN` على الخادم، مرر الرمز نفسه للاختبار:
+Smoke Test يتحقق من الغرفة العامة والخاصة، منع تسرب الخاصة إلى البحث، إخفاء النتائج، كشفها بعد التصويت، منع التكرار، طول السبب، ومخطط الأصوات.
 
-```sh
-BASE_URL=http://localhost:8787 WESH_ALRAY_API_TOKEN=change-this npm run smoke
-```
+## المتغيرات
 
-## الربط من تطبيق iOS
+| الاسم | الغرض | الحساسية | الافتراضي |
+|---|---|---:|---|
+| `PORT` | منفذ HTTP | لا | `8787` |
+| `WESH_ALRAY_DATA_FILE` | ملف JSON للتطوير | لا | `data/store.json` |
+| `CORS_ORIGIN` | Origin مسموح | لا | `*` في التطوير فقط |
+| `RATE_LIMIT_WINDOW_MS` | نافذة تحديد المعدل | لا | `60000` |
+| `RATE_LIMIT_MAX` | الطلبات لكل عنوان/نافذة | لا | `120` |
+| `WESH_ALRAY_API_TOKEN` | حماية مشتركة لكتابة التطوير | نعم | فارغ |
+| `WESH_ALRAY_BLOCKED_CLIENT_HASHES` | SHA-256 hashes مفصولة بفواصل | لا | فارغ |
 
-من تبويب الحساب داخل التطبيق:
-
-1. فعّل "المزامنة مع الخادم".
-2. أدخل رابط الخادم، مثل `http://localhost:8787`.
-3. أدخل `API token` فقط إذا كان الخادم يعمل بمتغير `WESH_ALRAY_API_TOKEN`. يحفظ التطبيق هذا الرمز في Keychain.
-4. اضغط "حفظ الإعداد"، ثم "مزامنة".
+عند `NODE_ENV=production` يرفض الخادم البدء إذا غاب `WESH_ALRAY_API_TOKEN` أو بقي `CORS_ORIGIN=*`. هذا حاجز أمان فقط ولا يحول التخزين الملفي إلى Backend إنتاجي.
 
 ## Docker
 
 ```sh
 cd StudyVaultApp/backend
 docker build -t wesh-alray-backend .
-docker run --rm -p 8787:8787 -e WESH_ALRAY_API_TOKEN=change-this wesh-alray-backend
+docker run --rm -p 8787:8787 \
+  -e WESH_ALRAY_API_TOKEN=development-only \
+  -e CORS_ORIGIN=https://example.invalid \
+  wesh-alray-backend
 ```
 
-## ملاحظات إنتاج
+## الانتقال إلى الإنتاج
 
-- هذا الخادم مناسب للتطوير والاختبار فقط.
-- الإنتاج يحتاج قاعدة بيانات حقيقية مثل PostgreSQL أو Firestore. تم توفير مخطط PostgreSQL في `sql/001_initial_schema.sql`.
-- منع التلاعب الحقيقي يحتاج مصادقة خادم وسياسة تصويت وربط كل صوت بمستخدم أو جهاز موثوق.
-- لا تستخدم `WESH_ALRAY_API_TOKEN` كسر إنتاج داخل نسخة App Store؛ الرمز الثابت مناسب للتطوير أو اختبار داخلي فقط.
-- الإنتاج يحتاج مصادقة مستخدمين حقيقية وجلسات آمنة بدل رمز كتابة مشترك داخل التطبيق.
+1. طبّق `sql/001_initial_schema.sql` ثم `sql/002_decision_rooms.sql` على PostgreSQL مع نسخ احتياطية ومستخدم قاعدة محدود الصلاحية.
+2. استبدل التخزين الملفي بطبقة معاملات PostgreSQL؛ لا تنشر `server.mjs` الحالي كخادم اجتماعي عام.
+3. تحقق على الخادم من identity token الخاص بـSign in with Apple: التوقيع، issuer، audience، expiry، nonce، ثم أنشئ جلسة قصيرة العمر.
+4. اربط الصوت بـ`user_id` المستخرج من الجلسة، وليس بمعرّف يرسله التطبيق.
+5. وفر HTTPS، secrets manager، مراقبة، نسخًا احتياطية، وسياسات حذف/احتفاظ وإشراف.
+6. اختبر الاستعادة، التزامن، الحظر، الإبلاغ، APNs، وسياسة الخصوصية في بيئة staging قبل ربط نسخة App Store.
+
+راجع `../docs/BACKEND_API.md` للعقد الحالي و`../docs/DECISION_PLATFORM_GATES.md` للمتطلبات الخارجية.
