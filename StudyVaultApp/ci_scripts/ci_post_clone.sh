@@ -6,7 +6,9 @@ required_xcode_build="17F113"
 required_min_iphoneos_sdk="26.5"
 expected_marketing_version="${EXPECTED_MARKETING_VERSION:-1.10.0}"
 minimum_build_number="${MIN_PROJECT_BUILD:-52}"
-project_file="StudyVaultApp/StudyVault.xcodeproj/project.pbxproj"
+script_directory="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+app_directory="$(CDPATH= cd -- "${script_directory}/.." && pwd)"
+project_file="${app_directory}/StudyVault.xcodeproj/project.pbxproj"
 
 echo "== Xcode Cloud preflight =="
 echo "Commit: $(git rev-parse HEAD 2>/dev/null || echo unknown)"
@@ -17,6 +19,7 @@ echo "CI build number: ${CI_BUILD_NUMBER:-unset}"
 echo "Xcode project: ${CI_XCODE_PROJECT:-unset}"
 echo "Xcode workspace: ${CI_XCODE_WORKSPACE:-unset}"
 echo "Developer dir: $(xcode-select -p)"
+echo "Resolved project file: ${project_file}"
 
 xcodebuild -version
 iphoneos_sdk_version="$(xcrun --sdk iphoneos --show-sdk-version)"
