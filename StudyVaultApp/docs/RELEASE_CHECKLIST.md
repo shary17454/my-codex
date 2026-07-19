@@ -50,7 +50,7 @@
 - [x] توجيه `ci_scripts/ci_post_clone.sh` المشترك إلى حارس وش الرأي عند اكتشاف `StudyVault` فقط.
 - [x] اعتماد Xcode Cloud وحده لبناء Release وArchive والرفع إلى App Store Connect.
 - [x] تثبيت Workflow على Xcode 26.6 الإنتاجي `17F113` وSDK iPhoneOS 26.5.
-- [x] إضافة `ci_post_xcodebuild.sh` للتحقق من Bundle ID والإصدار والبناء وXcode/SDK داخل الأرشيف الفعلي.
+- [x] إضافة `ci_post_xcodebuild.sh` للتحقق من Bundle ID والإصدار وXcode/SDK داخل الأرشيف، ومن رقم Cloud داخل IPA الموقّع النهائي.
 - [x] نجاح Build وArchive رقم 58 من commit `dda2ea7` وظهور `1.10.0 (58)` بحالة `Complete`.
 - [x] فحص Shell syntax ومسار الرفض المحلي عند استخدام Xcode أقدم من 26.6.
 - [x] تأكيد أن Workflow يبني `StudyVaultApp/StudyVault.xcodeproj` والـScheme `StudyVault`.

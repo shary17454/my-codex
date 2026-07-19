@@ -27,12 +27,13 @@ Xcode Cloud هو المصدر الوحيد لبناء Release وإنشاء Archi
 - اختلاف Marketing Version أو Build Number بين إعدادات المشروع.
 - انخفاض رقم Xcode Cloud عن الحد الأدنى.
 
-`ci_post_xcodebuild.sh` يفحص الأرشيف الناتج فعليًا ويتحقق من:
+`ci_post_xcodebuild.sh` يفحص الأرشيف الأساسي والـIPA الموقّع الناتج فعليًا ويتحقق من:
 
 - نجاح `xcodebuild`.
 - Bundle ID `com.shary17454.esal`.
 - Marketing Version المتوقع.
-- تطابق Build Number داخل الأرشيف مع `CI_BUILD_NUMBER`.
+- سلامة Build Number الأساسي داخل `.xcarchive`.
+- تطابق Build Number النهائي داخل IPA الموقّع مع `CI_BUILD_NUMBER`؛ يطبق Xcode Cloud الرقم السحابي أثناء App Store export وليس داخل الأرشيف الأساسي.
 - Xcode Build `17F113` وSDK `iphoneos26.5`.
 - تطابق الإصدارات بين التطبيق وأي Extension مضمّن.
 

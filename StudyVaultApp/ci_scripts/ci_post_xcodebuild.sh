@@ -74,8 +74,8 @@ case "${sdk_name}" in
     ;;
 esac
 
-if [ -n "${CI_BUILD_NUMBER:-}" ] && [ "${build_number}" != "${CI_BUILD_NUMBER}" ]; then
-  echo "ERROR: Archived build ${build_number} differs from Xcode Cloud build ${CI_BUILD_NUMBER}."
+if ! echo "${build_number}" | grep -Eq '^[0-9]+$'; then
+  echo "ERROR: Archived build number is not numeric: ${build_number}"
   exit 36
 fi
 
@@ -90,6 +90,54 @@ if [ -d "${extensions_directory}" ]; then
     [ "${extension_version}" = "${marketing_version}" ] || exit 37
     [ "${extension_build}" = "${build_number}" ] || exit 38
   done
+fi
+
+signed_app_path="${CI_APP_STORE_SIGNED_APP_PATH:-}"
+if [ -z "${signed_app_path}" ] || [ ! -d "${signed_app_path}" ]; then
+  echo "ERROR: App Store signed export directory is unavailable: ${signed_app_path:-unset}"
+  exit 39
+fi
+
+ipa_path="$(find "${signed_app_path}" -maxdepth 1 -type f -name '*.ipa' -print | head -n 1)"
+if [ -z "${ipa_path}" ] || [ ! -f "${ipa_path}" ]; then
+  echo "ERROR: App Store signed IPA was not found in ${signed_app_path}."
+  exit 40
+fi
+
+ipa_info_entry="$(unzip -Z1 "${ipa_path}" | grep -E '^Payload/[^/]+\.app/Info\.plist$' | head -n 1)"
+if [ -z "${ipa_info_entry}" ]; then
+  echo "ERROR: Main app Info.plist was not found inside the signed IPA."
+  exit 41
+fi
+
+temporary_directory="$(mktemp -d)"
+trap 'rm -rf "${temporary_directory}"' EXIT
+signed_info_plist="${temporary_directory}/Info.plist"
+unzip -p "${ipa_path}" "${ipa_info_entry}" > "${signed_info_plist}"
+
+signed_bundle_id="$(plist_value CFBundleIdentifier "${signed_info_plist}")"
+signed_marketing_version="$(plist_value CFBundleShortVersionString "${signed_info_plist}")"
+signed_build_number="$(plist_value CFBundleVersion "${signed_info_plist}")"
+signed_xcode_build="$(plist_value DTXcodeBuild "${signed_info_plist}")"
+signed_sdk_name="$(plist_value DTSDKName "${signed_info_plist}")"
+
+echo "Signed IPA bundle: ${signed_bundle_id}"
+echo "Signed IPA version: ${signed_marketing_version} (${signed_build_number})"
+echo "Signed IPA Xcode build: ${signed_xcode_build}"
+echo "Signed IPA SDK: ${signed_sdk_name}"
+
+[ "${signed_bundle_id}" = "${expected_bundle_id}" ] || exit 42
+[ "${signed_marketing_version}" = "${expected_marketing_version}" ] || exit 43
+[ "${signed_xcode_build}" = "${required_xcode_build}" ] || exit 44
+
+case "${signed_sdk_name}" in
+  "${required_sdk_prefix}"*) ;;
+  *) exit 45 ;;
+esac
+
+if [ -z "${CI_BUILD_NUMBER:-}" ] || [ "${signed_build_number}" != "${CI_BUILD_NUMBER}" ]; then
+  echo "ERROR: Signed IPA build ${signed_build_number} differs from Xcode Cloud build ${CI_BUILD_NUMBER:-unset}."
+  exit 46
 fi
 
 echo "Xcode Cloud archive verification passed."
