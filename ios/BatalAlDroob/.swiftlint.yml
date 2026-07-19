@@ -1,0 +1,12 @@
+included:
+  - BatalAlDroob
+  - BatalAlDroobTests
+  - BatalAlDroobUITests
+
+file_length:
+  warning: 500
+  error: 700
+
+opening_brace:
+  ignore_multiline_function_signatures: true
+  ignore_multiline_statement_conditions: true

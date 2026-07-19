@@ -30,7 +30,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>نستخدم موقعك فقط لتشغيل التتبع والبوصلة وعرض الطقس المحلي داخل بطل الدروب. We use your location only for tracking, compass, and local weather inside Batal Al-Droob.</string>
+	<string>نستخدم موقعك عند تشغيل التتبع والبوصلة. ولعرض الطقس المحلي، تُرسل الإحداثيات إلى خدمة Open-Meteo.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

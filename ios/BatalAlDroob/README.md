@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `1.1.0`
-- Next build: `106`
+- Project build: `106`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -23,6 +23,8 @@ The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old w
 For App Store archives, keep signing managed by Xcode/Xcode Cloud and use Xcode 26.6 build 17F113 or a newer non-beta Xcode accepted by Apple.
 
 ## Build
+
+Run the following commands from `ios/BatalAlDroob/`.
 
 Debug simulator build:
 
@@ -54,7 +56,7 @@ Release device validation without local signing:
 
 ```sh
 /Applications/Xcode-26.6-duplicate.app/Contents/Developer/usr/bin/xcodebuild \
-  -project ios/BatalAlDroob/BatalAlDroob.xcodeproj \
+  -project BatalAlDroob.xcodeproj \
   -scheme BatalAlDroob \
   -configuration Release \
   -sdk iphoneos \
@@ -72,7 +74,7 @@ Run regression tests:
   -project BatalAlDroob.xcodeproj \
   -scheme BatalAlDroob \
   -sdk iphonesimulator \
-  -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' \
   -derivedDataPath /tmp/BatalAlDroobTestDerivedData
 ```
 
@@ -107,3 +109,14 @@ If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/
 ## Supplier Partnerships
 
 Supplier and outreach research for Nissan Patrol parts providers is tracked in `Partnerships/`. Do not send outreach or mark a supplier as approved without human review and written permission.
+
+## Engineering Reference
+
+- Permanent quality and release standard: [`docs/PRODUCTION_READINESS_STANDARD.md`](docs/PRODUCTION_READINESS_STANDARD.md)
+- Architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- Flutter/native status: [`docs/FLUTTER_TO_NATIVE_MIGRATION.md`](docs/FLUTTER_TO_NATIVE_MIGRATION.md)
+- Release checklist: [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md)
+- Latest executed verification: [`docs/FINAL_EXECUTION_REPORT.md`](docs/FINAL_EXECUTION_REPORT.md)
+- Arabic status summary: [`docs/FINAL_STATUS_AR.md`](docs/FINAL_STATUS_AR.md)
+
+The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The remaining requirements are deliberately kept visible in the execution report and include signed Xcode Cloud archiving, App Store Connect/IAP metadata, privacy-label confirmation, production weather-service terms, and manual device checks for permission-dependent behavior.
