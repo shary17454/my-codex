@@ -5,20 +5,18 @@ import UIKit
 
 struct ActiveTripDriveView: View {
     @Environment(AppState.self) private var appState: AppState
-    @State private var route = GPXParser.loadRoute(named: "SampleRoute")
     @State private var isTripStarted = false
+    @State private var followsUserLocation = true
     @State private var statusMessage: String?
     @State private var showingOfflineMaps = false
     @State private var showingAddPlace = false
     @State private var showingDestinationPicker = false
     @State private var showingSOS = false
 
-    private var driveRegion: MKCoordinateRegion {
-        MKCoordinateRegion(
-            center: appState.selectedTrip.meetingPoint,
-            span: MKCoordinateSpan(latitudeDelta: 0.075, longitudeDelta: 0.075)
-        )
-    }
+    @State private var driveRegion = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
+        span: MKCoordinateSpan(latitudeDelta: 0.075, longitudeDelta: 0.075)
+    )
 
     var body: some View {
         ZStack {
@@ -32,7 +30,6 @@ struct ActiveTripDriveView: View {
                     mapStage
                     topFloatingTools
                     compassDial
-                    routeNodes
                     sideControls
                     startTripButton
                     statusToast
@@ -45,6 +42,14 @@ struct ActiveTripDriveView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
             await appState.startLocationAndRefreshEnvironment()
+            updateVisibleRegion()
+        }
+        .onChange(of: appState.locationManager.currentLocation?.timestamp) { _, _ in
+            guard followsUserLocation else { return }
+            updateVisibleRegion()
+        }
+        .onChange(of: appState.selectedTrip.meetingPoint) { _, _ in
+            updateVisibleRegion()
         }
         .onAppear {
             UIDevice.current.isBatteryMonitoringEnabled = true
@@ -89,15 +94,27 @@ struct ActiveTripDriveView: View {
 
     private var telemetryStrip: some View {
         HStack(spacing: 0) {
-            driveMetric("الزعامة", batteryText, nil)
+            driveMetric("البطارية", batteryText, nil) {
+                showStatus(batteryText == "--" ? "تعذر قراءة البطارية حاليًا" : "مستوى بطارية الجهاز: \(batteryText)")
+            }
             driveDivider
-            driveMetric("GPS", gpsText, gpsColor)
+            driveMetric("GPS", gpsText, gpsColor) {
+                toggleTracking()
+            }
             driveDivider
-            driveMetric("المسافة المتبقية", distanceText, nil)
+            driveMetric("المسافة", distanceText, nil) {
+                openAppleMapsDirections()
+            }
             driveDivider
-            driveMetric("الارتفاع", altitudeText, nil)
+            driveMetric("الارتفاع", altitudeText, nil) {
+                appState.locationManager.startNavigation()
+                showStatus(altitudeText == "--" ? "بانتظار قراءة ارتفاع دقيقة من GPS" : "الارتفاع الحالي \(altitudeText)")
+            }
             driveDivider
-            driveMetric("السرعة", speedText, nil)
+            driveMetric("السرعة", speedText, nil) {
+                appState.locationManager.startNavigation()
+                showStatus(speedText == "--" ? "بانتظار حركة الجهاز وقراءة GPS" : "السرعة الحالية \(speedText)")
+            }
         }
         .padding(.vertical, 11)
         .background(
@@ -114,7 +131,7 @@ struct ActiveTripDriveView: View {
     private var mapStage: some View {
         MapCanvasView(
             region: driveRegion,
-            route: route,
+            route: navigationRoute,
             places: appState.hiddenPlaces.filter { $0.status == .approved },
             tileTemplateURL: nil,
             tileOpacity: 0.7
@@ -131,21 +148,6 @@ struct ActiveTripDriveView: View {
                 endPoint: .bottom
             )
             .allowsHitTesting(false)
-        }
-        .overlay {
-            TripGlowPath()
-                .stroke(
-                    LinearGradient(
-                        colors: [.clear, Color.driveGold, Color.white.opacity(0.94), Color.driveGold],
-                        startPoint: .bottomLeading,
-                        endPoint: .topTrailing
-                    ),
-                    style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round)
-                )
-                .shadow(color: Color.driveGold.opacity(0.9), radius: 12)
-                .padding(.horizontal, 28)
-                .padding(.vertical, 60)
-                .allowsHitTesting(false)
         }
     }
 
@@ -169,7 +171,7 @@ struct ActiveTripDriveView: View {
         HStack(spacing: 8) {
             Image(systemName: weatherIcon)
                 .foregroundStyle(Color.driveGold)
-            Text("\(Int(appState.environmentalReport.temperatureCelsius))°C")
+            Text(weatherText)
                 .font(.headline.monospacedDigit())
         }
         .drivePill()
@@ -178,10 +180,10 @@ struct ActiveTripDriveView: View {
     private var airQualityPill: some View {
         HStack(spacing: 8) {
             Image(systemName: "leaf.circle")
-                .foregroundStyle(.green)
-            Text(appState.environmentalReport.airQualityIndex < 80 ? "Good" : "تنبيه")
+                .foregroundStyle(airQualityColor)
+            Text(airQualityText)
                 .font(.subheadline.weight(.bold))
-                .foregroundStyle(appState.environmentalReport.airQualityIndex < 80 ? .green : .orange)
+                .foregroundStyle(airQualityColor)
         }
         .drivePill()
     }
@@ -194,10 +196,11 @@ struct ActiveTripDriveView: View {
                     Circle()
                         .fill(Color.black.opacity(0.58))
                         .overlay(Circle().stroke(DrivePalette.goldGradient, lineWidth: 2))
-                    Image(systemName: "safari.fill")
+                    Image(systemName: "location.north.fill")
                         .font(.system(size: 34))
                         .foregroundStyle(DrivePalette.goldGradient)
-                        .rotationEffect(.degrees(headingDegrees))
+                        .opacity(headingDegrees == nil ? 0.32 : 1)
+                        .rotationEffect(.degrees(headingDegrees ?? 0))
                     VStack {
                         Text("N")
                         Spacer()
@@ -215,8 +218,11 @@ struct ActiveTripDriveView: View {
                     .foregroundStyle(.white.opacity(0.72))
                     .padding(7)
                 }
+                .environment(\.layoutDirection, .leftToRight)
                 .frame(width: 74, height: 74)
                 .shadow(color: .black.opacity(0.5), radius: 12, y: 8)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(headingAccessibilityText)
             }
             Spacer()
         }
@@ -224,25 +230,14 @@ struct ActiveTripDriveView: View {
         .padding(.top, 24)
     }
 
-    private var routeNodes: some View {
-        ZStack {
-            driveNode(icon: "house.fill", x: 0.70, y: 0.25)
-            driveNode(icon: "fuelpump.fill", x: 0.50, y: 0.42)
-            driveNode(icon: "wrench.and.screwdriver.fill", x: 0.64, y: 0.55)
-            driveNode(icon: "tent.fill", x: 0.36, y: 0.63)
-            driveNode(icon: "mappin", x: 0.72, y: 0.74)
-            driveNode(icon: "flag.fill", x: 0.18, y: 0.37, emphasized: true)
-        }
-        .allowsHitTesting(false)
-    }
-
     private var sideControls: some View {
         HStack {
             VStack(spacing: 10) {
                 driveRoundButton(icon: "location.fill", title: "موقعي") {
-                    appState.locationManager.requestWhenInUse()
                     appState.locationManager.startNavigation()
-                    showStatus("تم طلب صلاحية الموقع")
+                    followsUserLocation = true
+                    updateVisibleRegion()
+                    showStatus(appState.locationManager.currentLocation == nil ? "بانتظار إشارة GPS" : "تم توسيط الخريطة على موقعك")
                 }
                 driveRoundButton(icon: "exclamationmark.triangle.fill", title: "تنبيه") {
                     appState.locationManager.requestBackgroundTripUpdates()
@@ -258,11 +253,15 @@ struct ActiveTripDriveView: View {
             VStack(spacing: 10) {
                 driveRoundButton(icon: "arrow.up.right.navigation.fill", title: "اتجاه") {
                     appState.locationManager.startNavigation()
-                    showingDestinationPicker = true
+                    openAppleMapsDirections()
                 }
                 driveRoundButton(icon: "scope", title: "تتبع") {
-                    appState.locationManager.startNavigation()
-                    showStatus("تم تشغيل التتبع")
+                    followsUserLocation.toggle()
+                    if followsUserLocation {
+                        appState.locationManager.startNavigation()
+                        updateVisibleRegion()
+                    }
+                    showStatus(followsUserLocation ? "متابعة الموقع مفعلة" : "يمكنك الآن تحريك الخريطة بحرية")
                 }
                 driveRoundButton(icon: "sos.circle.fill", title: "SOS") {
                     showingSOS = true
@@ -282,6 +281,8 @@ struct ActiveTripDriveView: View {
                 isTripStarted.toggle()
                 if isTripStarted {
                     appState.locationManager.startNavigation()
+                    followsUserLocation = true
+                    updateVisibleRegion()
                 } else {
                     appState.locationManager.stopNavigation()
                 }
@@ -334,58 +335,100 @@ struct ActiveTripDriveView: View {
 
     private var batteryText: String {
         let level = UIDevice.current.batteryLevel
-        guard level >= 0 else { return "87%" }
+        guard level >= 0 else { return "--" }
         return "\(Int(level * 100))%"
     }
 
     private var gpsText: String {
-        appState.locationManager.isTracking ? "Green" : "جاهز"
+        if appState.locationManager.authorizationStatus == .denied || appState.locationManager.authorizationStatus == .restricted {
+            return "مرفوض"
+        }
+        guard appState.locationManager.isTracking else { return "متوقف" }
+        guard let accuracy = appState.locationManager.horizontalAccuracyMeters else { return "يبحث" }
+        if accuracy <= 10 { return "ممتاز" }
+        if accuracy <= 30 { return "جيد" }
+        return "ضعيف"
     }
 
     private var gpsColor: Color {
-        appState.locationManager.isTracking ? .green : Color.driveGold
+        guard appState.locationManager.isTracking else { return Color.driveGold }
+        guard let accuracy = appState.locationManager.horizontalAccuracyMeters else { return .orange }
+        return accuracy <= 30 ? .green : .orange
     }
 
     private var speedText: String {
-        guard let speed = appState.locationManager.currentLocation?.speed, speed > 0 else { return "-- km/h" }
-        return "\(Int(speed * 3.6)) km/h"
+        guard let speed = appState.locationManager.speedKPH else { return "--" }
+        return "\(Int(speed.rounded())) كم/س"
     }
 
     private var altitudeText: String {
-        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "-- m" }
-        return "\(Int(altitude)) m"
+        guard let altitude = appState.locationManager.altitudeMeters else { return "--" }
+        return "\(Int(altitude.rounded())) م"
     }
 
     private var distanceText: String {
-        guard let current = appState.locationManager.currentLocation else { return "-- km" }
-        let target = CLLocation(latitude: appState.selectedTrip.meetingPoint.latitude, longitude: appState.selectedTrip.meetingPoint.longitude)
-        return String(format: "%.0f km", current.distance(from: target) / 1000)
+        guard let distance = appState.locationManager.distance(to: appState.selectedTrip.meetingPoint) else { return "--" }
+        if distance < 1_000 { return "\(Int(distance.rounded())) م" }
+        return String(format: "%.1f كم", distance / 1_000)
     }
 
-    private var headingDegrees: Double {
-        guard let heading = appState.locationManager.heading else { return 0 }
-        let value = heading.trueHeading >= 0 ? heading.trueHeading : heading.magneticHeading
-        return value >= 0 ? value : 0
+    private var headingDegrees: Double? {
+        appState.locationManager.resolvedHeadingDegrees
     }
 
     private var weatherIcon: String {
-        appState.environmentalReport.windSpeedKPH > 35 ? "wind" : "cloud.sun.fill"
+        guard appState.environmentalReport.isLiveData else { return "cloud.slash" }
+        return appState.environmentalReport.windSpeedKPH > 35 ? "wind" : "cloud.sun.fill"
     }
 
-    private func driveMetric(_ title: String, _ value: String, _ valueColor: Color?) -> some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.74))
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-            Text(value)
-                .font(.subheadline.weight(.bold).monospacedDigit())
-                .foregroundStyle(valueColor ?? .white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
+    private var weatherText: String {
+        guard appState.environmentalReport.isLiveData else { return "--°" }
+        return "\(Int(appState.environmentalReport.temperatureCelsius.rounded()))°C"
+    }
+
+    private var airQualityText: String {
+        guard appState.environmentalReport.isAirQualityAvailable else { return "AQI --" }
+        return "AQI \(appState.environmentalReport.airQualityDisplayText)"
+    }
+
+    private var airQualityColor: Color {
+        guard appState.environmentalReport.isAirQualityAvailable else { return .secondary }
+        return appState.environmentalReport.airQualityIndex < 80 ? .green : .orange
+    }
+
+    private var headingAccessibilityText: String {
+        guard let headingDegrees else { return "البوصلة بانتظار قراءة موثوقة" }
+        return "اتجاه البوصلة \(Int(headingDegrees.rounded())) درجة"
+    }
+
+    private var navigationRoute: [CLLocationCoordinate2D] {
+        guard let current = appState.locationManager.currentLocation?.coordinate else { return [] }
+        return [current, appState.selectedTrip.meetingPoint]
+    }
+
+    private func driveMetric(
+        _ title: String,
+        _ value: String,
+        _ valueColor: Color?,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.74))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+                Text(value)
+                    .font(.subheadline.weight(.bold).monospacedDigit())
+                    .foregroundStyle(valueColor ?? .white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
         }
-        .frame(maxWidth: .infinity)
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title): \(value)")
     }
 
     private func driveRoundButton(icon: String, title: String, action: @escaping () -> Void) -> some View {
@@ -419,45 +462,53 @@ struct ActiveTripDriveView: View {
         }
     }
 
-    private func driveNode(icon: String, x: CGFloat, y: CGFloat, emphasized: Bool = false) -> some View {
-        GeometryReader { proxy in
-            Image(systemName: icon)
-                .font(.system(size: emphasized ? 20 : 14, weight: .bold))
-                .foregroundStyle(emphasized ? Color.driveBlack : Color.driveGold)
-                .frame(width: emphasized ? 48 : 34, height: emphasized ? 48 : 34)
-                .background(Circle().fill(emphasized ? Color.driveGold : Color.black.opacity(0.64)))
-                .overlay(Circle().stroke(Color.driveGold.opacity(0.7), lineWidth: 1))
-                .shadow(color: emphasized ? Color.driveGold.opacity(0.7) : .black.opacity(0.4), radius: emphasized ? 13 : 6)
-                .position(x: proxy.size.width * x, y: proxy.size.height * y)
+    private func toggleTracking() {
+        if appState.locationManager.isTracking {
+            appState.locationManager.stopNavigation()
+            showStatus("تم إيقاف تحديث GPS")
+        } else {
+            appState.locationManager.startNavigation()
+            showStatus("تم تشغيل تحديث GPS")
         }
     }
-}
 
-private struct TripGlowPath: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX + rect.width * 0.16, y: rect.maxY - rect.height * 0.10))
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.28, y: rect.maxY - rect.height * 0.34),
-            control1: CGPoint(x: rect.minX + rect.width * 0.07, y: rect.maxY - rect.height * 0.22),
-            control2: CGPoint(x: rect.minX + rect.width * 0.24, y: rect.maxY - rect.height * 0.25)
+    private func updateVisibleRegion() {
+        let destination = appState.selectedTrip.meetingPoint
+        guard let current = appState.locationManager.currentLocation?.coordinate else {
+            driveRegion = MKCoordinateRegion(
+                center: destination,
+                span: MKCoordinateSpan(latitudeDelta: 0.075, longitudeDelta: 0.075)
+            )
+            return
+        }
+        let center = CLLocationCoordinate2D(
+            latitude: (current.latitude + destination.latitude) / 2,
+            longitude: (current.longitude + destination.longitude) / 2
         )
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.55, y: rect.maxY - rect.height * 0.48),
-            control1: CGPoint(x: rect.minX + rect.width * 0.34, y: rect.maxY - rect.height * 0.45),
-            control2: CGPoint(x: rect.minX + rect.width * 0.44, y: rect.maxY - rect.height * 0.36)
+        let latitudeDelta = max(abs(current.latitude - destination.latitude) * 1.45, 0.015)
+        let longitudeDelta = max(abs(current.longitude - destination.longitude) * 1.45, 0.015)
+        driveRegion = MKCoordinateRegion(
+            center: center,
+            span: MKCoordinateSpan(latitudeDelta: min(latitudeDelta, 90), longitudeDelta: min(longitudeDelta, 180))
         )
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.78, y: rect.maxY - rect.height * 0.62),
-            control1: CGPoint(x: rect.minX + rect.width * 0.66, y: rect.maxY - rect.height * 0.60),
-            control2: CGPoint(x: rect.minX + rect.width * 0.70, y: rect.maxY - rect.height * 0.47)
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.88, y: rect.maxY - rect.height * 0.86),
-            control1: CGPoint(x: rect.minX + rect.width * 0.86, y: rect.maxY - rect.height * 0.75),
-            control2: CGPoint(x: rect.minX + rect.width * 0.77, y: rect.maxY - rect.height * 0.79)
-        )
-        return path
+    }
+
+    private func openAppleMapsDirections() {
+        let destination = appState.selectedTrip.meetingPoint
+        var components = URLComponents(string: "https://maps.apple.com/")
+        components?.queryItems = [
+            URLQueryItem(name: "daddr", value: "\(destination.latitude),\(destination.longitude)"),
+            URLQueryItem(name: "dirflg", value: "d")
+        ]
+        guard let url = components?.url else {
+            showStatus("تعذر تجهيز رابط الاتجاه")
+            return
+        }
+        UIApplication.shared.open(url) { opened in
+            if !opened {
+                showStatus("تعذر فتح خرائط Apple")
+            }
+        }
     }
 }
 

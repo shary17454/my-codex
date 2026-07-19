@@ -1,4 +1,5 @@
 import CoreLocation
+import MapKit
 import SwiftUI
 import UIKit
 import UserNotifications
@@ -10,14 +11,21 @@ struct AdvancedToolsView: View {
     @State private var showingAssistant = false
     @State private var showingTripReport = false
     @State private var showingTripCamera = false
+    @State private var showingOfflineMaps = false
+    @State private var showingNearbyServices = false
+    @State private var showingCreateTrip = false
     @State private var isRecording = false
     @State private var recordingStartedAt = Date()
+    @State private var recordingDistanceMeters: CLLocationDistance = 0
+    @State private var recordedSpeedTotalKPH = 0.0
+    @State private var recordedSpeedSamples = 0
+    @State private var maximumRecordedSpeedKPH = 0.0
+    @State private var recordingStops = 0
+    @State private var wasRecordingMoving = false
+    @State private var lastRecordedLocation: CLLocation?
     @State private var packingItems = PackingItem.samples
-    @State private var downloadedRegions = OfflineRegionPack.samples
-    @State private var enabledServiceCategories: Set<String> = ["وقود", "إسعاف", "تخييم"]
     @State private var voiceGuidanceEnabled = true
     @State private var prayerAlertsEnabled = false
-    @State private var liveShareHours = 6.0
     @State private var aiPrompt = "أبغى مكان مناسب للعائلات قريب من الرياض"
     @State private var tripPeopleCount = 5.0
     @State private var tripDays = 2.0
@@ -27,8 +35,15 @@ struct AdvancedToolsView: View {
     @State private var offlineLayerOptions = OfflineMapLayerOption.samples
     @State private var toolStatusMessage: String?
 
-    private var coordinate: CLLocationCoordinate2D {
-        appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
+    private var availableCoordinate: CLLocationCoordinate2D? {
+        if let currentCoordinate = appState.locationManager.currentLocation?.coordinate {
+            return currentCoordinate
+        }
+        return appState.hasSelectedTrip ? appState.selectedTrip.meetingPoint : nil
+    }
+
+    private var presentationCoordinate: CLLocationCoordinate2D {
+        availableCoordinate ?? CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753)
     }
 
     private var calculatorResult: ExpeditionCalculatorResult {
@@ -44,71 +59,90 @@ struct AdvancedToolsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 14) {
+                appearanceCard
                 activeDriveCard
                 coordinateNavigatorEntryCard
                 toolStatusBanner
-                platformVisionCard
-                wildlifeGuideEntryCard
-                smartTripPlannerCard
-                aiDestinationGuideCard
-                safetyAssistantCard
-                advancedOfflineLayersCard
-                expeditionCalculatorsCard
-                advancedSearchCard
                 dashboardCard
-                smartAlertsCard
-                tripRecorderCard
-                emergencyCard
-                safetyContinuityCard
+                wildlifeGuideEntryCard
                 offlineMapsCard
                 nearbyServicesCard
-                liveShareCard
-                groupTripCard
-                routePlannerCard
+                expeditionCalculatorsCard
+                tripRecorderCard
+                emergencyCard
                 packingCard
-                routeDifficultyCard
-                reviewsAndGalleryCard
-                communityMediaCard
-                assistantCard
-                advancedAICard
-                voiceGuidanceCard
-                skyAndPrayerCard
-                fuelAndRoadStatusCard
-                guidesCard
                 tripCameraCard
-                photographyPlannerCard
-                autoSuggestionCard
-                safetyGuideCard
-                liveCommunityMapCard
-                tripHistoryCard
-                contentPlatformCard
-                vehicleManagementCard
-                futureServicesCard
-                appleIntegrationCard
-                advancedFutureCard
-                achievementsCard
+                liveShareCard
             }
             .padding()
         }
         .background(Color(.systemGroupedBackground))
         .sheet(isPresented: $showingSOS) {
-            SOSView(coordinate: coordinate)
+            SOSView(coordinate: presentationCoordinate)
         }
         .sheet(isPresented: $showingLiveShare) {
-            LiveShareView(hours: liveShareHours, trip: appState.selectedTrip)
+            LiveShareView(trip: appState.selectedTrip)
         }
         .sheet(isPresented: $showingAssistant) {
             SmartAssistantView(prompt: $aiPrompt, weather: appState.environmentalReport)
         }
         .sheet(isPresented: $showingTripReport) {
-            TripReportView(startedAt: recordingStartedAt, coordinate: coordinate)
+            TripReportView(
+                startedAt: recordingStartedAt,
+                coordinate: presentationCoordinate,
+                distanceMeters: recordingDistanceMeters,
+                averageSpeedKPH: averageRecordedSpeedKPH,
+                maximumSpeedKPH: maximumRecordedSpeedKPH,
+                stops: recordingStops
+            )
         }
         .sheet(isPresented: $showingTripCamera) {
             TripCameraPicker()
         }
+        .sheet(isPresented: $showingOfflineMaps) {
+            OfflineMapsView(region: offlineMapRegion)
+        }
+        .sheet(isPresented: $showingNearbyServices) {
+            NearbyServicesView(origin: presentationCoordinate)
+        }
+        .sheet(isPresented: $showingCreateTrip) {
+            CreateTripSheet()
+        }
         .onAppear {
+            UIDevice.current.isBatteryMonitoringEnabled = true
             appState.locationManager.startNavigation()
         }
+        .onChange(of: appState.locationManager.currentLocation?.timestamp) { _, _ in
+            updateRecordingMetrics(with: appState.locationManager.currentLocation)
+        }
+    }
+
+    private var appearanceCard: some View {
+        let selection = Binding(
+            get: { appState.appearance },
+            set: { appState.appearance = $0 }
+        )
+
+        return VStack(alignment: .leading, spacing: 12) {
+            Label("مظهر التطبيق", systemImage: "circle.lefthalf.filled")
+                .font(.headline)
+                .foregroundStyle(Color.desertCopper)
+
+            Picker("مظهر التطبيق", selection: selection) {
+                ForEach(AppAppearance.allCases) { appearance in
+                    Text(appearance.title(language: appState.language))
+                        .tag(appearance)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text("يمكن للدرب اتباع إعداد الجهاز أو استخدام المظهر النهاري أو الليلي دائمًا.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .accessibilityElement(children: .contain)
     }
 
     @ViewBuilder
@@ -129,9 +163,27 @@ struct AdvancedToolsView: View {
     }
 
     private var activeDriveCard: some View {
-        NavigationLink {
-            ActiveTripDriveView()
-        } label: {
+        Group {
+            if appState.hasSelectedTrip {
+                NavigationLink {
+                    ActiveTripDriveView()
+                } label: {
+                    activeDriveCardLabel
+                }
+                .buttonStyle(.plain)
+            } else {
+                Button {
+                    toolStatusMessage = "أنشئ رحلة وحدد وجهتها أولًا لتفعيل لوحة القيادة والتوجيه"
+                    showingCreateTrip = true
+                } label: {
+                    activeDriveCardLabel
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var activeDriveCardLabel: some View {
             HStack(spacing: 14) {
                 ZStack {
                     Circle()
@@ -151,7 +203,9 @@ struct AdvancedToolsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("وضع الرحلة النشطة")
                         .font(.headline)
-                    Text("واجهة قيادة فاخرة تعرض المسار، السرعة، GPS، الطقس، الخدمات، وزر بدء الرحلة.")
+                    Text(appState.hasSelectedTrip
+                         ? "يعرض المسار والسرعة والموقع والطقس، ويوجهك إلى وجهة الرحلة الحالية."
+                         : "أنشئ رحلة وحدد وجهتها لبدء الملاحة وقياس المسافة.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
@@ -165,8 +219,6 @@ struct AdvancedToolsView: View {
             }
             .padding()
             .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
-        }
-        .buttonStyle(.plain)
     }
 
     private var coordinateNavigatorEntryCard: some View {
@@ -211,18 +263,27 @@ struct AdvancedToolsView: View {
         featureCard(title: "لوحة قيادة الرحلة", icon: "gauge.with.dots.needle.67percent", color: .oasisTeal) {
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow {
-                    metric("السرعة", "-- km/h", "speedometer")
-                    metric("الاتجاه", "305°", "location.north")
+                    metric("السرعة", speedText, "speedometer")
+                    metric("اتجاه الوجهة", destinationBearingText, "location.north")
                 }
                 GridRow {
                     metric("الارتفاع", altitudeText, "mountain.2")
                     metric("البطارية", batteryText, "battery.75percent")
                 }
                 GridRow {
-                    metric("الطقس", "\(Int(appState.environmentalReport.temperatureCelsius))°C", "sun.max")
-                    metric("GPS", appState.locationManager.isTracking ? "نشط" : "جاهز", "location")
+                    metric("الطقس", weatherText, "sun.max")
+                    metric("دقة GPS", gpsAccuracyText, "location")
                 }
             }
+
+            Button {
+                refreshEnvironmentFromTools()
+            } label: {
+                Label("تحديث بيانات اللوحة", systemImage: "arrow.clockwise")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .disabled(appState.isEnvironmentRefreshing)
         }
     }
 
@@ -234,12 +295,20 @@ struct AdvancedToolsView: View {
 
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow {
-                    metric("AI", "تخطيط واقتراح", "sparkles")
-                    metric("أوفلاين", "خرائط وطبقات", "arrow.down.app")
+                    toolActionMetric("AI", "تخطيط واقتراح", "sparkles") {
+                        showingAssistant = true
+                    }
+                    toolActionMetric("أوفلاين", "خرائط وطبقات", "arrow.down.app") {
+                        showingOfflineMaps = true
+                    }
                 }
                 GridRow {
-                    metric("السلامة", "SOS وتنبيهات", "shield.lefthalf.filled")
-                    metric("المجتمع", "حالة مباشرة", "person.3")
+                    toolActionMetric("السلامة", "SOS وتنبيهات", "shield.lefthalf.filled") {
+                        showingSOS = true
+                    }
+                    toolActionMetric("المجتمع", "حالة مباشرة", "person.3") {
+                        showingLiveShare = true
+                    }
                 }
             }
 
@@ -479,11 +548,11 @@ struct AdvancedToolsView: View {
                 Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                     GridRow {
                         metric("المدة", durationText(elapsed), "timer")
-                        metric("المسافة", String(format: "%.1f كم", elapsed / 850), "map")
+                        metric("المسافة", String(format: "%.2f كم", recordingDistanceMeters / 1_000), "map")
                     }
                     GridRow {
-                        metric("متوسط السرعة", isRecording ? "42 km/h" : "--", "speedometer")
-                        metric("نقاط التوقف", isRecording ? "2" : "0", "mappin.and.ellipse")
+                        metric("متوسط السرعة", recordedSpeedSamples == 0 ? "--" : String(format: "%.1f km/h", averageRecordedSpeedKPH), "speedometer")
+                        metric("نقاط التوقف", "\(recordingStops)", "mappin.and.ellipse")
                     }
                 }
             }
@@ -491,11 +560,12 @@ struct AdvancedToolsView: View {
             HStack {
                 Button {
                     if isRecording {
-                        showingTripReport = true
+                        updateRecordingMetrics(with: appState.locationManager.currentLocation)
+                        isRecording = false
+                        openTripReport()
                     } else {
-                        recordingStartedAt = .now
+                        startTripRecording()
                     }
-                    isRecording.toggle()
                 } label: {
                     Label(isRecording ? "إنهاء وحفظ التقرير" : "بدء التسجيل", systemImage: isRecording ? "stop.fill" : "record.circle")
                         .frame(maxWidth: .infinity)
@@ -503,7 +573,7 @@ struct AdvancedToolsView: View {
                 .buttonStyle(.borderedProminent)
 
                 Button {
-                    showingTripReport = true
+                    openTripReport()
                 } label: {
                     Image(systemName: "doc.richtext")
                 }
@@ -515,11 +585,11 @@ struct AdvancedToolsView: View {
 
     private var emergencyCard: some View {
         featureCard(title: "نظام الطوارئ SOS", icon: "sos", color: .red) {
-            Text("يرسل آخر موقع معروف مع الإحداثيات والوقت والبطارية واتجاه الحركة. عند انقطاع الاتصال يحفظ الطلب للإرسال عند عودة الشبكة.")
+            Text("يجهز رسالة طوارئ تحتوي آخر موقع معروف والوقت والبطارية، ثم يفتح ورقة المشاركة لاختيار وسيلة الإرسال المتاحة.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             Button {
-                showingSOS = true
+                openEmergencyTools()
             } label: {
                 Label("فتح زر الطوارئ", systemImage: "sos.circle.fill")
                     .frame(maxWidth: .infinity)
@@ -540,67 +610,51 @@ struct AdvancedToolsView: View {
 
     private var offlineMapsCard: some View {
         featureCard(title: "الخرائط الكاملة بدون إنترنت", icon: "arrow.down.app", color: .oasisTeal) {
-            ForEach($downloadedRegions) { $region in
-                VStack(alignment: .leading, spacing: 7) {
-                    HStack {
-                        Text(region.name)
-                            .font(.headline)
-                        Spacer()
-                        Text(region.size)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    ProgressView(value: region.progress)
-                    Button(region.isDownloaded ? "جاهزة للاستخدام دون إنترنت" : "تنزيل المنطقة") {
-                        region.progress = 1
-                        region.isDownloaded = true
-                    }
-                    .font(.caption.weight(.semibold))
-                    .buttonStyle(.bordered)
-                }
-                Divider()
+            Text("احفظ صورة واضحة للمنطقة الظاهرة أو اختر منطقة أخرى من القائمة. الخرائط المحفوظة تبقى متاحة محليًا عند ضعف الاتصال.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            Button {
+                showingOfflineMaps = true
+            } label: {
+                Label("اختيار منطقة وإدارة الخرائط المحفوظة", systemImage: "map.fill")
+                    .frame(maxWidth: .infinity)
             }
+            .buttonStyle(.borderedProminent)
         }
     }
 
     private var nearbyServicesCard: some View {
         featureCard(title: "طبقات الخدمات القريبة", icon: "point.3.connected.trianglepath.dotted", color: .desertCopper) {
-            let categories = Array(Set(NearbyService.samples.map(\.category))).sorted()
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(categories, id: \.self) { category in
-                        Toggle(category, isOn: Binding(
-                            get: { enabledServiceCategories.contains(category) },
-                            set: { enabled in
-                                if enabled { enabledServiceCategories.insert(category) } else { enabledServiceCategories.remove(category) }
-                            }
-                        ))
-                        .toggleStyle(.button)
-                    }
-                }
-            }
+            Text("ابحث عبر خرائط Apple عن الوقود والمستشفيات والمساجد والورش والتخييم حول إحداثياتك الحالية، ثم افتح الملاحة إلى النتيجة المختارة.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
 
-            ForEach(NearbyService.samples.filter { enabledServiceCategories.contains($0.category) }) { service in
-                row(icon: service.icon, title: service.name, subtitle: "\(service.category) - \(String(format: "%.1f كم", service.distanceKilometers))", trailing: "انتقال")
+            Button {
+                openNearbyServices()
+            } label: {
+                Label("البحث عن خدمات قريبة", systemImage: "magnifyingglass.circle.fill")
+                    .frame(maxWidth: .infinity)
             }
+            .buttonStyle(.borderedProminent)
         }
     }
 
     private var liveShareCard: some View {
-        featureCard(title: "مشاركة الموقع المباشر", icon: "location.viewfinder", color: .oasisTeal) {
-            Slider(value: $liveShareHours, in: 1...24, step: 1) {
-                Text("مدة المشاركة")
-            }
-            Text("مدة المشاركة: \(Int(liveShareHours)) ساعات")
-                .font(.caption)
+        featureCard(title: "مشاركة الرحلة", icon: "location.viewfinder", color: .oasisTeal) {
+            Text(appState.hasSelectedTrip
+                 ? "شارك اسم الرحلة وإحداثيات وجهتها ورابط خرائط Apple عبر ورقة المشاركة."
+                 : "أنشئ رحلة أولًا حتى تتوفر بيانات صحيحة للمشاركة.")
+                .font(.footnote)
                 .foregroundStyle(.secondary)
             Button {
                 showingLiveShare = true
             } label: {
-                Label("إنشاء رابط وQR للمشاركة", systemImage: "qrcode")
+                Label("إنشاء رابط وQR للرحلة", systemImage: "qrcode")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .disabled(!appState.hasSelectedTrip)
         }
     }
 
@@ -838,7 +892,7 @@ struct AdvancedToolsView: View {
             Text("تفتح الكاميرا أو مكتبة الصور لتوثيق الرحلة مع عرض موقع الالتقاط الحالي داخل التطبيق.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
-            row(icon: "mappin", title: "موقع الالتقاط", subtitle: String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude), trailing: altitudeText)
+            row(icon: "mappin", title: "موقع الالتقاط", subtitle: captureLocationText, trailing: altitudeText)
             Button {
                 showingTripCamera = true
             } label: {
@@ -1015,8 +1069,49 @@ struct AdvancedToolsView: View {
     }
 
     private var altitudeText: String {
-        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "-- m" }
+        guard let altitude = appState.locationManager.altitudeMeters else { return "-- m" }
         return "\(Int(altitude)) m"
+    }
+
+    private var speedText: String {
+        guard let speed = appState.locationManager.speedKPH else { return "-- km/h" }
+        return String(format: "%.1f km/h", speed)
+    }
+
+    private var destinationBearingText: String {
+        guard appState.hasSelectedTrip else { return "--" }
+        guard let bearing = appState.locationManager.bearing(to: appState.selectedTrip.meetingPoint) else { return "--" }
+        return "\(Int(bearing.rounded()))°"
+    }
+
+    private var gpsAccuracyText: String {
+        guard appState.locationManager.isTracking else { return "متوقف" }
+        guard let accuracy = appState.locationManager.horizontalAccuracyMeters else { return "بانتظار الموقع" }
+        return "±\(Int(accuracy.rounded())) m"
+    }
+
+    private var weatherText: String {
+        guard appState.environmentalReport.isLiveData else {
+            return appState.isEnvironmentRefreshing ? "جارٍ التحديث" : "غير متاح"
+        }
+        return "\(Int(appState.environmentalReport.temperatureCelsius.rounded()))°C"
+    }
+
+    private var offlineMapRegion: MKCoordinateRegion {
+        MKCoordinateRegion(
+            center: presentationCoordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.18, longitudeDelta: 0.18)
+        )
+    }
+
+    private var captureLocationText: String {
+        guard let coordinate = availableCoordinate else { return "بانتظار موقع GPS" }
+        return String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude)
+    }
+
+    private var averageRecordedSpeedKPH: Double {
+        guard recordedSpeedSamples > 0 else { return 0 }
+        return recordedSpeedTotalKPH / Double(recordedSpeedSamples)
     }
 
     private var batteryText: String {
@@ -1040,19 +1135,50 @@ struct AdvancedToolsView: View {
     }
 
     private func metric(_ title: String, _ value: String, _ icon: String) -> some View {
-        Button {
-            handleToolShortcut(title: title, value: value)
-        } label: {
+        VStack(alignment: .leading, spacing: 6) {
+            Image(systemName: icon)
+                .foregroundStyle(Color.desertCopper)
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
+            Text(value)
+                .font(.subheadline.monospacedDigit().weight(.bold))
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+                .minimumScaleFactor(0.50)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+        .padding(9)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .accessibilityLabel("\(title) \(value)")
+    }
+
+    private func toolActionMetric(
+        _ title: String,
+        _ value: String,
+        _ icon: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
             VStack(alignment: .leading, spacing: 6) {
-                Image(systemName: icon)
-                    .foregroundStyle(Color.desertCopper)
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundStyle(Color.desertCopper)
+                    Spacer(minLength: 4)
+                    Image(systemName: "chevron.left")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.secondary)
+                }
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.68)
                 Text(value)
-                    .font(.subheadline.monospacedDigit().weight(.bold))
+                    .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.50)
@@ -1061,95 +1187,122 @@ struct AdvancedToolsView: View {
             .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
             .padding(9)
             .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(title) \(value)")
+        .accessibilityLabel("\(title): \(value)")
+        .accessibilityHint("فتح الأداة")
     }
 
     private func row(icon: String, title: String, subtitle: String, trailing: String) -> some View {
-        Button {
-            handleToolShortcut(title: title, value: trailing.isEmpty ? subtitle : trailing)
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .foregroundStyle(Color.oasisTeal)
-                    .frame(width: 34, height: 34)
-                    .background(Color.oasisTeal.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.72)
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.72)
-                }
-                Spacer()
-                if !trailing.isEmpty {
-                    Text(trailing)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.desertCopper)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.65)
-                }
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundStyle(Color.oasisTeal)
+                .frame(width: 34, height: 34)
+                .background(Color.oasisTeal.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.72)
+            }
+            Spacer()
+            if !trailing.isEmpty {
+                Text(trailing)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.desertCopper)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.65)
             }
         }
-        .buttonStyle(.plain)
-        .contentShape(Rectangle())
     }
 
     private func tag(_ text: String) -> some View {
-        Button {
-            handleToolShortcut(title: text, value: "")
-        } label: {
-            Text(text)
-                .font(.system(size: 11, weight: .semibold))
-                .lineLimit(2)
-                .minimumScaleFactor(0.62)
-                .multilineTextAlignment(.center)
-                .frame(minWidth: 74, minHeight: 36)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color.desertSand.opacity(0.45), in: Capsule())
-        }
-        .buttonStyle(.plain)
+        Text(text)
+            .font(.system(size: 11, weight: .semibold))
+            .lineLimit(2)
+            .minimumScaleFactor(0.62)
+            .multilineTextAlignment(.center)
+            .frame(minWidth: 74, minHeight: 36)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.desertSand.opacity(0.45), in: Capsule())
     }
 
-    private func handleToolShortcut(title: String, value: String) {
-        let combined = "\(title) \(value)"
-        if combined.contains("GPS") || combined.contains("الارتفاع") || combined.contains("الاتجاه") || combined.contains("السرعة") {
-            appState.locationManager.startNavigation()
-            showToolStatus("تم تشغيل GPS والبوصلة وتحديث بيانات الرحلة")
-        } else if combined.contains("الطقس") || combined.contains("رياح") || combined.contains("جودة") || combined.contains("AQI") {
-            refreshEnvironmentFromTools()
-        } else if combined.contains("SOS") || combined.contains("سلامة") || combined.contains("طوارئ") {
-            showingSOS = true
-            showToolStatus("تم فتح أدوات السلامة والطوارئ")
-        } else if combined.contains("AI") || combined.contains("تخطيط") || combined.contains("اقتراح") || combined.contains("ذكاء") {
-            showingAssistant = true
-            showToolStatus("تم فتح المساعد الذكي للتخطيط")
-        } else if combined.contains("مجتمع") || combined.contains("مباشرة") || combined.contains("مشاركة") {
-            showingLiveShare = true
-            showToolStatus("تم فتح مشاركة الموقع المباشر")
-        } else if combined.contains("تصوير") || combined.contains("كاميرا") {
-            showingTripCamera = true
-            showToolStatus("تم فتح كاميرا الرحلات")
-        } else if combined.contains("خرائط") || combined.contains("أوفلاين") || combined.contains("طبقات") {
-            offlineLayerOptions = offlineLayerOptions.map { option in
-                var updated = option
-                updated.isEnabled = true
-                return updated
-            }
-            showToolStatus("تم تفعيل طبقات الخرائط والأوفلاين في الأدوات")
-        } else if combined.contains("فلك") || combined.contains("السماء") {
-            prayerAlertsEnabled.toggle()
-            showToolStatus(prayerAlertsEnabled ? "تم تفعيل تنبيهات الفلك والصلاة" : "تم إيقاف تنبيهات الفلك والصلاة")
-        } else {
-            showToolStatus("\(title): جاهزة للاستخدام ضمن أدوات الدرب")
+    private func startTripRecording() {
+        recordingStartedAt = .now
+        recordingDistanceMeters = 0
+        recordedSpeedTotalKPH = 0
+        recordedSpeedSamples = 0
+        maximumRecordedSpeedKPH = 0
+        recordingStops = 0
+        wasRecordingMoving = false
+        lastRecordedLocation = appState.locationManager.currentLocation
+        isRecording = true
+        appState.locationManager.startNavigation()
+        showToolStatus(
+            availableCoordinate == nil
+                ? "بدأ التسجيل، وبانتظار أول قراءة GPS صحيحة"
+                : "بدأ تسجيل الرحلة باستخدام GPS"
+        )
+    }
+
+    private func openTripReport() {
+        appState.locationManager.startNavigation()
+        guard availableCoordinate != nil else {
+            showToolStatus("بانتظار موقع GPS قبل إنشاء تقرير الرحلة")
+            return
         }
+        showingTripReport = true
+    }
+
+    private func openEmergencyTools() {
+        appState.locationManager.startNavigation()
+        guard availableCoordinate != nil else {
+            showToolStatus("بانتظار موقع GPS لإرفاق إحداثية صحيحة برسالة الطوارئ")
+            return
+        }
+        showingSOS = true
+    }
+
+    private func openNearbyServices() {
+        appState.locationManager.startNavigation()
+        guard availableCoordinate != nil else {
+            showToolStatus("بانتظار موقع GPS للبحث عن الخدمات القريبة منك")
+            return
+        }
+        showingNearbyServices = true
+    }
+
+    private func updateRecordingMetrics(with location: CLLocation?) {
+        guard isRecording, let location else { return }
+
+        if let previous = lastRecordedLocation, location.timestamp > previous.timestamp {
+            let segmentDistance = location.distance(from: previous)
+            let minimumMovement = max(3, max(location.horizontalAccuracy, previous.horizontalAccuracy) * 0.5)
+            if segmentDistance >= minimumMovement, segmentDistance < 2_000 {
+                recordingDistanceMeters += segmentDistance
+            }
+        }
+
+        let speedKPH = max(0, appState.locationManager.speedKPH ?? 0)
+        recordedSpeedTotalKPH += speedKPH
+        recordedSpeedSamples += 1
+        maximumRecordedSpeedKPH = max(maximumRecordedSpeedKPH, speedKPH)
+
+        if speedKPH >= 3 {
+            wasRecordingMoving = true
+        } else if speedKPH < 1, wasRecordingMoving {
+            recordingStops += 1
+            wasRecordingMoving = false
+        }
+        lastRecordedLocation = location
     }
 
     private func showToolStatus(_ message: String) {
@@ -1165,9 +1318,8 @@ struct AdvancedToolsView: View {
         appState.locationManager.startNavigation()
         showToolStatus("جاري تحديث الطقس وجودة الهواء")
         Task {
-            let coordinate = appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint
-            appState.environmentalReport = await appState.weatherService.fetchReport(for: coordinate)
-            showToolStatus("تم تحديث الطقس وجودة الهواء")
+            await appState.refreshEnvironmentReport()
+            showToolStatus(appState.environmentErrorMessage == nil ? "تم تحديث الطقس وجودة الهواء" : "تعذر تحديث الطقس وجودة الهواء")
         }
     }
 
@@ -1216,6 +1368,227 @@ struct AdvancedToolsView: View {
             let request = UNNotificationRequest(identifier: "desert-risk-demo", content: content, trigger: trigger)
             UNUserNotificationCenter.current().add(request)
         }
+    }
+}
+
+private struct NearbyServicesView: View {
+    @Environment(\.dismiss) private var dismiss
+    let origin: CLLocationCoordinate2D
+
+    @State private var selectedCategory: NearbyServiceSearchCategory = .fuel
+    @State private var results: [NearbyServiceSearchResult] = []
+    @State private var isSearching = false
+    @State private var errorMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 14) {
+                    Text("نتائج فعلية من خرائط Apple حول موقعك. قد تتطلب النتائج والاتجاهات اتصالًا بالإنترنت.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(NearbyServiceSearchCategory.allCases) { category in
+                                Button {
+                                    selectedCategory = category
+                                    Task { await search() }
+                                } label: {
+                                    Label(category.title, systemImage: category.icon)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(selectedCategory == category ? Color.desertCopper : .secondary)
+                            }
+                        }
+                    }
+
+                    if isSearching {
+                        HStack(spacing: 10) {
+                            ProgressView()
+                            Text("جاري البحث عن \(selectedCategory.title)…")
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 120)
+                    } else if let errorMessage {
+                        ContentUnavailableView {
+                            Label("تعذر البحث", systemImage: "wifi.exclamationmark")
+                        } description: {
+                            Text(errorMessage)
+                        } actions: {
+                            Button("إعادة المحاولة") {
+                                Task { await search() }
+                            }
+                        }
+                    } else if results.isEmpty {
+                        ContentUnavailableView(
+                            "لا توجد نتائج قريبة",
+                            systemImage: "mappin.slash",
+                            description: Text("جرّب فئة أخرى أو أعد البحث عند توفر اتصال أفضل.")
+                        )
+                    } else {
+                        ForEach(results) { result in
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack(alignment: .top, spacing: 12) {
+                                    Image(systemName: selectedCategory.icon)
+                                        .foregroundStyle(Color.desertCopper)
+                                        .frame(width: 38, height: 38)
+                                        .background(Color.desertCopper.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(result.name)
+                                            .font(.headline)
+                                        if !result.address.isEmpty {
+                                            Text(result.address)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(2)
+                                        }
+                                        Text(result.distanceText)
+                                            .font(.caption.monospacedDigit().weight(.semibold))
+                                            .foregroundStyle(Color.oasisTeal)
+                                    }
+                                    Spacer(minLength: 4)
+                                }
+
+                                Button {
+                                    result.mapItem.openInMaps(launchOptions: [
+                                        MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving
+                                    ])
+                                } label: {
+                                    Label("الاتجاه عبر خرائط Apple", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.borderedProminent)
+                            }
+                            .padding(12)
+                            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
+                .padding()
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("الخدمات القريبة")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("تم") { dismiss() }
+                }
+            }
+            .task { await search() }
+            .refreshable { await search() }
+        }
+    }
+
+    @MainActor
+    private func search() async {
+        guard CLLocationCoordinate2DIsValid(origin) else {
+            errorMessage = "إحداثيات الموقع غير صالحة. فعّل الموقع ثم حاول مرة أخرى."
+            results = []
+            return
+        }
+
+        isSearching = true
+        errorMessage = nil
+        defer { isSearching = false }
+
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = selectedCategory.query
+        request.resultTypes = .pointOfInterest
+        request.region = MKCoordinateRegion(
+            center: origin,
+            latitudinalMeters: 50_000,
+            longitudinalMeters: 50_000
+        )
+
+        do {
+            let response = try await MKLocalSearch(request: request).start()
+            let originLocation = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
+            results = response.mapItems
+                .map { item in
+                    NearbyServiceSearchResult(
+                        mapItem: item,
+                        origin: originLocation
+                    )
+                }
+                .sorted { $0.distanceMeters < $1.distanceMeters }
+                .prefix(12)
+                .map { $0 }
+        } catch is CancellationError {
+            return
+        } catch {
+            results = []
+            errorMessage = "تعذر تحميل النتائج من خرائط Apple. تحقق من الاتصال وحاول مرة أخرى."
+        }
+    }
+}
+
+private enum NearbyServiceSearchCategory: String, CaseIterable, Identifiable {
+    case fuel
+    case hospital
+    case mosque
+    case repair
+    case camping
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .fuel: "وقود"
+        case .hospital: "مستشفى"
+        case .mosque: "مسجد"
+        case .repair: "ورشة"
+        case .camping: "تخييم"
+        }
+    }
+
+    var query: String {
+        switch self {
+        case .fuel: "محطة وقود"
+        case .hospital: "مستشفى"
+        case .mosque: "مسجد"
+        case .repair: "ورشة سيارات"
+        case .camping: "مخيم"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .fuel: "fuelpump.fill"
+        case .hospital: "cross.case.fill"
+        case .mosque: "moon.stars.fill"
+        case .repair: "wrench.and.screwdriver.fill"
+        case .camping: "tent.fill"
+        }
+    }
+}
+
+private struct NearbyServiceSearchResult: Identifiable {
+    let id = UUID()
+    let mapItem: MKMapItem
+    let distanceMeters: CLLocationDistance
+
+    init(mapItem: MKMapItem, origin: CLLocation) {
+        self.mapItem = mapItem
+        distanceMeters = origin.distance(from: CLLocation(
+            latitude: mapItem.placemark.coordinate.latitude,
+            longitude: mapItem.placemark.coordinate.longitude
+        ))
+    }
+
+    var name: String {
+        mapItem.name ?? "موقع بدون اسم"
+    }
+
+    var address: String {
+        mapItem.placemark.title ?? ""
+    }
+
+    var distanceText: String {
+        if distanceMeters < 1_000 {
+            return "\(Int(distanceMeters.rounded())) متر"
+        }
+        return String(format: "%.1f كم", distanceMeters / 1_000)
     }
 }
 
@@ -1270,25 +1643,24 @@ struct SOSView: View {
 }
 
 struct LiveShareView: View {
-    let hours: Double
     let trip: TripPlan
     @Environment(\.dismiss) private var dismiss
 
     private var liveURL: URL {
-        URL(string: "https://deserttrail.local/live/\(trip.id.uuidString)?hours=\(Int(hours))") ?? URL(fileURLWithPath: "/")
+        trip.shareURL
     }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 18) {
-                Text("مشاركة الموقع المباشر")
+                Text("مشاركة الرحلة")
                     .font(.title2.weight(.bold))
                 QRCodeGenerator.image(from: liveURL.absoluteString)
                     .interpolation(.none)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 230, height: 230)
-                Text("الرابط صالح لمدة \(Int(hours)) ساعات")
+                Text("يفتح الرابط وجهة الرحلة مباشرة في خرائط Apple")
                     .foregroundStyle(.secondary)
                 ShareLink(item: liveURL) {
                     Label("مشاركة الرابط", systemImage: "square.and.arrow.up")
@@ -1384,6 +1756,10 @@ struct TripCameraPicker: UIViewControllerRepresentable {
 struct TripReportView: View {
     let startedAt: Date
     let coordinate: CLLocationCoordinate2D
+    let distanceMeters: CLLocationDistance
+    let averageSpeedKPH: Double
+    let maximumSpeedKPH: Double
+    let stops: Int
     @Environment(\.dismiss) private var dismiss
 
     private var report: String {
@@ -1391,9 +1767,10 @@ struct TripReportView: View {
         تقرير رحلة الدرب
         البداية: \(startedAt.formatted(date: .numeric, time: .shortened))
         النهاية: \(Date().formatted(date: .numeric, time: .shortened))
-        المسافة المقدرة: 18.6 كم
-        متوسط السرعة: 42 km/h
-        أعلى سرعة: 76 km/h
+        المسافة المسجلة: \(String(format: "%.2f", distanceMeters / 1_000)) كم
+        متوسط السرعة: \(String(format: "%.1f", averageSpeedKPH)) km/h
+        أعلى سرعة: \(String(format: "%.1f", maximumSpeedKPH)) km/h
+        نقاط التوقف: \(stops)
         آخر إحداثيات: \(coordinate.latitude), \(coordinate.longitude)
         """
     }

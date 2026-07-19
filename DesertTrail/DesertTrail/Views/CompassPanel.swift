@@ -30,13 +30,15 @@ struct CompassPanel: View {
                         compassCardinal("E", x: 98)
                         compassCardinal("W", x: -98)
                     }
+                    .environment(\.layoutDirection, .leftToRight)
 
                     VStack(spacing: 10) {
                         Image(systemName: "location.north.fill")
                             .font(.system(size: 66))
-                            .foregroundStyle(Color.oasisTeal)
-                            .rotationEffect(.degrees(normalizedHeading))
-                        Text("\(Int(normalizedHeading))°")
+                            .foregroundStyle(headingDegrees == nil ? Color.secondary : Color.oasisTeal)
+                            .rotationEffect(.degrees(headingDegrees ?? 0))
+                            .environment(\.layoutDirection, .leftToRight)
+                        Text(headingDegrees.map { "\(Int($0.rounded()))°" } ?? "--°")
                             .font(.system(.largeTitle, design: .rounded).monospacedDigit().weight(.bold))
                             .foregroundStyle(.primary)
                         Text(directionName)
@@ -71,18 +73,26 @@ struct CompassPanel: View {
                         .padding(.horizontal)
                 }
 
+                if let headingError = appState.locationManager.headingErrorMessage {
+                    Label(headingError, systemImage: "safari")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+
                 Grid(horizontalSpacing: 12, verticalSpacing: 12) {
                     GridRow {
                         readingButton(title: appState.text(.altitude), value: altitudeText, icon: "mountain.2") {
                             startCompassAndLocation()
                             showStatus("تم تشغيل الموقع لتحديث الارتفاع")
                         }
-                        readingButton(title: appState.text(.windSpeed), value: "\(Int(appState.environmentalReport.windSpeedKPH)) km/h", icon: "wind") {
+                        readingButton(title: appState.text(.windSpeed), value: windSpeedText, icon: "wind") {
                             refreshWeather()
                         }
                     }
                     GridRow {
-                        readingButton(title: appState.text(.windDirection), value: "\(Int(appState.environmentalReport.windDirectionDegrees))°", icon: "arrow.up.right") {
+                        readingButton(title: appState.text(.windDirection), value: windDirectionText, icon: "arrow.up.right") {
                             refreshWeather()
                         }
                         readingButton(title: appState.text(.magellan), value: appState.text(.gpxReady), icon: "point.topleft.down.curvedto.point.bottomright.up") {
@@ -127,14 +137,8 @@ struct CompassPanel: View {
         }
     }
 
-    private var normalizedHeading: Double {
-        guard let heading = appState.locationManager.heading else { return 0 }
-        let value = heading.trueHeading >= 0 ? heading.trueHeading : heading.magneticHeading
-        return value >= 0 ? value : 0
-    }
-
-    private var headingDegrees: Double {
-        normalizedHeading
+    private var headingDegrees: Double? {
+        appState.locationManager.resolvedHeadingDegrees
     }
 
     private func compassCardinal(_ text: String, x: CGFloat = 0, y: CGFloat = 0) -> some View {
@@ -145,6 +149,9 @@ struct CompassPanel: View {
     }
 
     private var directionName: String {
+        guard let headingDegrees else {
+            return "بانتظار قراءة الاتجاه"
+        }
         let directions = [
             appState.text(.north),
             appState.text(.northeast),
@@ -155,7 +162,7 @@ struct CompassPanel: View {
             appState.text(.west),
             appState.text(.northwest)
         ]
-        let index = Int((normalizedHeading + 22.5) / 45.0) % directions.count
+        let index = Int((headingDegrees + 22.5) / 45.0) % directions.count
         return directions[index]
     }
 
@@ -187,7 +194,10 @@ struct CompassPanel: View {
         case .restricted, .denied:
             return "الموقع غير مفعل"
         default:
-            return appState.locationManager.isTracking ? "البوصلة تعمل" : "جاهز للتشغيل"
+            if headingDegrees != nil {
+                return appState.locationManager.supportsHeading ? "البوصلة تعمل" : "اتجاه الحركة يعمل"
+            }
+            return appState.locationManager.isTracking ? "بانتظار قراءة الاتجاه" : "جاهز للتشغيل"
         }
     }
 
@@ -198,6 +208,9 @@ struct CompassPanel: View {
         case .restricted, .denied:
             return "فعّل صلاحية الموقع من إعدادات iOS حتى تظهر بيانات الارتفاع والاتجاه بدقة."
         default:
+            if !appState.locationManager.supportsHeading {
+                return "هذا الجهاز لا يحتوي حساس بوصلة. سيظهر اتجاه الحركة تلقائيًا بعد بدء التنقل عبر GPS."
+            }
             return appState.locationManager.heading == nil ? "حرّك الجهاز على شكل 8 بعيداً عن المعادن، ثم اضغط القرص أو زر التشغيل." : "يستخدم التطبيق الموقع أثناء الاستخدام فقط، ويمكن تفعيل التحديث الدائم لتنبيهات الرحلات عند الحاجة."
         }
     }
@@ -230,7 +243,9 @@ struct CompassPanel: View {
     }
 
     private var headingAccuracyText: String {
-        guard let heading = appState.locationManager.heading else { return "لم تصل قراءة الاتجاه بعد" }
+        guard let heading = appState.locationManager.heading else {
+            return headingDegrees == nil ? "لم تصل قراءة الاتجاه بعد" : "اتجاه الحركة محسوب من GPS"
+        }
         guard heading.headingAccuracy >= 0 else { return "تحتاج البوصلة إلى معايرة" }
         return "دقة الاتجاه ±\(Int(heading.headingAccuracy))°"
     }
@@ -250,8 +265,18 @@ struct CompassPanel: View {
     }
 
     private var altitudeText: String {
-        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "-- m" }
+        guard let altitude = appState.locationManager.altitudeMeters else { return "-- m" }
         return "\(Int(altitude)) m"
+    }
+
+    private var windSpeedText: String {
+        guard appState.environmentalReport.isLiveData else { return "-- km/h" }
+        return "\(Int(appState.environmentalReport.windSpeedKPH.rounded())) km/h"
+    }
+
+    private var windDirectionText: String {
+        guard appState.environmentalReport.isLiveData else { return "--°" }
+        return "\(Int(appState.environmentalReport.windDirectionDegrees.rounded()))°"
     }
 
     private func refreshWeather() {
@@ -261,7 +286,7 @@ struct CompassPanel: View {
         Task {
             await appState.startLocationAndRefreshEnvironment()
             isRefreshingWeather = false
-            showStatus("تم تحديث بيانات الرياح")
+            showStatus(appState.environmentErrorMessage == nil ? "تم تحديث بيانات الرياح" : "تعذر تحديث بيانات الرياح")
         }
     }
 

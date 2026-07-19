@@ -74,7 +74,11 @@ struct OfflineMapsView: View {
 
                 Section(store.maps.isEmpty ? "لا توجد خرائط محفوظة" : "الخرائط المحفوظة") {
                     ForEach(store.maps) { map in
-                        SavedOfflineMapRow(map: map)
+                        NavigationLink {
+                            SavedOfflineMapDetail(map: map)
+                        } label: {
+                            SavedOfflineMapRow(map: map)
+                        }
                     }
                     .onDelete { offsets in
                         for index in offsets {
@@ -145,5 +149,41 @@ private struct SavedOfflineMapRow: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+private struct SavedOfflineMapDetail: View {
+    let map: OfflineMap
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if let image = UIImage(contentsOfFile: map.fileURL.path) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .accessibilityLabel("الخريطة المحفوظة لمنطقة \(map.title)")
+                } else {
+                    ContentUnavailableView("تعذر فتح الخريطة", systemImage: "map.fill")
+                }
+
+                Label(map.createdAt.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
+                Label(
+                    String(format: "%.5f, %.5f", map.centerLatitude, map.centerLongitude),
+                    systemImage: "location"
+                )
+                .font(.body.monospacedDigit())
+
+                ShareLink(item: map.fileURL) {
+                    Label("مشاركة صورة الخريطة", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .padding()
+        }
+        .navigationTitle(map.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

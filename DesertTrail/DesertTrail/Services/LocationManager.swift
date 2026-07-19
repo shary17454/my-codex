@@ -1,6 +1,7 @@
 @preconcurrency import CoreLocation
 import Foundation
 import Observation
+import UIKit
 import UserNotifications
 
 @MainActor
@@ -12,12 +13,74 @@ final class LocationManager: NSObject {
     var isTracking = false
     var proximityAlertsEnabled = false
     var locationErrorMessage: String?
+    var headingErrorMessage: String?
+    var inferredCourse: CLLocationDirection?
+    var inferredSpeedMetersPerSecond: CLLocationSpeed?
 
     @ObservationIgnored
     private let manager = CLLocationManager()
     @ObservationIgnored
     private let notificationCenter = UNUserNotificationCenter.current()
+    @ObservationIgnored
+    private var previousLocation: CLLocation?
     private var shouldStartWhenAuthorized = false
+
+    var supportsHeading: Bool {
+        CLLocationManager.headingAvailable()
+    }
+
+    var resolvedHeadingDegrees: CLLocationDirection? {
+        if let heading {
+            let sensorHeading = heading.trueHeading >= 0 ? heading.trueHeading : heading.magneticHeading
+            if sensorHeading >= 0, heading.headingAccuracy >= 0, heading.headingAccuracy <= 50 {
+                return sensorHeading
+            }
+        }
+        if let course = currentLocation?.course, course >= 0 {
+            return course
+        }
+        return inferredCourse
+    }
+
+    var speedKPH: Double? {
+        let speed = currentLocation?.speed ?? -1
+        let resolvedSpeed: CLLocationSpeed?
+        if speed >= 0 {
+            resolvedSpeed = speed
+        } else {
+            resolvedSpeed = inferredSpeedMetersPerSecond
+        }
+        if resolvedSpeed == nil, isTracking, currentLocation != nil {
+            // Core Location commonly reports an invalid speed while the device is
+            // stationary. A valid position with no measured motion is represented
+            // as zero instead of making the dashboard look disconnected.
+            return 0
+        }
+        guard let resolvedSpeed, resolvedSpeed >= 0 else { return nil }
+        return resolvedSpeed * 3.6
+    }
+
+    var altitudeMeters: CLLocationDistance? {
+        guard let location = currentLocation,
+              location.altitude.isFinite,
+              location.verticalAccuracy >= 0 else { return nil }
+        return location.altitude
+    }
+
+    var horizontalAccuracyMeters: CLLocationAccuracy? {
+        guard let accuracy = currentLocation?.horizontalAccuracy, accuracy >= 0 else { return nil }
+        return accuracy
+    }
+
+    func distance(to coordinate: CLLocationCoordinate2D) -> CLLocationDistance? {
+        guard let currentLocation else { return nil }
+        return currentLocation.distance(from: CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude))
+    }
+
+    func bearing(to coordinate: CLLocationCoordinate2D) -> CLLocationDirection? {
+        guard let start = currentLocation?.coordinate else { return nil }
+        return Self.initialBearing(from: start, to: coordinate)
+    }
 
     override init() {
         super.init()
@@ -25,8 +88,18 @@ final class LocationManager: NSObject {
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         manager.distanceFilter = 10
         manager.headingFilter = 2
+        manager.headingOrientation = .portrait
         manager.activityType = .otherNavigation
         authorizationStatus = manager.authorizationStatus
+
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(deviceOrientationDidChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+        updateHeadingOrientation()
     }
 
     func requestWhenInUse() {
@@ -55,13 +128,15 @@ final class LocationManager: NSObject {
         guard authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways else { return }
         shouldStartWhenAuthorized = false
         isTracking = true
+        updateHeadingOrientation()
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         locationErrorMessage = nil
         manager.startUpdatingLocation()
         if CLLocationManager.headingAvailable() {
+            headingErrorMessage = nil
             manager.startUpdatingHeading()
         } else {
-            locationErrorMessage = "البوصلة غير متاحة على هذا الجهاز."
+            headingErrorMessage = "حساس البوصلة غير متاح. سيُستخدم اتجاه الحركة عند توفره."
         }
     }
 
@@ -70,6 +145,26 @@ final class LocationManager: NSObject {
         isTracking = false
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
+    }
+
+    @objc
+    private func deviceOrientationDidChange() {
+        updateHeadingOrientation()
+    }
+
+    private func updateHeadingOrientation() {
+        switch UIDevice.current.orientation {
+        case .portrait:
+            manager.headingOrientation = .portrait
+        case .portraitUpsideDown:
+            manager.headingOrientation = .portraitUpsideDown
+        case .landscapeLeft:
+            manager.headingOrientation = .landscapeLeft
+        case .landscapeRight:
+            manager.headingOrientation = .landscapeRight
+        default:
+            break
+        }
     }
 
     func requestBackgroundTripUpdates() {
@@ -199,6 +294,27 @@ extension LocationManager: CLLocationManagerDelegate {
                 speed: speed,
                 timestamp: timestamp
             )
+            if let previousLocation, timestamp > previousLocation.timestamp {
+                let elapsed = timestamp.timeIntervalSince(previousLocation.timestamp)
+                let distance = location.distance(from: previousLocation)
+                if speed < 0, elapsed > 0, elapsed <= 30 {
+                    let calculatedSpeed = distance / elapsed
+                    inferredSpeedMetersPerSecond = calculatedSpeed.isFinite ? max(0, calculatedSpeed) : nil
+                }
+                if course < 0, distance >= 3 {
+                    inferredCourse = Self.initialBearing(
+                        from: previousLocation.coordinate,
+                        to: location.coordinate
+                    )
+                }
+            }
+            if speed >= 0 {
+                inferredSpeedMetersPerSecond = speed
+            }
+            if course >= 0 {
+                inferredCourse = course
+            }
+            previousLocation = location
             currentLocation = location
             locationErrorMessage = nil
         }
@@ -212,10 +328,20 @@ extension LocationManager: CLLocationManagerDelegate {
         )
         Task { @MainActor in
             heading = headingReading
+            if headingReading.headingAccuracy < 0 {
+                headingErrorMessage = "تعذر قراءة حساس البوصلة. حرّك الجهاز على شكل رقم 8 للمعايرة."
+            } else if headingReading.headingAccuracy > 50 {
+                headingErrorMessage = "دقة البوصلة منخفضة (±\(Int(headingReading.headingAccuracy))°). ابتعد عن المعادن وعاير الجهاز."
+            } else {
+                headingErrorMessage = nil
+            }
         }
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if let locationError = error as? CLError, locationError.code == .locationUnknown {
+            return
+        }
         let message = error.localizedDescription
         Task { @MainActor in
             locationErrorMessage = message
@@ -243,5 +369,17 @@ extension LocationManager: CLLocationManagerDelegate {
 
     nonisolated func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {
         true
+    }
+
+    private static func initialBearing(
+        from start: CLLocationCoordinate2D,
+        to end: CLLocationCoordinate2D
+    ) -> CLLocationDirection {
+        let startLatitude = start.latitude * .pi / 180
+        let endLatitude = end.latitude * .pi / 180
+        let longitudeDelta = (end.longitude - start.longitude) * .pi / 180
+        let y = sin(longitudeDelta) * cos(endLatitude)
+        let x = cos(startLatitude) * sin(endLatitude) - sin(startLatitude) * cos(endLatitude) * cos(longitudeDelta)
+        return (atan2(y, x) * 180 / .pi + 360).truncatingRemainder(dividingBy: 360)
     }
 }

@@ -22,12 +22,28 @@ struct SavedCoordinatePoint: Identifiable, Codable, Hashable {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    var appleMapsURL: URL {
-        URL(string: "http://maps.apple.com/?ll=\(latitude),\(longitude)&q=\(encodedName)")!
+    var appleMapsURL: URL? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "maps.apple.com"
+        components.path = "/"
+        components.queryItems = [
+            URLQueryItem(name: "ll", value: "\(latitude),\(longitude)"),
+            URLQueryItem(name: "q", value: name)
+        ]
+        return components.url
     }
 
-    var googleMapsURL: URL {
-        URL(string: "https://www.google.com/maps/search/?api=1&query=\(latitude),\(longitude)")!
+    var googleMapsURL: URL? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "www.google.com"
+        components.path = "/maps/search/"
+        components.queryItems = [
+            URLQueryItem(name: "api", value: "1"),
+            URLQueryItem(name: "query", value: "\(latitude),\(longitude)")
+        ]
+        return components.url
     }
 
     var shareText: String {
@@ -35,13 +51,9 @@ struct SavedCoordinatePoint: Identifiable, Codable, Hashable {
         \(name)
         \(latitude), \(longitude)
         \(note)
-        Apple Maps: \(appleMapsURL.absoluteString)
-        Google Maps: \(googleMapsURL.absoluteString)
+        Apple Maps: \(appleMapsURL?.absoluteString ?? "")
+        Google Maps: \(googleMapsURL?.absoluteString ?? "")
         """
-    }
-
-    private var encodedName: String {
-        name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "Point"
     }
 }
 

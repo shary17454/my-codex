@@ -131,6 +131,7 @@ struct CoordinateNavigationView: View {
                     .font(.system(size: 56, weight: .bold))
                     .foregroundStyle(Color.oasisTeal)
                     .rotationEffect(.degrees(compassArrowRotation))
+                    .environment(\.layoutDirection, .leftToRight)
                 VStack {
                     Spacer()
                     Text(bearingText)
@@ -345,7 +346,11 @@ struct CoordinateNavigationView: View {
                 .buttonStyle(.bordered)
 
                 Button {
-                    openURL(point.appleMapsURL)
+                    if let url = point.appleMapsURL {
+                        openURL(url)
+                    } else {
+                        showStatus("تعذر إنشاء رابط خرائط Apple")
+                    }
                 } label: {
                     Label("Apple", systemImage: "map")
                 }
@@ -353,7 +358,11 @@ struct CoordinateNavigationView: View {
                 .buttonStyle(.bordered)
 
                 Button {
-                    openURL(point.googleMapsURL)
+                    if let url = point.googleMapsURL {
+                        openURL(url)
+                    } else {
+                        showStatus("تعذر إنشاء رابط خرائط Google")
+                    }
                 } label: {
                     Label("Google", systemImage: "link")
                 }
@@ -436,8 +445,7 @@ struct CoordinateNavigationView: View {
     }
 
     private var compassArrowRotation: Double {
-        let heading = appState.locationManager.heading?.trueHeading ?? appState.locationManager.heading?.magneticHeading ?? 0
-        return (bearingDegrees ?? 0) - max(heading, 0)
+        (bearingDegrees ?? 0) - (appState.locationManager.resolvedHeadingDegrees ?? 0)
     }
 
     private func coordinateText(_ coordinate: CLLocationCoordinate2D?) -> String {

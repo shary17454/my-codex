@@ -9,9 +9,22 @@ struct PlannerView: View {
     var body: some View {
         @Bindable var appState = appState
 
-        NavigationStack {
-            List {
+        List {
                 Section("الرحلات") {
+                    if appState.trips.isEmpty {
+                        ContentUnavailableView {
+                            Label("لا توجد رحلات", systemImage: "map")
+                        } description: {
+                            Text("أنشئ رحلة باسمك وحدد وقتها، ثم اختر الوجهة من الخريطة أو المواقع المحفوظة.")
+                        } actions: {
+                            Button("إنشاء رحلة") {
+                                showingCreateTrip = true
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color.desertCopper)
+                        }
+                    }
+
                     ForEach(appState.trips) { trip in
                         Button {
                             appState.selectTrip(trip)
@@ -21,57 +34,66 @@ struct PlannerView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    .onDelete(perform: appState.removeTrips)
                 }
 
-                Section(appState.text(.tripDetails)) {
-                    TextField(appState.text(.tripTitle), text: $appState.selectedTrip.title)
-                        .textInputAutocapitalization(.words)
-                        .onSubmit { appState.saveSelectedTrip() }
-
-                    DatePicker(appState.text(.start), selection: $appState.selectedTrip.startDate)
-                    DatePicker(appState.text(.end), selection: $appState.selectedTrip.endDate)
-
-                    TextField(appState.text(.packingNotes), text: $appState.selectedTrip.notes, axis: .vertical)
-                        .lineLimit(3...5)
-
-                    Text(String(format: "%.4f, %.4f", appState.selectedTrip.meetingPoint.latitude, appState.selectedTrip.meetingPoint.longitude))
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                }
-
-                Section(appState.text(.participants)) {
-                    HStack {
-                        TextField("اسم مشارك جديد", text: $newParticipant)
+                if appState.hasSelectedTrip {
+                    Section(appState.text(.tripDetails)) {
+                        TextField(appState.text(.tripTitle), text: $appState.selectedTrip.title)
                             .textInputAutocapitalization(.words)
-                            .submitLabel(.done)
-                            .onSubmit(addParticipant)
-                        Button(action: addParticipant) {
-                            Image(systemName: "plus.circle.fill")
+                            .onSubmit { appState.saveSelectedTrip() }
+
+                        DatePicker(appState.text(.start), selection: $appState.selectedTrip.startDate)
+                        DatePicker(appState.text(.end), selection: $appState.selectedTrip.endDate, in: appState.selectedTrip.startDate...)
+
+                        TextField(appState.text(.packingNotes), text: $appState.selectedTrip.notes, axis: .vertical)
+                            .lineLimit(3...5)
+
+                        Text(String(format: "%.4f, %.4f", appState.selectedTrip.meetingPoint.latitude, appState.selectedTrip.meetingPoint.longitude))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Section(appState.text(.participants)) {
+                        HStack {
+                            TextField("اسم مشارك جديد", text: $newParticipant)
+                                .textInputAutocapitalization(.words)
+                                .submitLabel(.done)
+                                .onSubmit(addParticipant)
+                            Button(action: addParticipant) {
+                                Image(systemName: "plus.circle.fill")
+                            }
+                            .disabled(newParticipant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         }
-                        .disabled(newParticipant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                        if appState.selectedTrip.participants.isEmpty {
+                            Text("لم تتم إضافة مشاركين بعد")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        ForEach(appState.selectedTrip.participants, id: \.self) { participant in
+                            Label(participant, systemImage: "person.crop.circle")
+                        }
+                        .onDelete { offsets in
+                            appState.removeParticipants(at: offsets)
+                        }
                     }
 
-                    ForEach(appState.selectedTrip.participants, id: \.self) { participant in
-                        Label(participant, systemImage: "person.crop.circle")
-                    }
-                    .onDelete { offsets in
-                        appState.removeParticipants(at: offsets)
-                    }
-                }
+                    Section(appState.text(.sharingPrivacy)) {
+                        Toggle(appState.text(.shareConsent), isOn: $appState.consentedToTripSharing)
+                        ShareLink(item: appState.selectedTrip.shareURL) {
+                            Label(appState.text(.shareLink), systemImage: "square.and.arrow.up")
+                        }
+                        .disabled(!appState.consentedToTripSharing)
 
-                Section(appState.text(.sharingPrivacy)) {
-                    Toggle(appState.text(.shareConsent), isOn: $appState.consentedToTripSharing)
-                    ShareLink(item: appState.selectedTrip.shareURL) {
-                        Label(appState.text(.shareLink), systemImage: "square.and.arrow.up")
+                        Button {
+                            showingQR = true
+                        } label: {
+                            Label(appState.text(.showQR), systemImage: "qrcode")
+                        }
+                        .disabled(!appState.consentedToTripSharing)
                     }
-                    .disabled(!appState.consentedToTripSharing)
-
-                    Button {
-                        showingQR = true
-                    } label: {
-                        Label(appState.text(.showQR), systemImage: "qrcode")
-                    }
-                    .disabled(!appState.consentedToTripSharing)
                 }
             }
             .navigationTitle(appState.text(.planner))
@@ -87,10 +109,13 @@ struct PlannerView: View {
                     Button("حفظ") {
                         appState.saveSelectedTrip()
                     }
+                    .disabled(!appState.hasSelectedTrip)
                 }
             }
             .onChange(of: appState.selectedTrip) { _, _ in
-                appState.saveSelectedTrip()
+                if appState.hasSelectedTrip {
+                    appState.saveSelectedTrip()
+                }
             }
             .onAppear {
                 if ScreenshotConfiguration.showTripQR {
@@ -105,7 +130,6 @@ struct PlannerView: View {
             .sheet(isPresented: $showingCreateTrip) {
                 CreateTripSheet()
             }
-        }
     }
 
     private func addParticipant() {
@@ -151,7 +175,7 @@ private struct TripListRow: View {
     }
 }
 
-private struct CreateTripSheet: View {
+struct CreateTripSheet: View {
     @Environment(AppState.self) private var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
@@ -186,6 +210,7 @@ private struct CreateTripSheet: View {
                         appState.createTrip(title: title, startDate: startDate, endDate: endDate, notes: notes)
                         dismiss()
                     }
+                    .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || endDate < startDate)
                 }
             }
         }

@@ -4,7 +4,6 @@ import SwiftUI
 
 struct DesertMapView: View {
     @Environment(AppState.self) private var appState: AppState
-    @State private var route = GPXParser.loadRoute(named: "SampleRoute")
     @State private var showingAddPlace = false
     @State private var showingOfflineMaps = false
     @State private var showingPDFSourceManager = false
@@ -16,8 +15,7 @@ struct DesertMapView: View {
     @AppStorage("wildernessTileOverlayEnabled") private var wildernessTileOverlayEnabled = false
     @AppStorage("wildernessTileTemplate") private var wildernessTileTemplate = ""
     @AppStorage("wildernessTileOpacity") private var wildernessTileOpacity = 0.72
-
-    private let tripRegion = MKCoordinateRegion(
+    @State private var mapRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
         span: MKCoordinateSpan(latitudeDelta: 0.06, longitudeDelta: 0.06)
     )
@@ -28,11 +26,12 @@ struct DesertMapView: View {
                 switch mapLayer {
                 case .satellite:
                     MapCanvasView(
-                        region: tripRegion,
-                        route: route,
+                        region: mapRegion,
+                        route: navigationRoute,
                         places: appState.hiddenPlaces.filter { $0.status == .approved },
                         tileTemplateURL: activeTileTemplate,
-                        tileOpacity: wildernessTileOpacity
+                        tileOpacity: wildernessTileOpacity,
+                        onRegionChange: { mapRegion = $0 }
                     )
                 case .ajaji:
                     if ajajiPDFURLs.isEmpty {
@@ -165,8 +164,9 @@ struct DesertMapView: View {
             .padding(.bottom, 104)
             .frame(maxHeight: 520, alignment: .bottom)
         }
-        .task(id: appState.locationManager.currentLocation?.coordinate.latitude) {
+        .task {
             await appState.startLocationAndRefreshEnvironment()
+            centerMapOnCurrentLocation()
         }
         .onAppear {
             appState.locationManager.startNavigation()
@@ -175,7 +175,7 @@ struct DesertMapView: View {
             HiddenPlaceForm()
         }
         .sheet(isPresented: $showingOfflineMaps) {
-            OfflineMapsView(region: tripRegion)
+            OfflineMapsView(region: mapRegion)
         }
         .sheet(isPresented: $showingPDFSourceManager) {
             PDFSourceManagerView(store: pdfMapStore, document: currentPDFDocument)
@@ -214,6 +214,19 @@ struct DesertMapView: View {
             return nil
         }
         return trimmed
+    }
+
+    private var navigationRoute: [CLLocationCoordinate2D] {
+        guard let current = appState.locationManager.currentLocation?.coordinate else {
+            return [appState.selectedTrip.meetingPoint]
+        }
+        return [current, appState.selectedTrip.meetingPoint]
+    }
+
+    private func centerMapOnCurrentLocation() {
+        guard let coordinate = appState.locationManager.currentLocation?.coordinate else { return }
+        mapRegion.center = coordinate
+        mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.06, longitudeDelta: 0.06)
     }
 
     private var altitudeText: String {
@@ -801,6 +814,7 @@ struct MapCanvasView: UIViewRepresentable {
     let places: [HiddenPlace]
     var tileTemplateURL: String?
     var tileOpacity: Double
+    var onRegionChange: ((MKCoordinateRegion) -> Void)? = nil
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
@@ -820,6 +834,7 @@ struct MapCanvasView: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         context.coordinator.tileOpacity = tileOpacity
+        context.coordinator.onRegionChange = onRegionChange
         mapView.mapType = .hybrid
         mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .flat)
         let nextRegionKey = context.coordinator.regionKey(region)
@@ -854,11 +869,6 @@ struct MapCanvasView: UIViewRepresentable {
             mapView.addOverlay(MKPolyline(coordinates: route, count: route.count), level: .aboveLabels)
         }
 
-        let wadi = route.map { CLLocationCoordinate2D(latitude: $0.latitude + 0.004, longitude: $0.longitude - 0.003) }
-        if wadi.count > 2 {
-            mapView.addOverlay(MKPolygon(coordinates: wadi, count: wadi.count), level: .aboveLabels)
-        }
-
         for place in places {
             let annotation = MKPointAnnotation()
             annotation.title = place.name
@@ -866,19 +876,36 @@ struct MapCanvasView: UIViewRepresentable {
             annotation.coordinate = place.coordinate
             mapView.addAnnotation(annotation)
         }
+
+        if let destination = route.last {
+            let annotation = MKPointAnnotation()
+            annotation.title = "الوجهة"
+            annotation.subtitle = "نقطة الوصول المحددة للرحلة"
+            annotation.coordinate = destination
+            mapView.addAnnotation(annotation)
+        }
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(tileOpacity: tileOpacity)
+        Coordinator(tileOpacity: tileOpacity, onRegionChange: onRegionChange)
     }
 
     final class Coordinator: NSObject, MKMapViewDelegate {
         var tileOpacity: Double
         var regionRenderKey = ""
         var renderSignature = ""
+        var onRegionChange: ((MKCoordinateRegion) -> Void)?
 
-        init(tileOpacity: Double) {
+        init(tileOpacity: Double, onRegionChange: ((MKCoordinateRegion) -> Void)?) {
             self.tileOpacity = tileOpacity
+            self.onRegionChange = onRegionChange
+        }
+
+        func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+            let nextKey = regionKey(mapView.region)
+            guard nextKey != regionRenderKey else { return }
+            regionRenderKey = nextKey
+            onRegionChange?(mapView.region)
         }
 
         func regionKey(_ region: MKCoordinateRegion) -> String {
@@ -908,13 +935,6 @@ struct MapCanvasView: UIViewRepresentable {
                 let renderer = MKPolylineRenderer(polyline: polyline)
                 renderer.strokeColor = UIColor(Color.oasisTeal)
                 renderer.lineWidth = 5
-                return renderer
-            }
-            if let polygon = overlay as? MKPolygon {
-                let renderer = MKPolygonRenderer(polygon: polygon)
-                renderer.fillColor = UIColor(Color.desertSand.opacity(0.32))
-                renderer.strokeColor = UIColor(Color.desertCopper.opacity(0.8))
-                renderer.lineWidth = 2
                 return renderer
             }
             return MKOverlayRenderer(overlay: overlay)

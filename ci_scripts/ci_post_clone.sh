@@ -28,12 +28,16 @@ XCODE_FULL="$(xcodebuild -version)"
 
 EXPECTED_XCODE_VERSION="${EXPECTED_XCODE_VERSION:-26.6}"
 EXPECTED_XCODE_BUILD="${EXPECTED_XCODE_BUILD:-17F113}"
-EXPECTED_MARKETING_VERSION="${EXPECTED_MARKETING_VERSION:-1.1.0}"
-MIN_PROJECT_BUILD="${MIN_PROJECT_BUILD:-106}"
 MIN_IPHONEOS_SDK_MAJOR="${MIN_IPHONEOS_SDK_MAJOR:-26}"
 MIN_IPHONEOS_SDK_MINOR="${MIN_IPHONEOS_SDK_MINOR:-5}"
+BATAL_EXPECTED_MARKETING_VERSION="${BATAL_EXPECTED_MARKETING_VERSION:-1.1.0}"
+BATAL_MIN_PROJECT_BUILD="${BATAL_MIN_PROJECT_BUILD:-106}"
 BATAL_BUNDLE_ID="com.batalaldroob.parts"
 BATAL_PROJECT_FILE="ios/BatalAlDroob/BatalAlDroob.xcodeproj/project.pbxproj"
+DARB_EXPECTED_MARKETING_VERSION="${DARB_EXPECTED_MARKETING_VERSION:-1.9.2}"
+DARB_MIN_PROJECT_BUILD="${DARB_MIN_PROJECT_BUILD:-95}"
+DARB_BUNDLE_ID="com.codex.DesertTrail"
+DARB_PROJECT_FILE="DesertTrail/DesertTrail.xcodeproj/project.pbxproj"
 WESH_BUNDLE_ID="com.shary17454.esal"
 WESH_GUARD_SCRIPT="StudyVaultApp/ci_scripts/ci_post_clone.sh"
 
@@ -44,6 +48,15 @@ elif [ -n "${CI_PROJECT_FILE_PATH:-}" ] && echo "${CI_PROJECT_FILE_PATH}" | grep
   IS_BATAL_BUILD="true"
 elif [ -n "${CI_XCODE_PROJECT:-}" ] && echo "${CI_XCODE_PROJECT}" | grep -Eq '(^|/)BatalAlDroob(\.xcodeproj)?$'; then
   IS_BATAL_BUILD="true"
+fi
+
+IS_DARB_BUILD="false"
+if [ "${DARB_RELEASE_GUARD:-0}" = "1" ] || [ "${CI_BUNDLE_ID:-}" = "${DARB_BUNDLE_ID}" ] || [ "${CI_PRODUCT:-}" = "DesertTrail" ]; then
+  IS_DARB_BUILD="true"
+elif [ -n "${CI_PROJECT_FILE_PATH:-}" ] && echo "${CI_PROJECT_FILE_PATH}" | grep -Eq '(^|/)DesertTrail\.xcodeproj$'; then
+  IS_DARB_BUILD="true"
+elif [ -n "${CI_XCODE_PROJECT:-}" ] && echo "${CI_XCODE_PROJECT}" | grep -Eq '(^|/)DesertTrail(\.xcodeproj)?$'; then
+  IS_DARB_BUILD="true"
 fi
 
 IS_WESH_BUILD="false"
@@ -63,9 +76,21 @@ if [ "${IS_WESH_BUILD}" = "true" ]; then
   exec "${WESH_GUARD_SCRIPT}"
 fi
 
-if [ "${IS_BATAL_BUILD}" != "true" ]; then
-  echo "Skipping Batal Al-Droob release guard for bundle ${CI_BUNDLE_ID:-unset} and product ${CI_PRODUCT:-unset}."
+if [ "${IS_BATAL_BUILD}" != "true" ] && [ "${IS_DARB_BUILD}" != "true" ]; then
+  echo "Skipping iOS release guard for bundle ${CI_BUNDLE_ID:-unset} and product ${CI_PRODUCT:-unset}."
   exit 0
+fi
+
+if [ "${IS_DARB_BUILD}" = "true" ]; then
+  PROJECT_FILE="${DARB_PROJECT_FILE}"
+  EXPECTED_MARKETING_VERSION="${DARB_EXPECTED_MARKETING_VERSION}"
+  MIN_PROJECT_BUILD="${DARB_MIN_PROJECT_BUILD}"
+  APP_LABEL="الدروب"
+else
+  PROJECT_FILE="${BATAL_PROJECT_FILE}"
+  EXPECTED_MARKETING_VERSION="${BATAL_EXPECTED_MARKETING_VERSION}"
+  MIN_PROJECT_BUILD="${BATAL_MIN_PROJECT_BUILD}"
+  APP_LABEL="Batal Al-Droob"
 fi
 
 if echo "${XCODE_FULL}" | grep -Eiq 'beta'; then
@@ -100,7 +125,6 @@ if [ -n "${SDKROOT:-}" ] && echo "${SDKROOT}" | grep -Eiq 'beta|iPhoneOS(1[0-9]|
   exit 1
 fi
 
-PROJECT_FILE="${BATAL_PROJECT_FILE}"
 if [ ! -f "${PROJECT_FILE}" ]; then
   echo "error: Expected project file is missing: ${PROJECT_FILE}" >&2
   exit 1
@@ -143,7 +167,7 @@ if [ -n "${CI_BUILD_NUMBER:-}" ]; then
   fi
   if [ "${CI_BUILD_NUMBER}" -lt "${MIN_PROJECT_BUILD}" ]; then
     echo "error: Xcode Cloud Next Build Number must be ${MIN_PROJECT_BUILD} or higher. Found: ${CI_BUILD_NUMBER}" >&2
-    echo "Manual step: App Store Connect > Batal Al-Droob > Xcode Cloud > Workflow > Edit > Next Build Number." >&2
+    echo "Manual step: App Store Connect > ${APP_LABEL} > Xcode Cloud > Workflow > Edit > Next Build Number." >&2
     exit 1
   fi
 fi

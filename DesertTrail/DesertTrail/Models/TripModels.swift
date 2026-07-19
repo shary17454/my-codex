@@ -13,8 +13,25 @@ struct TripPlan: Identifiable, Hashable {
     var participants: [String]
 
     var shareURL: URL {
-        URL(string: "https://deserttrail.local/trip/\(id.uuidString)") ?? URL(fileURLWithPath: "/")
+        var components = URLComponents(string: "https://maps.apple.com/")
+        components?.queryItems = [
+            URLQueryItem(name: "ll", value: "\(meetingPoint.latitude),\(meetingPoint.longitude)"),
+            URLQueryItem(name: "q", value: title)
+        ]
+        guard let url = components?.url else { return URL(fileURLWithPath: "/") }
+        return url
     }
+
+    static let draft = TripPlan(
+        id: UUID(uuidString: "B238B5D8-7074-42D0-97D2-03D8F1DA9A4D")!,
+        title: "رحلة جديدة",
+        startDate: .now,
+        endDate: Calendar.current.date(byAdding: .hour, value: 8, to: .now) ?? .now,
+        meetingPoint: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753),
+        routeName: "مسار مباشر",
+        notes: "",
+        participants: []
+    )
 
     static let sample = TripPlan(
         id: UUID(uuidString: "7B3C61DA-A32B-4D89-B292-3014F8C62F68")!,
@@ -22,7 +39,7 @@ struct TripPlan: Identifiable, Hashable {
         startDate: Calendar.current.date(byAdding: .day, value: 3, to: .now) ?? .now,
         endDate: Calendar.current.date(byAdding: .day, value: 4, to: .now) ?? .now,
         meetingPoint: CLLocationCoordinate2D(latitude: 24.6028, longitude: 46.5535),
-        routeName: "SampleRoute",
+        routeName: "مسار مباشر",
         notes: "تجهيز ماء إضافي، جهاز ماجلان، وحطب آمن.",
         participants: ["سارة", "فهد", "نورة"]
     )
@@ -35,7 +52,7 @@ struct TripPlan: Identifiable, Hashable {
             startDate: Calendar.current.date(byAdding: .day, value: 7, to: .now) ?? .now,
             endDate: Calendar.current.date(byAdding: .day, value: 8, to: .now) ?? .now,
             meetingPoint: CLLocationCoordinate2D(latitude: 24.5229, longitude: 46.2748),
-            routeName: "SampleRoute",
+            routeName: "مسار مباشر",
             notes: "مسار جبلي يحتاج فحص الإطارات قبل الانطلاق.",
             participants: ["أحمد", "ماجد"]
         ),
@@ -45,7 +62,7 @@ struct TripPlan: Identifiable, Hashable {
             startDate: Calendar.current.date(byAdding: .day, value: 12, to: .now) ?? .now,
             endDate: Calendar.current.date(byAdding: .day, value: 12, to: .now) ?? .now,
             meetingPoint: CLLocationCoordinate2D(latitude: 25.3828, longitude: 47.2552),
-            routeName: "SampleRoute",
+            routeName: "مسار مباشر",
             notes: "مناسبة للعائلات مع متابعة حالة الطقس.",
             participants: ["نورة", "سارة", "فهد"]
         )
@@ -67,12 +84,12 @@ struct HiddenPlace: Identifiable, Hashable {
         HiddenPlace(id: UUID(), name: "مطل الحجر", coordinate: CLLocationCoordinate2D(latitude: 24.6352, longitude: 46.5927), rating: 5, imageSystemName: "mountain.2", notes: "إطلالة صخرية مناسبة للغروب.", status: .approved, contributor: "فهد", points: 320),
         HiddenPlace(id: UUID(), name: "فيضة الندى", coordinate: CLLocationCoordinate2D(latitude: 24.6180, longitude: 46.5720), rating: 4, imageSystemName: "leaf", notes: "أرض منبسطة بعد المطر، تحتاج سيارة دفع رباعي.", status: .approved, contributor: "نورة", points: 210),
         HiddenPlace(id: UUID(), name: "شعب السدر", coordinate: CLLocationCoordinate2D(latitude: 24.6088, longitude: 46.5615), rating: 3, imageSystemName: "camera.macro", notes: "موقع هادئ قيد التحقق.", status: .pending, contributor: "سارة", points: 84),
-        HiddenPlace(id: UUID(), name: "وادي حنيفة", coordinate: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730), rating: 5, imageSystemName: "water.waves", notes: "وادي معروف داخل الرياض، مناسب للتجربة والتوجيه.", status: .approved, contributor: "الدروب", points: 510),
-        HiddenPlace(id: UUID(), name: "حافة العالم", coordinate: CLLocationCoordinate2D(latitude: 24.9530, longitude: 45.9960), rating: 5, imageSystemName: "mountain.2.fill", notes: "مطل صحراوي مرتفع، يحتاج سيارة مناسبة ومتابعة الرياح.", status: .approved, contributor: "الدروب", points: 870),
-        HiddenPlace(id: UUID(), name: "روضة خريم", coordinate: CLLocationCoordinate2D(latitude: 25.3828, longitude: 47.2552), rating: 4, imageSystemName: "leaf.fill", notes: "منطقة ربيعية، تحقق من الأنظمة والتصاريح قبل الزيارة.", status: .approved, contributor: "الدروب", points: 430),
-        HiddenPlace(id: UUID(), name: "جبل طويق", coordinate: CLLocationCoordinate2D(latitude: 24.5229, longitude: 46.2748), rating: 5, imageSystemName: "figure.hiking", notes: "تضاريس صخرية جميلة، انتبه للحواف والمنحدرات.", status: .approved, contributor: "الدروب", points: 620),
-        HiddenPlace(id: UUID(), name: "نفود الثويرات", coordinate: CLLocationCoordinate2D(latitude: 26.0900, longitude: 44.1500), rating: 4, imageSystemName: "sun.horizon.fill", notes: "كثبان رملية واسعة، مناسبة للتطعيس مع تجهيزات سلامة.", status: .approved, contributor: "الدروب", points: 390),
-        HiddenPlace(id: UUID(), name: "وادي الدواسر", coordinate: CLLocationCoordinate2D(latitude: 20.4630, longitude: 44.7890), rating: 4, imageSystemName: "mappin.and.ellipse", notes: "مساحات برية واسعة، خطط للوقود والماء قبل الانطلاق.", status: .approved, contributor: "الدروب", points: 350)
+        HiddenPlace(id: UUID(), name: "وادي حنيفة", coordinate: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730), rating: 5, imageSystemName: "water.waves", notes: "وادي معروف داخل الرياض، مناسب للتجربة والتوجيه.", status: .approved, contributor: "الدرب", points: 510),
+        HiddenPlace(id: UUID(), name: "حافة العالم", coordinate: CLLocationCoordinate2D(latitude: 24.9530, longitude: 45.9960), rating: 5, imageSystemName: "mountain.2.fill", notes: "مطل صحراوي مرتفع، يحتاج سيارة مناسبة ومتابعة الرياح.", status: .approved, contributor: "الدرب", points: 870),
+        HiddenPlace(id: UUID(), name: "روضة خريم", coordinate: CLLocationCoordinate2D(latitude: 25.3828, longitude: 47.2552), rating: 4, imageSystemName: "leaf.fill", notes: "منطقة ربيعية، تحقق من الأنظمة والتصاريح قبل الزيارة.", status: .approved, contributor: "الدرب", points: 430),
+        HiddenPlace(id: UUID(), name: "جبل طويق", coordinate: CLLocationCoordinate2D(latitude: 24.5229, longitude: 46.2748), rating: 5, imageSystemName: "figure.hiking", notes: "تضاريس صخرية جميلة، انتبه للحواف والمنحدرات.", status: .approved, contributor: "الدرب", points: 620),
+        HiddenPlace(id: UUID(), name: "نفود الثويرات", coordinate: CLLocationCoordinate2D(latitude: 26.0900, longitude: 44.1500), rating: 4, imageSystemName: "sun.horizon.fill", notes: "كثبان رملية واسعة، مناسبة للتطعيس مع تجهيزات سلامة.", status: .approved, contributor: "الدرب", points: 390),
+        HiddenPlace(id: UUID(), name: "وادي الدواسر", coordinate: CLLocationCoordinate2D(latitude: 20.4630, longitude: 44.7890), rating: 4, imageSystemName: "mappin.and.ellipse", notes: "مساحات برية واسعة، خطط للوقود والماء قبل الانطلاق.", status: .approved, contributor: "الدرب", points: 350)
     ]
 }
 
@@ -97,6 +114,13 @@ struct EnvironmentalReport: Hashable, Sendable {
     var windSpeedKPH: Double
     var windDirectionDegrees: Double
     var updatedAt: Date
+    var isLiveData = true
+    var isAirQualityAvailable = true
+
+    var airQualityDisplayText: String {
+        guard isAirQualityAvailable else { return "--" }
+        return airQualityIndex > 500 ? "500+" : "\(max(0, airQualityIndex))"
+    }
 
     func alertText(language: AppLanguage) -> String {
         if airQualityIndex > 150 {
@@ -109,12 +133,14 @@ struct EnvironmentalReport: Hashable, Sendable {
     }
 
     static let placeholder = EnvironmentalReport(
-        temperatureCelsius: 34,
-        airQualityIndex: 72,
-        weatherSummary: "سماء صافية",
-        windSpeedKPH: 18,
-        windDirectionDegrees: 305,
-        updatedAt: .now
+        temperatureCelsius: 0,
+        airQualityIndex: 0,
+        weatherSummary: "بانتظار تحديث الطقس",
+        windSpeedKPH: 0,
+        windDirectionDegrees: 0,
+        updatedAt: .distantPast,
+        isLiveData: false,
+        isAirQualityAvailable: false
     )
 }
 

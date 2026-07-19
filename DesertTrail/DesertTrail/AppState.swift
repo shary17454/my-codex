@@ -8,10 +8,15 @@ final class AppState {
     var language: AppLanguage = .arabic {
         didSet { UserDefaults.standard.set(language.rawValue, forKey: AppStorageKey.language) }
     }
-    var selectedTrip: TripPlan = TripPlan.sample
-    var trips: [TripPlan] = TripPlan.samples
+    var appearance: AppAppearance = .system {
+        didSet { UserDefaults.standard.set(appearance.rawValue, forKey: AppStorageKey.appearance) }
+    }
+    var selectedTrip: TripPlan = TripPlan.draft
+    var trips: [TripPlan] = []
     var hiddenPlaces: [HiddenPlace] = HiddenPlace.samples
     var environmentalReport: EnvironmentalReport = .placeholder
+    var isEnvironmentRefreshing = false
+    var environmentErrorMessage: String?
     var consentedToTripSharing = false {
         didSet { UserDefaults.standard.set(consentedToTripSharing, forKey: AppStorageKey.tripSharingConsent) }
     }
@@ -27,8 +32,12 @@ final class AppState {
            let storedLanguage = AppLanguage(rawValue: rawLanguage) {
             language = storedLanguage
         }
+        if let rawAppearance = defaults.string(forKey: AppStorageKey.appearance),
+           let storedAppearance = AppAppearance(rawValue: rawAppearance) {
+            appearance = storedAppearance
+        }
 
-        trips = AppStateStorage.loadTrips() ?? TripPlan.samples
+        trips = AppStateStorage.loadTrips() ?? []
         hiddenPlaces = AppStateStorage.loadHiddenPlaces() ?? HiddenPlace.samples
 
         if let selectedID = defaults.string(forKey: AppStorageKey.selectedTripID),
@@ -36,18 +45,43 @@ final class AppState {
            let storedTrip = trips.first(where: { $0.id == uuid }) {
             selectedTrip = storedTrip
         } else {
-            selectedTrip = trips.first ?? TripPlan.sample
+            selectedTrip = trips.first ?? TripPlan.draft
         }
         consentedToTripSharing = defaults.bool(forKey: AppStorageKey.tripSharingConsent)
     }
 
     func refreshEnvironmentReport() async {
-        let coordinate = locationManager.currentLocation?.coordinate ?? selectedTrip.meetingPoint
-        environmentalReport = await weatherService.fetchReport(for: coordinate)
+        let coordinate: CLLocationCoordinate2D?
+        if let currentCoordinate = locationManager.currentLocation?.coordinate {
+            coordinate = currentCoordinate
+        } else if hasSelectedTrip {
+            coordinate = selectedTrip.meetingPoint
+        } else {
+            coordinate = nil
+        }
+
+        guard let coordinate else {
+            environmentErrorMessage = "فعّل الموقع أو أنشئ رحلة بوجهة محددة لتحديث الطقس وجودة الهواء."
+            return
+        }
+
+        isEnvironmentRefreshing = true
+        defer { isEnvironmentRefreshing = false }
+        do {
+            environmentalReport = try await weatherService.fetchReport(for: coordinate)
+            environmentErrorMessage = nil
+        } catch {
+            environmentErrorMessage = error.localizedDescription
+        }
     }
 
     func startLocationAndRefreshEnvironment() async {
         locationManager.startNavigation()
+        if locationManager.currentLocation == nil {
+            for _ in 0..<8 where locationManager.currentLocation == nil {
+                try? await Task.sleep(nanoseconds: 250_000_000)
+            }
+        }
         await refreshEnvironmentReport()
     }
 
@@ -57,10 +91,9 @@ final class AppState {
     }
 
     func saveSelectedTrip() {
+        guard trips.contains(where: { $0.id == selectedTrip.id }) else { return }
         if let index = trips.firstIndex(where: { $0.id == selectedTrip.id }) {
             trips[index] = selectedTrip
-        } else {
-            trips.insert(selectedTrip, at: 0)
         }
         persistTrips()
         persistSelectedTripID()
@@ -76,7 +109,7 @@ final class AppState {
             startDate: startDate,
             endDate: max(endDate, startDate),
             meetingPoint: coordinate,
-            routeName: "SampleRoute",
+            routeName: "مسار مخصص",
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
             participants: []
         )
@@ -102,6 +135,19 @@ final class AppState {
         saveSelectedTrip()
     }
 
+    func removeTrips(at offsets: IndexSet) {
+        let removedIDs = Set(offsets.compactMap { trips.indices.contains($0) ? trips[$0].id : nil })
+        trips.remove(atOffsets: offsets)
+        if trips.isEmpty {
+            selectedTrip = TripPlan.draft
+            UserDefaults.standard.removeObject(forKey: AppStorageKey.selectedTripID)
+        } else if removedIDs.contains(selectedTrip.id), let firstTrip = trips.first {
+            selectedTrip = firstTrip
+        }
+        persistTrips()
+        persistSelectedTripID()
+    }
+
     func addHiddenPlace(_ place: HiddenPlace) {
         hiddenPlaces.insert(place, at: 0)
         statusMessage = "تم حفظ الموقع وإرساله للمراجعة"
@@ -109,6 +155,10 @@ final class AppState {
     }
 
     func setTripDestination(to place: HiddenPlace) {
+        guard !trips.isEmpty else {
+            statusMessage = "أنشئ رحلة أولًا ثم اختر وجهتها"
+            return
+        }
         selectedTrip.meetingPoint = place.coordinate
         selectedTrip.title = selectedTrip.title.isEmpty ? place.name : selectedTrip.title
         saveSelectedTrip()
@@ -117,6 +167,10 @@ final class AppState {
 
     func text(_ key: LocalizedKey) -> String {
         key.value(for: language)
+    }
+
+    var hasSelectedTrip: Bool {
+        trips.contains(where: { $0.id == selectedTrip.id })
     }
 
     private func persistTrips() {
@@ -128,16 +182,40 @@ final class AppState {
     }
 
     private func persistSelectedTripID() {
+        guard hasSelectedTrip else {
+            UserDefaults.standard.removeObject(forKey: AppStorageKey.selectedTripID)
+            return
+        }
         UserDefaults.standard.set(selectedTrip.id.uuidString, forKey: AppStorageKey.selectedTripID)
     }
 }
 
 private enum AppStorageKey {
     static let language = "desertTrail.language"
+    static let appearance = "desertTrail.appearance"
     static let selectedTripID = "desertTrail.selectedTripID"
     static let trips = "desertTrail.trips.v1"
     static let hiddenPlaces = "desertTrail.hiddenPlaces.v1"
     static let tripSharingConsent = "desertTrail.tripSharingConsent"
+}
+
+enum AppAppearance: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: String { rawValue }
+
+    func title(language: AppLanguage) -> String {
+        switch (self, language) {
+        case (.system, .arabic): "حسب النظام"
+        case (.light, .arabic): "نهاري"
+        case (.dark, .arabic): "ليلي"
+        case (.system, _): "System"
+        case (.light, _): "Light"
+        case (.dark, _): "Dark"
+        }
+    }
 }
 
 private enum AppStateStorage {

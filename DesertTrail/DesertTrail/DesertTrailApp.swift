@@ -16,9 +16,20 @@ struct DesertTrailApp: App {
             ContentView()
                 .environment(appState)
                 .environment(\.layoutDirection, appState.language == .arabic ? .rightToLeft : .leftToRight)
+                .preferredColorScheme(appState.appearance.colorScheme)
                 .task {
                     WeatherService.scheduleBackgroundRefresh()
                 }
+        }
+    }
+}
+
+private extension AppAppearance {
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
         }
     }
 }

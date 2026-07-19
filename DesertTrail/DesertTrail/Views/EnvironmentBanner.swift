@@ -5,22 +5,62 @@ struct EnvironmentBanner: View {
     let report: EnvironmentalReport
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: report.airQualityIndex > 150 ? "exclamationmark.triangle.fill" : "sun.max.fill")
-                .font(.title3)
-                .foregroundStyle(report.airQualityIndex > 150 ? .red : .desertCopper)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(report.alertText(language: appState.language))
-                    .font(.subheadline.weight(.semibold))
-                Text("\(Int(report.temperatureCelsius))°C  |  AQI \(report.airQualityIndex)  |  \(appState.text(.wind)) \(Int(report.windSpeedKPH)) km/h")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        Button {
+            Task {
+                appState.locationManager.startNavigation()
+                await appState.refreshEnvironmentReport()
             }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: bannerIcon)
+                    .font(.title3)
+                    .foregroundStyle(bannerColor)
 
-            Spacer()
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(bannerTitle)
+                        .font(.subheadline.weight(.semibold))
+                    Text(bannerDetails)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
+                }
+
+                Spacer()
+
+                if appState.isEnvironmentRefreshing {
+                    ProgressView()
+                } else {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .padding(12)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .accessibilityHint("تحديث الطقس وجودة الهواء")
+    }
+
+    private var bannerIcon: String {
+        guard report.isLiveData else { return "cloud.slash" }
+        return report.airQualityIndex > 150 ? "exclamationmark.triangle.fill" : "sun.max.fill"
+    }
+
+    private var bannerColor: Color {
+        guard report.isLiveData else { return .secondary }
+        return report.airQualityIndex > 150 ? .red : .desertCopper
+    }
+
+    private var bannerTitle: String {
+        if appState.isEnvironmentRefreshing { return "جاري تحديث الظروف" }
+        if !report.isLiveData { return appState.environmentErrorMessage ?? "بيانات الطقس غير متاحة" }
+        return report.alertText(language: appState.language)
+    }
+
+    private var bannerDetails: String {
+        guard report.isLiveData else { return "اضغط للمحاولة عند توفر الإنترنت والموقع" }
+        return "\(Int(report.temperatureCelsius.rounded()))°C  |  AQI \(report.airQualityDisplayText)  |  \(appState.text(.wind)) \(Int(report.windSpeedKPH.rounded())) km/h"
     }
 }

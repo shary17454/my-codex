@@ -92,9 +92,10 @@ final class OfflineMapStore: ObservableObject {
         let snapshot = try await MKMapSnapshotter(options: options).start()
         guard let data = snapshot.image.pngData() else { return }
 
-        let id = UUID()
         let directory = try mapsDirectory()
-        let fileURL = directory.appendingPathComponent("\(id.uuidString).png")
+        let existingMap = matchingMap(title: title, region: region)
+        let id = existingMap?.id ?? UUID()
+        let fileURL = existingMap?.fileURL ?? directory.appendingPathComponent("\(id.uuidString).png")
         try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
 
         let map = OfflineMap(
@@ -105,6 +106,7 @@ final class OfflineMapStore: ObservableObject {
             centerLatitude: region.center.latitude,
             centerLongitude: region.center.longitude
         )
+        maps.removeAll { $0.id == id }
         maps.insert(map, at: 0)
         try persistIndex()
     }
@@ -122,7 +124,7 @@ final class OfflineMapStore: ObservableObject {
             return
         }
 
-        maps = decoded.compactMap { entry in
+        let loadedMaps: [OfflineMap] = decoded.compactMap { entry -> OfflineMap? in
             let fileURL = mapsDirectoryIfExists().appendingPathComponent(entry.fileName)
             guard FileManager.default.fileExists(atPath: fileURL.path) else { return nil }
             return OfflineMap(
@@ -134,6 +136,44 @@ final class OfflineMapStore: ObservableObject {
                 centerLongitude: entry.centerLongitude
             )
         }
+        maps = removeDuplicateMaps(from: loadedMaps)
+        if maps.count != loadedMaps.count {
+            try? persistIndex()
+        }
+    }
+
+    private func matchingMap(title: String, region: MKCoordinateRegion) -> OfflineMap? {
+        let normalizedTitle = normalized(title)
+        let target = CLLocation(latitude: region.center.latitude, longitude: region.center.longitude)
+        return maps.first { map in
+            guard normalized(map.title) == normalizedTitle else { return false }
+            let saved = CLLocation(latitude: map.centerLatitude, longitude: map.centerLongitude)
+            return target.distance(from: saved) < 1_000
+        }
+    }
+
+    private func removeDuplicateMaps(from loadedMaps: [OfflineMap]) -> [OfflineMap] {
+        var result: [OfflineMap] = []
+        for map in loadedMaps.sorted(by: { $0.createdAt > $1.createdAt }) {
+            let location = CLLocation(latitude: map.centerLatitude, longitude: map.centerLongitude)
+            let duplicate = result.contains { existing in
+                guard normalized(existing.title) == normalized(map.title) else { return false }
+                let existingLocation = CLLocation(latitude: existing.centerLatitude, longitude: existing.centerLongitude)
+                return location.distance(from: existingLocation) < 1_000
+            }
+            if duplicate {
+                try? FileManager.default.removeItem(at: map.fileURL)
+            } else {
+                result.append(map)
+            }
+        }
+        return result
+    }
+
+    private func normalized(_ title: String) -> String {
+        title
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "ar"))
     }
 
     private func persistIndex() throws {

@@ -1,10 +1,25 @@
 # سجل إصدار الدرب
 
-## 1.9.1 (76) - 2026-07-15
+## 1.9.2 (95) - 2026-07-20
+
+### العربية - What's New
+
+- تجهيز إصدار جديد أعلى من الإصدار المعتمد السابق لتجاوز إغلاق مسار الإصدار 1.9.1 في App Store Connect.
+- رفع رقم البناء إلى 95 لتجنب إعادة استخدام أرقام البناء السابقة أو المرفوضة.
+- الحفاظ على اسم التطبيق المعروض "الدرب" وتحديث حارس Xcode Cloud ليتحقق من الإصدار والبناء الصحيحين قبل الأرشفة.
+
+### English - What's New
+
+- Prepared a new version above the previously approved release to avoid the closed 1.9.1 pre-release train in App Store Connect.
+- Raised the build number to 95 to avoid reusing prior or rejected build numbers.
+- Kept the displayed app name as "Al Darb" and updated the Xcode Cloud guard to verify the correct version and build before archiving.
+
+## 1.9.1 (90) - 2026-07-19
 
 ### العربية - What's New
 
 - تثبيت اسم التطبيق المعروض داخل النظام والمتجر إلى "الدرب".
+- توحيد بقايا اسم التطبيق داخل البيانات المعروضة لتظهر باسم "الدرب" فقط.
 - إصلاح إنشاء الرحلات الجديدة وحفظها وتعديل المشاركين والوجهة.
 - تحسين البوصلة واتجاه الشمال وربطها بطلب الموقع عند الحاجة.
 - إصلاح أزرار الطقس وجودة الهواء ولوحة القيادة وإضافة الموقع لتظهر حالة واضحة عند الاستخدام.
@@ -12,11 +27,14 @@
 - تحسين خرائط بلا إنترنت بإظهار خيارات مناطق متعددة بدل تكرار موقع واحد.
 - تحسين الخريطة وإعادة تمركزها عند تغيير الطبقة أو الوجهة.
 - تحسين وضوح النصوص والبطاقات على الشاشات الصغيرة.
+- إضافة إعداد مظهر محفوظ يتيح اتباع إعدادات النظام أو اختيار المظهر النهاري أو الليلي.
+- إصلاح انعكاس اتجاهات البوصلة في الواجهة العربية وعرض اتجاه الحركة من GPS عند غياب حساس البوصلة.
 - توحيد إعدادات الإصدار والبناء وتجهيز حماية Xcode Cloud لمنع استخدام Xcode beta أو SDK غير مدعوم في أرشيف App Store.
 
 ### English - What's New
 
 - Set the displayed app name consistently to "Al Darb".
+- Unified remaining in-app displayed app-name references to "Al Darb".
 - Fixed trip creation, saved trip editing, participants, and destination selection.
 - Improved compass heading behavior and location permission flow.
 - Fixed weather, air quality, driving dashboard, and add-place actions with clearer status feedback.
@@ -24,6 +42,8 @@
 - Improved offline maps with multiple region choices instead of repeated saved entries.
 - Improved map recentering when changing layers or destinations.
 - Improved text and card readability on smaller screens.
+- Added a saved appearance setting for system, light, or dark mode.
+- Fixed compass mirroring in Arabic and added GPS course feedback when a compass sensor is unavailable.
 - Unified release/build settings and added an Xcode Cloud guard to prevent App Store archives from using beta Xcode or unsupported SDKs.
 
 ## 1.9.0 (67) - 2026-07-15
@@ -62,7 +82,7 @@
 
 ## 1.5 (54) - 2026-07-11
 
-- تغيير اسم التطبيق المعروض إلى "الدروب".
+- تغيير اسم التطبيق المعروض إلى "الدرب".
 - إصلاح ربط `CFBundleVersion` برقم البناء الفعلي في إعدادات Xcode بدلاً من رقم ثابت قديم، حتى يظهر البناء الجديد بشكل صحيح في App Store Connect.
 - رفع رقم الإصدار إلى `1.5` ورقم البناء إلى `54` لتجاوز آخر محاولات Xcode Cloud الفاشلة.
 - إعادة تجهيز المشروع للأرشفة عبر Xcode Cloud و App Store Connect.
