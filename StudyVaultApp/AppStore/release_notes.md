@@ -1,16 +1,25 @@
 # ملاحظات الإصدار 1.10.0
 
-- تحديث إعدادات الإصدار والبناء لتفادي مسارات App Store Connect المغلقة أو أرقام البناء المستخدمة سابقًا.
-- إضافة فحص مبكر في Xcode Cloud يمنع استخدام Xcode Beta أو SDK غير مناسب قبل مرحلة الأرشفة.
-- توحيد مصدر أرقام الإصدار والبناء عبر `MARKETING_VERSION` و`CURRENT_PROJECT_VERSION`.
-- تحسين وثائق التحقق قبل الرفع لضمان استخدام Archive جديد من Commit الصحيح.
+- تصميم عربي جديد أكثر وضوحًا وسرعة على iPhone وiPad.
+- لوحة رئيسية تعرض المقارنات والأصوات والأسباب والعناصر المحفوظة.
+- بحث وتصنيف وفرز محسن لاكتشاف المقارنات والعناصر المناسبة.
+- إنشاء مقارنة من خيارين إلى 10 خيارات مع حفظ المسودة محليًا.
+- نتائج أوضح تشمل النسب وفارق التصويت ودرجة الثقة وملخص القرار.
+- مقارنة موزونة حسب الأولويات مثل السعر والجودة والأداء والاعتمادية.
+- تحسين التصويت وأسباب الاختيار والحفظ والمشاركة والتذكيرات المحلية.
+- تحسين دعم RTL والوضع الداكن وDynamic Type وVoiceOver.
+- إصلاحات للاستقرار والأداء وتجهيزات إصدار أكثر موثوقية.
 
 ## English Release Notes 1.10.0
 
-- Updated release and build settings to avoid closed App Store Connect trains and previously used build numbers.
-- Added an early Xcode Cloud preflight check that blocks Beta Xcode or unsupported SDKs before archiving.
-- Unified version and build values through `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`.
-- Improved release verification documentation to require a fresh archive from the correct commit.
+- Introduced a clearer, faster Arabic-first design for iPhone and iPad.
+- Added a decision dashboard for comparisons, votes, reasons, and saved items.
+- Improved search, categories, and sorting across comparisons and the local catalog.
+- Added multi-option comparison creation with local draft recovery.
+- Expanded results with vote percentages, confidence, vote gap, and decision summaries.
+- Added weighted comparison based on priorities such as price, quality, and reliability.
+- Improved voting reasons, saving, sharing, local reminders, accessibility, RTL, and Dark Mode.
+- Included stability, performance, and release-readiness improvements.
 
 # ملاحظات الإصدار 1.9.0
 

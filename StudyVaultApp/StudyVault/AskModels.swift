@@ -146,7 +146,7 @@ struct AskQuestion: Identifiable, Hashable, Codable {
     }
 
     var decisionConfidence: Int {
-        guard totalVotes > 0, let winner = winningOption else { return 52 }
+        guard totalVotes > 0, let winner = winningOption else { return 0 }
         let lead = Double(winner.votes) / Double(max(totalVotes, 1))
         let reasonDepth = min(comments.count * 4, 24)
         let verifiedBoost = min(verifiedComments.count * 7, 21)
@@ -704,7 +704,7 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
         switch self {
         case .text: "نص"
         case .audio: "صوت"
-        case .video: "فيديو"
+        case .video: "سيناريو"
         }
     }
 
@@ -712,7 +712,7 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
         switch self {
         case .text: "text.alignright"
         case .audio: "waveform"
-        case .video: "play.rectangle.fill"
+        case .video: "list.bullet.rectangle"
         }
     }
 }

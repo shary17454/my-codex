@@ -67,7 +67,7 @@
 - Target: `StudyVault`
 - Bundle ID: `com.shary17454.esal`
 - Marketing Version: `1.10.0`
-- Build Number: `36`
+- Build Number: `52`
 - Deployment Target: iOS `17.0`
 - Swift Version: `6.0`
 - Signing: Automatic، دون تغيير ضمن هذا العمل.

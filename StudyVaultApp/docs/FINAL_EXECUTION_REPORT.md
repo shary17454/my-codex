@@ -1,133 +1,150 @@
-# Final Execution Report - وش الرأي
+# تقرير التنفيذ النهائي - وش الرأي
 
-تاريخ التنفيذ: 2026-07-18
+تاريخ التحقق: 2026-07-19
 
 ## 1. Discovery & Fixes
 
-- النطاق المؤكد: `StudyVaultApp/` فقط لتطبيق وش الرأي.
-- التطبيق الحالي Native iOS وليس Flutter:
-  - Swift 6
-  - SwiftUI
-  - Xcode project: `StudyVault.xcodeproj`
-  - Scheme: `StudyVault`
-- لم يتم العثور على Flutter/Dart runtime داخل نطاق وش الرأي النشط.
-- تم فصل تعليمات وش الرأي عن بطل الدروب عبر:
-  - `AGENTS.md`
-  - `StudyVaultApp/AGENTS.md`
-- تم إضافة بوابة تحقق:
-  - `StudyVaultApp/scripts/validate_wesh_alray_scope.sh`
-  - `StudyVaultApp/scripts/validate_wesh_alray_data.py`
-- تم إصلاح إعداد App Store/Capabilities بإزالة مفاتيح Live Activities غير المستخدمة من `Info.plist`.
-- تم التحقق من بيانات `SeedQuestions.json` و`ProductKnowledge.json` لمنع:
-  - الأسئلة الفارغة.
-  - الخيارات الأقل من خيارين.
-  - الخيارات المكررة.
-  - التصنيفات غير المعروفة.
-  - الأصوات السالبة.
-  - معرفات المعرفة المكررة.
+### الحالة المكتشفة
+
+- النطاق: `StudyVaultApp/` فقط، دون تعديل أي تطبيق آخر.
+- التطبيق Native iOS باستخدام Swift 6 وSwiftUI.
+- المعمارية كانت MVVM جزئية، لكن معظم الواجهات كانت مجمعة في `ContentView.swift` بحجم يقارب 2800 سطر.
+- لم يكن للمشروع Target اختبارات فعّال.
+- ملخص القرار كان يعطي ثقة غير صفرية عند عدم وجود أصوات.
+- التصويت عند تفعيل Backend كان يزيد محليًا قبل تأكيد الخادم.
+- التوثيق كان يصف نسخة محلية قديمة ولا يعكس الـBackend أو الاختبارات.
+
+### الإصلاحات
+
+- إعادة تصميم كاملة للتدفقات الأساسية مع Design System دلالي.
+- فصل الشاشات إلى ملفات Features قابلة للصيانة.
+- إضافة حالات Loading وEmpty وError وOffline وRefreshing.
+- تحسين RTL وDark Mode وDynamic Type وVoiceOver والتخطيط المتكيف.
+- إصلاح حساب الثقة ليكون صفرًا عند عدم وجود أصوات.
+- جعل التصويت عبر Backend ينتظر تأكيد الخادم، مع منع الإرسال المكرر وعدم تغيير العداد عند الفشل.
+- عدم مسح المسودة أو عرض المقارنة كمنشورة عند فشل Backend، وإبقاؤها جاهزة لإعادة المحاولة.
+- إضافة مهلات محددة لطلبات الشبكة مع الحفاظ على رسائل AppError العربية وعدم إعادة POST تلقائيًا.
+- نقل بيانات جلسة Apple الحساسة إلى Keychain مع ترحيل القيم القديمة.
+- إضافة 9 اختبارات وحدة وUI Smoke Test.
+- تحديث README وتقارير الجاهزية.
 
 ## 2. File Manifest
 
-ملفات Swift النشطة:
+### ملفات جديدة
 
-- `StudyVault/StudyVaultApp.swift`
-- `StudyVault/ContentView.swift`
-- `StudyVault/AskModels.swift`
-- `StudyVault/ViewModels.swift`
+- `StudyVault/DesignSystem.swift`: الألوان الدلالية والأسطح والأزرار ومؤشرات الحالة.
+- `StudyVault/UserSession.swift`: الجلسة وKeychain.
+- `StudyVault/PreviewCatalog.swift`: Previews للوضعين الفاتح والداكن.
+- `StudyVault/DashboardView.swift`: الرئيسية.
+- `StudyVault/DiscoverViews.swift`: الاكتشاف والمكتبة والمتصفح.
+- `StudyVault/SmartComparisonView.swift`: المقارنة الذكية.
+- `StudyVault/QuestionDetailView.swift`: التفاصيل والتصويت والقرار.
+- `StudyVault/CreateComparisonView.swift`: إنشاء المقارنة.
+- `StudyVault/AccountView.swift`: الحساب والاهتمامات.
+- `StudyVault/SharedComponents.swift`: مكونات الواجهة المشتركة.
+- `StudyVaultTests/StudyVaultCoreTests.swift`: اختبارات المنطق.
+- `StudyVaultUITests/StudyVaultUITests.swift`: اختبار الواجهة الأساسي.
 
-ملفات أضيفت أو عدلت في هذا التنفيذ:
+### ملفات معدلة
 
-- `AGENTS.md`: جعل وش الرأي هو النطاق الحالي ومنع خلطه مع بطل الدروب.
-- `StudyVaultApp/AGENTS.md`: تعليمات محلية لتطبيق وش الرأي.
-- `StudyVaultApp/StudyVault/Info.plist`: إزالة Live Activities غير المستخدمة.
-- `StudyVaultApp/scripts/validate_wesh_alray_scope.sh`: فحص فصل النطاق.
-- `StudyVaultApp/scripts/validate_wesh_alray_data.py`: فحص بيانات وإعدادات وش الرأي.
-- `StudyVaultApp/docs/NATIVE_IOS_MIGRATION_READINESS_REPORT.md`: تقرير هجرة وجاهزية Native iOS.
-- `StudyVaultApp/docs/FINAL_EXECUTION_REPORT.md`: هذا التقرير.
+- `StudyVault/ContentView.swift`: حاوية TabView والتنقل والـSheets فقط.
+- `StudyVault/AskModels.swift`: إصلاح حساب الثقة.
+- `StudyVault/ViewModels.swift`: حالات البيانات والتصويت المؤكد من الخادم.
+- `StudyVault.xcodeproj/project.pbxproj`: ملفات وTargets الاختبارات.
+- `StudyVault.xcodeproj/xcshareddata/xcschemes/StudyVault.xcscheme`: تشغيل Unit/UI tests.
+- `README.md` وتقارير `docs/`: أوامر وحالة فعلية محدثة.
 
 ## 3. Capabilities & Permissions Log
 
-- Bundle ID: `com.shary17454.esal`
-- Deep Link URL scheme:
-  - `weshalray`
-- Permissions:
-  - لا توجد أذونات كاميرا أو صور أو موقع أو ميكروفون في `Info.plist`.
-- Privacy Manifest:
-  - `NSPrivacyTracking = false`
-  - `NSPrivacyCollectedDataTypes = []`
-  - `NSPrivacyTrackingDomains = []`
-  - `NSPrivacyAccessedAPITypes = []`
-- Live Activities:
-  - تمت إزالتها من `Info.plist` لأنها غير منفذة فعليًا.
-  - لا يجب إعادة تفعيلها إلا عند إضافة ActivityKit implementation وCapability واضحة.
+- Bundle ID: `com.shary17454.esal`، لم يتغير.
+- Development Team وSigning: لم يتغيرا.
+- Apple Sign In entitlement: موجود مسبقًا.
+- Deep link scheme: `weshalray`.
+- Camera/Photos/Location/Microphone: لا توجد أذونات مستخدمة أو مطلوبة.
+- Local notifications: يطلب الإذن فقط عند تفعيل تذكير قرار.
+- Privacy manifest:
+  - Tracking: false.
+  - Collected data types: فارغة في الملف الحالي.
+  - Tracking domains: فارغة.
+- لا توجد أسرار أو API keys مضافة إلى الكود.
 
 ## 4. Xcode & Scheme Configurations
 
 - Project: `StudyVaultApp/StudyVault.xcodeproj`
 - Scheme: `StudyVault`
-- Target: `StudyVault`
-- Display name: `وش الرأي`
-- Bundle ID: `com.shary17454.esal`
+- Targets: `StudyVault`, `StudyVaultTests`, `StudyVaultUITests`
 - Marketing Version: `1.10.0`
-- Build Number: `36`
-- Deployment Target: iOS `17.0`
-- Swift Version: `6.0`
-- Signing: Automatic، لم يتم تغييره.
-- Archive metadata verified from `/tmp/WeshAlray.xcarchive`:
-  - `CFBundleIdentifier = com.shary17454.esal`
-  - `CFBundleShortVersionString = 1.10.0`
-  - `CFBundleVersion = 36`
-  - `DTSDKName = iphoneos26.4`
-  - `DTXcodeBuild = 17E202`
-  - `MinimumOSVersion = 17.0`
+- Build Number: `52`
+- Deployment Target: iOS 17.0
+- Swift Version: 6.0
+- Supported families: iPhone وiPad
+- Local Xcode observed: 26.4.1 (`17E202`)
+- Local SDK observed: iPhoneOS 26.4
+- Archive المحلي أنشئ دون توقيع للتحقق البنيوي فقط؛ لم يتم رفعه.
+
+قيم التطبيق داخل الـxcarchive المحلي:
+
+| المفتاح | القيمة |
+|---|---|
+| CFBundleIdentifier | `com.shary17454.esal` |
+| CFBundleDisplayName | `وش الرأي` |
+| CFBundleShortVersionString | `1.10.0` |
+| CFBundleVersion | `52` |
+| DTPlatformName | `iphoneos` |
+| DTSDKName | `iphoneos26.4` |
+| DTXcodeBuild | `17E202` |
+| MinimumOSVersion | `17.0` |
+
+لا توجد Widgets أو Extensions مضمنة في التطبيق الحالي.
 
 ## 5. Services Configured
 
-- لا توجد SDKs خارجية مضافة في تطبيق iOS.
-- Backend تطوير محلي:
-  - `StudyVaultApp/backend/server.mjs`
-  - `StudyVaultApp/backend/tests/smoke.mjs`
-- إعداد API token اختياري محفوظ في Keychain داخل التطبيق.
-- لا توجد أسرار مضافة للكود.
+- لا توجد SDKs خارجية داخل تطبيق iOS.
+- `URLSession` للاتصال بالـBackend.
+- مهلة 15 ثانية للطلب و30 ثانية للعملية الشبكية، دون Retry تلقائي لعمليات الكتابة.
+- Keychain لحفظ الرمز ومعرف Apple.
+- UserDefaults للمسودات والتفضيلات غير الحساسة.
+- Backend تطوير Node.js دون تبعيات خارجية.
+- PostgreSQL schema متوفر كمرجع إنتاجي، لكنه غير موصول بخدمة إنتاج حاليًا.
 
-## 6. Verification Commands
+## 6. Verification Evidence
 
-| الأمر | النتيجة | ملاحظة |
-|---|---|---|
-| `StudyVaultApp/scripts/validate_wesh_alray_scope.sh` | PASS | فحص النطاق والبيانات نجح |
-| `npm run check` داخل `StudyVaultApp/backend` | PASS | `node --check server.mjs` |
-| `plutil -lint StudyVaultApp/StudyVault/Info.plist StudyVaultApp/StudyVault/PrivacyInfo.xcprivacy` | PASS | ملفات plist سليمة |
-| `xcodebuild ... Debug ... build -quiet` | PASS | Debug simulator build نجح |
-| `xcodebuild ... Release ... build -quiet` | PASS | Release simulator build نجح |
-| `xcodebuild ... archive CODE_SIGNING_ALLOWED=NO` | PASS | Archive محلي بدون توقيع نجح |
-| فحص Info.plist داخل `/tmp/WeshAlray.xcarchive` | PASS | النسخة والبناء وBundle ID مطابقة |
-| `git diff --check` | PASS | لا توجد مشاكل whitespace |
-| فحص conflict markers | PASS | لا توجد علامات تعارض |
-| `xcrun simctl install ...` | BLOCKED | علق تثبيت Simulator لأكثر من دقيقتين، وتم إيقافه؛ Build/Archive لم يتأثرا |
+| الفحص | النتيجة |
+|---|---|
+| اكتشاف المشروع والـTargets عبر `xcodebuild -list` | PASS |
+| Debug Simulator Build بعد إعادة التصميم | PASS |
+| Release Simulator Build | PASS |
+| Static Analyzer | PASS |
+| Unit Tests | PASS - 9/9 |
+| UI Smoke Test على iPhone 17 | PASS - 1/1 |
+| فحص نطاق وش الرأي | PASS |
+| فحص JSON وInfo.plist وإعدادات المشروع | PASS |
+| Backend syntax check | PASS |
+| Backend isolated smoke test | PASS |
+| Archive محلي جديد بدون توقيع | PASS |
+| فحص قيم Info.plist داخل Archive | PASS |
+| فحص iPhone Light/Dark وRTL | PASS بصريًا على Simulator |
+| فحص iPad Portrait/Landscape | PASS بصريًا على Simulator |
+| لقطات App Store فعلية | PASS - أربع لقطات iPhone وثلاث لقطات iPad بالحجوم المقبولة |
+| تصويت محلي وتحديث النتيجة | PASS عبر Smoke Test يدوي |
+| Instruments وAccessibility Inspector | لم يُشغلا؛ يلزم فحص يدوي متخصص |
+| Archive موقّع أو Upload | لم يُنفذ ضمن هذه المهمة |
+
+ملاحظة: أظهر Xcode تنبيه أداة metadata لعدم وجود AppIntents dependency. التطبيق لا يعلن App Intents حاليًا، ولم تتم إضافة Capability غير مستخدمة لإخفاء التنبيه.
 
 ## 7. Manual Actions Required
 
-1. تشغيل Smoke Test يدوي من Xcode أو Simulator مستقر:
-   ```sh
-   xcodebuild -project StudyVaultApp/StudyVault.xcodeproj -scheme StudyVault -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17' build
-   ```
-   ثم تشغيل التطبيق من Xcode.
-2. اختبار VoiceOver وDynamic Type يدويًا.
-3. مراجعة App Store Privacy Labels داخل App Store Connect.
-4. تشغيل Backend إنتاجي حقيقي وربطه بقاعدة بيانات دائمة إذا كان التصويت الجماعي مطلوبًا.
-5. استبدال API token المشترك بمصادقة مستخدمين حقيقية قبل الاعتماد العام على Backend.
-6. إنشاء Archive موقّع من Xcode/Xcode Cloud عند طلب الرفع.
+1. اختيار إصدار Xcode إنتاجي تسمح به Apple داخل Xcode Cloud قبل أي Archive للمتجر.
+2. Next Build Number مؤكد على `52`، أعلى من كل Builds الظاهرة حتى `51`.
+3. إنشاء Archive موقّع جديد من Commit النهائي، وعدم استخدام الأرشيف المحلي غير الموقع.
+4. مراجعة App Store Privacy Labels مع مالك المنتج؛ لا يمكن استنتاج الالتزامات القانونية من الكود وحده.
+5. تشغيل Accessibility Inspector واختبار VoiceOver على جهاز فعلي.
+6. تشغيل Instruments لقياس Launch Time وAllocations وLeaks وEnergy.
+7. توفير Backend إنتاجي بقاعدة بيانات دائمة ومصادقة مستخدمين قبل اعتبار التصويت الجماعي عامًا وموثوقًا.
+8. اختبار Apple Sign In والإشعارات والروابط العميقة على جهاز فعلي.
 
 ## 8. Final Assessment
 
 الحالة: `READY_WITH_EXTERNAL_REQUIREMENTS`
 
-السبب:
-
-- وش الرأي Native iOS ومفصول عن بطل الدروب.
-- Build وRelease وArchive المحلي بدون توقيع نجحت.
-- فحوص النطاق والبيانات والـBackend نجحت.
-- لا يمكن إعلان App Store production-ready بالكامل حتى يتم:
-  - تشغيل Smoke Test يدوي مستقر.
-  - مراجعة App Store privacy labels.
-  - توفير Backend إنتاجي ومصادقة حقيقية إذا كانت الميزات الجماعية ستعمل للعامة.
+الكود يبني ويُختبر، والواجهة الجديدة تعمل على iPhone وiPad، وبيانات المتجر واللقطات محدثة. ما زال الإصدار العام يتطلب Archive موقّع من Xcode Cloud، مراجعة App Store Connect، واختبارات جهاز فعلي. المزامنة الجماعية تحتاج Backend إنتاجيًا مستقلًا؛ نسخة Release الحالية تعمل محليًا ولا تعرض إعدادات Backend التطويرية.

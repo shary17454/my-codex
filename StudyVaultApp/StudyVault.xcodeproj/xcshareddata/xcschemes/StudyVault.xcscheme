@@ -21,6 +21,34 @@
                ReferencedContainer = "container:StudyVault.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BB0000000000000000000040"
+               BuildableName = "StudyVaultTests.xctest"
+               BlueprintName = "StudyVaultTests"
+               ReferencedContainer = "container:StudyVault.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DD0000000000000000000040"
+               BuildableName = "StudyVaultUITests.xctest"
+               BlueprintName = "StudyVaultUITests"
+               ReferencedContainer = "container:StudyVault.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -29,6 +57,28 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BB0000000000000000000040"
+               BuildableName = "StudyVaultTests.xctest"
+               BlueprintName = "StudyVaultTests"
+               ReferencedContainer = "container:StudyVault.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DD0000000000000000000040"
+               BuildableName = "StudyVaultUITests.xctest"
+               BlueprintName = "StudyVaultUITests"
+               ReferencedContainer = "container:StudyVault.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

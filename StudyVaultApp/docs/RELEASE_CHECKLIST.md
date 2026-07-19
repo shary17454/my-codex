@@ -1,75 +1,85 @@
 # قائمة تحقق إصدار وش الرأي
 
-## معلومات الإصدار
+## معلومات ثابتة
 
-- App name: وش الرأي.
-- Bundle ID: `com.shary17454.esal`.
-- Marketing version: `1.10.0`.
-- Build number: `36`.
-- Release action: `PREPARE_ONLY`، بدون رفع وبدون إرسال للمراجعة من هذه المهمة.
-- Scheme: `StudyVault`.
-- Target: `StudyVault`.
-- Xcode Cloud required: Xcode 26.6 `17F113` أو أحدث إصدار إنتاجي تسمح به Apple.
-- Local Xcode observed: 26.4.1 `17E202`، صالح للبناء المحلي فقط ولا يعتمد كبيئة رفع لهذا الإصدار.
-- Swift: 6.0.
-- Deployment target: iOS 17.0.
+- [x] الاسم: وش الرأي.
+- [x] Bundle ID: `com.shary17454.esal`.
+- [x] Scheme: `StudyVault`.
+- [x] Swift: 6.0.
+- [x] Deployment target: iOS 17.0.
+- [x] الأجهزة: iPhone وiPad.
+- [x] Marketing Version في المشروع: `1.10.0`.
+- [x] Build Number في المشروع: `52`.
+- [x] لم يتغير Team أو Signing أو Entitlements.
 
-## البناء والتحقق
+## البناء والاختبارات المحلية
 
-- [x] تشغيل Debug build بدون توقيع قبل التعديل.
-- [x] تشغيل Release build بدون توقيع قبل التعديل.
-- [x] تشغيل Debug build بدون توقيع بعد التعديل.
-- [x] تشغيل Release build بدون توقيع بعد التعديل.
-- [x] محاولة Archive بدون توقيع للتحقق البنيوي.
-- [x] تشغيل `plutil -lint` لملفات plist الأساسية.
-- [ ] تشغيل `git diff --check`.
-- [ ] فحص conflict markers.
+- [x] Debug build.
+- [x] Release simulator build.
+- [x] Static Analyzer.
+- [x] Unit Tests: 9/9.
+- [x] UI Smoke Test: 1/1.
+- [x] Backend syntax check.
+- [x] Backend isolated smoke test.
+- [x] فحص JSON وInfo.plist.
+- [x] Archive محلي جديد دون توقيع للتحقق البنيوي.
+- [x] فحص القيم الفعلية داخل xcarchive.
+- [x] لا توجد Extensions مضمنة بأرقام مختلفة.
+- [x] `git diff --check`.
+- [x] فحص conflict markers.
 
-## الاختبارات
+## الواجهة
 
-- [x] التحقق من حالة `xcodebuild test`.
-- [ ] إنشاء Test target لاحقًا؛ الـScheme الحالي غير مهيأ للـTest action.
-- [ ] اختبار يدوي لفتح الصفحة الرئيسية.
-- [ ] اختبار يدوي لإنشاء مقارنة.
-- [ ] اختبار يدوي للتصويت وإضافة السبب.
-- [ ] اختبار يدوي للبحث والحفظ والمشاركة.
+- [x] iPhone حديث.
+- [x] iPad Portrait.
+- [x] iPad Landscape.
+- [x] Light Mode.
+- [x] Dark Mode.
+- [x] العربية RTL.
+- [x] بحث واكتشاف.
+- [x] إنشاء مقارنة.
+- [x] تصويت محلي وعرض النتائج.
+- [x] المكتبة والحساب.
+- [ ] iPhone فعلي صغير.
+- [ ] Dynamic Type بأكبر الأحجام على جهاز فعلي.
+- [ ] VoiceOver وAccessibility Inspector.
+- [ ] Reduce Motion وIncrease Contrast يدويًا.
+
+## Xcode Cloud
+
+- [x] تأكيد أن Workflow يبني `StudyVaultApp/StudyVault.xcodeproj` والـScheme `StudyVault`.
+- [x] اختيار Xcode Stable إنتاجي: Latest Release، حاليًا Xcode 26.6 (`17F113`).
+- [x] ضبط Next Build Number على `52`، أعلى من Build Uploads حتى `51`.
+- [ ] تشغيل Unit وUI tests قبل Archive.
+- [ ] إنشاء Archive من Commit النهائي.
+- [ ] التأكد أن الإصدار والبناء داخل Artifact يطابقان App Store Connect.
+- [ ] عدم استخدام Artifact أو Archive أقدم.
+- [ ] عدم إعادة استخدام Build Number سبق رفعه.
 
 ## App Store Connect
 
-- [ ] التأكد من أن الإصدار `1.10.0` أعلى من آخر إصدار مقبول ومن آخر محاولة `1.9.0`.
-- [ ] التأكد من أن Build `36` أعلى من كل Build ظاهر في TestFlight / Build Uploads، خصوصًا Build `35`.
-- [ ] التأكد أن Xcode Cloud workflow يحتوي `Archive - iOS` مع Distribution Preparation = App Store Connect.
-- [ ] ضبط Xcode Cloud > Workflow > Environment > Xcode Version على Xcode 26.6 `17F113` أو إصدار إنتاجي أحدث مسموح.
-- [ ] ضبط Xcode Cloud > Next Build Number على `36` أو رقم أعلى إن ظهر Build أحدث في Build Uploads.
-- [ ] عدم اختيار Latest Beta أو Xcode 27 beta.
-- [ ] عدم اختيار Build مرفوض أو train مغلق.
-- [ ] مراجعة What’s New بالعربية والإنجليزية.
-- [ ] مراجعة Screenshots وApp Preview إن وجدت.
-- [ ] مراجعة Pricing and Availability، خاصة السعودية إذا كانت مطلوبة.
-- [ ] مراجعة Compliance والأسئلة القانونية.
+- [x] التأكد أن `1.10.0` أعلى من آخر إصدار منشور `1.9.0`.
+- [x] التأكد أن Build `52` أعلى من أعلى Build ظاهر `51`.
+- [ ] مراجعة App Privacy Labels يدويًا.
+- [ ] مراجعة Export Compliance.
+- [x] تحديث What’s New بالعربية والإنجليزية بما يطابق الوظائف المنفذة.
+- [x] تجهيز Screenshots فعلية لـiPhone 6.9 بوصة وiPad 13 بوصة.
+- [ ] مراجعة Pricing and Availability.
+- [ ] اختبار Apple Sign In على جهاز فعلي.
+- [ ] اختبار الإشعارات والـDeep Links.
+- [ ] عدم الإرسال للمراجعة قبل إغلاق جميع البنود اليدوية.
 
-## الخصوصية والأمان
+## Backend والإنتاج
 
-- [ ] مراجعة `PrivacyInfo.xcprivacy`.
-- [ ] مراجعة App Store Privacy Labels يدويًا.
-- [ ] التأكد من عدم وجود مفاتيح API أو أسرار داخل الكود.
-- [ ] مراجعة بيانات `UserDefaults` المحلية.
-- [ ] التأكد من عدم تسجيل بيانات حساسة.
-- [ ] مراجعة المتصفح الداخلي والروابط الخارجية.
+- [ ] توفير خدمة HTTPS إنتاجية.
+- [ ] استبدال تخزين JSON بقاعدة بيانات دائمة.
+- [ ] تطبيق مصادقة مستخدمين وسياسة تصويت على الخادم.
+- [ ] ضبط Rate Limiting وMonitoring وBackups.
+- [ ] مراجعة تطابق Privacy Labels مع بيانات الخادم الفعلية.
+- [ ] اختبار Rollback وتوافق API قبل الإطلاق.
 
-## الجودة وتجربة المستخدم
+## قرار الإصدار
 
-- [ ] iPhone صغير.
-- [ ] iPhone حديث كبير.
-- [ ] iPad.
-- [ ] Light Mode.
-- [ ] Dark Mode.
-- [ ] العربية RTL.
-- [ ] الإنجليزية LTR إذا كانت مفعلة.
-- [ ] Dynamic Type.
-- [ ] VoiceOver عبر Accessibility Inspector.
-- [ ] اختبار Safe Area وDynamic Island.
+الحالة الحالية: `READY_WITH_EXTERNAL_REQUIREMENTS`.
 
-## قرار الإطلاق
-
-لا ترسل للمراجعة قبل تحقق العناصر اليدوية أعلاه، خصوصًا Archive موقّع من Xcode Cloud، App Store Privacy Labels، وفحص التدفقات الحرجة على جهاز فعلي.
+لا ترفع النسخة المحلية غير الموقعة. استخدم Xcode Cloud بعد إكمال فحوص Version/Build وPrivacy وBackend أعلاه.

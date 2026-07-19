@@ -31,6 +31,10 @@ final class HomeViewModel {
     var searchText = ""
     var savedQuestionIDs: Set<UUID> = []
     var appErrorMessage: String?
+    private(set) var isRefreshing = false
+    private(set) var isOffline = false
+    private(set) var lastUpdatedAt: Date?
+    private(set) var pendingVoteQuestionIDs: Set<UUID> = []
     var isBackendEnabled: Bool
     var backendBaseURLText: String
     var backendAPITokenText: String
@@ -62,7 +66,15 @@ final class HomeViewModel {
             }?
             .key ?? .other
 
-        let mostVoted = questions.max { $0.totalVotes < $1.totalVotes }?.title ?? "لا توجد بيانات"
+        let mostVoted = questions
+            .filter { $0.totalVotes > 0 }
+            .max { lhs, rhs in
+                if lhs.totalVotes == rhs.totalVotes {
+                    return lhs.title.localizedStandardCompare(rhs.title) == .orderedDescending
+                }
+                return lhs.totalVotes < rhs.totalVotes
+            }?
+            .title ?? "لا توجد تصويتات بعد"
         let closeCount = questions.filter {
             let summary = DecisionSummaryService.makeSummary(for: $0)
             return summary.clarity == .close || summary.clarity == .insufficientData
@@ -172,20 +184,28 @@ final class HomeViewModel {
 
     func refreshFromBackend() async {
         guard isBackendEnabled, let client = makeBackendClient() else { return }
+        guard !isRefreshing else { return }
+        isRefreshing = true
+        defer { isRefreshing = false }
+
         do {
             let remoteQuestions = try await client.fetchComparisons(category: selectedCategory == .all ? nil : selectedCategory)
             questions = remoteQuestions.isEmpty ? questions : remoteQuestions
             appErrorMessage = nil
+            isOffline = false
+            lastUpdatedAt = Date()
         } catch {
-            appErrorMessage = AppError.unknown(error).errorDescription
+            appErrorMessage = userFacingMessage(for: error)
+            isOffline = (error as? URLError)?.code == .notConnectedToInternet
         }
     }
 
-    func publishQuestion(_ question: AskQuestion) async -> AskQuestion {
-        guard isBackendEnabled, let client = makeBackendClient() else {
+    func publishQuestion(_ question: AskQuestion) async -> AskQuestion? {
+        guard isBackendEnabled else {
             insertPublishedQuestion(question)
             return question
         }
+        guard let client = makeBackendClient() else { return nil }
 
         do {
             let remote = try await client.createComparison(question: question)
@@ -193,9 +213,8 @@ final class HomeViewModel {
             appErrorMessage = nil
             return remote
         } catch {
-            appErrorMessage = AppError.unknown(error).errorDescription
-            insertPublishedQuestion(question)
-            return question
+            appErrorMessage = userFacingMessage(for: error)
+            return nil
         }
     }
 
@@ -203,15 +222,15 @@ final class HomeViewModel {
         questions.insert(question, at: 0)
     }
 
-    func vote(questionID: AskQuestion.ID, optionID: PollOption.ID) -> AskQuestion? {
-        guard let questionIndex = questions.firstIndex(where: { $0.id == questionID }),
-              let optionIndex = questions[questionIndex].options.firstIndex(where: { $0.id == optionID }) else {
-            return nil
-        }
-
-        questions[questionIndex].options[optionIndex].votes += 1
-        pushVoteIfNeeded(questionID: questionID, optionID: optionID, reason: nil, authorName: "مستخدم", reasonCategory: nil, isVerifiedExperience: false)
-        return questions[questionIndex]
+    func vote(questionID: AskQuestion.ID, optionID: PollOption.ID) async -> AskQuestion? {
+        await submitVote(
+            questionID: questionID,
+            optionID: optionID,
+            reason: nil,
+            authorName: "مستخدم",
+            reasonCategory: nil,
+            isVerifiedExperience: false
+        )
     }
 
     func voteWithReason(
@@ -221,6 +240,89 @@ final class HomeViewModel {
         authorName: String,
         reasonCategory: String? = nil,
         isVerifiedExperience: Bool = false
+    ) async -> AskQuestion? {
+        await submitVote(
+            questionID: questionID,
+            optionID: optionID,
+            reason: reason,
+            authorName: authorName,
+            reasonCategory: reasonCategory,
+            isVerifiedExperience: isVerifiedExperience
+        )
+    }
+
+    private func submitVote(
+        questionID: AskQuestion.ID,
+        optionID: PollOption.ID,
+        reason: String?,
+        authorName: String,
+        reasonCategory: String?,
+        isVerifiedExperience: Bool
+    ) async -> AskQuestion? {
+        guard !pendingVoteQuestionIDs.contains(questionID),
+              let questionIndex = questions.firstIndex(where: { $0.id == questionID }),
+              questions[questionIndex].options.contains(where: { $0.id == optionID }) else {
+            return questions.first { $0.id == questionID }
+        }
+
+        pendingVoteQuestionIDs.insert(questionID)
+        defer { pendingVoteQuestionIDs.remove(questionID) }
+
+        let cleanReason = reason?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if isBackendEnabled {
+            guard let client = makeBackendClient() else {
+                return questions.first { $0.id == questionID }
+            }
+            do {
+                let remoteQuestion = try await client.vote(
+                    comparisonID: questionID,
+                    optionID: optionID,
+                    authorName: authorName,
+                    reason: cleanReason?.isEmpty == true ? nil : cleanReason,
+                    reasonCategory: reasonCategory,
+                    isVerifiedExperience: isVerifiedExperience
+                )
+                if let updatedIndex = questions.firstIndex(where: { $0.id == questionID }) {
+                    questions[updatedIndex] = remoteQuestion
+                }
+                appErrorMessage = nil
+                return remoteQuestion
+            } catch {
+                appErrorMessage = userFacingMessage(for: error)
+                return questions.first { $0.id == questionID }
+            }
+        }
+
+        do {
+            _ = try await LocalVotingRepository.shared.vote(
+                comparisonID: questionID,
+                optionID: optionID,
+                reason: cleanReason?.isEmpty == true ? nil : cleanReason,
+                isAnonymous: authorName == "مجهول"
+            )
+            appErrorMessage = nil
+            return applyLocalVote(
+                questionID: questionID,
+                optionID: optionID,
+                reason: cleanReason,
+                authorName: authorName,
+                reasonCategory: reasonCategory,
+                isVerifiedExperience: isVerifiedExperience
+            )
+        } catch {
+            appErrorMessage = userFacingMessage(for: error)
+            return questions.first { $0.id == questionID }
+        }
+    }
+
+    private func applyLocalVote(
+        questionID: AskQuestion.ID,
+        optionID: PollOption.ID,
+        reason: String?,
+        authorName: String,
+        reasonCategory: String?,
+        isVerifiedExperience: Bool
     ) -> AskQuestion? {
         guard let questionIndex = questions.firstIndex(where: { $0.id == questionID }),
               let optionIndex = questions[questionIndex].options.firstIndex(where: { $0.id == optionID }) else {
@@ -230,7 +332,7 @@ final class HomeViewModel {
         let option = questions[questionIndex].options[optionIndex]
         questions[questionIndex].options[optionIndex].votes += 1
 
-        let cleanReason = reason.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanReason = reason?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !cleanReason.isEmpty {
             questions[questionIndex].comments.insert(
                 AskComment(
@@ -246,14 +348,6 @@ final class HomeViewModel {
             )
         }
 
-        pushVoteIfNeeded(
-            questionID: questionID,
-            optionID: optionID,
-            reason: cleanReason.isEmpty ? nil : cleanReason,
-            authorName: authorName,
-            reasonCategory: reasonCategory,
-            isVerifiedExperience: isVerifiedExperience
-        )
         return questions[questionIndex]
     }
 
@@ -282,7 +376,7 @@ final class HomeViewModel {
                 savedQuestionIDs.insert(questionID)
             }
         } catch {
-            appErrorMessage = AppError.unknown(error).errorDescription
+            appErrorMessage = userFacingMessage(for: error)
         }
     }
 
@@ -295,31 +389,21 @@ final class HomeViewModel {
         return WeshAlrayAPIClient(baseURL: url, apiToken: cleanToken.isEmpty ? nil : cleanToken)
     }
 
-    private func pushVoteIfNeeded(
-        questionID: AskQuestion.ID,
-        optionID: PollOption.ID,
-        reason: String?,
-        authorName: String,
-        reasonCategory: String?,
-        isVerifiedExperience: Bool
-    ) {
-        guard isBackendEnabled, let client = makeBackendClient() else { return }
-        Task {
-            do {
-                _ = try await client.vote(
-                    comparisonID: questionID,
-                    optionID: optionID,
-                    authorName: authorName,
-                    reason: reason,
-                    reasonCategory: reasonCategory,
-                    isVerifiedExperience: isVerifiedExperience
-                )
-            } catch {
-                await MainActor.run {
-                    appErrorMessage = AppError.unknown(error).errorDescription
-                }
+    private func userFacingMessage(for error: Error) -> String {
+        if let appError = error as? AppError {
+            return appError.errorDescription ?? "حدث خطأ غير متوقع."
+        }
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .notConnectedToInternet, .networkConnectionLost:
+                return AppError.networkUnavailable.errorDescription ?? "لا يوجد اتصال بالإنترنت."
+            case .timedOut:
+                return "استغرق الاتصال وقتًا أطول من المتوقع. حاول مرة أخرى."
+            default:
+                return AppError.serviceUnavailable.errorDescription ?? "الخدمة غير متاحة حاليًا."
             }
         }
+        return AppError.unknown(error).errorDescription ?? "حدث خطأ غير متوقع."
     }
 
     private func pushCommentIfNeeded(questionID: AskQuestion.ID, text: String, authorName: String) {
@@ -329,7 +413,7 @@ final class HomeViewModel {
                 _ = try await client.addComment(comparisonID: questionID, text: text, authorName: authorName)
             } catch {
                 await MainActor.run {
-                    appErrorMessage = AppError.unknown(error).errorDescription
+                    appErrorMessage = userFacingMessage(for: error)
                 }
             }
         }
@@ -406,9 +490,23 @@ enum BackendAPITokenStore {
 struct WeshAlrayAPIClient: Sendable {
     let baseURL: URL
     let apiToken: String?
-    private let session: URLSession = .shared
+    private let session: URLSession
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
+
+    init(baseURL: URL, apiToken: String?, session: URLSession? = nil) {
+        self.baseURL = baseURL
+        self.apiToken = apiToken
+        if let session {
+            self.session = session
+        } else {
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = 15
+            configuration.timeoutIntervalForResource = 30
+            configuration.waitsForConnectivity = true
+            self.session = URLSession(configuration: configuration)
+        }
+    }
 
     func fetchComparisons(category: AskCategory?) async throws -> [AskQuestion] {
         var components = URLComponents(url: baseURL.appendingPathComponent("/api/v1/comparisons"), resolvingAgainstBaseURL: false)
@@ -470,6 +568,7 @@ struct WeshAlrayAPIClient: Sendable {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "content-type")
+        request.setValue("application/json", forHTTPHeaderField: "accept")
         request.setValue(DeviceClientID.value, forHTTPHeaderField: "x-client-id")
         if let apiToken, !apiToken.isEmpty {
             request.setValue("Bearer \(apiToken)", forHTTPHeaderField: "authorization")
@@ -749,9 +848,6 @@ final class CreateComparisonViewModel {
 
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanDetails = details.trimmingCharacters(in: .whitespacesAndNewlines)
-        didPublish = true
-        LocalDraftStore.shared.clear()
-
         return AskQuestion(
             title: cleanTitle,
             details: cleanDetails.isEmpty ? "ساعد صاحب السؤال بالتصويت أو التعليق." : cleanDetails,
@@ -761,6 +857,12 @@ final class CreateComparisonViewModel {
             options: completedOptions.map { PollOption(title: $0, votes: 0) },
             comments: []
         )
+    }
+
+    func markPublished() {
+        didPublish = true
+        validationMessage = nil
+        LocalDraftStore.shared.clear()
     }
 
     private func durationOption(for expiryDate: Date?) -> VoteDurationOption {
