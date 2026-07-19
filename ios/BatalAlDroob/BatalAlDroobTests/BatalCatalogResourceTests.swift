@@ -1,8 +1,10 @@
-import XCTest
 @testable import BatalAlDroob
+import XCTest
 
 final class BatalCatalogResourceTests: XCTestCase {
-    private var bundle: Bundle { Bundle(for: Self.self) }
+    private var bundle: Bundle {
+        Bundle(for: Self.self)
+    }
 
     func testBundledCatalogJSONHasUsableRecords() throws {
         let catalog = try loadJSONObject(named: "y60_app_catalog", subdirectory: "data")
@@ -23,13 +25,25 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertFalse(stores.isEmpty)
         XCTAssertNotNil(stores.first?["name_ar"] as? String)
         XCTAssertNotNil(stores.first?["website"] as? String)
+        for store in stores {
+            let website = try XCTUnwrap(store["website"] as? String)
+            XCTAssertTrue(try isAllowedExternalURL(XCTUnwrap(URL(string: website))))
+            if let template = store["search_url_template"] as? String {
+                let resolved = template.replacingOccurrences(of: "{part_number}", with: "21082-4W000")
+                XCTAssertTrue(try isAllowedExternalURL(XCTUnwrap(URL(string: resolved))))
+            }
+        }
     }
 
-    func testBundledSupportDataExists() throws {
+    func testBundledSupportDataExists() {
         XCTAssertNotNil(bundle.url(forResource: "part_fitment_index", withExtension: "json", subdirectory: "data"))
         XCTAssertNotNil(bundle.url(forResource: "patrol_catalog_manifest", withExtension: "json", subdirectory: "data"))
         XCTAssertNotNil(bundle.url(forResource: "patrol_catalog_database", withExtension: "json", subdirectory: "data"))
-        XCTAssertNotNil(bundle.url(forResource: "part_request_business_model", withExtension: "json", subdirectory: "data"))
+        XCTAssertNotNil(bundle.url(
+            forResource: "part_request_business_model",
+            withExtension: "json",
+            subdirectory: "data"
+        ))
     }
 
     func testPartNumberCandidatesRecognizePrintedOEMFormats() {
@@ -74,17 +88,62 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertFalse(english.contains("VIN:"))
     }
 
-    func testExternalStoreLinksRequireHTTPHost() throws {
-        XCTAssertTrue(isAllowedExternalURL(try XCTUnwrap(URL(string: "https://example.com/parts?q=21082-4W000"))))
-        XCTAssertFalse(isAllowedExternalURL(try XCTUnwrap(URL(string: "javascript:alert(1)"))))
-        XCTAssertFalse(isAllowedExternalURL(try XCTUnwrap(URL(string: "https:///missing-host"))))
+    func testExternalStoreLinksRequireHTTPSHost() throws {
+        XCTAssertTrue(try isAllowedExternalURL(XCTUnwrap(URL(string: "https://example.com/parts?q=21082-4W000"))))
+        XCTAssertFalse(try isAllowedExternalURL(XCTUnwrap(URL(string: "http://example.com/parts"))))
+        XCTAssertFalse(try isAllowedExternalURL(XCTUnwrap(URL(string: "javascript:alert(1)"))))
+        XCTAssertFalse(try isAllowedExternalURL(XCTUnwrap(URL(string: "https:///missing-host"))))
     }
 
-    func testWeatherConditionIsLocalized() {
-        let weather = OpenMeteoWeather.Current(temperature2m: 31, weatherCode: 3)
+    @MainActor
+    func testCatalogLoadRetriesStoreDirectoryAfterPartialFailure() async {
+        let repository = RetryStoreDirectoryRepository()
+        let viewModel = CatalogViewModel(
+            repository: repository,
+            store: TestPurchaseService()
+        )
 
-        XCTAssertEqual(weather.condition(language: .arabic), "غائم")
-        XCTAssertEqual(weather.condition(language: .english), "Cloudy")
+        await viewModel.load()
+        XCTAssertTrue(viewModel.stores.isEmpty)
+        XCTAssertNotNil(viewModel.errorMessage)
+
+        await viewModel.load()
+        XCTAssertEqual(viewModel.stores.map(\.id), ["verified-store"])
+        XCTAssertNil(viewModel.errorMessage)
+        let attempts = await repository.storeLoadAttempts()
+        XCTAssertEqual(attempts, 2)
+    }
+
+    @MainActor
+    func testStoreKitEntitlementsAreTheUnlockSourceOfTruth() async {
+        let defaultsKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let entitledViewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService(entitlements: [StoreProductID.catalogPermanentUnlock])
+        )
+        await entitledViewModel.load()
+        XCTAssertTrue(entitledViewModel.paidUnlocks.contains("__catalog_unlock__"))
+
+        let revokedViewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService(entitlements: [])
+        )
+        await revokedViewModel.load()
+        XCTAssertFalse(revokedViewModel.paidUnlocks.contains("__catalog_unlock__"))
+    }
+
+    @MainActor
+    func testCatalogUnlockUsesPermanentProductIdentifier() {
+        let viewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        XCTAssertEqual(viewModel.purchaseProductIDs, ["batal.catalog.permanent.unlock"])
+        XCTAssertEqual(StoreProductID.catalogPermanentUnlock, "batal.catalog.permanent.unlock")
     }
 
     private func loadJSONObject(named name: String, subdirectory: String) throws -> [String: Any] {
@@ -93,4 +152,78 @@ final class BatalCatalogResourceTests: XCTestCase {
         let object = try JSONSerialization.jsonObject(with: data)
         return try XCTUnwrap(object as? [String: Any])
     }
+}
+
+private struct StaticCatalogRepository: CatalogRepository {
+    func loadCatalog() async throws -> CatalogPayload {
+        CatalogPayload(
+            generatedAt: nil,
+            appName: "بطل الدروب",
+            model: "Y60",
+            sourceCount: 0,
+            recordCount: 0,
+            partCount: 0,
+            sources: [],
+            parts: []
+        )
+    }
+
+    func loadStores() async throws -> [VerifiedStore] {
+        []
+    }
+}
+
+private actor RetryStoreDirectoryRepository: CatalogRepository {
+    private var attempts = 0
+
+    func loadCatalog() async throws -> CatalogPayload {
+        try await StaticCatalogRepository().loadCatalog()
+    }
+
+    func loadStores() async throws -> [VerifiedStore] {
+        attempts += 1
+        if attempts == 1 { throw TestFailure.storeDirectoryUnavailable }
+        return [
+            VerifiedStore(
+                id: "verified-store",
+                nameAr: "متجر موثق",
+                nameEn: "Verified Store",
+                category: "global",
+                website: "https://example.com",
+                searchURLTemplate: "https://example.com/search?q={part_number}"
+            )
+        ]
+    }
+
+    func storeLoadAttempts() -> Int {
+        attempts
+    }
+}
+
+private struct TestPurchaseService: PurchaseService {
+    var entitlements = Set<String>()
+
+    func availableProductIDs(for productIDs: [String]) async throws -> Set<String> {
+        Set(productIDs)
+    }
+
+    func currentEntitledProductIDs() async -> Set<String> {
+        entitlements
+    }
+
+    func entitlementUpdates() -> AsyncStream<Set<String>> {
+        AsyncStream { continuation in continuation.finish() }
+    }
+
+    func purchase(productID _: String) async throws -> PurchaseOutcome {
+        .success
+    }
+
+    func restorePurchasedProductIDs() async throws -> Set<String> {
+        entitlements
+    }
+}
+
+private enum TestFailure: Error {
+    case storeDirectoryUnavailable
 }

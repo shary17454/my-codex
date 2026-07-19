@@ -41,6 +41,17 @@
                ReferencedContainer = "container:BatalAlDroob.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "105000000000000000000003"
+               BuildableName = "BatalAlDroobUITests.xctest"
+               BlueprintName = "BatalAlDroobUITests"
+               ReferencedContainer = "container:BatalAlDroob.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

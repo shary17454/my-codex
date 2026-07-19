@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[3]
 APP_ROOT = ROOT / "ios" / "BatalAlDroob"
 PROJECT = APP_ROOT / "BatalAlDroob.xcodeproj" / "project.pbxproj"
 INFO_PLIST = APP_ROOT / "BatalAlDroob" / "Info.plist"
-APP_SWIFT = APP_ROOT / "BatalAlDroob" / "AppDelegate.swift"
+PRIVACY_MANIFEST = APP_ROOT / "BatalAlDroob" / "PrivacyInfo.xcprivacy"
+SWIFT_ROOT = APP_ROOT / "BatalAlDroob"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
 EXPECTED_MARKETING_VERSION = "1.1.0"
@@ -20,9 +21,10 @@ EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts",
     "com.batalaldroob.parts.tests",
+    "com.batalaldroob.parts.uitests",
 }
 EXPECTED_DEPLOYMENT_TARGET = "17.0"
-ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.unlock"}
+ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.permanent.unlock"}
 
 
 def fail(message: str) -> None:
@@ -38,7 +40,13 @@ def main() -> None:
     project_text = PROJECT.read_text(encoding="utf-8")
     with INFO_PLIST.open("rb") as stream:
         info = plistlib.load(stream)
-    app_text = APP_SWIFT.read_text(encoding="utf-8")
+    with PRIVACY_MANIFEST.open("rb") as stream:
+        privacy = plistlib.load(stream)
+    app_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in SWIFT_ROOT.rglob("*.swift")
+        if path.is_file()
+    )
     web_text = "\n".join(
         path.read_text(encoding="utf-8")
         for path in WEB_ROOT.rglob("*")
@@ -64,6 +72,10 @@ def main() -> None:
         fail(f"IPHONEOS_DEPLOYMENT_TARGET must remain {EXPECTED_DEPLOYMENT_TARGET}; found {sorted(deployment_values)}")
     if sdkroot_values != {"iphoneos"}:
         fail(f"SDKROOT must be iphoneos; found {sorted(sdkroot_values)}")
+    if "LM_FILTER_WARNINGS = YES;" in project_text:
+        fail("Release settings must not hide linker metadata warnings with LM_FILTER_WARNINGS")
+    if unique_setting_values(project_text, "EXTRACT_APP_INTENTS_METADATA") != {"NO"}:
+        fail("The app target must disable unused App Intents metadata extraction explicitly")
 
     if info.get("CFBundleIdentifier") != "$(PRODUCT_BUNDLE_IDENTIFIER)":
         fail("Info.plist must derive CFBundleIdentifier from PRODUCT_BUNDLE_IDENTIFIER")
@@ -71,6 +83,32 @@ def main() -> None:
         fail("Info.plist must derive CFBundleShortVersionString from MARKETING_VERSION")
     if info.get("CFBundleVersion") != "$(CURRENT_PROJECT_VERSION)":
         fail("Info.plist must derive CFBundleVersion from CURRENT_PROJECT_VERSION")
+    if not info.get("NSLocationWhenInUseUsageDescription"):
+        fail("Info.plist must explain the location permission")
+
+    accessed_types = {
+        item.get("NSPrivacyAccessedAPIType")
+        for item in privacy.get("NSPrivacyAccessedAPITypes", [])
+    }
+    if "NSPrivacyAccessedAPICategoryUserDefaults" not in accessed_types:
+        fail("Privacy manifest must declare the UserDefaults required-reason API")
+    collected_types = {
+        item.get("NSPrivacyCollectedDataType")
+        for item in privacy.get("NSPrivacyCollectedDataTypes", [])
+    }
+    if collected_types:
+        fail(f"The app must not declare collected data types; found {sorted(collected_types)}")
+    if privacy.get("NSPrivacyTracking") is not False:
+        fail("Privacy manifest must declare that the app does not track users")
+
+    forbidden_weather_terms = [
+        "api.open-meteo.com",
+        "OpenMeteoWeatherService",
+        "OpenMeteoWeatherCurrent",
+    ]
+    for term in forbidden_weather_terms:
+        if term.lower() in app_text.lower():
+            fail(f"External weather integration must not return: {term}")
 
     forbidden_version_mutators = [
         r"\bagvtool\b",
