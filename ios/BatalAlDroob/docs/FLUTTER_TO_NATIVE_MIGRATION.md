@@ -16,7 +16,7 @@ The `BatalAlDroob/Web/` directory is retained only for bundled catalog/support d
 | Local persistence | `UserDefaults` with `Codable` helpers |
 | Purchases | StoreKit 2 |
 | Location/heading | Core Location |
-| Weather | `URLSession` and Open-Meteo HTTPS API |
+| Location and compass | Core Location and MapKit; no external weather service |
 | Maps/coordinates | MapKit/Core Location platform types |
 | Logging | `OSLog.Logger` |
 | Tests | XCTest/XCUIAutomation |

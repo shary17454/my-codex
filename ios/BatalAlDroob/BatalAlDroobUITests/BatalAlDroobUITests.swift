@@ -49,22 +49,19 @@ final class BatalAlDroobUITests: XCTestCase {
             XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
         } else {
             let compactMoreTab = firstExistingNavigationItem(named: ["المزيد", "More"], in: app)
-            if compactMoreTab.waitForExistence(timeout: 3) {
-                compactMoreTab.tap()
-                XCTAssertTrue(app.tables.staticTexts["الصيانة"].waitForExistence(timeout: 10))
-                XCTAssertTrue(app.tables.staticTexts["الأدوات"].waitForExistence(timeout: 10))
-            } else {
-                XCTAssertTrue(navigationItem(named: "الصيانة", in: app).waitForExistence(timeout: 10))
-                let nextPage = firstExistingNavigationItem(named: ["الصفحة التالية", "Next Page"], in: app)
-                XCTAssertTrue(nextPage.waitForExistence(timeout: 10))
-                nextPage.tap()
+            XCTAssertTrue(compactMoreTab.waitForExistence(timeout: 3))
+            compactMoreTab.tap()
 
-                let pagedToolsTab = navigationItem(named: "الأدوات", in: app)
-                XCTAssertTrue(pagedToolsTab.waitForExistence(timeout: 10))
-                pagedToolsTab.tap()
-                XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
-            }
+            let maintenanceItem = app.staticTexts["الصيانة"]
+            let toolsItem = app.staticTexts["الأدوات"]
+            XCTAssertTrue(maintenanceItem.waitForExistence(timeout: 10))
+            XCTAssertTrue(toolsItem.waitForExistence(timeout: 10))
+            toolsItem.tap()
+            XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
         }
+
+        let trackingSection = app.staticTexts["more.section.tracking"]
+        XCTAssertTrue(reveal(trackingSection, in: app))
     }
 
     @MainActor
@@ -81,11 +78,11 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertTrue(navigationItem(named: "Catalog", in: app).waitForExistence(timeout: 10))
         XCTAssertTrue(navigationItem(named: "Request", in: app).waitForExistence(timeout: 10))
 
-        let languageMenu = app.buttons["Change language"]
+        let languageMenu = app.buttons["language.menu"]
         XCTAssertTrue(languageMenu.waitForExistence(timeout: 10))
         languageMenu.tap()
 
-        let arabicOption = app.buttons["العربية"]
+        let arabicOption = app.buttons["language.option.ar"]
         XCTAssertTrue(arabicOption.waitForExistence(timeout: 10))
         arabicOption.tap()
 

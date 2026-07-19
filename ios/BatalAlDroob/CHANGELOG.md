@@ -7,7 +7,7 @@
 - Split the native SwiftUI application into focused models, services, view models, views, and utilities.
 - Improved Arabic/English localization, RTL behavior, Dynamic Type layout, keyboard handling, accessibility labels, and iPhone/iPad tab navigation coverage.
 - Added structured logging and safer HTTPS-only external store links.
-- Hardened location/weather requests with timeout, retry, cancellation, response validation, caching, attribution, and accurate privacy disclosure.
+- Hardened location and compass permission handling, lifecycle cleanup, and localized errors.
 - Made StoreKit current entitlements and verified transaction updates the source of truth for protected catalog access.
 - Added explicit loading, retry, offline/error, and permission-denied behavior to relevant flows.
 
@@ -21,5 +21,6 @@
 ### Privacy
 
 - Localized the location permission explanation.
-- Declared precise location sent to Open-Meteo for weather as unlinked, non-tracking app-functionality data.
+- Removed the unrelated external weather integration; tracking coordinates are no longer sent to Open-Meteo.
+- Kept the location permission limited to on-screen tracking, map position, and compass tools.
 - Declared the required reason for app-owned `UserDefaults` access.

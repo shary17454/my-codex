@@ -96,10 +96,19 @@ def main() -> None:
         item.get("NSPrivacyCollectedDataType")
         for item in privacy.get("NSPrivacyCollectedDataTypes", [])
     }
-    if "NSPrivacyCollectedDataTypePreciseLocation" not in collected_types:
-        fail("Privacy manifest must disclose precise location sent to the weather provider")
+    if collected_types:
+        fail(f"The app must not declare collected data types; found {sorted(collected_types)}")
     if privacy.get("NSPrivacyTracking") is not False:
         fail("Privacy manifest must declare that the app does not track users")
+
+    forbidden_weather_terms = [
+        "api.open-meteo.com",
+        "OpenMeteoWeatherService",
+        "OpenMeteoWeatherCurrent",
+    ]
+    for term in forbidden_weather_terms:
+        if term.lower() in app_text.lower():
+            fail(f"External weather integration must not return: {term}")
 
     forbidden_version_mutators = [
         r"\bagvtool\b",

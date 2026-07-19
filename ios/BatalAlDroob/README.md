@@ -119,4 +119,4 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 - Latest executed verification: [`docs/FINAL_EXECUTION_REPORT.md`](docs/FINAL_EXECUTION_REPORT.md)
 - Arabic status summary: [`docs/FINAL_STATUS_AR.md`](docs/FINAL_STATUS_AR.md)
 
-The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The remaining requirements are deliberately kept visible in the execution report and include signed Xcode Cloud archiving, App Store Connect/IAP metadata, privacy-label confirmation, production weather-service terms, and manual device checks for permission-dependent behavior.
+The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The remaining requirements are deliberately kept visible in the execution report and include a fresh signed Xcode Cloud archive after the weather removal, App Store Connect/IAP metadata, current screenshots, privacy-label confirmation, and manual device checks for permission-dependent behavior.

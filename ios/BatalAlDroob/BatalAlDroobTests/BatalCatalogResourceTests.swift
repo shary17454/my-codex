@@ -135,13 +135,6 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertFalse(revokedViewModel.paidUnlocks.contains("__catalog_unlock__"))
     }
 
-    func testWeatherConditionIsLocalized() {
-        let weather = OpenMeteoWeatherCurrent(temperature2m: 31, weatherCode: 3)
-
-        XCTAssertEqual(weather.condition(language: .arabic), "غائم")
-        XCTAssertEqual(weather.condition(language: .english), "Cloudy")
-    }
-
     private func loadJSONObject(named name: String, subdirectory: String) throws -> [String: Any] {
         let url = try XCTUnwrap(bundle.url(forResource: name, withExtension: "json", subdirectory: subdirectory))
         let data = try Data(contentsOf: url)

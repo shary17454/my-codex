@@ -4,7 +4,7 @@ import SwiftUI
 
 struct MoreView: View {
     @Bindable var viewModel: CatalogViewModel
-    @State private var locationWeather = LocationWeatherViewModel()
+    @State private var locationTracking = LocationTrackingViewModel()
     @State private var descriptionQuery = ""
     @State private var oldTireSize = "265/70R16"
     @State private var newTireSize = "285/75R16"
@@ -75,9 +75,9 @@ struct MoreView: View {
                         ) }
                     }
                 }
-                Section(viewModel.text(ar: "التتبع والبوصلة والطقس", en: "Tracking, compass, and weather")) {
-                    Map(position: $locationWeather.cameraPosition) {
-                        if let coordinate = locationWeather.coordinate {
+                Section {
+                    Map(position: $locationTracking.cameraPosition) {
+                        if let coordinate = locationTracking.coordinate {
                             Marker(viewModel.text(ar: "موقعي", en: "My location"), coordinate: coordinate)
                         }
                     }
@@ -85,23 +85,23 @@ struct MoreView: View {
                     .clipShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
 
                     HStack {
-                        Button { locationWeather.requestAndStart(language: viewModel.language) } label: {
+                        Button { locationTracking.requestAndStart(language: viewModel.language) } label: {
                             Label(
                                 viewModel.text(ar: "تشغيل التتبع", en: "Start tracking"),
                                 systemImage: "location.fill"
                             )
                         }
-                        Button { locationWeather.stop(language: viewModel.language) } label: {
+                        Button { locationTracking.stop(language: viewModel.language) } label: {
                             Label(viewModel.text(ar: "إيقاف", en: "Stop"), systemImage: "pause.circle")
                         }
                     }
-                    if let coordinate = locationWeather.coordinate {
+                    if let coordinate = locationTracking.coordinate {
                         LabeledContent(
                             viewModel.text(ar: "الإحداثيات", en: "Coordinates"),
                             value: String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude)
                         )
                     }
-                    if let heading = locationWeather.headingDegrees {
+                    if let heading = locationTracking.headingDegrees {
                         LabeledContent(
                             viewModel.text(ar: "البوصلة", en: "Compass"),
                             value: String(format: "%.0f°", heading)
@@ -110,59 +110,23 @@ struct MoreView: View {
                             .frame(height: 120)
                             .accessibilityLabel(viewModel.text(ar: "اتجاه البوصلة", en: "Compass heading"))
                     }
-                    if !locationWeather.weatherSummary.isEmpty {
-                        LabeledContent(
-                            viewModel.text(ar: "الطقس", en: "Weather"),
-                            value: locationWeather.weatherSummary
-                        )
-                        if let attributionURL = URL(string: "https://open-meteo.com/") {
-                            Link(destination: attributionURL) {
-                                Label(
-                                    viewModel.text(ar: "بيانات الطقس: Open-Meteo", en: "Weather data: Open-Meteo"),
-                                    systemImage: "arrow.up.right.square"
-                                )
-                            }
-                            .font(.caption)
-                        }
+                    if !locationTracking.locationMessage.isEmpty {
+                        Text(locationTracking.locationMessage).font(.caption).foregroundStyle(.secondary)
                     }
-                    if locationWeather.isLoadingWeather {
-                        HStack {
-                            ProgressView()
-                            Text(viewModel.text(ar: "جاري تحديث الطقس...", en: "Updating weather..."))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    if let weatherError = locationWeather.weatherError {
-                        Text(viewModel.text(ar: "تعذر تحميل الطقس: ", en: "Weather unavailable: ") + weatherError)
-                            .font(.caption)
-                            .foregroundStyle(.orange)
-                        if let coordinate = locationWeather.coordinate {
-                            Button {
-                                Task {
-                                    await locationWeather.loadWeather(
-                                        for: CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-                                    )
-                                }
-                            } label: {
-                                Label(viewModel.text(ar: "إعادة المحاولة", en: "Retry"), systemImage: "arrow.clockwise")
-                            }
-                        }
-                    }
-                    if !locationWeather.locationMessage.isEmpty {
-                        Text(locationWeather.locationMessage).font(.caption).foregroundStyle(.secondary)
-                    }
+                } header: {
+                    Text(viewModel.text(ar: "التتبع والبوصلة", en: "Tracking and compass"))
+                        .accessibilityIdentifier("more.section.tracking")
                 }
                 Section(viewModel.text(ar: "سياسة البيانات", en: "Data policy")) {
                     Text(viewModel.text(
                         ar: "التطبيق مستقل ولا يتبع نيسان، ولا ينسخ أسعار المتاجر أو مخزونها. " +
                             "تُفتح روابط المتاجر الموثقة لإكمال البحث أو الشراء خارج التطبيق. " +
-                            "تبقى صور البحث وبيانات السيارة والصيانة على الجهاز. عند طلب الطقس فقط، " +
-                            "تُرسل إحداثيات الموقع الدقيقة إلى Open-Meteo لتقديم النتيجة.",
+                            "لا يرسل التطبيق صور البحث أو بيانات السيارة والصيانة أو إحداثيات التتبع " +
+                            "إلى خادم تابع لنا.",
                         en: "This app is independent from Nissan and does not copy store prices or inventory. " +
                             "Verified store links open externally to continue searching or purchasing. " +
-                            "Reference photos, vehicle details, and maintenance entries stay on device. " +
-                            "Only when weather is requested, precise coordinates are sent to Open-Meteo."
+                            "The app does not send reference photos, vehicle details, maintenance entries, " +
+                            "or tracking coordinates to a developer-operated server."
                     ))
                 }
             }
@@ -171,7 +135,7 @@ struct MoreView: View {
             .navigationDestination(for: Part.self) { part in
                 PartDetailView(part: part, viewModel: viewModel)
             }
-            .onDisappear { locationWeather.pauseTracking() }
+            .onDisappear { locationTracking.pauseTracking() }
         }
     }
 }
@@ -214,8 +178,10 @@ struct LanguageMenu: View {
                         Text(language.title)
                     }
                 }
+                .accessibilityIdentifier("language.option.\(language.rawValue)")
             }
         } label: { Label(viewModel.language.title, systemImage: "globe") }
+            .accessibilityIdentifier("language.menu")
             .accessibilityLabel(viewModel.text(ar: "تغيير اللغة", en: "Change language"))
     }
 }

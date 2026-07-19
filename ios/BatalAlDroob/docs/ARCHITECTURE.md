@@ -2,7 +2,7 @@
 
 ## Product Boundary
 
-Batal Al-Droob is a native iOS/iPadOS SwiftUI application for Nissan Patrol catalog lookup, fitment evidence, local request preparation, maintenance records, vehicle tools, weather, and a StoreKit catalog unlock. The app target has no Flutter, Dart, CocoaPods, Swift Package Manager, or third-party runtime dependency.
+Batal Al-Droob is a native iOS/iPadOS SwiftUI application for Nissan Patrol catalog lookup, fitment evidence, local request preparation, maintenance records, vehicle tools, location/compass assistance, and a StoreKit catalog unlock. The app target has no Flutter, Dart, CocoaPods, Swift Package Manager, or third-party runtime dependency.
 
 ## Targets
 
@@ -20,11 +20,11 @@ There are no widgets, app clips, watch targets, share extensions, notification e
 - `Models.swift`: catalog, store, vehicle, maintenance, request, and API data models.
 - `Services.swift`: bundled-resource loading and StoreKit purchase service protocols/implementations.
 - `CatalogViewModel.swift`: catalog/search/filter state, local persistence, request workflows, StoreKit state.
-- `LocationWeatherViewModel.swift`: Core Location/heading lifecycle and Open-Meteo requests.
+- `LocationTrackingViewModel.swift`: Core Location and heading lifecycle.
 - `Views.swift`: root tabs, dashboard, catalog, shared-fitment, and common state views.
 - `PartDetailViews.swift`: part details and store-link presentation.
 - `WorkflowViews.swift`: request and maintenance workflows.
-- `MoreViews.swift`: vehicle profile, weather/location, tools, policies, and secondary flows.
+- `MoreViews.swift`: vehicle profile, location/compass, tools, policies, and secondary flows.
 - `Utilities.swift`: formatting, validation, persistence helpers, logging categories, and shared UI helpers.
 
 Dependencies are injected at the application boundary through service protocols. UI-observable state is main-actor isolated, asynchronous work uses structured concurrency, and StoreKit transaction updates have a bounded lifecycle.
@@ -42,9 +42,9 @@ Dependencies are injected at the application boundary through service protocols.
 
 Product identifier: `batal.catalog.unlock`. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement.
 
-### Open-Meteo
+### Location and compass
 
-Weather requests use HTTPS, a timeout, bounded retry, response/status validation, cancellation, and a short-lived cache. Precise coordinates are sent only after the user requests weather. The UI contains attribution and the privacy manifest declares precise location as unlinked, non-tracking data used for app functionality.
+Location updates begin only after the user taps the tracking control and grants when-in-use permission. Updates stop when the user stops tracking or leaves the screen. The application has no developer-operated location backend and does not send coordinates to Open-Meteo or another weather provider.
 
 ### External Stores
 
@@ -52,7 +52,7 @@ Store links are opened only when the URL uses HTTPS and has a valid host. The ap
 
 ## Permissions And Capabilities
 
-The only runtime permission requested is location while in use. It supports compass/trip tools and local weather. No background location, camera, microphone, photos, contacts, tracking, notifications, Bluetooth, HealthKit, or other permission is requested.
+The only runtime permission requested is location while in use. It supports the on-screen map, tracking, and compass tools. No background location, camera, microphone, photos, contacts, tracking, notifications, Bluetooth, HealthKit, or other permission is requested.
 
 No custom entitlement file or optional Apple capability is enabled. Signing remains automatic with the existing bundle identifier and development team.
 

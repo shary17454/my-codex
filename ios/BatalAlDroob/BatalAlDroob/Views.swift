@@ -125,9 +125,8 @@ struct DashboardView: View {
                         symbol: "wrench.and.screwdriver",
                         title: viewModel.text(ar: "سجل صيانة وأدوات", en: "Maintenance and tools"),
                         detail: viewModel.text(
-                            ar: "حفظ صيانة السيارة، حساب الكفرات، تتبع الموقع، البوصلة، والطقس.",
-                            en: "Save maintenance, calculate tire changes, and use location, " +
-                                "compass, and weather tools."
+                            ar: "حفظ صيانة السيارة، حساب الكفرات، تتبع الموقع، والبوصلة.",
+                            en: "Save maintenance, calculate tire changes, and use location and compass tools."
                         )
                     )
                 }

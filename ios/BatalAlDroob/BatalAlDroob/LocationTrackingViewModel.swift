@@ -6,13 +6,10 @@ import SwiftUI
 
 @MainActor
 @Observable
-final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
+final class LocationTrackingViewModel: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     private var pendingStartLanguage: AppLanguage?
-    private var lastWeatherLocation: CLLocation?
-    private var lastWeatherUpdate: Date?
     private var currentLanguage: AppLanguage = .arabic
-    private var weatherTask: Task<Void, Never>?
 
     var authorization: CLAuthorizationStatus = .notDetermined
     var coordinate: CLLocationCoordinate2D?
@@ -21,9 +18,6 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     var headingDegrees: CLLocationDirection?
     var isTracking = false
     var locationMessage = ""
-    var weatherSummary = ""
-    var weatherError: String?
-    var isLoadingWeather = false
     var cameraPosition = MapCameraPosition.region(MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753),
         span: MKCoordinateSpan(latitudeDelta: 8, longitudeDelta: 8)
@@ -41,6 +35,7 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     }
 
     func requestAndStart(language: AppLanguage) {
+        currentLanguage = language
         authorization = manager.authorizationStatus
         if authorization == .notDetermined {
             pendingStartLanguage = language
@@ -80,11 +75,8 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
 
     func pauseTracking() {
         isTracking = false
-        weatherTask?.cancel()
-        weatherTask = nil
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
-        isLoadingWeather = false
     }
 
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -120,7 +112,6 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
                 center: coordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
             ))
-            self.scheduleWeatherLoad(for: CLLocation(latitude: latitude, longitude: longitude))
         }
     }
 
@@ -132,117 +123,14 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    nonisolated func locationManager(_: CLLocationManager, didFailWithError _: Error) {
+    nonisolated func locationManager(_: CLLocationManager, didFailWithError error: Error) {
+        let errorDescription = String(describing: error)
         Task { @MainActor in
+            BatalLog.location.error("Location request failed: \(errorDescription, privacy: .public)")
             self.pauseTracking()
             self.locationMessage = self.currentLanguage == .arabic
                 ? "تعذر تحديث الموقع. تحقق من الصلاحية وحاول مرة أخرى."
                 : "Location could not be updated. Check permission and try again."
-        }
-    }
-
-    private func scheduleWeatherLoad(for location: CLLocation) {
-        if let lastWeatherLocation, let lastWeatherUpdate {
-            let recentlyUpdated = Date().timeIntervalSince(lastWeatherUpdate) < 600
-            let nearby = location.distance(from: lastWeatherLocation) < 1000
-            if recentlyUpdated, nearby { return }
-        }
-        weatherTask?.cancel()
-        weatherTask = Task { [weak self] in
-            try? await Task.sleep(for: .milliseconds(750))
-            guard !Task.isCancelled else { return }
-            await self?.loadWeather(for: location)
-        }
-    }
-
-    func loadWeather(for location: CLLocation) async {
-        if let lastWeatherLocation, let lastWeatherUpdate {
-            let recentlyUpdated = Date().timeIntervalSince(lastWeatherUpdate) < 600
-            let nearby = location.distance(from: lastWeatherLocation) < 1000
-            if recentlyUpdated, nearby { return }
-        }
-        isLoadingWeather = true
-        defer { isLoadingWeather = false }
-        do {
-            let weather = try await OpenMeteoWeatherService.fetch(
-                latitude: location.coordinate.latitude,
-                longitude: location.coordinate.longitude
-            )
-            let temp = Measurement(value: weather.current.temperature2m, unit: UnitTemperature.celsius)
-                .formatted(.measurement(width: .abbreviated, usage: .weather))
-            weatherSummary = "\(temp) · \(weather.current.condition(language: currentLanguage))"
-            weatherError = nil
-            lastWeatherLocation = location
-            lastWeatherUpdate = Date()
-        } catch is CancellationError {
-            return
-        } catch {
-            let errorDescription = String(describing: error)
-            BatalLog.location.error("Weather request failed: \(errorDescription, privacy: .public)")
-            weatherError = currentLanguage == .arabic
-                ? "تعذر تحديث الطقس. تحقق من الاتصال ثم حاول مرة أخرى."
-                : "Weather could not be updated. Check your connection and try again."
-        }
-    }
-}
-
-enum WeatherServiceError: Error {
-    case invalidCoordinates
-    case httpStatus(Int)
-}
-
-enum OpenMeteoWeatherService {
-    static func fetch(latitude: Double, longitude: Double) async throws -> OpenMeteoWeather {
-        guard (-90 ... 90).contains(latitude), (-180 ... 180).contains(longitude) else {
-            throw WeatherServiceError.invalidCoordinates
-        }
-        var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")
-        components?.queryItems = [
-            URLQueryItem(name: "latitude", value: String(latitude)),
-            URLQueryItem(name: "longitude", value: String(longitude)),
-            URLQueryItem(name: "current", value: "temperature_2m,weather_code")
-        ]
-        guard let url = components?.url else { throw URLError(.badURL) }
-        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 10)
-
-        for attempt in 0 ..< 2 {
-            do {
-                let (data, response) = try await URLSession.shared.data(for: request)
-                guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-                guard (200 ..< 300).contains(http.statusCode)
-                else { throw WeatherServiceError.httpStatus(http.statusCode) }
-                return try JSONDecoder().decode(OpenMeteoWeather.self, from: data)
-            } catch {
-                guard attempt == 0, shouldRetryWeatherRequest(after: error) else { throw error }
-                try await Task.sleep(for: .milliseconds(400))
-            }
-        }
-        throw URLError(.unknown)
-    }
-}
-
-struct OpenMeteoWeather: Decodable {
-    let current: OpenMeteoWeatherCurrent
-}
-
-struct OpenMeteoWeatherCurrent: Decodable {
-    let temperature2m: Double
-    let weatherCode: Int
-
-    enum CodingKeys: String, CodingKey {
-        case temperature2m = "temperature_2m"
-        case weatherCode = "weather_code"
-    }
-
-    func condition(language: AppLanguage) -> String {
-        switch weatherCode {
-        case 0: language == .arabic ? "صحو" : "Clear"
-        case 1, 2: language == .arabic ? "غائم جزئياً" : "Partly cloudy"
-        case 3: language == .arabic ? "غائم" : "Cloudy"
-        case 45, 48: language == .arabic ? "ضباب" : "Fog"
-        case 51, 53, 55, 61, 63, 65, 80, 81, 82: language == .arabic ? "أمطار" : "Rain"
-        case 95, 96, 99: language == .arabic ? "عواصف" : "Thunderstorm"
-        default: language == .arabic ? "طقس محلي" : "Local weather"
         }
     }
 }

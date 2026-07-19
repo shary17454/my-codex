@@ -103,17 +103,6 @@ func tireDiameter(_ size: String) -> Double? {
     return (width * (aspect / 100) * 2 / 25.4) + wheel
 }
 
-func shouldRetryWeatherRequest(after error: Error) -> Bool {
-    if case let WeatherServiceError.httpStatus(status) = error {
-        return status == 429 || (500 ... 599).contains(status)
-    }
-    guard let urlError = error as? URLError else { return false }
-    return [
-        .timedOut, .cannotFindHost, .cannotConnectToHost, .networkConnectionLost,
-        .dnsLookupFailed, .notConnectedToInternet, .resourceUnavailable
-    ].contains(urlError.code)
-}
-
 func nonEmpty(_ value: String?) -> String? {
     guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else { return nil }
     return value

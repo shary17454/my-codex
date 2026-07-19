@@ -20,7 +20,7 @@
 		101000000000000000000011 /* CatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000012 /* CatalogViewModel.swift */; };
 		101000000000000000000012 /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000013 /* Views.swift */; };
 		101000000000000000000013 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000014 /* Utilities.swift */; };
-		101000000000000000000014 /* LocationWeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000015 /* LocationWeatherViewModel.swift */; };
+		101000000000000000000014 /* LocationTrackingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000015 /* LocationTrackingViewModel.swift */; };
 		101000000000000000000015 /* PartDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000016 /* PartDetailViews.swift */; };
 		101000000000000000000016 /* WorkflowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000017 /* WorkflowViews.swift */; };
 		101000000000000000000017 /* MoreViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000018 /* MoreViews.swift */; };
@@ -62,7 +62,7 @@
 		102000000000000000000012 /* CatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogViewModel.swift; sourceTree = "<group>"; };
 		102000000000000000000013 /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		102000000000000000000014 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
-		102000000000000000000015 /* LocationWeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationWeatherViewModel.swift; sourceTree = "<group>"; };
+		102000000000000000000015 /* LocationTrackingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackingViewModel.swift; sourceTree = "<group>"; };
 		102000000000000000000016 /* PartDetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartDetailViews.swift; sourceTree = "<group>"; };
 		102000000000000000000017 /* WorkflowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowViews.swift; sourceTree = "<group>"; };
 		102000000000000000000018 /* MoreViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreViews.swift; sourceTree = "<group>"; };
@@ -108,7 +108,7 @@
 			children = (
 				102000000000000000000001 /* AppDelegate.swift */,
 				102000000000000000000012 /* CatalogViewModel.swift */,
-				102000000000000000000015 /* LocationWeatherViewModel.swift */,
+				102000000000000000000015 /* LocationTrackingViewModel.swift */,
 				102000000000000000000010 /* Models.swift */,
 				102000000000000000000018 /* MoreViews.swift */,
 				102000000000000000000016 /* PartDetailViews.swift */,
@@ -319,7 +319,7 @@
 			files = (
 				101000000000000000000001 /* AppDelegate.swift in Sources */,
 				101000000000000000000011 /* CatalogViewModel.swift in Sources */,
-				101000000000000000000014 /* LocationWeatherViewModel.swift in Sources */,
+				101000000000000000000014 /* LocationTrackingViewModel.swift in Sources */,
 				10100000000000000000000F /* Models.swift in Sources */,
 				101000000000000000000017 /* MoreViews.swift in Sources */,
 				101000000000000000000015 /* PartDetailViews.swift in Sources */,

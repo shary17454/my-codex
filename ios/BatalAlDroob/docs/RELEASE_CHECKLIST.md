@@ -7,9 +7,9 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [ ] The intended commit is pushed and selected by the Batal Al-Droob Xcode Cloud workflow.
 - [ ] Xcode Cloud uses Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release.
 - [ ] The iPhoneOS SDK is 26.5 or newer and `SDKROOT` is not pinned to a beta/old SDK.
-- [ ] `python3 ios/BatalAlDroob/scripts/validate_release.py` passes.
-- [ ] `swiftformat --lint --cache ignore ...` passes.
-- [ ] `swiftlint lint --strict --no-cache --config ios/BatalAlDroob/.swiftlint.yml` passes.
+- [x] `python3 ios/BatalAlDroob/scripts/validate_release.py` passes locally for the weather-removal source.
+- [x] `swiftformat ... --lint` passes locally: 0/12 files require formatting.
+- [x] `swiftlint lint --strict --no-cache` passes locally: 0 violations.
 - [ ] Xcode static analysis passes.
 
 ## Version And Build
@@ -23,12 +23,12 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] Dependency resolution succeeds.
 - [ ] Debug build succeeds.
-- [ ] Release build succeeds.
-- [ ] Unit tests pass on a current iPhone simulator.
-- [ ] UI smoke tests pass on supported iPhone and iPad layouts.
+- [x] Release build succeeds locally with Xcode 26.6 and iPhoneOS SDK 26.5.
+- [x] Unit tests pass on a current iPhone simulator: 10/10.
+- [x] iPhone UI smoke tests pass: 2/2, including the tools and tracking/compass surface.
 - [ ] Relevant tests pass on a physical iPhone.
 - [ ] Location permission denied/granted behavior is manually checked.
-- [ ] Compass and weather are manually checked on a physical device.
+- [ ] Location tracking and compass are manually checked on a physical device.
 - [ ] StoreKit purchase, cancel, pending, failure, current entitlement, and restore are checked in Sandbox.
 - [ ] VoiceOver, Accessibility Inspector, large Dynamic Type, Light/Dark, Reduce Motion, rotation, iPad Split View, and Stage Manager are manually checked.
 - [ ] Instruments Leaks, Time Profiler, and Energy checks are completed for critical flows.
@@ -43,8 +43,8 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Privacy, Services, And Store Metadata
 
-- [ ] App Store privacy labels are human-confirmed against actual collection, including precise location sent to Open-Meteo for weather.
-- [ ] Production/commercial Open-Meteo terms are confirmed, or the service is replaced with an authorized provider.
+- [ ] App Store privacy labels are human-confirmed against the final app, which has no developer-operated location backend.
+- [ ] No Open-Meteo endpoint or other external weather integration remains in source or the submitted binary.
 - [ ] Location usage descriptions are accurate in Arabic and English.
 - [ ] The StoreKit product `batal.catalog.unlock` is complete, cleared for sale where appropriate, and attached to the same first-review submission as the binary.
 - [ ] The IAP review screenshot demonstrates the purchase surface.

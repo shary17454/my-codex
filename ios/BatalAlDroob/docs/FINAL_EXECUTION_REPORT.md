@@ -3,6 +3,12 @@
 Date: 2026-07-19  
 Status: `READY_WITH_EXTERNAL_REQUIREMENTS`
 
+> Current release update: commit `d6c265c` was pushed to `origin/main`.
+> Xcode Cloud build `109` completed Build, Archive, and TestFlight processing
+> using Xcode 26.6 (`17F113`) and iPhoneOS SDK 26.5. The next Cloud build
+> number is `110`. See `CURRENT_RELEASE_STATUS.md` for the authoritative
+> remaining blockers and App Store metadata state.
+
 ## 1. Discovery And Fixes
 
 The project is a native Swift 6/SwiftUI iOS and iPadOS app, not a Flutter application. The initial application implementation concentrated roughly 1,800 lines in one file, retained empty legacy scene/web-view files, lacked UI tests, cached purchase state too permissively, coupled catalog and store-directory retries, used unstructured diagnostics, and needed stronger location/network/privacy handling.
@@ -14,7 +20,7 @@ Implemented corrections:
 - made verified StoreKit current entitlements/updates authoritative and implemented restore;
 - separated catalog and store-directory loading/retry state;
 - limited external store links to valid HTTPS hosts;
-- added weather timeout, bounded retry, cancellation, status validation, cache, attribution, and localized errors;
+- removed the unrelated Open-Meteo weather feature and retained only user-initiated location/compass behavior;
 - added app lifecycle privacy shielding and structured `Logger` categories;
 - improved keyboard behavior, Dynamic Type layout, Arabic/English locale handling, and iPad paged-tab navigation testing;
 - added unit/UI test targets and release/archive guards;
@@ -30,7 +36,7 @@ Created/refactored Swift files:
 - `Models.swift`
 - `Services.swift`
 - `CatalogViewModel.swift`
-- `LocationWeatherViewModel.swift`
+- `LocationTrackingViewModel.swift`
 - `Views.swift`
 - `PartDetailViews.swift`
 - `WorkflowViews.swift`
@@ -70,12 +76,12 @@ Removed because empty and unreferenced:
 
 | Area | Result |
 |---|---|
-| Location When In Use | Used by real compass/trip/weather flows; accurate Arabic/English usage strings present |
+| Location When In Use | Used by real on-screen map/tracking/compass flows; accurate Arabic/English usage strings present |
 | Camera, microphone, photos, contacts, notifications, tracking, Bluetooth, health, local network | Not used and not requested |
 | Background location/modes | Not enabled |
 | Entitlements file | None required or added |
 | Optional capabilities | None enabled; existing signing/capability state preserved |
-| Privacy manifest | `UserDefaults` reason `CA92.1`; precise location declared unlinked/non-tracking for app functionality |
+| Privacy manifest | `UserDefaults` reason `CA92.1`; no collected data type declared because tracking coordinates are not sent to a developer-operated server |
 
 ## 4. Xcode And Scheme Configuration
 
@@ -88,15 +94,14 @@ Removed because empty and unreferenced:
 - Development Team: `4HM66AD594` (unchanged)
 - Signing: automatic (unchanged)
 - Marketing version/build: `1.1.0 (106)` across all targets
-- App Intents metadata extraction disabled because the app has no App Intents target/dependency
+- The app has no App Intents target/dependency. Xcode may emit its own metadata-processor skip warning; no unused capability was added to suppress a toolchain message.
 - Stable archive toolchain: Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5
 - The host-wide `xcode-select -p` remains `/Applications/Xcode.app/Contents/Developer`; every recorded local Xcode command explicitly used `DEVELOPER_DIR=/Applications/Xcode-26.6-duplicate.app/Contents/Developer`. Xcode Cloud must select the stable toolchain in its workflow environment.
 
 ## 5. Services Configured
 
 - StoreKit 2: product lookup, purchase, verified transaction handling, current entitlements, updates, finish, and restore for `batal.catalog.unlock`.
-- Core Location: when-in-use location and heading with lifecycle cleanup and permission/error states.
-- Open-Meteo: native `URLSession` HTTPS integration with timeout/retry/cache/validation/cancellation and attribution.
+- Core Location and MapKit: user-initiated location/heading updates with permission/error states and lifecycle cleanup; no external weather provider.
 - Bundled catalog/store data: native Foundation loading/decoding.
 
 No Firebase, Supabase, RevenueCat, OneSignal, Stripe, Google Maps, OpenAI SDK, or other third-party SDK is present.
@@ -113,10 +118,11 @@ No Firebase, Supabase, RevenueCat, OneSignal, Stripe, Google Maps, OpenAI SDK, o
 | Partnership data validator | PASS | 19 suppliers, 0 errors, 0 warnings |
 | Clean Debug build | PASS | generic iOS simulator build exited 0 |
 | Xcode static analyzer | PASS | clean analyzer run exited 0 |
-| iPhone simulator tests | PASS | 13/13 on iPhone 17 Pro, iOS 26.5 |
+| Current iPhone simulator tests after weather removal | PASS | 12/12: 10 unit + 2 UI on iPhone 17 Pro, iOS 26.5 |
+| Current unsigned Release build after weather removal | PASS | `/tmp/BatalNoWeatherRelease/Build/Products/Release-iphoneos/BatalAlDroob.app` |
 | iPad simulator UI tests | PASS | 2/2 on iPad Air 11-inch (M4), iOS 26.5 |
-| Physical iPhone unit tests | PASS | 11/11 on iPhone 16 Pro Max |
-| Physical iPhone UI tests | PASS | 2/2 launch/navigation/request persistence/language tests |
+| Prior physical iPhone unit tests | PASS | 11/11 on iPhone 16 Pro Max before removal of the isolated weather feature |
+| Prior physical iPhone UI tests | PASS | 2/2 launch/navigation/request persistence/language tests before weather removal |
 | Fresh unsigned archive | PASS | `/tmp/BatalAlDroob-1.1.0-106-native-final-20260719.xcarchive` |
 | Post-archive metadata guard | PASS | actual app metadata matched all expected values |
 
@@ -145,21 +151,21 @@ No embedded app extension or third-party framework was present in the archive. `
 2. Verify Xcode Cloud Next Build Number is greater than every previous App Store Connect upload before triggering the workflow.
 3. Complete and attach StoreKit product `batal.catalog.unlock`, including price/localization, review screenshot, agreements, and first-review submission with the app version.
 4. Replace any promoted-IAP screenshot with unique product artwork. Upload current 6.5-inch iPhone and 13-inch iPad screenshots showing the native app in use.
-5. Human-confirm App Store privacy labels, specifically precise location sent to Open-Meteo for weather.
-6. Confirm production/commercial Open-Meteo terms for the released app, or migrate to an authorized provider before release.
-7. Manually verify location denied/granted, compass/heading, real weather, StoreKit Sandbox purchase/cancel/pending/restore, offline/slow network, app update, and background/foreground flows.
-8. Complete Accessibility Inspector/VoiceOver/large Dynamic Type/Reduce Motion and Instruments Leaks/Time Profiler/Energy checks. These were not claimed from static analysis.
-9. Generate the final signed archive and validate signing/provisioning in Xcode Cloud/Apple Developer Portal. The local archive intentionally disabled signing.
+5. Human-confirm App Store privacy labels against the final binary after removal of the external weather integration.
+6. Manually verify location denied/granted, compass/heading, StoreKit Sandbox purchase/cancel/pending/restore, offline/slow network, app update, and background/foreground flows.
+7. Complete Accessibility Inspector/VoiceOver/large Dynamic Type/Reduce Motion and Instruments Leaks/Time Profiler/Energy checks. These were not claimed from static analysis.
+8. Generate the final signed archive and validate signing/provisioning in Xcode Cloud/Apple Developer Portal. The local archive intentionally disabled signing.
 
 ## 8. Release Decision
 
-The source, automated tests, physical-device smoke tests, static checks, and unsigned archive metadata are in a strong releasable state. It is not honest to label the app fully production-ready until the external StoreKit/App Store metadata, weather-service terms, signed cloud archive, privacy-label confirmation, permission-dependent manual flows, accessibility inspection, and Instruments checks are completed.
+The source, automated tests, physical-device smoke tests, static checks, and unsigned archive metadata are in a strong releasable state. A new signed cloud archive is required after the weather removal. It is not honest to label the app fully production-ready until the external StoreKit/App Store metadata, current screenshots, privacy-label confirmation, permission-dependent manual flows, accessibility inspection, and Instruments checks are completed.
 
 Recommended action: complete the manual checklist, then run an internal TestFlight cycle before App Review.
 
 ## 9. Git State
 
-- Branch inspected: `main`.
-- Baseline commit: `b610793`.
-- The modernization changes listed in this report remain uncommitted in the working tree.
-- No commit, push, App Store Connect upload, or App Review submission was performed as part of this verification.
+- Branch: `main`.
+- Modernization commit: `d6c265c feat(batal): complete native production readiness`.
+- Commit `d6c265c` is present on `origin/main`.
+- Xcode Cloud build `109` was produced from that exact commit and uploaded to TestFlight.
+- No App Review submission was performed by the source-code verification step.
