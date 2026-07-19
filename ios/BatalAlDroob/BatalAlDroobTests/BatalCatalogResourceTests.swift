@@ -122,7 +122,7 @@ final class BatalCatalogResourceTests: XCTestCase {
 
         let entitledViewModel = CatalogViewModel(
             repository: StaticCatalogRepository(),
-            store: TestPurchaseService(entitlements: ["batal.catalog.unlock"])
+            store: TestPurchaseService(entitlements: [StoreProductID.catalogPermanentUnlock])
         )
         await entitledViewModel.load()
         XCTAssertTrue(entitledViewModel.paidUnlocks.contains("__catalog_unlock__"))
@@ -133,6 +133,17 @@ final class BatalCatalogResourceTests: XCTestCase {
         )
         await revokedViewModel.load()
         XCTAssertFalse(revokedViewModel.paidUnlocks.contains("__catalog_unlock__"))
+    }
+
+    @MainActor
+    func testCatalogUnlockUsesPermanentProductIdentifier() {
+        let viewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        XCTAssertEqual(viewModel.purchaseProductIDs, ["batal.catalog.permanent.unlock"])
+        XCTAssertEqual(StoreProductID.catalogPermanentUnlock, "batal.catalog.permanent.unlock")
     }
 
     private func loadJSONObject(named name: String, subdirectory: String) throws -> [String: Any] {

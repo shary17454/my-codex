@@ -93,7 +93,7 @@ final class CatalogViewModel {
         )
     ]
     var purchaseProductIDs: [String] {
-        ["batal.catalog.unlock"]
+        [StoreProductID.catalogPermanentUnlock]
     }
 
     init(
@@ -226,16 +226,16 @@ extension CatalogViewModel {
     }
 
     func unlock(_: Part) async {
-        guard isProductAvailable("batal.catalog.unlock") else {
+        guard isProductAvailable(StoreProductID.catalogPermanentUnlock) else {
             paymentMessage = purchaseSetupMessage
             return
         }
         paymentMessage = text(ar: "جاري طلب الدفع...", en: "Requesting purchase...")
         do {
-            let outcome = try await store.purchase(productID: "batal.catalog.unlock")
+            let outcome = try await store.purchase(productID: StoreProductID.catalogPermanentUnlock)
             switch outcome {
             case .success:
-                applyEntitlements(["batal.catalog.unlock"])
+                applyEntitlements([StoreProductID.catalogPermanentUnlock])
                 paymentMessage = text(ar: "تم الدفع وفتح المحتوى", en: "Payment complete. Content unlocked.")
             case .cancelled:
                 paymentMessage = text(ar: "تم إلغاء عملية الدفع.", en: "Purchase was cancelled.")
@@ -275,7 +275,7 @@ extension CatalogViewModel {
         do {
             let restored = try await store.restorePurchasedProductIDs()
             applyEntitlements(restored)
-            if restored.contains("batal.catalog.unlock") {
+            if restored.contains(StoreProductID.catalogPermanentUnlock) {
                 paymentMessage = text(ar: "تمت استعادة فتح الكتالوج.", en: "Catalog unlock was restored.")
             } else {
                 paymentMessage = text(
@@ -296,7 +296,7 @@ extension CatalogViewModel {
     }
 
     private func applyEntitlements(_ productIDs: Set<String>) {
-        if productIDs.contains("batal.catalog.unlock") {
+        if productIDs.contains(StoreProductID.catalogPermanentUnlock) {
             paidUnlocks.insert(catalogUnlockToken)
         } else {
             paidUnlocks.remove(catalogUnlockToken)

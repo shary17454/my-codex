@@ -40,7 +40,7 @@ Dependencies are injected at the application boundary through service protocols.
 
 ### StoreKit
 
-Product identifier: `batal.catalog.unlock`. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement.
+Product identifier: `batal.catalog.permanent.unlock`. It must be configured as a non-consumable because the entitlement is permanent and restorable. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement.
 
 ### Location and compass
 

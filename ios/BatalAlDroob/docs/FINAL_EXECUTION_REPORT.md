@@ -3,11 +3,11 @@
 Date: 2026-07-19  
 Status: `READY_WITH_EXTERNAL_REQUIREMENTS`
 
-> Current release update: commit `d6c265c` was pushed to `origin/main`.
-> Xcode Cloud build `109` completed Build, Archive, and TestFlight processing
-> using Xcode 26.6 (`17F113`) and iPhoneOS SDK 26.5. The next Cloud build
-> number is `110`. See `CURRENT_RELEASE_STATUS.md` for the authoritative
-> remaining blockers and App Store metadata state.
+> Current release update: commit `5a80728` is on `origin/main`. Xcode Cloud
+> build `110` completed Build and Archive using Xcode 26.6 (`17F113`) and
+> iPhoneOS SDK 26.5. Build `110` predates the permanent-IAP correction in the
+> current working tree, so the corrected cloud candidate must be build `111`
+> or higher. See `CURRENT_RELEASE_STATUS.md` for the authoritative blockers.
 
 ## 1. Discovery And Fixes
 
@@ -21,10 +21,22 @@ Implemented corrections:
 - separated catalog and store-directory loading/retry state;
 - limited external store links to valid HTTPS hosts;
 - removed the unrelated Open-Meteo weather feature and retained only user-initiated location/compass behavior;
+- replaced the incompatible consumable catalog product with the non-consumable `batal.catalog.permanent.unlock` identifier and made StoreKit reject an incorrect product type;
 - added app lifecycle privacy shielding and structured `Logger` categories;
 - improved keyboard behavior, Dynamic Type layout, Arabic/English locale handling, and iPad paged-tab navigation testing;
 - added unit/UI test targets and release/archive guards;
 - updated permission text and privacy manifest for actual location behavior.
+
+Latest Apple review evidence:
+
+- App Store Connect issue email received July 18, 2026 for app version `1.1.0`,
+  submission `0fd0e8d0-ea44-4fe4-8fad-2ef8ea35eff6`;
+- the detailed App Review page identified Guideline 2.1(b), App Completeness:
+  the paid feature's IAP was not included with the submission;
+- Apple requires the IAP, its App Review screenshot, and a new binary in the
+  same review submission;
+- no newer Batal Al-Droob rejection mail was found; the latest Apple message
+  for this app confirms Xcode Cloud build `110` succeeded.
 
 No unsafe force unwrap, `try!`, unsafe cast, `fatalError`, production `print`, TODO/FIXME/HACK marker, Dart source, Flutter runtime, or third-party package was found in the final app scope.
 
@@ -100,7 +112,7 @@ Removed because empty and unreferenced:
 
 ## 5. Services Configured
 
-- StoreKit 2: product lookup, purchase, verified transaction handling, current entitlements, updates, finish, and restore for `batal.catalog.unlock`.
+- StoreKit 2: product lookup, purchase, verified transaction handling, current entitlements, updates, finish, and restore for the non-consumable `batal.catalog.permanent.unlock`.
 - Core Location and MapKit: user-initiated location/heading updates with permission/error states and lifecycle cleanup; no external weather provider.
 - Bundled catalog/store data: native Foundation loading/decoding.
 
@@ -118,12 +130,12 @@ No Firebase, Supabase, RevenueCat, OneSignal, Stripe, Google Maps, OpenAI SDK, o
 | Partnership data validator | PASS | 19 suppliers, 0 errors, 0 warnings |
 | Clean Debug build | PASS | generic iOS simulator build exited 0 |
 | Xcode static analyzer | PASS | clean analyzer run exited 0 |
-| Current iPhone simulator tests after weather removal | PASS | 12/12: 10 unit + 2 UI on iPhone 17 Pro, iOS 26.5 |
-| Current unsigned Release build after weather removal | PASS | `/tmp/BatalNoWeatherRelease/Build/Products/Release-iphoneos/BatalAlDroob.app` |
+| Current iPhone simulator tests after permanent-IAP correction | PASS | 13/13: 11 unit + 2 UI on iPhone 17 Pro, iOS 26.5 |
+| Current unsigned Release build after permanent-IAP correction | PASS | Xcode 26.6 device Release build completed with `BUILD SUCCEEDED` |
 | iPad simulator UI tests | PASS | 2/2 on iPad Air 11-inch (M4), iOS 26.5 |
 | Prior physical iPhone unit tests | PASS | 11/11 on iPhone 16 Pro Max before removal of the isolated weather feature |
 | Prior physical iPhone UI tests | PASS | 2/2 launch/navigation/request persistence/language tests before weather removal |
-| Fresh unsigned archive | PASS | `/tmp/BatalAlDroob-1.1.0-106-native-final-20260719.xcarchive` |
+| Fresh unsigned archive after permanent-IAP correction | PASS | `/tmp/BatalAlDroob-IAP-fix-1.1.0-106-20260719.xcarchive` |
 | Post-archive metadata guard | PASS | actual app metadata matched all expected values |
 
 Physical test device ran iOS 27.0 beta. This is valid functional evidence only; the App Store archive was independently built with stable Xcode 26.6 and iPhoneOS SDK 26.5.
@@ -147,9 +159,9 @@ No embedded app extension or third-party framework was present in the archive. `
 
 ## 7. Manual Actions Required
 
-1. In Xcode Cloud, select stable Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release, push the intended commit, and create a fresh signed archive. Do not reuse a local/old archive.
-2. Verify Xcode Cloud Next Build Number is greater than every previous App Store Connect upload before triggering the workflow.
-3. Complete and attach StoreKit product `batal.catalog.unlock`, including price/localization, review screenshot, agreements, and first-review submission with the app version.
+1. Commit and push the permanent-IAP correction, then create Xcode Cloud build `111` or higher from that exact commit using stable Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release.
+2. Verify Xcode Cloud Next Build Number and TestFlight Build Uploads before triggering the workflow; do not reuse any uploaded build number.
+3. Complete and attach the non-consumable StoreKit product `batal.catalog.permanent.unlock` (Apple ID `6792436213`), including price, availability, localization, review screenshot, agreements, and review notes. Do not attach legacy consumable `batal.catalog.unlock` (Apple ID `6786440522`).
 4. Replace any promoted-IAP screenshot with unique product artwork. Upload current 6.5-inch iPhone and 13-inch iPad screenshots showing the native app in use.
 5. Human-confirm App Store privacy labels against the final binary after removal of the external weather integration.
 6. Manually verify location denied/granted, compass/heading, StoreKit Sandbox purchase/cancel/pending/restore, offline/slow network, app update, and background/foreground flows.
@@ -158,14 +170,20 @@ No embedded app extension or third-party framework was present in the archive. `
 
 ## 8. Release Decision
 
-The source, automated tests, physical-device smoke tests, static checks, and unsigned archive metadata are in a strong releasable state. A new signed cloud archive is required after the weather removal. It is not honest to label the app fully production-ready until the external StoreKit/App Store metadata, current screenshots, privacy-label confirmation, permission-dependent manual flows, accessibility inspection, and Instruments checks are completed.
+The source, automated tests, prior physical-device smoke tests, static checks,
+and fresh unsigned archive metadata are in a strong releasable state. A new
+signed cloud archive is required after the permanent-IAP correction. Apple also
+requires that IAP to be complete and included with the new binary in the same
+review submission. It is not honest to label the app fully production-ready
+until those external items and the remaining manual checks are complete.
 
 Recommended action: complete the manual checklist, then run an internal TestFlight cycle before App Review.
 
 ## 9. Git State
 
 - Branch: `main`.
-- Modernization commit: `d6c265c feat(batal): complete native production readiness`.
-- Commit `d6c265c` is present on `origin/main`.
-- Xcode Cloud build `109` was produced from that exact commit and uploaded to TestFlight.
+- Latest pushed commit: `5a80728 fix(batal): remove unrelated weather integration`.
+- Commit `5a80728` is present on `origin/main`.
+- Xcode Cloud build `110` was produced from that commit and completed successfully.
+- The permanent-IAP correction is still an uncommitted local change and requires cloud build `111` or higher after review and push.
 - No App Review submission was performed by the source-code verification step.

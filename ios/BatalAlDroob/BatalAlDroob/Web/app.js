@@ -17,7 +17,7 @@ let searchDebounceTimer = null;
 const wishlist = new Set();
 const paidPartUnlocks = new Set();
 let pendingPaidAction = null;
-const catalogUnlockProductId = "batal.catalog.unlock";
+const catalogUnlockProductId = "batal.catalog.permanent.unlock";
 const partRequestPlans = [
   {
     id: "basic",

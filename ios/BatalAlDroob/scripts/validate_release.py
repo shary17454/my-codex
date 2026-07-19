@@ -24,7 +24,7 @@ EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts.uitests",
 }
 EXPECTED_DEPLOYMENT_TARGET = "17.0"
-ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.unlock"}
+ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.permanent.unlock"}
 
 
 def fail(message: str) -> None:

@@ -9,6 +9,7 @@
 - Added structured logging and safer HTTPS-only external store links.
 - Hardened location and compass permission handling, lifecycle cleanup, and localized errors.
 - Made StoreKit current entitlements and verified transaction updates the source of truth for protected catalog access.
+- Replaced the incompatible consumable catalog product with the non-consumable `batal.catalog.permanent.unlock` identifier and rejected an incorrect StoreKit product type at runtime.
 - Added explicit loading, retry, offline/error, and permission-denied behavior to relevant flows.
 
 ### Quality

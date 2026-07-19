@@ -7,7 +7,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [ ] The intended commit is pushed and selected by the Batal Al-Droob Xcode Cloud workflow.
 - [ ] Xcode Cloud uses Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release.
 - [ ] The iPhoneOS SDK is 26.5 or newer and `SDKROOT` is not pinned to a beta/old SDK.
-- [x] `python3 ios/BatalAlDroob/scripts/validate_release.py` passes locally for the weather-removal source.
+- [x] `python3 ios/BatalAlDroob/scripts/validate_release.py` passes locally for the permanent-IAP source.
 - [x] `swiftformat ... --lint` passes locally: 0/12 files require formatting.
 - [x] `swiftlint lint --strict --no-cache` passes locally: 0 violations.
 - [ ] Xcode static analysis passes.
@@ -24,7 +24,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [ ] Dependency resolution succeeds.
 - [ ] Debug build succeeds.
 - [x] Release build succeeds locally with Xcode 26.6 and iPhoneOS SDK 26.5.
-- [x] Unit tests pass on a current iPhone simulator: 10/10.
+- [x] Unit tests pass on a current iPhone simulator: 11/11.
 - [x] iPhone UI smoke tests pass: 2/2, including the tools and tracking/compass surface.
 - [ ] Relevant tests pass on a physical iPhone.
 - [ ] Location permission denied/granted behavior is manually checked.
@@ -35,6 +35,8 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Archive
 
+- [x] A fresh unsigned local archive for the permanent-IAP correction succeeds with Xcode 26.6 and iPhoneOS SDK 26.5.
+- [x] Local archive metadata confirms bundle `com.batalaldroob.parts`, version `1.1.0 (106)`, Xcode build `17F113`, SDK `iphoneos26.5`, and iOS 17.0 minimum.
 - [ ] A fresh signed Xcode Cloud archive is created from the intended commit.
 - [ ] `ci_post_xcodebuild.sh` passes against that archive.
 - [ ] Archive metadata confirms bundle `com.batalaldroob.parts`, expected version/build, production Xcode, accepted SDK, and iOS 17.0 minimum.
@@ -46,7 +48,8 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [ ] App Store privacy labels are human-confirmed against the final app, which has no developer-operated location backend.
 - [ ] No Open-Meteo endpoint or other external weather integration remains in source or the submitted binary.
 - [ ] Location usage descriptions are accurate in Arabic and English.
-- [ ] The StoreKit product `batal.catalog.unlock` is complete, cleared for sale where appropriate, and attached to the same first-review submission as the binary.
+- [ ] The non-consumable StoreKit product `batal.catalog.permanent.unlock` is complete, cleared for sale where appropriate, and attached to the same first-review submission as the binary.
+- [ ] The legacy consumable `batal.catalog.unlock` is not attached to the corrected permanent-unlock submission.
 - [ ] The IAP review screenshot demonstrates the purchase surface.
 - [ ] Promoted-IAP artwork represents the product and is not an ordinary app screenshot.
 - [ ] 6.5-inch iPhone and 13-inch iPad screenshots show the current native app in use and its core functionality.

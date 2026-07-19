@@ -25,7 +25,10 @@ struct PartDetailView: View {
                             )
                         }
                         .buttonStyle(.borderedProminent)
-                        .disabled(!viewModel.isProductAvailable("batal.catalog.unlock") || viewModel.isLoadingPurchases)
+                        .disabled(
+                            !viewModel.isProductAvailable(StoreProductID.catalogPermanentUnlock)
+                                || viewModel.isLoadingPurchases
+                        )
                         Button { Task { await viewModel.restorePurchases() } } label: {
                             Label(
                                 viewModel.text(ar: "استعادة المشتريات", en: "Restore Purchases"),

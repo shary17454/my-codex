@@ -92,15 +92,23 @@ After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metada
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-Before starting a new App Store build, set Xcode Cloud > Workflow > Next Build Number to `106` or higher. Build `105` was reviewed and rejected, so do not reuse it.
+The latest successful cloud archive is build `110` from commit `5a80728`, but it
+predates the permanent-IAP correction. Before starting the corrected App Store
+build, verify TestFlight Build Uploads and set Xcode Cloud > Workflow > Next
+Build Number to `111` or higher. Do not reuse any uploaded build number.
 
 ## In-App Purchase
 
 Only one StoreKit product is referenced by the app:
 
-- `batal.catalog.unlock`
+- `batal.catalog.permanent.unlock` (non-consumable permanent catalog unlock)
 
-For the first review of this product, add the In-App Purchase and the matching new app version to the same App Review submission. Apple requires an App Review screenshot for the product and a new binary when the product was omitted from an earlier submission.
+The legacy `batal.catalog.unlock` product was configured as a consumable and is
+not compatible with a permanent, restorable entitlement. Do not attach it to a
+corrected release. For the first review of the replacement product, add the
+In-App Purchase and the matching new app version to the same App Review
+submission. Apple requires an App Review screenshot for the product and a new
+binary when the product was omitted from an earlier submission.
 
 Part requests are prepared and saved inside the app without a separate purchase product.
 
@@ -119,4 +127,8 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 - Latest executed verification: [`docs/FINAL_EXECUTION_REPORT.md`](docs/FINAL_EXECUTION_REPORT.md)
 - Arabic status summary: [`docs/FINAL_STATUS_AR.md`](docs/FINAL_STATUS_AR.md)
 
-The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The remaining requirements are deliberately kept visible in the execution report and include a fresh signed Xcode Cloud archive after the weather removal, App Store Connect/IAP metadata, current screenshots, privacy-label confirmation, and manual device checks for permission-dependent behavior.
+The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
+remaining requirements are deliberately kept visible in the execution report:
+a fresh signed Xcode Cloud build `111` or higher containing the permanent-IAP
+correction, completion and attachment of that IAP in App Store Connect, current
+screenshots, privacy-label confirmation, and manual device checks.

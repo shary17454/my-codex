@@ -25,7 +25,7 @@
     }
   ],
   "app_store_connect_products": [
-    "batal.catalog.unlock"
+    "batal.catalog.permanent.unlock"
   ],
   "policy": {
     "do_not_claim_price_or_availability_without_store_source": true,
