@@ -47,6 +47,8 @@
 
 ## Xcode Cloud
 
+- [x] توجيه `ci_scripts/ci_post_clone.sh` المشترك إلى حارس وش الرأي عند اكتشاف `StudyVault` فقط.
+- [x] فحص Shell syntax ومسار الرفض المحلي عند استخدام Xcode أقدم من 26.6.
 - [x] تأكيد أن Workflow يبني `StudyVaultApp/StudyVault.xcodeproj` والـScheme `StudyVault`.
 - [x] اختيار Xcode Stable إنتاجي: Latest Release، حاليًا Xcode 26.6 (`17F113`).
 - [x] ضبط Next Build Number على `52`، أعلى من Build Uploads حتى `51`.

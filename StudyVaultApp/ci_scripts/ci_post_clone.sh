@@ -4,6 +4,9 @@ set -euo pipefail
 required_xcode_version="26.6"
 required_xcode_build="17F113"
 required_min_iphoneos_sdk="26.5"
+expected_marketing_version="${EXPECTED_MARKETING_VERSION:-1.10.0}"
+minimum_build_number="${MIN_PROJECT_BUILD:-52}"
+project_file="StudyVaultApp/StudyVault.xcodeproj/project.pbxproj"
 
 echo "== Xcode Cloud preflight =="
 echo "Commit: $(git rev-parse HEAD 2>/dev/null || echo unknown)"
@@ -69,4 +72,35 @@ if ! version_ge "${iphoneos_sdk_version}" "${required_min_iphoneos_sdk}"; then
   exit 22
 fi
 
+if [ ! -f "${project_file}" ]; then
+  echo "ERROR: Wesh Alray project file was not found: ${project_file}"
+  exit 23
+fi
+
+marketing_values="$(grep -E 'MARKETING_VERSION = ' "${project_file}" | sed -E 's/.*MARKETING_VERSION = ([^;]+);.*/\1/' | sort -u)"
+build_values="$(grep -E 'CURRENT_PROJECT_VERSION = ' "${project_file}" | sed -E 's/.*CURRENT_PROJECT_VERSION = ([^;]+);.*/\1/' | sort -u)"
+
+if [ "$(printf '%s\n' "${marketing_values}" | sed '/^$/d' | wc -l | tr -d ' ')" != "1" ] || [ "${marketing_values}" != "${expected_marketing_version}" ]; then
+  echo "ERROR: MARKETING_VERSION must be unified on ${expected_marketing_version}. Found: ${marketing_values}"
+  exit 24
+fi
+
+if [ "$(printf '%s\n' "${build_values}" | sed '/^$/d' | wc -l | tr -d ' ')" != "1" ] || ! echo "${build_values}" | grep -Eq '^[0-9]+$'; then
+  echo "ERROR: CURRENT_PROJECT_VERSION must be one unified numeric value. Found: ${build_values}"
+  exit 25
+fi
+
+if [ "${build_values}" -lt "${minimum_build_number}" ]; then
+  echo "ERROR: CURRENT_PROJECT_VERSION must be ${minimum_build_number} or higher. Found: ${build_values}"
+  exit 26
+fi
+
+if [ -n "${CI_BUILD_NUMBER:-}" ]; then
+  if ! echo "${CI_BUILD_NUMBER}" | grep -Eq '^[0-9]+$' || [ "${CI_BUILD_NUMBER}" -lt "${minimum_build_number}" ]; then
+    echo "ERROR: Xcode Cloud build number must be numeric and at least ${minimum_build_number}. Found: ${CI_BUILD_NUMBER}"
+    exit 27
+  fi
+fi
+
+echo "Wesh Alray version preflight: ${marketing_values} (${build_values}); cloud build ${CI_BUILD_NUMBER:-unset}."
 echo "Xcode Cloud preflight passed."

@@ -45,7 +45,8 @@
 | الملف | سبب التعديل |
 |---|---|
 | `StudyVault.xcodeproj/project.pbxproj` | توحيد `MARKETING_VERSION` على `1.10.0` و`CURRENT_PROJECT_VERSION` على `52` في Debug وRelease |
-| `ci_scripts/ci_post_clone.sh` | إضافة فحص مبكر لبيئة Xcode Cloud يمنع Xcode Beta أو SDK غير مناسب |
+| `ci_scripts/ci_post_clone.sh` | توجيه Workflow وش الرأي إلى حارس الإصدار الخاص به دون تغيير حارس التطبيقات الأخرى |
+| `StudyVaultApp/ci_scripts/ci_post_clone.sh` | منع Xcode Beta أو SDK غير مناسب والتحقق من `1.10.0` وBuild لا يقل عن `52` |
 | `AppStore/release_notes.md` | إضافة ملاحظات إصدار `1.10.0` بالعربية والإنجليزية |
 | `docs/RELEASE_CHECKLIST.md` | تحديث Checklist للإصدار الجديد وخطوات Xcode Cloud اليدوية |
 | `scripts/submit_app_store_version.mjs` | تحديث القيم الافتراضية اليدوية إلى `1.10.0 (52)` بدل قيم قديمة |

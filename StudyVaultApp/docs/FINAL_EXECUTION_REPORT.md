@@ -81,6 +81,7 @@
 - Local Xcode observed: 26.4.1 (`17E202`)
 - Local SDK observed: iPhoneOS 26.4
 - Archive المحلي أنشئ دون توقيع للتحقق البنيوي فقط؛ لم يتم رفعه.
+- سكربت Xcode Cloud المشترك يكتشف `StudyVault` أو Bundle ID الخاص بوش الرأي، ثم يشغّل حارسًا يفشل مبكرًا إذا اختلف Xcode/SDK أو Marketing Version أو Build Number.
 
 قيم التطبيق داخل الـxcarchive المحلي:
 

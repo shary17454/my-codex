@@ -34,6 +34,8 @@ MIN_IPHONEOS_SDK_MAJOR="${MIN_IPHONEOS_SDK_MAJOR:-26}"
 MIN_IPHONEOS_SDK_MINOR="${MIN_IPHONEOS_SDK_MINOR:-5}"
 BATAL_BUNDLE_ID="com.batalaldroob.parts"
 BATAL_PROJECT_FILE="ios/BatalAlDroob/BatalAlDroob.xcodeproj/project.pbxproj"
+WESH_BUNDLE_ID="com.shary17454.esal"
+WESH_GUARD_SCRIPT="StudyVaultApp/ci_scripts/ci_post_clone.sh"
 
 IS_BATAL_BUILD="false"
 if [ "${BATAL_RELEASE_GUARD:-0}" = "1" ] || [ "${CI_BUNDLE_ID:-}" = "${BATAL_BUNDLE_ID}" ] || [ "${CI_PRODUCT:-}" = "BatalAlDroob" ]; then
@@ -42,6 +44,23 @@ elif [ -n "${CI_PROJECT_FILE_PATH:-}" ] && echo "${CI_PROJECT_FILE_PATH}" | grep
   IS_BATAL_BUILD="true"
 elif [ -n "${CI_XCODE_PROJECT:-}" ] && echo "${CI_XCODE_PROJECT}" | grep -Eq '(^|/)BatalAlDroob(\.xcodeproj)?$'; then
   IS_BATAL_BUILD="true"
+fi
+
+IS_WESH_BUILD="false"
+if [ "${WESH_RELEASE_GUARD:-0}" = "1" ] || [ "${CI_BUNDLE_ID:-}" = "${WESH_BUNDLE_ID}" ] || [ "${CI_PRODUCT:-}" = "StudyVault" ]; then
+  IS_WESH_BUILD="true"
+elif [ -n "${CI_PROJECT_FILE_PATH:-}" ] && echo "${CI_PROJECT_FILE_PATH}" | grep -Eq '(^|/)StudyVault\.xcodeproj$'; then
+  IS_WESH_BUILD="true"
+elif [ -n "${CI_XCODE_PROJECT:-}" ] && echo "${CI_XCODE_PROJECT}" | grep -Eq '(^|/)StudyVault(\.xcodeproj)?$'; then
+  IS_WESH_BUILD="true"
+fi
+
+if [ "${IS_WESH_BUILD}" = "true" ]; then
+  if [ ! -x "${WESH_GUARD_SCRIPT}" ]; then
+    echo "error: Wesh Alray release guard is missing or not executable: ${WESH_GUARD_SCRIPT}" >&2
+    exit 1
+  fi
+  exec "${WESH_GUARD_SCRIPT}"
 fi
 
 if [ "${IS_BATAL_BUILD}" != "true" ]; then
