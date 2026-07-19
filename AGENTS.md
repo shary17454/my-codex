@@ -41,3 +41,4 @@ cd StudyVaultApp/backend && npm run check
 - Do not commit generated build outputs, archives, DerivedData, `.xcresult` bundles, `.ipa` files, local backend data, or secrets.
 - Keep `Info.plist` deriving `CFBundleShortVersionString` and `CFBundleVersion` from Xcode build settings.
 - وش الرأي is a native Swift/SwiftUI app; do not add Flutter or Dart runtime dependencies.
+- Record any verification that requires a physical device, Apple Developer Portal, App Store Connect, credentials, or external production service as an explicit manual/external requirement; never report it as completed without evidence.

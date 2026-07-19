@@ -2,8 +2,10 @@ import SwiftUI
 import Observation
 import StoreKit
 import PhotosUI
+import CoreTransferable
 import MapKit
 import CoreLocation
+import Vision
 
 @main
 struct BatalAlDroobApp: App {
@@ -301,6 +303,26 @@ struct BundledCatalogRepository: CatalogRepository {
     }
 }
 
+protocol PhotoTextRecognizing: Sendable {
+    func recognizeText(in data: Data) async throws -> [String]
+}
+
+struct VisionPhotoTextRecognizer: PhotoTextRecognizing {
+    func recognizeText(in data: Data) async throws -> [String] {
+        try await Task.detached(priority: .userInitiated) {
+            let request = VNRecognizeTextRequest()
+            request.recognitionLevel = .accurate
+            request.usesLanguageCorrection = true
+
+            let handler = VNImageRequestHandler(data: data, options: [:])
+            try handler.perform([request])
+            return (request.results ?? []).compactMap { observation in
+                observation.topCandidates(1).first?.string
+            }
+        }.value
+    }
+}
+
 protocol PurchaseService: Sendable {
     func availableProductIDs(for productIDs: [String]) async throws -> Set<String>
     func purchase(productID: String) async throws -> PurchaseOutcome
@@ -344,13 +366,14 @@ struct StoreKitPurchaseService: PurchaseService {
 }
 
 enum AppError: LocalizedError, Sendable {
-    case missingResource(String), productUnavailable, unverifiedTransaction, unknownPurchaseResult
+    case missingResource(String), productUnavailable, unverifiedTransaction, unknownPurchaseResult, unreadablePhoto
     var errorDescription: String? {
         switch self {
         case .missingResource(let name): "Missing bundled resource: \(name)"
         case .productUnavailable: "In-app purchase is not ready yet."
         case .unverifiedTransaction: "Transaction verification failed."
         case .unknownPurchaseResult: "Unknown purchase result."
+        case .unreadablePhoto: "The selected photo could not be read."
         }
     }
 }
@@ -362,6 +385,7 @@ enum AppError: LocalizedError, Sendable {
 final class CatalogViewModel {
     private let repository: CatalogRepository
     private let store: PurchaseService
+    private let photoTextRecognizer: any PhotoTextRecognizing
     private let catalogUnlockToken = "__catalog_unlock__"
 
     var language: AppLanguage = AppLanguage(rawValue: UserDefaults.standard.string(forKey: "batalLang") ?? "ar") ?? .arabic {
@@ -377,6 +401,7 @@ final class CatalogViewModel {
     var isPrivacyShieldVisible = false
     var selectedPhoto: PhotosPickerItem?
     var selectedPhotoName: String?
+    var isAnalyzingPhoto = false
     var isLoadingPurchases = false
     var availableProductIDs = Set<String>()
 
@@ -412,9 +437,14 @@ final class CatalogViewModel {
     ]
     var purchaseProductIDs: [String] { ["batal.catalog.unlock"] }
 
-    init(repository: CatalogRepository, store: PurchaseService) {
+    init(
+        repository: CatalogRepository,
+        store: PurchaseService,
+        photoTextRecognizer: any PhotoTextRecognizing = VisionPhotoTextRecognizer()
+    ) {
         self.repository = repository
         self.store = store
+        self.photoTextRecognizer = photoTextRecognizer
     }
 
     func load() async {
@@ -552,23 +582,20 @@ final class CatalogViewModel {
     }
 
     func buildDraft(for request: SavedPartRequest, plan: PartRequestPlan) -> String {
-        let lines = [
-            "بطل الدروب - \(plan.titleAr)",
-            "الجيل: \(request.generation)",
-            "السنة: \(request.year)",
-            "VIN: \(request.vin)",
-            "المحرك: \(request.engine)",
-            "القير: \(request.transmission)",
-            "رقم القطعة: \(request.partNumber)",
-            "اسم القطعة: \(request.partName)",
-            "ملاحظات: \(request.notes)"
-        ]
-        return lines.filter { !$0.hasSuffix(": ") }.joined(separator: "\n")
+        partRequestDraft(for: request, plan: plan, language: language)
     }
 
     func addMaintenance(title: String, odometer: String, notes: String) {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         maintenanceItems.insert(.init(title: title, odometer: odometer, notes: notes), at: 0)
+    }
+
+    func deleteMaintenance(at offsets: IndexSet) {
+        maintenanceItems.remove(atOffsets: offsets)
+    }
+
+    func deleteSavedRequests(at offsets: IndexSet) {
+        savedRequests.remove(atOffsets: offsets)
     }
 
 
@@ -580,11 +607,53 @@ final class CatalogViewModel {
         selectedPart = filteredParts.first
     }
 
-    func applyPhotoHint(_ name: String) {
-        selectedPhotoName = name
-        searchText = diagnosticKeywords(name).joined(separator: " ")
+    func analyzePhoto(_ item: PhotosPickerItem) async {
+        isAnalyzingPhoto = true
+        selectedPhotoName = text(ar: "جاري تحليل الصورة محليًا...", en: "Analyzing the photo on device...")
+        defer { isAnalyzingPhoto = false }
+
+        do {
+            guard let data = try await item.loadTransferable(type: Data.self), !data.isEmpty else {
+                throw AppError.unreadablePhoto
+            }
+            try Task.checkCancellation()
+            let recognizedLines = try await photoTextRecognizer.recognizeText(in: data)
+            try Task.checkCancellation()
+            applyRecognizedPhotoText(recognizedLines)
+        } catch is CancellationError {
+            return
+        } catch {
+            selectedPhotoName = nil
+            errorMessage = text(
+                ar: "تعذر قراءة نص واضح من الصورة. جرّب صورة أوضح يظهر فيها رقم القطعة.",
+                en: "No clear text could be read from the photo. Try a sharper image showing the part number."
+            )
+        }
+    }
+
+    func applyRecognizedPhotoText(_ lines: [String]) {
+        let recognizedText = lines.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !recognizedText.isEmpty else {
+            errorMessage = text(ar: "لم يظهر نص قابل للبحث في الصورة.", en: "No searchable text was found in the photo.")
+            selectedPhotoName = nil
+            return
+        }
+
+        let candidates = partNumberCandidates(in: recognizedText)
+        let matchingNumber = candidates.first { candidate in
+            let query = normalized(candidate)
+            return parts.contains { part in
+                (partSearchIndex[part.partNumber] ?? searchableText(for: part)).contains(query)
+            }
+        }
+        let fallback = diagnosticKeywords(recognizedText).joined(separator: " ")
+        searchText = matchingNumber ?? fallback
         selectedCategory = .all
         selectedPart = filteredParts.first
+        selectedPhotoName = text(
+            ar: "تمت قراءة الصورة والبحث عن: \(searchText)",
+            en: "Photo analyzed. Searching for: \(searchText)"
+        )
     }
 
     func tireDifference(oldSize: String, newSize: String) -> String {
@@ -641,9 +710,17 @@ final class CatalogViewModel {
 
     func openStore(_ store: VerifiedStore, part: Part?) {
         let url = store.searchURL(partNumber: part?.partNumber ?? "") ?? URL(string: store.website ?? "")
-        guard let url else { return }
+        guard let url, isAllowedExternalURL(url) else {
+            errorMessage = text(ar: "رابط المتجر غير صالح.", en: "The store link is invalid.")
+            return
+        }
         #if os(iOS)
-        Task { await UIApplication.shared.open(url) }
+        Task {
+            let opened = await UIApplication.shared.open(url)
+            if !opened {
+                errorMessage = text(ar: "تعذر فتح رابط المتجر.", en: "The store link could not be opened.")
+            }
+        }
         #endif
     }
 
@@ -678,9 +755,11 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     override init() {
         super.init()
         manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         manager.distanceFilter = 10
         manager.headingFilter = 3
+        manager.activityType = .automotiveNavigation
+        manager.pausesLocationUpdatesAutomatically = true
         authorization = manager.authorizationStatus
     }
 
@@ -714,12 +793,17 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     }
 
     func stop(language: AppLanguage) {
+        pauseTracking()
+        locationMessage = language == .arabic ? "تم إيقاف التتبع" : "Tracking stopped"
+    }
+
+    func pauseTracking() {
         isTracking = false
         weatherTask?.cancel()
         weatherTask = nil
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
-        locationMessage = language == .arabic ? "تم إيقاف التتبع" : "Tracking stopped"
+        isLoadingWeather = false
     }
 
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -738,12 +822,13 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
+        guard let location = locations.last, location.horizontalAccuracy >= 0 else { return }
         let latitude = location.coordinate.latitude
         let longitude = location.coordinate.longitude
         let altitude = location.altitude
         let horizontalAccuracy = location.horizontalAccuracy
         Task { @MainActor in
+            guard self.isTracking else { return }
             let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             self.coordinate = coordinate
             self.altitude = altitude
@@ -754,6 +839,7 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        guard newHeading.headingAccuracy >= 0 else { return }
         let value = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
         Task { @MainActor in
             self.headingDegrees = value
@@ -761,7 +847,12 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        Task { @MainActor in self.locationMessage = error.localizedDescription }
+        Task { @MainActor in
+            self.pauseTracking()
+            self.locationMessage = self.currentLanguage == .arabic
+                ? "تعذر تحديث الموقع. تحقق من الصلاحية وحاول مرة أخرى."
+                : "Location could not be updated. Check permission and try again."
+        }
     }
 
     private func scheduleWeatherLoad(for location: CLLocation) {
@@ -772,7 +863,7 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
         }
         weatherTask?.cancel()
         weatherTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 750_000_000)
+            try? await Task.sleep(for: .milliseconds(750))
             guard !Task.isCancelled else { return }
             await self?.loadWeather(for: location)
         }
@@ -794,14 +885,24 @@ final class LocationWeatherViewModel: NSObject, CLLocationManagerDelegate {
             weatherError = nil
             lastWeatherLocation = location
             lastWeatherUpdate = Date()
+        } catch is CancellationError {
+            return
         } catch {
             weatherError = currentLanguage == .arabic ? "تعذر تحديث الطقس. تحقق من الاتصال ثم حاول مرة أخرى." : "Weather could not be updated. Check your connection and try again."
         }
     }
 }
 
+enum WeatherServiceError: Error, Sendable {
+    case invalidCoordinates
+    case httpStatus(Int)
+}
+
 struct OpenMeteoWeatherService {
     static func fetch(latitude: Double, longitude: Double) async throws -> OpenMeteoWeather {
+        guard (-90...90).contains(latitude), (-180...180).contains(longitude) else {
+            throw WeatherServiceError.invalidCoordinates
+        }
         var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")
         components?.queryItems = [
             URLQueryItem(name: "latitude", value: String(latitude)),
@@ -809,12 +910,20 @@ struct OpenMeteoWeatherService {
             URLQueryItem(name: "current", value: "temperature_2m,weather_code")
         ]
         guard let url = components?.url else { throw URLError(.badURL) }
-        let request = URLRequest(url: url, timeoutInterval: 10)
-        let (data, response) = try await URLSession.shared.data(for: request)
-        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
-            throw URLError(.badServerResponse)
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 10)
+
+        for attempt in 0..<2 {
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+                guard (200..<300).contains(http.statusCode) else { throw WeatherServiceError.httpStatus(http.statusCode) }
+                return try JSONDecoder().decode(OpenMeteoWeather.self, from: data)
+            } catch {
+                guard attempt == 0, shouldRetryWeatherRequest(after: error) else { throw error }
+                try await Task.sleep(for: .milliseconds(400))
+            }
         }
-        return try JSONDecoder().decode(OpenMeteoWeather.self, from: data)
+        throw URLError(.unknown)
     }
 }
 
@@ -865,7 +974,14 @@ struct RootView: View {
                 MoreView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الأدوات", en: "Tools"), systemImage: "wrench.and.screwdriver") }
             }
-            .overlay(alignment: .top) { PaymentBanner(message: viewModel.paymentMessage) }
+            .overlay(alignment: .top) {
+                PaymentBanner(
+                    message: viewModel.paymentMessage,
+                    dismissLabel: viewModel.text(ar: "إغلاق", en: "Dismiss")
+                ) {
+                    viewModel.paymentMessage = nil
+                }
+            }
 
             if viewModel.isLoading { LoadingOverlay(message: viewModel.loadingMessage) }
             if viewModel.isPrivacyShieldVisible { PrivacyShieldView(language: viewModel.language) }
@@ -1116,7 +1232,7 @@ struct PartDetailView: View {
                 }
             }
             Section(viewModel.text(ar: "رسم كتالوج تقريبي", en: "Catalog diagram")) {
-                NativeDiagramView(part: part, unlocked: viewModel.isUnlocked(part))
+                NativeDiagramView(part: part)
                     .frame(height: 220)
                     .accessibilityLabel(viewModel.text(ar: "رسم يوضح رقم النداء التقريبي للقطعة", en: "Diagram showing the approximate part callout"))
             }
@@ -1150,13 +1266,16 @@ struct PartDetailView: View {
             Button { viewModel.toggleWishlist(part) } label: {
                 Image(systemName: viewModel.wishlist.contains(part.partNumber) ? "heart.fill" : "heart")
             }
+            .accessibilityLabel(viewModel.text(
+                ar: viewModel.wishlist.contains(part.partNumber) ? "إزالة من قائمة الرغبات" : "إضافة إلى قائمة الرغبات",
+                en: viewModel.wishlist.contains(part.partNumber) ? "Remove from wishlist" : "Add to wishlist"
+            ))
         }
     }
 }
 
 struct NativeDiagramView: View {
     let part: Part
-    let unlocked: Bool
     var body: some View {
         Canvas { context, size in
             let box = CGRect(x: 30, y: 42, width: size.width - 60, height: 104)
@@ -1234,11 +1353,19 @@ struct RequestView: View {
                         )
                     } else {
                         ForEach(viewModel.savedRequests) { saved in
-                            VStack(alignment: .leading) {
-                                Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber).font(.headline)
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber).font(.headline)
+                                    Spacer()
+                                    ShareLink(item: saved.draft) {
+                                        Image(systemName: "square.and.arrow.up")
+                                    }
+                                    .accessibilityLabel(viewModel.text(ar: "مشاركة طلب القطعة", en: "Share part request"))
+                                }
                                 Text(saved.draft).font(.caption).foregroundStyle(.secondary).lineLimit(4)
                             }
                         }
+                        .onDelete(perform: viewModel.deleteSavedRequests)
                     }
                 }
             }
@@ -1291,6 +1418,7 @@ struct MaintenanceView: View {
                                 Text([item.odometer, item.notes].filter { !$0.isEmpty }.joined(separator: " · ")).font(.caption).foregroundStyle(.secondary)
                             }
                         }
+                        .onDelete(perform: viewModel.deleteMaintenance)
                     }
                 }
             }
@@ -1321,10 +1449,12 @@ struct MoreView: View {
                     PhotosPicker(selection: $viewModel.selectedPhoto, matching: .images) {
                         Label(photoPickerTitle, systemImage: "photo")
                     }
-                    .onChange(of: viewModel.selectedPhoto) { _, item in
-                        guard let item else { return }
-                        let hint = item.itemIdentifier ?? "part photo"
-                        viewModel.applyPhotoHint(hint)
+                    .task(id: viewModel.selectedPhoto) {
+                        guard let item = viewModel.selectedPhoto else { return }
+                        await viewModel.analyzePhoto(item)
+                    }
+                    if viewModel.isAnalyzingPhoto {
+                        ProgressView(viewModel.text(ar: "تحليل الصورة على الجهاز", en: "Analyzing on device"))
                     }
                     if let selectedPhotoName = viewModel.selectedPhotoName {
                         Text(selectedPhotoName).font(.caption).foregroundStyle(.secondary)
@@ -1346,7 +1476,11 @@ struct MoreView: View {
                             message: viewModel.text(ar: "افتح أي قطعة واضغط القلب لحفظها هنا.", en: "Open a part and tap the heart to save it here.")
                         )
                     } else {
-                        ForEach(viewModel.wishlistParts) { part in PartRow(part: part, viewModel: viewModel) }
+                        ForEach(viewModel.wishlistParts) { part in
+                            NavigationLink(value: part) {
+                                PartRow(part: part, viewModel: viewModel)
+                            }
+                        }
                     }
                 }
                 Section(viewModel.text(ar: "المتاجر الموثقة", en: "Verified stores")) {
@@ -1395,17 +1529,35 @@ struct MoreView: View {
                         Text(viewModel.text(ar: "تعذر تحميل الطقس: ", en: "Weather unavailable: ") + weatherError)
                             .font(.caption)
                             .foregroundStyle(.orange)
+                        if let coordinate = locationWeather.coordinate {
+                            Button {
+                                Task {
+                                    await locationWeather.loadWeather(
+                                        for: CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                                    )
+                                }
+                            } label: {
+                                Label(viewModel.text(ar: "إعادة المحاولة", en: "Retry"), systemImage: "arrow.clockwise")
+                            }
+                        }
                     }
                     if !locationWeather.locationMessage.isEmpty {
                         Text(locationWeather.locationMessage).font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 Section(viewModel.text(ar: "سياسة البيانات", en: "Data policy")) {
-                    Text(viewModel.text(ar: "التطبيق مستقل ولا يتبع نيسان. بيانات الأسعار والتوفر لا تعرض إلا من مصادر متجر موثقة.", en: "This app is independent from Nissan. Prices and availability are shown only from verified store sources."))
+                    Text(viewModel.text(
+                        ar: "التطبيق مستقل ولا يتبع نيسان، ولا ينسخ أسعار المتاجر أو مخزونها. تُفتح روابط المتاجر الموثقة لإكمال البحث أو الشراء خارج التطبيق.",
+                        en: "This app is independent from Nissan and does not copy store prices or inventory. Verified store links open externally to continue searching or purchasing."
+                    ))
                 }
             }
             .navigationTitle(viewModel.text(ar: "المزيد", en: "More"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
+            .navigationDestination(for: Part.self) { part in
+                PartDetailView(part: part, viewModel: viewModel)
+            }
+            .onDisappear { locationWeather.pauseTracking() }
         }
     }
 }
@@ -1511,10 +1663,27 @@ struct EmptyStateView: View {
 
 struct PaymentBanner: View {
     let message: String?
+    let dismissLabel: String
+    let dismiss: () -> Void
+
     var body: some View {
         if let message, !message.isEmpty {
-            Text(message).font(.footnote.bold()).padding(.horizontal, 14).padding(.vertical, 8)
-                .background(.regularMaterial, in: Capsule()).padding(.top, 8)
+            HStack(spacing: 10) {
+                Text(message)
+                    .font(.footnote.bold())
+                    .fixedSize(horizontal: false, vertical: true)
+                Button(action: dismiss) {
+                    Image(systemName: "xmark.circle.fill")
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(dismissLabel)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .frame(maxWidth: 560)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
         }
     }
 }
@@ -1522,7 +1691,60 @@ struct PaymentBanner: View {
 // MARK: - Helpers
 
 
-private func diagnosticKeywords(_ text: String) -> [String] {
+func partRequestDraft(for request: SavedPartRequest, plan: PartRequestPlan, language: AppLanguage) -> String {
+    let header = language == .arabic ? "بطل الدروب - \(plan.titleAr)" : "Batal Al-Droob - \(plan.titleEn)"
+    let fields: [(String, String)] = language == .arabic ? [
+        ("الجيل", request.generation), ("السنة", request.year), ("VIN", request.vin),
+        ("المحرك", request.engine), ("القير", request.transmission),
+        ("رقم القطعة", request.partNumber), ("اسم القطعة", request.partName), ("ملاحظات", request.notes)
+    ] : [
+        ("Generation", request.generation), ("Year", request.year), ("VIN", request.vin),
+        ("Engine", request.engine), ("Transmission", request.transmission),
+        ("Part number", request.partNumber), ("Part name", request.partName), ("Notes", request.notes)
+    ]
+    let lines = fields.compactMap { label, value -> String? in
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : "\(label): \(trimmed)"
+    }
+    return ([header] + lines).joined(separator: "\n")
+}
+
+func partNumberCandidates(in text: String) -> [String] {
+    let uppercased = text.uppercased()
+    var candidates: [String] = []
+    let fullRange = NSRange(uppercased.startIndex..<uppercased.endIndex, in: uppercased)
+
+    if let separated = try? NSRegularExpression(
+        pattern: #"(?<![A-Z0-9])([A-Z0-9]{4,8})\s*[-–—_/]\s*([A-Z0-9]{3,8})(?![A-Z0-9])"#
+    ) {
+        for match in separated.matches(in: uppercased, range: fullRange) where match.numberOfRanges == 3 {
+            guard let firstRange = Range(match.range(at: 1), in: uppercased),
+                  let secondRange = Range(match.range(at: 2), in: uppercased) else { continue }
+            candidates.append("\(uppercased[firstRange])-\(uppercased[secondRange])")
+        }
+    }
+
+    if let compact = try? NSRegularExpression(pattern: #"(?<![A-Z0-9])[A-Z0-9]{8,14}(?![A-Z0-9])"#) {
+        for match in compact.matches(in: uppercased, range: fullRange) {
+            guard let range = Range(match.range, in: uppercased) else { continue }
+            let candidate = String(uppercased[range])
+            if candidate.contains(where: { $0.isNumber }) {
+                candidates.append(candidate)
+            }
+        }
+    }
+
+    return candidates.uniqued()
+}
+
+func isAllowedExternalURL(_ url: URL) -> Bool {
+    guard let scheme = url.scheme?.lowercased(),
+          scheme == "https" || scheme == "http",
+          url.host != nil else { return false }
+    return true
+}
+
+func diagnosticKeywords(_ text: String) -> [String] {
     let normalizedText = text.lowercased()
     var words: [String] = []
     if normalizedText.contains("حر") || normalizedText.contains("heat") || normalizedText.contains("cool") || normalizedText.contains("radiator") { words += ["cooling", "fan", "radiator"] }
@@ -1533,7 +1755,7 @@ private func diagnosticKeywords(_ text: String) -> [String] {
     return words.isEmpty ? normalizedText.split(separator: " ").prefix(6).map(String.init) : words.uniqued()
 }
 
-private func tireDiameter(_ size: String) -> Double? {
+func tireDiameter(_ size: String) -> Double? {
     let cleaned = size.uppercased().replacingOccurrences(of: " ", with: "")
     let parts = cleaned.replacingOccurrences(of: "R", with: "/").split(separator: "/")
     guard parts.count >= 3,
@@ -1541,6 +1763,17 @@ private func tireDiameter(_ size: String) -> Double? {
           let aspect = Double(parts[1]),
           let wheel = Double(parts[2]) else { return nil }
     return (width * (aspect / 100) * 2 / 25.4) + wheel
+}
+
+private func shouldRetryWeatherRequest(after error: Error) -> Bool {
+    if case WeatherServiceError.httpStatus(let status) = error {
+        return status == 429 || (500...599).contains(status)
+    }
+    guard let urlError = error as? URLError else { return false }
+    return [
+        .timedOut, .cannotFindHost, .cannotConnectToHost, .networkConnectionLost,
+        .dnsLookupFailed, .notConnectedToInternet, .resourceUnavailable
+    ].contains(urlError.code)
 }
 
 private func nonEmpty(_ value: String?) -> String? {

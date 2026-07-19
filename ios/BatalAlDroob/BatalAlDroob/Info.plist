@@ -29,10 +29,6 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>نحفظ الصور فقط عندما تختار حفظ مرجع كتالوج أو قطعة. We save images only when you choose to keep a catalog or part reference.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>نستخدم مكتبة الصور فقط إذا اخترت صورة كمرجع كتالوج أو قطعة. We use photo library access only if you choose an image as a catalog or part reference.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>نستخدم موقعك فقط لتشغيل التتبع والبوصلة وعرض الطقس المحلي داخل بطل الدروب. We use your location only for tracking, compass, and local weather inside Batal Al-Droob.</string>
 	<key>UILaunchScreen</key>
