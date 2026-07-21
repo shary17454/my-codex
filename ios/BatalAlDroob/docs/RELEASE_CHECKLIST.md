@@ -14,7 +14,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Version And Build
 
-- [ ] `MARKETING_VERSION` exactly matches the open App Store version.
+- [ ] `MARKETING_VERSION` exactly matches the open App Store version; for new source changes after `1.1.0 (111)` this must be `1.2.0` or higher.
 - [ ] Xcode Cloud Next Build Number is greater than every prior upload.
 - [ ] All targets have one matching marketing version and build number.
 - [ ] The version train is open; no build is attached to a closed or released train.
@@ -36,7 +36,8 @@ Use this list for every App Store candidate. A checked item must have current ev
 ## Archive
 
 - [x] A fresh unsigned local archive for the permanent-IAP correction succeeds with Xcode 26.6 and iPhoneOS SDK 26.5.
-- [x] Local archive metadata confirms bundle `com.batalaldroob.parts`, version `1.1.0 (111)`, Xcode build `17F113`, SDK `iphoneos26.5`, and iOS 17.0 minimum.
+- [x] Previous local archive metadata confirmed bundle `com.batalaldroob.parts`, version `1.1.0 (111)`, Xcode build `17F113`, SDK `iphoneos26.5`, and iOS 17.0 minimum.
+- [ ] New `1.2.0 (120+)` archive metadata is verified before selecting a new build.
 - [ ] A fresh signed Xcode Cloud archive is created from the intended commit.
 - [ ] `ci_post_xcodebuild.sh` passes against that archive.
 - [ ] Archive metadata confirms bundle `com.batalaldroob.parts`, expected version/build, production Xcode, accepted SDK, and iOS 17.0 minimum.

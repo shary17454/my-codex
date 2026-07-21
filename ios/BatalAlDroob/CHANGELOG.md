@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0 (120) - 2026-07-21
+
+### Release
+
+- Moved the next App Store candidate to release train `1.2.0` after App Store
+  Connect marked `1.1.0 (111)` as ready for distribution.
+- Raised the local project build floor to `120` after Xcode Cloud build `119`
+  failed during "Prepare Build for App Store Connect" under the closed `1.1.0`
+  train.
+- Added Batal-local Xcode Cloud script wrappers under `ios/BatalAlDroob/ci_scripts`
+  so workflows rooted at the app folder run the release and archive guards.
+
 ## 1.1.0 (111) - 2026-07-21
 
 ### Release
