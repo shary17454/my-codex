@@ -88,6 +88,30 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertFalse(english.contains("VIN:"))
     }
 
+    @MainActor
+    func testBlankPartRequestCannotBeSaved() {
+        let defaultsKey = "batalPartRequests"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService()
+        )
+        let plan = PartRequestPlan(
+            id: "basic",
+            titleAr: "طلب أساسي",
+            titleEn: "Basic request",
+            descriptionAr: "",
+            descriptionEn: ""
+        )
+        let blankRequest = SavedPartRequest(partNumber: "   ", partName: "\n")
+
+        XCTAssertFalse(partRequestHasRequiredInput(blankRequest))
+        viewModel.saveRequestPlan(plan, request: blankRequest)
+        XCTAssertTrue(viewModel.savedRequests.isEmpty)
+    }
+
     func testExternalStoreLinksRequireHTTPSHost() throws {
         XCTAssertTrue(try isAllowedExternalURL(XCTUnwrap(URL(string: "https://example.com/parts?q=21082-4W000"))))
         XCTAssertFalse(try isAllowedExternalURL(XCTUnwrap(URL(string: "http://example.com/parts"))))

@@ -245,6 +245,7 @@ extension CatalogViewModel {
     }
 
     func saveRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) {
+        guard partRequestHasRequiredInput(request) else { return }
         var saved = request
         saved.planID = plan.id
         saved.draft = buildDraft(for: saved, plan: plan)

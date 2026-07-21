@@ -20,6 +20,11 @@ func partRequestDraft(for request: SavedPartRequest, plan: PartRequestPlan, lang
     return ([header] + lines).joined(separator: "\n")
 }
 
+func partRequestHasRequiredInput(_ request: SavedPartRequest) -> Bool {
+    !request.partNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        || !request.partName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+}
+
 func partNumberCandidates(in text: String) -> [String] {
     let uppercased = text.uppercased()
     var candidates: [String] = []

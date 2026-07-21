@@ -10,8 +10,9 @@
 
 ## Engineering Rules
 
-- Treat `docs/APPLE_ENGINEERING_STANDARD.md` as the long-form Apple engineering reference for this project.
-- When that reference conflicts with this file, the Batal Al-Droob project-specific constraints in this file take precedence unless the user explicitly changes them.
+- Treat `docs/APPLE_ENGINEERING_STANDARD.md` as the mandatory long-form Apple engineering reference for this project, not optional documentation.
+- All app work must satisfy both this file and `docs/APPLE_ENGINEERING_STANDARD.md`; when rules conflict, apply the stricter production-quality rule unless a project owner explicitly records an exception.
+- Keep `scripts/validate_release.py` enforcing the presence of the Apple engineering reference before release validation passes.
 - Preserve the native SwiftUI implementation and do not reintroduce Flutter or Dart runtime dependencies.
 - Keep user-facing strings localized in Arabic and English where they are part of shipped UI.
 - Use bundled catalog data under `BatalAlDroob/Web/data/` as the offline source of truth unless a reviewed migration replaces it.
