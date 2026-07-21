@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-07-21
-Decision: `READY_WITH_EXTERNAL_REQUIREMENTS`
+Decision: `SUBMITTED_FOR_REVIEW`
 
 ## App And Apple Review State
 
@@ -14,11 +14,13 @@ Decision: `READY_WITH_EXTERNAL_REQUIREMENTS`
 | Current project build | `120` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
 | Latest App Store-ready version | `1.1.0 (111)` |
 | Latest failed Xcode Cloud build | `121` from commit `1c511d6` |
-| Required next cloud build | higher than `121` on version `1.2.0` |
-| Latest pushed source commit | `1c511d6` before the pre-build number synchronization fix |
+| Latest successful Xcode Cloud build | `122` from commit `2c08e18` |
+| Latest pushed source commit | `2c08e18` |
+| Latest App Review submission | `1.2.0 (122)` waiting for review |
 | Required toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 | Latest detailed App Review issue | Guideline 2.1(b), App Completeness |
-| Submission ID | `0fd0e8d0-ea44-4fe4-8fad-2ef8ea35eff6` |
+| Latest historical rejected submission ID | `0fd0e8d0-ea44-4fe4-8fad-2ef8ea35eff6` |
+| Current submitted submission ID | `00e306d9-8983-4df8-b284-6cbc1fff2c04` |
 
 App Store Connect now shows `1.1.0 (111)` as `Ready for Distribution`. That
 means the `1.1.0` train must not be reused for new source changes. Xcode Cloud
@@ -30,6 +32,11 @@ because Xcode Cloud's `CI_BUILD_NUMBER` was `121` while the archived
 `CFBundleVersion` was still `120`. The app-local `ci_pre_xcodebuild.sh` now
 synchronizes `CURRENT_PROJECT_VERSION` to the actual Xcode Cloud build number
 before archive.
+
+Xcode Cloud build `122` from commit `2c08e18` succeeded for both Build and
+Archive using Xcode 26.6 (`17F113`). App Store Connect now has iOS App Version
+`1.2.0` with build `122` selected, and submission
+`00e306d9-8983-4df8-b284-6cbc1fff2c04` is `Waiting for Review`.
 
 The latest Apple issue message says that the app references paid functionality,
 but the associated In-App Purchase was not included in the review submission.
@@ -90,14 +97,12 @@ Verified app metadata inside that archive:
 
 ## Remaining Release Gates
 
-1. Commit and push the pre-build number synchronization fix, then create an
-   Xcode Cloud build from that exact commit using stable Xcode 26.6.
-2. Complete `batal.catalog.permanent.unlock` in App Store Connect and attach it
-   to the same App Review submission as the corrected binary.
-3. Verify Xcode Cloud Next Build Number is higher than `121` before the workflow
-   starts; do not reuse any uploaded build number.
-4. Confirm App Store privacy labels and current screenshots against the final
-   cloud binary.
-5. Complete StoreKit Sandbox, permission, accessibility, Instruments, and
-   physical-device checks on the exact release candidate.
-6. Run an internal TestFlight pass before resubmitting to App Review.
+1. Monitor App Review messages for submission
+   `00e306d9-8983-4df8-b284-6cbc1fff2c04`.
+2. If Apple rejects or requests metadata changes, fix the exact item and do not
+   resubmit the same build without addressing the root cause.
+3. Keep the obsolete draft consumable `batal.catalog.unlock` out of future
+   submissions; the shipping app uses the approved non-consumable
+   `batal.catalog.permanent.unlock`.
+4. Before the next code-bearing release, verify Xcode Cloud Next Build Number is
+   higher than `122`.

@@ -15,6 +15,8 @@
   `CURRENT_PROJECT_VERSION` to Xcode Cloud's `CI_BUILD_NUMBER` before archive,
   preventing App Store exports where the uploaded build number and archived
   `CFBundleVersion` diverge.
+- Submitted iOS App Version `1.2.0` with Xcode Cloud build `122` to App Review
+  after confirming the build/archive pipeline succeeded.
 
 ## 1.1.0 (111) - 2026-07-21
 

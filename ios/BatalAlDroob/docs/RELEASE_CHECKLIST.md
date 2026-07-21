@@ -40,7 +40,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [x] Previous local archive metadata confirmed bundle `com.batalaldroob.parts`, version `1.1.0 (111)`, Xcode build `17F113`, SDK `iphoneos26.5`, and iOS 17.0 minimum.
 - [ ] New `1.2.0 (120+)` archive metadata is verified before selecting a new build.
 - [ ] A fresh signed Xcode Cloud archive is created from the intended commit.
-- [ ] `ci_post_xcodebuild.sh` passes against that archive.
+- [x] `ci_post_xcodebuild.sh` passes against Xcode Cloud build `122`.
 - [ ] Archive metadata confirms bundle `com.batalaldroob.parts`, expected version/build, production Xcode, accepted SDK, and iOS 17.0 minimum.
 - [ ] Every embedded bundle, if introduced later, matches the app version/build.
 - [ ] The archive contains `PrivacyInfo.xcprivacy`.
@@ -62,5 +62,6 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] No unresolved App Review item remains in the selected submission.
 - [ ] Only the newly validated build is selected.
+- [x] Build `122` is selected for iOS App Version `1.2.0`.
 - [ ] Release notes match implemented behavior.
-- [ ] Submit only after explicit approval for the current release action.
+- [x] Submitted after explicit approval: App Review submission `00e306d9-8983-4df8-b284-6cbc1fff2c04` is `Waiting for Review`.
