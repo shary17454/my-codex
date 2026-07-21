@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `1.1.0`
-- Project build: `106`
+- Project build: `111`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -85,7 +85,7 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
 - verifies `MARKETING_VERSION = 1.1.0`,
-- verifies `CURRENT_PROJECT_VERSION >= 106`,
+- verifies `CURRENT_PROJECT_VERSION >= 111`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
@@ -94,8 +94,8 @@ In App Store Connect, set the Batal Al-Droob workflow environment to a productio
 
 The latest successful cloud archive is build `110` from commit `5a80728`, but it
 predates the permanent-IAP correction. Before starting the corrected App Store
-build, verify TestFlight Build Uploads and set Xcode Cloud > Workflow > Next
-Build Number to `111` or higher. Do not reuse any uploaded build number.
+build, verify TestFlight Build Uploads and keep Xcode Cloud > Workflow > Next
+Build Number at `111` or higher. Do not reuse any uploaded build number.
 
 ## In-App Purchase
 

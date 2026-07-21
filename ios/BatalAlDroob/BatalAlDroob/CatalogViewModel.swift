@@ -1,7 +1,4 @@
-import CoreLocation
-import CoreTransferable
 import Foundation
-import MapKit
 import Observation
 import PhotosUI
 import SwiftUI
@@ -251,7 +248,7 @@ extension CatalogViewModel {
         var saved = request
         saved.planID = plan.id
         saved.draft = buildDraft(for: saved, plan: plan)
-        savedRequests.insert(saved, at: 0)
+        savedRequests = Array(([saved] + savedRequests).prefix(50))
         paymentMessage = text(ar: "تم تجهيز طلب القطعة وحفظه.", en: "Part request was prepared and saved.")
     }
 
@@ -412,12 +409,7 @@ extension CatalogViewModel {
         guard !trimmed.isEmpty else {
             return text(ar: "أدخل رقم قطعة أو وصفًا مختصرًا.", en: "Enter a part number or short description.")
         }
-        let normalizedQuery = normalized(trimmed)
-        let match = parts.first { part in
-            part.partNumber.localizedCaseInsensitiveContains(trimmed)
-                || part.allNumbers.contains { $0.localizedCaseInsensitiveContains(trimmed) }
-                || self.searchableText(for: part).contains(normalizedQuery)
-        }
+        let match = rankedFitmentMatches(for: trimmed, limit: 1).first
         guard let match else {
             return text(
                 ar: "لم أجد تطابقًا مباشرًا. جرّب رقم قطعة مثل 21082-4W000 أو اسم القسم.",
@@ -439,14 +431,37 @@ extension CatalogViewModel {
     func fitmentMatches(for query: String) -> [Part] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
-        let normalizedQuery = normalized(trimmed)
-        return parts.lazy.filter { part in
-            part.partNumber.localizedCaseInsensitiveContains(trimmed)
-                || part.allNumbers.contains { $0.localizedCaseInsensitiveContains(trimmed) }
-                || self.searchableText(for: part).contains(normalizedQuery)
+        return rankedFitmentMatches(for: trimmed, limit: 8)
+    }
+
+    private func rankedFitmentMatches(for query: String, limit: Int) -> [Part] {
+        let normalizedQuery = normalized(query)
+        return parts.compactMap { part -> (Part, Int)? in
+            let normalizedPrimary = normalized(part.partNumber)
+            let normalizedNumbers = part.allNumbers.map(normalized)
+            let searchText = self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)
+            let score: Int
+            if normalizedPrimary == normalizedQuery {
+                score = 400
+            } else if normalizedNumbers.contains(normalizedQuery) {
+                score = 350
+            } else if normalizedPrimary.contains(normalizedQuery) {
+                score = 300
+            } else if normalizedNumbers.contains(where: { $0.contains(normalizedQuery) }) {
+                score = 250
+            } else if searchText.contains(normalizedQuery) {
+                score = 100 + (part.confidence ?? 0)
+            } else {
+                return nil
+            }
+            return (part, score)
         }
-        .prefix(8)
-        .map(\.self)
+        .sorted { lhs, rhs in
+            if lhs.1 == rhs.1 { return (lhs.0.confidence ?? 0) > (rhs.0.confidence ?? 0) }
+            return lhs.1 > rhs.1
+        }
+        .prefix(limit)
+        .map(\.0)
     }
 
     func categoryCount(_ category: CatalogCategory) -> Int {
@@ -456,7 +471,7 @@ extension CatalogViewModel {
 
     func openStore(_ store: VerifiedStore, part: Part?) {
         let url = store.searchURL(partNumber: part?.partNumber ?? "") ?? URL(string: store.website ?? "")
-        guard let url, isAllowedExternalURL(url) else {
+        guard let url, isAllowedExternalURL(url, for: store) else {
             errorMessage = text(ar: "رابط المتجر غير صالح.", en: "The store link is invalid.")
             return
         }

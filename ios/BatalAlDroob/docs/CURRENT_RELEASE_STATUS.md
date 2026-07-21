@@ -1,6 +1,6 @@
 # Batal Al-Droob Current Release Status
 
-Updated: 2026-07-19
+Updated: 2026-07-21
 Decision: `READY_WITH_EXTERNAL_REQUIREMENTS`
 
 ## App And Apple Review State
@@ -11,9 +11,9 @@ Decision: `READY_WITH_EXTERNAL_REQUIREMENTS`
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
 | App Store version | `1.1.0` |
-| Current project build | `106` |
+| Current project build | `111` |
 | Latest successful Xcode Cloud build | `110` |
-| Required next cloud build | `111` or higher |
+| Required next cloud build | `111` or higher, until build `111` is uploaded |
 | Latest cloud source commit | `5a80728` |
 | Required toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 | Latest detailed App Review issue | Guideline 2.1(b), App Completeness |
@@ -57,13 +57,13 @@ that issue; the newest Batal-specific mail confirms cloud build `110` succeeded.
 | Actual archive metadata | PASS |
 
 Fresh local archive:
-`/tmp/BatalAlDroob-IAP-fix-1.1.0-106-20260719.xcarchive`
+`/tmp/BatalAudit-1.1.0-111.xcarchive`
 
 Verified app metadata inside that archive:
 
 - `CFBundleIdentifier = com.batalaldroob.parts`
 - `CFBundleShortVersionString = 1.1.0`
-- `CFBundleVersion = 106`
+- `CFBundleVersion = 111`
 - `DTXcodeBuild = 17F113`
 - `DTSDKName = iphoneos26.5`
 - `MinimumOSVersion = 17.0`
@@ -71,6 +71,8 @@ Verified app metadata inside that archive:
 
 ## Store Metadata State
 
+- The detailed manual review gate is documented in
+  `docs/APP_STORE_REVIEW_FIX_PLAN.md`.
 - Replacement promoted-IAP artwork is saved at
   `docs/app-store-assets/iap-catalog-unlock-1024.png`.
 - The IAP App Review screenshot must show the purchase surface in the current
@@ -80,8 +82,9 @@ Verified app metadata inside that archive:
 
 ## Remaining Release Gates
 
-1. Commit and push the permanent-IAP correction, then create Xcode Cloud build
-   `111` or higher from that exact commit using stable Xcode 26.6.
+1. Commit and push the permanent-IAP correction and build-number update, then
+   create Xcode Cloud build `111` or higher from that exact commit using stable
+   Xcode 26.6.
 2. Complete `batal.catalog.permanent.unlock` in App Store Connect and attach it
    to the same App Review submission as the corrected binary.
 3. Verify Xcode Cloud Next Build Number and TestFlight Build Uploads before the

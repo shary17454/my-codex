@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0 (111) - 2026-07-21
+
+### Release
+
+- Bumped the unified Xcode build number from 106 to 111 for the corrected Xcode Cloud/App Store candidate.
+- Removed the obsolete bundle metadata cleanup run script that printed `xattr: Operation not permitted` during archive.
+- Adopted the user-provided Apple engineering reference in `docs/APPLE_ENGINEERING_STANDARD.md`.
+- Updated UI smoke coverage for the current Tools > Maintenance navigation path.
+
 ## 1.1.0 (106) - 2026-07-19
 
 ### Changed

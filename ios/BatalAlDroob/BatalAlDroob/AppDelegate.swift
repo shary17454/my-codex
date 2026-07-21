@@ -38,4 +38,5 @@ enum BatalLog {
     static let catalog = Logger(subsystem: subsystem, category: "Catalog")
     static let purchases = Logger(subsystem: subsystem, category: "Purchases")
     static let location = Logger(subsystem: subsystem, category: "LocationTracking")
+    static let persistence = Logger(subsystem: subsystem, category: "Persistence")
 }

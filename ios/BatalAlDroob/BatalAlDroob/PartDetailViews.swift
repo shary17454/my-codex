@@ -54,12 +54,12 @@ struct PartDetailView: View {
                     Text(viewModel.premiumNumber(number, for: part)).font(.body.monospaced())
                 }
             }
-            Section(viewModel.text(ar: "رسم كتالوج تقريبي", en: "Catalog diagram")) {
+            Section(viewModel.text(ar: "مؤشر موضع توضيحي", en: "Illustrative part locator")) {
                 NativeDiagramView(part: part)
                     .frame(height: 220)
                     .accessibilityLabel(viewModel.text(
-                        ar: "رسم يوضح رقم النداء التقريبي للقطعة",
-                        en: "Diagram showing the approximate part callout"
+                        ar: "مؤشر توضيحي يعرض رقم القطعة وليس رسماً رسمياً من الكتالوج",
+                        en: "Illustrative locator showing the part number, not an official catalog diagram"
                     ))
             }
             Section(viewModel.text(ar: "الأدلة", en: "Evidence")) {
@@ -126,12 +126,33 @@ struct SharedFitmentView: View {
     @Bindable var viewModel: CatalogViewModel
     var body: some View {
         NavigationStack {
-            List(viewModel.sharedParts) { part in
-                NavigationLink(value: part) { PartRow(part: part, viewModel: viewModel) }
-            }
-            .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
-            .toolbar { LanguageMenu(viewModel: viewModel) }
-            .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
+            SharedFitmentContent(viewModel: viewModel)
+                .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
+                .toolbar { LanguageMenu(viewModel: viewModel) }
         }
+    }
+}
+
+struct SharedFitmentContent: View {
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        List {
+            if viewModel.sharedParts.isEmpty {
+                EmptyStateView(
+                    symbol: "point.3.connected.trianglepath.dotted",
+                    title: viewModel.text(ar: "لا توجد قطع مشتركة", en: "No shared-fitment parts"),
+                    message: viewModel.text(
+                        ar: "ستظهر هنا القطع التي تعمل على أكثر من إعداد موثق.",
+                        en: "Parts that fit more than one verified configuration will appear here."
+                    )
+                )
+            } else {
+                ForEach(viewModel.sharedParts) { part in
+                    NavigationLink(value: part) { PartRow(part: part, viewModel: viewModel) }
+                }
+            }
+        }
+        .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
     }
 }

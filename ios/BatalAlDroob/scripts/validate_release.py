@@ -16,7 +16,7 @@ SWIFT_ROOT = APP_ROOT / "BatalAlDroob"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
 EXPECTED_MARKETING_VERSION = "1.1.0"
-MIN_EXPECTED_BUILD = 106
+MIN_EXPECTED_BUILD = 111
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts",
@@ -100,6 +100,8 @@ def main() -> None:
         fail(f"The app must not declare collected data types; found {sorted(collected_types)}")
     if privacy.get("NSPrivacyTracking") is not False:
         fail("Privacy manifest must declare that the app does not track users")
+    if not (APP_ROOT / "docs" / "APP_STORE_REVIEW_FIX_PLAN.md").exists():
+        fail("App Store review fix plan must exist for metadata and IAP manual gates")
 
     forbidden_weather_terms = [
         "api.open-meteo.com",

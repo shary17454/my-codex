@@ -109,6 +109,7 @@ struct StoreKitPurchaseService: PurchaseService {
         var entitled = Set<String>()
         for await result in Transaction.currentEntitlements {
             guard case let .verified(transaction) = result else { continue }
+            guard transaction.revocationDate == nil else { continue }
             entitled.insert(transaction.productID)
         }
         return entitled

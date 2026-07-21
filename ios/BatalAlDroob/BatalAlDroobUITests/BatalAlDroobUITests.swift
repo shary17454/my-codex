@@ -43,22 +43,16 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
 
         let toolsTab = navigationItem(named: "الأدوات", in: app)
-        if toolsTab.waitForExistence(timeout: 3) {
-            XCTAssertTrue(navigationItem(named: "الصيانة", in: app).waitForExistence(timeout: 10))
-            toolsTab.tap()
-            XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
-        } else {
-            let compactMoreTab = firstExistingNavigationItem(named: ["المزيد", "More"], in: app)
-            XCTAssertTrue(compactMoreTab.waitForExistence(timeout: 3))
-            compactMoreTab.tap()
+        XCTAssertTrue(toolsTab.waitForExistence(timeout: 10))
+        toolsTab.tap()
+        XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
 
-            let maintenanceItem = app.staticTexts["الصيانة"]
-            let toolsItem = app.staticTexts["الأدوات"]
-            XCTAssertTrue(maintenanceItem.waitForExistence(timeout: 10))
-            XCTAssertTrue(toolsItem.waitForExistence(timeout: 10))
-            toolsItem.tap()
-            XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
-        }
+        let maintenanceItem = app.staticTexts["الصيانة"]
+        XCTAssertTrue(maintenanceItem.waitForExistence(timeout: 10))
+        maintenanceItem.tap()
+        XCTAssertTrue(app.navigationBars["الصيانة"].waitForExistence(timeout: 10))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
 
         let trackingSection = app.staticTexts["more.section.tracking"]
         XCTAssertTrue(reveal(trackingSection, in: app))
@@ -99,18 +93,6 @@ final class BatalAlDroobUITests: XCTestCase {
         }
 
         return app.buttons.matching(identifier: name).firstMatch
-    }
-
-    @MainActor
-    private func firstExistingNavigationItem(named names: [String], in app: XCUIApplication) -> XCUIElement {
-        for name in names {
-            let item = navigationItem(named: name, in: app)
-            if item.waitForExistence(timeout: 2) {
-                return item
-            }
-        }
-
-        return navigationItem(named: names[0], in: app)
     }
 
     @MainActor
