@@ -16,6 +16,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] `MARKETING_VERSION` exactly matches the open App Store version; for new source changes after `1.1.0 (111)` this must be `1.2.0` or higher.
 - [ ] Xcode Cloud Next Build Number is greater than every prior upload.
+- [ ] `ci_pre_xcodebuild.sh` runs before archive and synchronizes `CURRENT_PROJECT_VERSION` to the actual `CI_BUILD_NUMBER`.
 - [ ] All targets have one matching marketing version and build number.
 - [ ] The version train is open; no build is attached to a closed or released train.
 

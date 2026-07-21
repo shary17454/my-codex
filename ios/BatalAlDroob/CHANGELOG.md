@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0 (120) - 2026-07-21
+## 1.2.0 (120+) - 2026-07-21
 
 ### Release
 
@@ -11,6 +11,10 @@
   train.
 - Added Batal-local Xcode Cloud script wrappers under `ios/BatalAlDroob/ci_scripts`
   so workflows rooted at the app folder run the release and archive guards.
+- Added a Batal-local `ci_pre_xcodebuild.sh` guard that synchronizes
+  `CURRENT_PROJECT_VERSION` to Xcode Cloud's `CI_BUILD_NUMBER` before archive,
+  preventing App Store exports where the uploaded build number and archived
+  `CFBundleVersion` diverge.
 
 ## 1.1.0 (111) - 2026-07-21
 
