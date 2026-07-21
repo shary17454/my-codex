@@ -17,17 +17,8 @@ struct RootView: View {
                     ) }
                 CatalogView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الكتالوج", en: "Catalog"), systemImage: "magnifyingglass") }
-                SharedFitmentView(viewModel: viewModel)
-                    .tabItem { Label(
-                        viewModel.text(ar: "المشتركة", en: "Fitment"),
-                        systemImage: "point.3.connected.trianglepath.dotted"
-                    ) }
                 RequestView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "طلب قطعة", en: "Request"), systemImage: "cart.badge.plus") }
-                MaintenanceView(viewModel: viewModel)
-                    .tabItem {
-                        Label(viewModel.text(ar: "الصيانة", en: "Maintenance"), systemImage: "wrench.adjustable")
-                    }
                 MoreView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الأدوات", en: "Tools"), systemImage: "wrench.and.screwdriver")
                     }
@@ -73,7 +64,7 @@ struct DashboardView: View {
             List {
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("بطل الدروب")
+                        Text(viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"))
                             .font(.largeTitle.bold())
                         Text(viewModel.text(
                             ar: "تطبيق أصلي للبحث في قطع نيسان باترول، التحقق من التوافق، " +
@@ -228,7 +219,7 @@ struct CatalogView: View {
                     en: "Part number, name, category, or VIN"
                 )
             )
-            .navigationTitle("بطل الدروب")
+            .navigationTitle(viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
             .navigationDestination(for: Part.self) { part in PartDetailView(part: part, viewModel: viewModel) }
         }

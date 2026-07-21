@@ -59,6 +59,15 @@ func isAllowedExternalURL(_ url: URL) -> Bool {
     return true
 }
 
+func isAllowedExternalURL(_ url: URL, for store: VerifiedStore) -> Bool {
+    guard isAllowedExternalURL(url), let host = url.host?.lowercased() else { return false }
+    let allowedHosts = [store.website, store.searchURLTemplate]
+        .compactMap(\.self)
+        .compactMap { URL(string: $0.replacingOccurrences(of: "{part_number}", with: "21082-4W000"))?.host }
+        .map { $0.lowercased() }
+    return allowedHosts.contains { host == $0 || host.hasSuffix("." + $0) }
+}
+
 func diagnosticKeywords(_ text: String) -> [String] {
     let normalizedText = text.lowercased()
     var words: [String] = []
@@ -159,11 +168,20 @@ extension KeyedDecodingContainer {
 extension UserDefaults {
     func codable<T: Decodable>(_: T.Type, forKey key: String) -> T? {
         guard let data = data(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(T.self, from: data)
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            BatalLog.persistence.error("Failed to decode UserDefaults value for \(key, privacy: .public)")
+            return nil
+        }
     }
 
     func setCodable(_ value: some Encodable, forKey key: String) {
-        let data = try? JSONEncoder().encode(value)
-        set(data, forKey: key)
+        do {
+            let data = try JSONEncoder().encode(value)
+            set(data, forKey: key)
+        } catch {
+            BatalLog.persistence.error("Failed to encode UserDefaults value for \(key, privacy: .public)")
+        }
     }
 }

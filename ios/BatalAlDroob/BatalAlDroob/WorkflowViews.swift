@@ -112,54 +112,71 @@ struct MaintenanceView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section(viewModel.text(ar: "ملف السيارة", en: "Vehicle profile")) {
-                    TextField("Y60", text: $viewModel.vehicleProfile.generation)
-                    TextField(viewModel.text(ar: "السنة", en: "Year"), text: $viewModel.vehicleProfile.year)
-                        .keyboardType(.numberPad)
-                    TextField("VIN", text: $viewModel.vehicleProfile.vin)
-                        .textInputAutocapitalization(.characters)
-                        .autocorrectionDisabled()
-                    TextField(viewModel.text(ar: "المحرك", en: "Engine"), text: $viewModel.vehicleProfile.engine)
-                    TextField(
-                        viewModel.text(ar: "القير", en: "Transmission"),
-                        text: $viewModel.vehicleProfile.transmission
-                    )
-                }
-                Section(viewModel.text(ar: "إضافة صيانة", en: "Add maintenance")) {
-                    TextField(viewModel.text(ar: "العنوان", en: "Title"), text: $title)
-                    TextField(viewModel.text(ar: "العداد", en: "Odometer"), text: $odometer)
-                        .keyboardType(.numberPad)
-                    TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $notes, axis: .vertical)
-                    Button(viewModel.text(ar: "حفظ", en: "Save")) {
-                        viewModel.addMaintenance(title: title, odometer: odometer, notes: notes)
-                        title = ""; odometer = ""; notes = ""
-                    }
-                }
-                Section(viewModel.text(ar: "السجل", en: "Log")) {
-                    if viewModel.maintenanceItems.isEmpty {
-                        EmptyStateView(
-                            symbol: "wrench.adjustable",
-                            title: viewModel.text(ar: "لا توجد صيانة محفوظة", en: "No maintenance yet"),
-                            message: viewModel.text(
-                                ar: "أضف أول عملية صيانة لحفظ سجل السيارة محليًا.",
-                                en: "Add the first service entry to keep a local vehicle log."
-                            )
-                        )
-                    } else {
-                        ForEach(viewModel.maintenanceItems) { item in
-                            VStack(alignment: .leading) {
-                                Text(item.title).font(.headline)
-                                Text([item.odometer, item.notes].filter { !$0.isEmpty }.joined(separator: " · "))
-                                    .font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                        .onDelete(perform: viewModel.deleteMaintenance)
-                    }
-                }
-            }
+            MaintenanceContent(
+                viewModel: viewModel,
+                title: $title,
+                odometer: $odometer,
+                notes: $notes
+            )
             .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
+        }
+    }
+}
+
+struct MaintenanceContent: View {
+    @Bindable var viewModel: CatalogViewModel
+    @Binding var title: String
+    @Binding var odometer: String
+    @Binding var notes: String
+
+    var body: some View {
+        Form {
+            Section(viewModel.text(ar: "ملف السيارة", en: "Vehicle profile")) {
+                TextField("Y60", text: $viewModel.vehicleProfile.generation)
+                TextField(viewModel.text(ar: "السنة", en: "Year"), text: $viewModel.vehicleProfile.year)
+                    .keyboardType(.numberPad)
+                TextField("VIN", text: $viewModel.vehicleProfile.vin)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                TextField(viewModel.text(ar: "المحرك", en: "Engine"), text: $viewModel.vehicleProfile.engine)
+                TextField(
+                    viewModel.text(ar: "القير", en: "Transmission"),
+                    text: $viewModel.vehicleProfile.transmission
+                )
+            }
+            Section(viewModel.text(ar: "إضافة صيانة", en: "Add maintenance")) {
+                TextField(viewModel.text(ar: "العنوان", en: "Title"), text: $title)
+                TextField(viewModel.text(ar: "العداد", en: "Odometer"), text: $odometer)
+                    .keyboardType(.numberPad)
+                TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $notes, axis: .vertical)
+                Button(viewModel.text(ar: "حفظ", en: "Save")) {
+                    viewModel.addMaintenance(title: title, odometer: odometer, notes: notes)
+                    title = ""; odometer = ""; notes = ""
+                }
+                .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            Section(viewModel.text(ar: "السجل", en: "Log")) {
+                if viewModel.maintenanceItems.isEmpty {
+                    EmptyStateView(
+                        symbol: "wrench.adjustable",
+                        title: viewModel.text(ar: "لا توجد صيانة محفوظة", en: "No maintenance yet"),
+                        message: viewModel.text(
+                            ar: "أضف أول عملية صيانة لحفظ سجل السيارة محليًا.",
+                            en: "Add the first service entry to keep a local vehicle log."
+                        )
+                    )
+                } else {
+                    ForEach(viewModel.maintenanceItems) { item in
+                        VStack(alignment: .leading) {
+                            Text(item.title).font(.headline)
+                            Text([item.odometer, item.notes].filter { !$0.isEmpty }.joined(separator: " · "))
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .onDelete(perform: viewModel.deleteMaintenance)
+                }
+            }
         }
     }
 }

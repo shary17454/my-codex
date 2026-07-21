@@ -1,13 +1,14 @@
 # Batal Al-Droob Final Execution Report
 
-Date: 2026-07-19  
+Date: 2026-07-21
 Status: `READY_WITH_EXTERNAL_REQUIREMENTS`
 
-> Current release update: commit `5a80728` is on `origin/main`. Xcode Cloud
-> build `110` completed Build and Archive using Xcode 26.6 (`17F113`) and
-> iPhoneOS SDK 26.5. Build `110` predates the permanent-IAP correction in the
-> current working tree, so the corrected cloud candidate must be build `111`
-> or higher. See `CURRENT_RELEASE_STATUS.md` for the authoritative blockers.
+> Current release update: the local corrected candidate is `1.1.0 (111)`.
+> Xcode Cloud build `110` completed Build and Archive using Xcode 26.6
+> (`17F113`) and iPhoneOS SDK 26.5, but it predates the permanent-IAP
+> correction and build-number update. The next signed cloud candidate must be
+> build `111` or higher from this exact corrected commit. See
+> `CURRENT_RELEASE_STATUS.md` for the authoritative blockers.
 
 ## 1. Discovery And Fixes
 
@@ -25,6 +26,8 @@ Implemented corrections:
 - added app lifecycle privacy shielding and structured `Logger` categories;
 - improved keyboard behavior, Dynamic Type layout, Arabic/English locale handling, and iPad paged-tab navigation testing;
 - added unit/UI test targets and release/archive guards;
+- adopted `docs/APPLE_ENGINEERING_STANDARD.md` as the long-form Apple engineering reference for future work;
+- removed the noisy `Clean Bundle Metadata` Xcode run script that printed `xattr: Operation not permitted` during archive while providing no required release function;
 - updated permission text and privacy manifest for actual location behavior.
 
 Latest Apple review evidence:
@@ -78,6 +81,7 @@ Documentation and durable project guidance:
 - `docs/RELEASE_CHECKLIST.md`
 - `docs/FINAL_EXECUTION_REPORT.md`
 - `docs/PRODUCTION_READINESS_STANDARD.md` (permanent governing reference)
+- `docs/APPLE_ENGINEERING_STANDARD.md` (user-provided Apple engineering reference)
 
 Removed because empty and unreferenced:
 
@@ -105,7 +109,7 @@ Removed because empty and unreferenced:
 - Bundle ID: `com.batalaldroob.parts` (unchanged)
 - Development Team: `4HM66AD594` (unchanged)
 - Signing: automatic (unchanged)
-- Marketing version/build: `1.1.0 (106)` across all targets
+- Marketing version/build: `1.1.0 (111)` across all targets
 - The app has no App Intents target/dependency. Xcode may emit its own metadata-processor skip warning; no unused capability was added to suppress a toolchain message.
 - Stable archive toolchain: Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5
 - The host-wide `xcode-select -p` remains `/Applications/Xcode.app/Contents/Developer`; every recorded local Xcode command explicitly used `DEVELOPER_DIR=/Applications/Xcode-26.6-duplicate.app/Contents/Developer`. Xcode Cloud must select the stable toolchain in its workflow environment.
@@ -126,16 +130,16 @@ No Firebase, Supabase, RevenueCat, OneSignal, Stripe, Google Maps, OpenAI SDK, o
 | SwiftFormat | PASS | 0 of 12 files require formatting |
 | SwiftLint strict | PASS | 0 violations in 12 Swift files |
 | Plist validation | PASS | app plist, privacy manifest, Arabic/English permission strings |
-| Release validator | PASS | version/build/bundle/SDK/StoreKit/privacy checks |
+| Release validator | PASS | version/build/bundle/SDK/StoreKit/privacy checks for build 111 |
 | Partnership data validator | PASS | 19 suppliers, 0 errors, 0 warnings |
 | Clean Debug build | PASS | generic iOS simulator build exited 0 |
 | Xcode static analyzer | PASS | clean analyzer run exited 0 |
-| Current iPhone simulator tests after permanent-IAP correction | PASS | 13/13: 11 unit + 2 UI on iPhone 17 Pro, iOS 26.5 |
+| Current iPhone simulator tests after permanent-IAP correction | PASS | 15/15: 13 unit + 2 UI on iPhone 17 Pro, iOS 26.5 |
 | Current unsigned Release build after permanent-IAP correction | PASS | Xcode 26.6 device Release build completed with `BUILD SUCCEEDED` |
 | iPad simulator UI tests | PASS | 2/2 on iPad Air 11-inch (M4), iOS 26.5 |
 | Prior physical iPhone unit tests | PASS | 11/11 on iPhone 16 Pro Max before removal of the isolated weather feature |
 | Prior physical iPhone UI tests | PASS | 2/2 launch/navigation/request persistence/language tests before weather removal |
-| Fresh unsigned archive after permanent-IAP correction | PASS | `/tmp/BatalAlDroob-IAP-fix-1.1.0-106-20260719.xcarchive` |
+| Fresh unsigned archive after permanent-IAP correction | PASS | `/tmp/BatalAudit-1.1.0-111.xcarchive` |
 | Post-archive metadata guard | PASS | actual app metadata matched all expected values |
 
 Physical test device ran iOS 27.0 beta. This is valid functional evidence only; the App Store archive was independently built with stable Xcode 26.6 and iPhoneOS SDK 26.5.
@@ -146,7 +150,7 @@ Archive metadata read from the built app:
 |---|---|
 | `CFBundleIdentifier` | `com.batalaldroob.parts` |
 | `CFBundleShortVersionString` | `1.1.0` |
-| `CFBundleVersion` | `106` |
+| `CFBundleVersion` | `111` |
 | `DTPlatformName` | `iphoneos` |
 | `DTPlatformVersion` | `26.5` |
 | `DTSDKName` | `iphoneos26.5` |
@@ -159,7 +163,7 @@ No embedded app extension or third-party framework was present in the archive. `
 
 ## 7. Manual Actions Required
 
-1. Commit and push the permanent-IAP correction, then create Xcode Cloud build `111` or higher from that exact commit using stable Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release.
+1. Commit and push the permanent-IAP correction and build-number update, then create Xcode Cloud build `111` or higher from that exact commit using stable Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release.
 2. Verify Xcode Cloud Next Build Number and TestFlight Build Uploads before triggering the workflow; do not reuse any uploaded build number.
 3. Complete and attach the non-consumable StoreKit product `batal.catalog.permanent.unlock` (Apple ID `6792436213`), including price, availability, localization, review screenshot, agreements, and review notes. Do not attach legacy consumable `batal.catalog.unlock` (Apple ID `6786440522`).
 4. Replace any promoted-IAP screenshot with unique product artwork. Upload current 6.5-inch iPhone and 13-inch iPad screenshots showing the native app in use.
@@ -185,5 +189,5 @@ Recommended action: complete the manual checklist, then run an internal TestFlig
 - Latest pushed commit: `5a80728 fix(batal): remove unrelated weather integration`.
 - Commit `5a80728` is present on `origin/main`.
 - Xcode Cloud build `110` was produced from that commit and completed successfully.
-- The permanent-IAP correction is still an uncommitted local change and requires cloud build `111` or higher after review and push.
+- The permanent-IAP correction and build-number update are still uncommitted local changes and require cloud build `111` or higher after review and push.
 - No App Review submission was performed by the source-code verification step.

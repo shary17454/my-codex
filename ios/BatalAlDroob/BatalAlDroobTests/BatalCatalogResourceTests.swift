@@ -95,6 +95,26 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertFalse(try isAllowedExternalURL(XCTUnwrap(URL(string: "https:///missing-host"))))
     }
 
+    func testStoreSpecificLinksStayWithinVerifiedStoreDomains() throws {
+        let store = VerifiedStore(
+            id: "verified-store",
+            nameAr: "متجر موثق",
+            nameEn: "Verified Store",
+            category: "global",
+            website: "https://example.com",
+            searchURLTemplate: "https://parts.example.com/search?q={part_number}"
+        )
+
+        XCTAssertTrue(try isAllowedExternalURL(XCTUnwrap(URL(string: "https://example.com")), for: store))
+        let searchURL = try XCTUnwrap(URL(string: "https://parts.example.com/search?q=21082"))
+        let unrelatedURL = try XCTUnwrap(URL(string: "https://evil.example/search?q=21082"))
+        let insecureURL = try XCTUnwrap(URL(string: "http://example.com/search?q=21082"))
+
+        XCTAssertTrue(isAllowedExternalURL(searchURL, for: store))
+        XCTAssertFalse(isAllowedExternalURL(unrelatedURL, for: store))
+        XCTAssertFalse(isAllowedExternalURL(insecureURL, for: store))
+    }
+
     @MainActor
     func testCatalogLoadRetriesStoreDirectoryAfterPartialFailure() async {
         let repository = RetryStoreDirectoryRepository()
@@ -146,6 +166,19 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertEqual(StoreProductID.catalogPermanentUnlock, "batal.catalog.permanent.unlock")
     }
 
+    @MainActor
+    func testFitmentSearchRanksExactPartNumberBeforeTextMatches() async {
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        await viewModel.load()
+        let matches = viewModel.fitmentMatches(for: "21082-4W000")
+
+        XCTAssertEqual(matches.first?.partNumber, "21082-4W000")
+    }
+
     private func loadJSONObject(named name: String, subdirectory: String) throws -> [String: Any] {
         let url = try XCTUnwrap(bundle.url(forResource: name, withExtension: "json", subdirectory: subdirectory))
         let data = try Data(contentsOf: url)
@@ -170,6 +203,48 @@ private struct StaticCatalogRepository: CatalogRepository {
 
     func loadStores() async throws -> [VerifiedStore] {
         []
+    }
+}
+
+private struct RankedCatalogRepository: CatalogRepository {
+    func loadCatalog() async throws -> CatalogPayload {
+        let parts = try [
+            Self.part("""
+            {
+              "part_number": "99999-TEST",
+              "name_en": "Text match 21082-4W000",
+              "confidence": 100,
+              "category": "general"
+            }
+            """),
+            Self.part("""
+            {
+              "part_number": "21082-4W000",
+              "name_en": "Exact part",
+              "confidence": 70,
+              "category": "cooling"
+            }
+            """)
+        ]
+
+        return CatalogPayload(
+            generatedAt: nil,
+            appName: "بطل الدروب",
+            model: "Y60",
+            sourceCount: 0,
+            recordCount: 2,
+            partCount: 2,
+            sources: [],
+            parts: parts
+        )
+    }
+
+    func loadStores() async throws -> [VerifiedStore] {
+        []
+    }
+
+    private static func part(_ json: String) throws -> Part {
+        try JSONDecoder().decode(Part.self, from: Data(json.utf8))
     }
 }
 

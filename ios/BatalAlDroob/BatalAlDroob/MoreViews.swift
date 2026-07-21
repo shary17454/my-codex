@@ -9,12 +9,37 @@ struct MoreView: View {
     @State private var oldTireSize = "265/70R16"
     @State private var newTireSize = "285/75R16"
     @State private var tireResult = ""
+    @State private var maintenanceTitle = ""
+    @State private var maintenanceOdometer = ""
+    @State private var maintenanceNotes = ""
 
     var body: some View {
         let photoPickerTitle = viewModel.text(ar: "اختيار صورة كمرجع", en: "Choose reference photo")
         return NavigationStack {
             List {
                 Section(viewModel.text(ar: "اللغة", en: "Language")) { LanguageMenu(viewModel: viewModel) }
+                Section(viewModel.text(ar: "مسارات سريعة", en: "Quick paths")) {
+                    NavigationLink {
+                        SharedFitmentContent(viewModel: viewModel)
+                            .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
+                    } label: {
+                        Label(
+                            viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"),
+                            systemImage: "point.3.connected.trianglepath.dotted"
+                        )
+                    }
+                    NavigationLink {
+                        MaintenanceContent(
+                            viewModel: viewModel,
+                            title: $maintenanceTitle,
+                            odometer: $maintenanceOdometer,
+                            notes: $maintenanceNotes
+                        )
+                        .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
+                    } label: {
+                        Label(viewModel.text(ar: "الصيانة", en: "Maintenance"), systemImage: "wrench.adjustable")
+                    }
+                }
                 Section(viewModel.text(ar: "بحث بالوصف والصورة", en: "Description and photo search")) {
                     TextField(
                         viewModel.text(ar: "اكتب وصف العطل أو القطعة", en: "Describe the fault or part"),
