@@ -14,7 +14,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Version And Build
 
-- [ ] `MARKETING_VERSION` exactly matches the open App Store version; for new source changes after `1.1.0 (111)` this must be `1.2.0` or higher.
+- [ ] `MARKETING_VERSION` exactly matches the open App Store version; for new source changes after `1.1.0 (111)` this must be `1.2.1` or higher.
 - [ ] Xcode Cloud Next Build Number is greater than every prior upload.
 - [ ] `ci_pre_xcodebuild.sh` runs before archive and synchronizes `CURRENT_PROJECT_VERSION` to the actual `CI_BUILD_NUMBER`.
 - [ ] All targets have one matching marketing version and build number.
@@ -26,10 +26,9 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [ ] Debug build succeeds.
 - [x] Release build succeeds locally with Xcode 26.6 and iPhoneOS SDK 26.5.
 - [x] Unit tests pass on a current iPhone simulator: 11/11.
-- [x] iPhone UI smoke tests pass: 2/2, including the tools and tracking/compass surface.
+- [x] iPhone UI smoke tests pass: 2/2, including the redesigned tools surface.
 - [ ] Relevant tests pass on a physical iPhone.
-- [ ] Location permission denied/granted behavior is manually checked.
-- [ ] Location tracking and compass are manually checked on a physical device.
+- [ ] Confirm the removed map, location tracking, and compass surfaces do not appear in the submitted build.
 - [ ] StoreKit purchase, cancel, pending, failure, current entitlement, and restore are checked in Sandbox.
 - [ ] VoiceOver, Accessibility Inspector, large Dynamic Type, Light/Dark, Reduce Motion, rotation, iPad Split View, and Stage Manager are manually checked.
 - [ ] Instruments Leaks, Time Profiler, and Energy checks are completed for critical flows.
@@ -38,7 +37,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [x] A fresh unsigned local archive for the permanent-IAP correction succeeds with Xcode 26.6 and iPhoneOS SDK 26.5.
 - [x] Previous local archive metadata confirmed bundle `com.batalaldroob.parts`, version `1.1.0 (111)`, Xcode build `17F113`, SDK `iphoneos26.5`, and iOS 17.0 minimum.
-- [ ] New `1.2.0 (120+)` archive metadata is verified before selecting a new build.
+- [ ] New `1.2.1 (126+)` archive metadata is verified before selecting a new build.
 - [ ] A fresh signed Xcode Cloud archive is created from the intended commit.
 - [x] `ci_post_xcodebuild.sh` passes against Xcode Cloud build `122`.
 - [ ] Archive metadata confirms bundle `com.batalaldroob.parts`, expected version/build, production Xcode, accepted SDK, and iOS 17.0 minimum.
@@ -47,9 +46,9 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Privacy, Services, And Store Metadata
 
-- [ ] App Store privacy labels are human-confirmed against the final app, which has no developer-operated location backend.
+- [ ] App Store privacy labels are human-confirmed against the final app, which no longer requests location access.
 - [ ] No Open-Meteo endpoint or other external weather integration remains in source or the submitted binary.
-- [ ] Location usage descriptions are accurate in Arabic and English.
+- [ ] No location usage description is present unless location features are deliberately reintroduced later.
 - [ ] The non-consumable StoreKit product `batal.catalog.permanent.unlock` is complete, cleared for sale where appropriate, and attached to the same first-review submission as the binary.
 - [ ] The legacy consumable `batal.catalog.unlock` is not attached to the corrected permanent-unlock submission.
 - [ ] The IAP review screenshot demonstrates the purchase surface.
@@ -62,6 +61,6 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] No unresolved App Review item remains in the selected submission.
 - [ ] Only the newly validated build is selected.
-- [x] Build `122` is selected for iOS App Version `1.2.0`.
+- [ ] Build `126` or higher is selected for iOS App Version `1.2.1`.
 - [ ] Release notes match implemented behavior.
 - [x] Submitted after explicit approval: App Review submission `00e306d9-8983-4df8-b284-6cbc1fff2c04` is `Waiting for Review`.

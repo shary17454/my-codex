@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.1 (126+) - 2026-07-23
+
+### Release
+
+- Moved the next App Store candidate to release train `1.2.1` after App Store
+  Connect closed `1.2.0` for new build uploads.
+- Raised the local project build floor to `126` after Xcode Cloud uploads
+  `124` and `125` failed with `ITMS-90062` and `ITMS-90186` on the closed
+  `1.2.0` train.
+- Added localized TestFlight "What to test" notes under `TestFlight/` so Xcode
+  Cloud can attach tester notes during distribution preparation.
+
 ## 1.2.0 (120+) - 2026-07-21
 
 ### Release

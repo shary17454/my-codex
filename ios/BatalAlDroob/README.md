@@ -1,6 +1,6 @@
 # Batal Al-Droob iOS
 
-Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence, saved part requests, maintenance notes, compass/trip tools, and a protected catalog unlock through Apple In-App Purchase.
+Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence, saved part requests, maintenance notes, supplier discovery, and a protected catalog unlock through Apple In-App Purchase.
 
 ## Project
 
@@ -8,8 +8,8 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
-- App Store version: `1.2.0`
-- Project build: `120`
+- App Store version: `1.2.1`
+- Project build: `126`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -84,21 +84,20 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
-- verifies `MARKETING_VERSION = 1.2.0`,
-- verifies `CURRENT_PROJECT_VERSION >= 120`,
+- verifies `MARKETING_VERSION = 1.2.1`,
+- verifies `CURRENT_PROJECT_VERSION >= 126`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-App Store Connect now shows `1.1.0` as `Ready for Distribution` with build
-`111`, so new code changes must use the next release train. Build `119` from
-commit `71fa806` built and archived, but failed during "Prepare Build for App
-Store Connect" because it still used the closed `1.1.0` train. For the next
-candidate, create/open App Store version `1.2.0` and keep Xcode Cloud >
-Workflow > Next Build Number at `120` or higher. Do not reuse any uploaded build
-number.
+App Store Connect has closed the `1.2.0` train for new build uploads. Xcode
+Cloud uploads `124` and `125` failed with `ITMS-90062` and `ITMS-90186` because
+they reused `CFBundleShortVersionString = 1.2.0` after that version was already
+approved. For the next candidate, create/open App Store version `1.2.1` and keep
+Xcode Cloud > Workflow > Next Build Number at `126` or higher. Do not reuse any
+uploaded build number.
 
 ## In-App Purchase
 
@@ -133,7 +132,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `120` or higher on release train `1.2.0`,
+a fresh signed Xcode Cloud build `126` or higher on release train `1.2.1`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 

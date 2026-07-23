@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
-Updated: 2026-07-21
-Decision: `SUBMITTED_FOR_REVIEW`
+Updated: 2026-07-23
+Decision: `PREPARING_1.2.1`
 
 ## App And Apple Review State
 
@@ -10,33 +10,23 @@ Decision: `SUBMITTED_FOR_REVIEW`
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| App Store version | `1.2.0` for the next code-carrying candidate |
-| Current project build | `120` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
-| Latest App Store-ready version | `1.1.0 (111)` |
-| Latest failed Xcode Cloud build | `121` from commit `1c511d6` |
-| Latest successful Xcode Cloud build | `122` from commit `2c08e18` |
-| Latest pushed source commit | `2c08e18` |
-| Latest App Review submission | `1.2.0 (122)` waiting for review |
+| App Store version | `1.2.1` for the next code-carrying candidate |
+| Current project build | `126` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
+| Latest App Store-ready version | `1.2.0` |
+| Latest failed Xcode Cloud build | `125` from commit `3f7f728` |
+| Latest successful Xcode Cloud build | `123` |
+| Latest pushed source commit | pending next commit |
+| Latest App Review submission | `1.2.0 (105)` rejected; `1.2.0` is now closed for new uploads |
 | Required toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 | Latest detailed App Review issue | Guideline 2.1(b), App Completeness |
 | Latest historical rejected submission ID | `0fd0e8d0-ea44-4fe4-8fad-2ef8ea35eff6` |
 | Current submitted submission ID | `00e306d9-8983-4df8-b284-6cbc1fff2c04` |
 
-App Store Connect now shows `1.1.0 (111)` as `Ready for Distribution`. That
-means the `1.1.0` train must not be reused for new source changes. Xcode Cloud
-build `119` from commit `71fa806` completed build/archive/export steps, but
-failed at "Prepare Build for App Store Connect" while still using `1.1.0`.
-The project was moved to release train `1.2.0`. Xcode Cloud build `121` then
-completed build/archive/export, but the post-archive guard correctly failed
-because Xcode Cloud's `CI_BUILD_NUMBER` was `121` while the archived
-`CFBundleVersion` was still `120`. The app-local `ci_pre_xcodebuild.sh` now
-synchronizes `CURRENT_PROJECT_VERSION` to the actual Xcode Cloud build number
-before archive.
-
-Xcode Cloud build `122` from commit `2c08e18` succeeded for both Build and
-Archive using Xcode 26.6 (`17F113`). App Store Connect now has iOS App Version
-`1.2.0` with build `122` selected, and submission
-`00e306d9-8983-4df8-b284-6cbc1fff2c04` is `Waiting for Review`.
+App Store Connect now reports `ITMS-90062` and `ITMS-90186` for new uploads on
+`1.2.0`: the `1.2.0` train is closed because it matches a previously approved
+version. Builds `124` and `125` failed in Build Uploads for this reason. The
+next valid binary must use `MARKETING_VERSION = 1.2.1` and a build number above
+all prior uploads, starting at `126`.
 
 The latest Apple issue message says that the app references paid functionality,
 but the associated In-App Purchase was not included in the review submission.
