@@ -86,9 +86,20 @@ struct PartDetailView: View {
                 }
             }
             Section(viewModel.text(ar: "متاجر موثقة", en: "Verified stores")) {
-                ForEach(viewModel.stores.prefix(8)) { store in
-                    Button { viewModel.openStore(store, part: part) } label: {
-                        Label(store.name(language: viewModel.language), systemImage: "safari")
+                if viewModel.stores.isEmpty {
+                    EmptyStateView(
+                        symbol: "storefront",
+                        title: viewModel.text(ar: "لا توجد متاجر محملة", en: "No stores loaded"),
+                        message: viewModel.text(
+                            ar: "دليل المتاجر الموثقة غير متاح حاليًا داخل التطبيق.",
+                            en: "The verified store directory is not currently available in the app."
+                        )
+                    )
+                } else {
+                    ForEach(viewModel.stores.prefix(8)) { store in
+                        Button { viewModel.openStore(store, part: part) } label: {
+                            Label(store.name(language: viewModel.language), systemImage: "safari")
+                        }
                     }
                 }
             }

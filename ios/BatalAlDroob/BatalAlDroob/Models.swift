@@ -238,6 +238,20 @@ struct SavedPartRequest: Identifiable, Codable, Hashable {
     var notes = ""
     var planID = "basic"
     var draft = ""
+
+    func normalizedForStorage() -> SavedPartRequest {
+        var copy = self
+        copy.generation = generation.trimmedForStorage(defaultValue: "Y60")
+        copy.year = year.trimmedForStorage()
+        copy.vin = vin.trimmedForStorage().uppercased()
+        copy.engine = engine.trimmedForStorage()
+        copy.transmission = transmission.trimmedForStorage()
+        copy.partNumber = partNumber.trimmedForStorage().uppercased()
+        copy.partName = partName.trimmedForStorage()
+        copy.notes = notes.trimmedForStorage()
+        copy.draft = draft.trimmedForStorage()
+        return copy
+    }
 }
 
 struct MaintenanceItem: Identifiable, Codable, Hashable {
@@ -254,4 +268,11 @@ struct VehicleProfile: Codable, Hashable {
     var vin = ""
     var engine = ""
     var transmission = ""
+}
+
+private extension String {
+    func trimmedForStorage(defaultValue: String = "") -> String {
+        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? defaultValue : trimmed
+    }
 }

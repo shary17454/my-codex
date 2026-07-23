@@ -30,6 +30,7 @@ enum BatalDesign {
     static let cardRadius: CGFloat = 8
     static let compactSpacing: CGFloat = 8
     static let sectionSpacing: CGFloat = 12
+    static let roomySpacing: CGFloat = 16
 }
 
 enum BatalLog {

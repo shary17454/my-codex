@@ -244,13 +244,15 @@ extension CatalogViewModel {
         }
     }
 
-    func saveRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) {
-        guard partRequestHasRequiredInput(request) else { return }
-        var saved = request
+    @discardableResult
+    func saveRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) -> Bool {
+        guard partRequestHasRequiredInput(request) else { return false }
+        var saved = request.normalizedForStorage()
         saved.planID = plan.id
         saved.draft = buildDraft(for: saved, plan: plan)
         savedRequests = Array(([saved] + savedRequests).prefix(50))
         paymentMessage = text(ar: "تم تجهيز طلب القطعة وحفظه.", en: "Part request was prepared and saved.")
+        return true
     }
 
     func refreshPurchaseProducts() async {
@@ -331,12 +333,27 @@ extension CatalogViewModel {
         savedRequests.remove(atOffsets: offsets)
     }
 
-    func applyDescriptionSearch(_ text: String) {
+    @discardableResult
+    func applyDescriptionSearch(_ text: String) -> Bool {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        searchText = diagnosticKeywords(trimmed).joined(separator: " ")
+        guard !trimmed.isEmpty else {
+            errorMessage = self.text(
+                ar: "اكتب وصف العطل أو رقم القطعة قبل البحث.",
+                en: "Enter a fault description or part number before searching."
+            )
+            return false
+        }
+        let mappedKeywords = diagnosticKeywords(trimmed)
+        searchText = mappedKeywords.isEmpty ? trimmed : mappedKeywords.joined(separator: " ")
         selectedCategory = .all
         selectedPart = filteredParts.first
+        if selectedPart == nil {
+            paymentMessage = self.text(
+                ar: "لم أجد تطابقًا مباشرًا. جرّب رقم القطعة أو كلمة أوضح مثل radiator أو brake.",
+                en: "No direct match was found. Try a part number or a clearer word such as radiator or brake."
+            )
+        }
+        return selectedPart != nil
     }
 
     func analyzePhoto(_ item: PhotosPickerItem) async {
@@ -463,27 +480,6 @@ extension CatalogViewModel {
         }
         .prefix(limit)
         .map(\.0)
-    }
-
-    func categoryCount(_ category: CatalogCategory) -> Int {
-        guard category != .all else { return parts.count }
-        return parts.lazy.filter { $0.categoryValue == category }.count
-    }
-
-    func openStore(_ store: VerifiedStore, part: Part?) {
-        let url = store.searchURL(partNumber: part?.partNumber ?? "") ?? URL(string: store.website ?? "")
-        guard let url, isAllowedExternalURL(url, for: store) else {
-            errorMessage = text(ar: "رابط المتجر غير صالح.", en: "The store link is invalid.")
-            return
-        }
-        #if os(iOS)
-            Task {
-                let opened = await UIApplication.shared.open(url)
-                if !opened {
-                    errorMessage = text(ar: "تعذر فتح رابط المتجر.", en: "The store link could not be opened.")
-                }
-            }
-        #endif
     }
 
     private func searchableText(for part: Part) -> String {

@@ -61,67 +61,71 @@ struct DashboardView: View {
         NavigationStack {
             List {
                 Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"))
-                            .font(.largeTitle.bold())
-                        Text(viewModel.text(
-                            ar: "تطبيق أصلي للبحث في قطع نيسان باترول، التحقق من التوافق، " +
-                                "حفظ الصيانة، وتجهيز طلبات القطع.",
-                            en: "A native app for Nissan Patrol parts search, fitment checks, " +
-                                "maintenance logging, and part request preparation."
-                        ))
-                        .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 4)
+                    BatalHeroCard(
+                        eyebrow: viewModel.text(ar: "كتالوج Y60 محلي", en: "Local Y60 catalog"),
+                        title: viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"),
+                        message: viewModel.text(
+                            ar: "ابدأ من رقم القطعة، الوصف، أو التوافق ثم جهز طلبًا واضحًا للمورد.",
+                            en: "Start from a part number, description, or fitment check, " +
+                                "then prepare a clear supplier request."
+                        ),
+                        symbol: "shippingbox.and.arrow.backward"
+                    )
                 }
 
-                Section(viewModel.text(ar: "لوحة الكتالوج المحلي", en: "Native catalog dashboard")) {
+                Section {
+                    BatalSectionHeader(
+                        title: viewModel.text(ar: "حالة الكتالوج", en: "Catalog status"),
+                        subtitle: viewModel.text(
+                            ar: "قاعدة محلية مدمجة، بدون تسجيل دخول أو اتصال بخادم تابع لنا.",
+                            en: "Bundled local database, with no sign-in or developer-operated server."
+                        )
+                    )
                     StatsHeader(viewModel: viewModel)
-                    ForEach(CatalogCategory.allCases.filter { $0 != .all }.prefix(6)) { category in
-                        LabeledContent(
-                            category.title(viewModel.language),
-                            value: viewModel.categoryCount(category).formatted()
-                        )
-                    }
                 }
 
-                Section(viewModel.text(ar: "عينات مدققة قابلة للفتح", en: "Verified native records")) {
-                    ForEach(viewModel.reviewReadyParts) { part in
-                        NavigationLink(value: part) {
-                            PartRow(part: part, viewModel: viewModel)
-                        }
-                    }
-                }
-
-                Section(viewModel.text(ar: "وظائف تعمل بدون شراء", en: "Included functionality")) {
-                    FeatureRow(
-                        symbol: "number.square",
-                        title: viewModel.text(ar: "إظهار رقم القطعة الأساسي", en: "Primary part number"),
-                        detail: viewModel.text(
-                            ar: "الرقم الأساسي وبيانات السنوات والمحركات ظاهرة مباشرة.",
-                            en: "The primary number, years, and engine data are visible immediately."
+                Section {
+                    BatalSectionHeader(
+                        title: viewModel.text(ar: "ابدأ بسرعة", en: "Start quickly"),
+                        subtitle: viewModel.text(
+                            ar: "الأكثر استخدامًا في التطبيق في مكان واحد.",
+                            en: "The most-used workflows in one place."
                         )
                     )
-                    FeatureRow(
-                        symbol: "doc.text.magnifyingglass",
-                        title: viewModel.text(ar: "بحث كتالوج محلي", en: "Local catalog search"),
+                    HomeWorkflowRow(
+                        symbol: "magnifyingglass",
+                        title: viewModel.text(ar: "ابحث في الكتالوج", en: "Search the catalog"),
                         detail: viewModel.text(
-                            ar: "يبحث داخل قاعدة مدمجة ولا يحتاج تسجيل دخول.",
-                            en: "Searches a bundled database without sign-in."
+                            ar: "استخدم تبويب الكتالوج للبحث برقم القطعة أو الاسم أو القسم.",
+                            en: "Use the Catalog tab to search by part number, name, or category."
                         )
                     )
-                    FeatureRow(
-                        symbol: "wrench.and.screwdriver",
-                        title: viewModel.text(ar: "سجل صيانة وأدوات", en: "Maintenance and tools"),
+                    HomeWorkflowRow(
+                        symbol: "cart.badge.plus",
+                        title: viewModel.text(ar: "جهز طلب قطعة", en: "Prepare a part request"),
                         detail: viewModel.text(
-                            ar: "حفظ صيانة السيارة، حساب الكفرات، البحث بالوصف، وتجهيز طلبات القطع.",
-                            en: "Save maintenance, calculate tire changes, search by description, " +
-                                "and prepare part requests."
+                            ar: "احفظ طلبًا منظمًا قابلًا للمشاركة مع المورد.",
+                            en: "Save a structured request that can be shared with a supplier."
+                        )
+                    )
+                    HomeWorkflowRow(
+                        symbol: "wrench.adjustable",
+                        title: viewModel.text(ar: "سجل الصيانة", en: "Log maintenance"),
+                        detail: viewModel.text(
+                            ar: "احفظ أعمال الصيانة محليًا داخل الجهاز.",
+                            en: "Keep maintenance entries locally on the device."
                         )
                     )
                 }
 
-                Section(viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check")) {
+                Section {
+                    BatalSectionHeader(
+                        title: viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check"),
+                        subtitle: viewModel.text(
+                            ar: "يعطيك أفضل مطابقة من قاعدة الكتالوج قبل فتح التفاصيل.",
+                            en: "Shows the best catalog match before opening details."
+                        )
+                    )
                     TextField(
                         viewModel.text(ar: "رقم القطعة أو الوصف", en: "Part number or description"),
                         text: $fitmentQuery
@@ -145,7 +149,23 @@ struct DashboardView: View {
                         }
                     }
                 }
+
+                Section {
+                    BatalSectionHeader(
+                        title: viewModel.text(ar: "قطع مدققة", en: "Verified records"),
+                        subtitle: viewModel.text(
+                            ar: "عينات جاهزة للمراجعة من بيانات الكتالوج.",
+                            en: "Review-ready samples from the catalog data."
+                        )
+                    )
+                    ForEach(viewModel.reviewReadyParts) { part in
+                        NavigationLink(value: part) {
+                            PartRow(part: part, viewModel: viewModel)
+                        }
+                    }
+                }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle(viewModel.text(ar: "الرئيسية", en: "Home"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
             .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
@@ -159,7 +179,59 @@ struct DashboardView: View {
     }
 }
 
-struct FeatureRow: View {
+struct BatalHeroCard: View {
+    let eyebrow: String
+    let title: String
+    let message: String
+    let symbol: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 46, height: 46)
+                    .background(.tint, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(eyebrow)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Text(title)
+                        .font(.largeTitle.bold())
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                }
+            }
+            Text(message)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct BatalSectionHeader: View {
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+            Text(subtitle)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct HomeWorkflowRow: View {
     let symbol: String
     let title: String
     let detail: String
@@ -167,8 +239,10 @@ struct FeatureRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: symbol)
-                .foregroundStyle(.tint)
-                .frame(width: 28)
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(width: 34, height: 34)
+                .background(.tint, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(.headline)
                 Text(detail).font(.caption).foregroundStyle(.secondary)
@@ -184,8 +258,14 @@ struct CatalogView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section { StatsHeader(viewModel: viewModel) }
                 Section {
+                    BatalSectionHeader(
+                        title: viewModel.text(ar: "بحث القطع", en: "Parts search"),
+                        subtitle: viewModel.text(
+                            ar: "اكتب رقم القطعة أو اسمها ثم حدد القسم عند الحاجة.",
+                            en: "Enter a part number or name, then narrow by category if needed."
+                        )
+                    )
                     Picker(viewModel.text(ar: "القسم", en: "Category"), selection: $viewModel.selectedCategory) {
                         ForEach(CatalogCategory.allCases) { category in
                             Label(category.title(viewModel.language), systemImage: category.symbol).tag(category)
@@ -193,7 +273,14 @@ struct CatalogView: View {
                     }
                     .pickerStyle(.menu)
                 }
-                Section(viewModel.text(ar: "النتائج", en: "Results")) {
+                Section {
+                    BatalSectionHeader(
+                        title: viewModel.text(ar: "النتائج", en: "Results"),
+                        subtitle: viewModel.text(
+                            ar: "\(viewModel.filteredParts.count.formatted()) نتيجة معروضة من الكتالوج.",
+                            en: "\(viewModel.filteredParts.count.formatted()) displayed catalog results."
+                        )
+                    )
                     if viewModel.filteredParts.isEmpty {
                         EmptyStateView(
                             symbol: "magnifyingglass",
@@ -210,6 +297,7 @@ struct CatalogView: View {
                     }
                 }
             }
+            .listStyle(.insetGrouped)
             .searchable(
                 text: $viewModel.searchText,
                 placement: .navigationBarDrawer(displayMode: .always),

@@ -112,6 +112,40 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertTrue(viewModel.savedRequests.isEmpty)
     }
 
+    @MainActor
+    func testSavedPartRequestIsTrimmedBeforeStorage() {
+        let defaultsKey = "batalPartRequests"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService()
+        )
+        let plan = PartRequestPlan(
+            id: "basic",
+            titleAr: "طلب أساسي",
+            titleEn: "Basic request",
+            descriptionAr: "",
+            descriptionEn: ""
+        )
+        let request = SavedPartRequest(
+            generation: "   ",
+            year: " 1997 ",
+            vin: " wgy60348567 ",
+            partNumber: " 21082-4w000 ",
+            partName: " Water outlet "
+        )
+
+        XCTAssertTrue(viewModel.saveRequestPlan(plan, request: request))
+        let saved = try? XCTUnwrap(viewModel.savedRequests.first)
+        XCTAssertEqual(saved?.generation, "Y60")
+        XCTAssertEqual(saved?.year, "1997")
+        XCTAssertEqual(saved?.vin, "WGY60348567")
+        XCTAssertEqual(saved?.partNumber, "21082-4W000")
+        XCTAssertEqual(saved?.partName, "Water outlet")
+    }
+
     func testExternalStoreLinksRequireHTTPSHost() throws {
         XCTAssertTrue(try isAllowedExternalURL(XCTUnwrap(URL(string: "https://example.com/parts?q=21082-4W000"))))
         XCTAssertFalse(try isAllowedExternalURL(XCTUnwrap(URL(string: "http://example.com/parts"))))
@@ -201,6 +235,29 @@ final class BatalCatalogResourceTests: XCTestCase {
         let matches = viewModel.fitmentMatches(for: "21082-4W000")
 
         XCTAssertEqual(matches.first?.partNumber, "21082-4W000")
+    }
+
+    @MainActor
+    func testDescriptionSearchAcceptsDirectPartNumber() async {
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        await viewModel.load()
+        XCTAssertTrue(viewModel.applyDescriptionSearch("21082-4W000"))
+        XCTAssertEqual(viewModel.selectedPart?.partNumber, "21082-4W000")
+    }
+
+    @MainActor
+    func testBlankDescriptionSearchShowsUserVisibleError() {
+        let viewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        XCTAssertFalse(viewModel.applyDescriptionSearch("   "))
+        XCTAssertNotNil(viewModel.errorMessage)
     }
 
     private func loadJSONObject(named name: String, subdirectory: String) throws -> [String: Any] {
