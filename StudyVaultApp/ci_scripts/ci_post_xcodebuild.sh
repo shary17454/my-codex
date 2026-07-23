@@ -2,9 +2,9 @@
 set -euo pipefail
 
 expected_bundle_id="com.shary17454.esal"
-expected_marketing_version="${EXPECTED_MARKETING_VERSION:-1.10.0}"
-required_xcode_build="17F113"
-required_sdk_prefix="iphoneos26.5"
+expected_marketing_version="${EXPECTED_MARKETING_VERSION:-1.11.0}"
+required_xcode_build="${EXPECTED_XCODE_BUILD:-17F113}"
+required_sdk_prefix="${EXPECTED_SDK_PREFIX:-iphoneos26.5}"
 
 echo "== Xcode Cloud post-build verification =="
 echo "Action: ${CI_XCODEBUILD_ACTION:-unknown}"
