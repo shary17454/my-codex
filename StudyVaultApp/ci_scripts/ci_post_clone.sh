@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 set -euo pipefail
 
 required_xcode_version="26.6"
 required_xcode_build="17F113"
 required_min_iphoneos_sdk="26.5"
-expected_marketing_version="${EXPECTED_MARKETING_VERSION:-1.10.0}"
-minimum_build_number="${MIN_PROJECT_BUILD:-52}"
+expected_marketing_version="${EXPECTED_MARKETING_VERSION:-1.11.0}"
+minimum_build_number="${MIN_PROJECT_BUILD:-70}"
 script_directory="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 app_directory="$(CDPATH= cd -- "${script_directory}/.." && pwd)"
 project_file="${app_directory}/StudyVault.xcodeproj/project.pbxproj"

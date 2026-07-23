@@ -1,3 +1,17 @@
+# ملاحظات الإصدار 1.11.0
+
+- تجهيز إصدار جديد أعلى من الإصدار المغلق في App Store Connect.
+- الحفاظ على مصدر الإصدار والبناء من إعدادات Xcode لتفادي تعارضات Info.plist.
+- تحسين فحص Xcode Cloud المبكر حتى يرفض البيئة أو رقم الإصدار غير الصحيح قبل الأرشفة.
+- إصلاح توافق سكربت Xcode Cloud مع `pipefail` عبر تشغيله بـbash.
+
+## English Release Notes 1.11.0
+
+- Prepared a new version above the closed App Store Connect release train.
+- Kept version and build values sourced from Xcode build settings to prevent Info.plist mismatches.
+- Improved Xcode Cloud preflight checks so invalid environments or version values fail before archiving.
+- Fixed Xcode Cloud script compatibility with `pipefail` by running it with bash.
+
 # ملاحظات الإصدار 1.10.0
 
 - تصميم عربي جديد أكثر وضوحًا وسرعة على iPhone وiPad.
