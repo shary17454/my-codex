@@ -1,0 +1,8 @@
+Batal Al-Droob 1.2.0
+
+Please verify the updated Tools experience:
+- Open the Tools tab and confirm the new premium layout is clear and stable.
+- Verify OEM number search, photo-based lookup entry points, tire calculator, wishlist, and supplier links.
+- Confirm the map, compass, and location-tracking tools are no longer shown.
+- Test Arabic and English switching, right-to-left layout, Dynamic Type, Dark Mode, and offline/error states.
+- Confirm external supplier links open correctly without copying store pricing or inventory into the app.
