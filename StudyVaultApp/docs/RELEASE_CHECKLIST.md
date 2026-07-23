@@ -8,8 +8,8 @@
 - [x] Swift: 6.0.
 - [x] Deployment target: iOS 17.0.
 - [x] الأجهزة: iPhone وiPad.
-- [x] Marketing Version في المشروع: `1.10.0`.
-- [x] Build Number في المشروع: `52`.
+- [x] Marketing Version في المشروع: `1.11.0`.
+- [x] Build Number في المشروع: `70`.
 - [x] لم يتغير Team أو Signing أو Entitlements.
 
 ## البناء والاختبارات المحلية
@@ -51,7 +51,7 @@
 - [x] فحص Shell syntax ومسار الرفض المحلي عند استخدام Xcode أقدم من 26.6.
 - [x] تأكيد أن Workflow يبني `StudyVaultApp/StudyVault.xcodeproj` والـScheme `StudyVault`.
 - [x] اختيار Xcode Stable إنتاجي: Latest Release، حاليًا Xcode 26.6 (`17F113`).
-- [x] ضبط Next Build Number على `52`، أعلى من Build Uploads حتى `51`.
+- [x] يجب ضبط Next Build Number على `70` أو أعلى، أعلى من Build المرفوض `69`.
 - [ ] تشغيل Unit وUI tests قبل Archive.
 - [ ] إنشاء Archive من Commit النهائي.
 - [ ] التأكد أن الإصدار والبناء داخل Artifact يطابقان App Store Connect.
@@ -60,8 +60,8 @@
 
 ## App Store Connect
 
-- [x] التأكد أن `1.10.0` أعلى من آخر إصدار منشور `1.9.0`.
-- [x] التأكد أن Build `52` أعلى من أعلى Build ظاهر `51`.
+- [x] التأكد أن `1.11.0` أعلى من الإصدار المغلق `1.10.0`.
+- [x] التأكد أن Build `70` أعلى من آخر Build مرفوض `69`.
 - [ ] مراجعة App Privacy Labels يدويًا.
 - [ ] مراجعة Export Compliance.
 - [x] تحديث What’s New بالعربية والإنجليزية بما يطابق الوظائف المنفذة.
