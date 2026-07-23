@@ -5,6 +5,7 @@
 - This directory is the native iOS app for تطبيق وش الرأي only.
 - Do not modify Batal Al-Droob, DesertTrail, Flutter demo apps, or any sibling app from this directory.
 - Treat Flutter/Dart projects elsewhere in the repository as unrelated references unless the user explicitly names them.
+- Adopt `docs/APPLE_ENGINEERING_STANDARD.md` as the permanent engineering standard for this app. When it conflicts with a local instruction, follow the stricter production-quality rule while preserving this app's scope and identifiers.
 
 ## Project
 
@@ -48,3 +49,4 @@ BASE_URL=http://localhost:8787 npm run smoke
 - Do not commit build artifacts, archives, DerivedData, `.xcresult`, `.ipa`, `backend/data/`, or secrets.
 - Store sensitive local tokens in Keychain from the app; do not hardcode them in Swift or JavaScript.
 - Use SwiftUI and MVVM-compatible structure for new iOS code.
+- Apply the engineering standard through verified, incremental changes: inspect first, keep user-facing behavior complete, test affected flows, document external requirements, and never report completion without evidence.
