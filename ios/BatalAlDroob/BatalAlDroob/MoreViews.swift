@@ -1,10 +1,8 @@
-import MapKit
 import PhotosUI
 import SwiftUI
 
 struct MoreView: View {
     @Bindable var viewModel: CatalogViewModel
-    @State private var locationTracking = LocationTrackingViewModel()
     @State private var descriptionQuery = ""
     @State private var oldTireSize = "265/70R16"
     @State private var newTireSize = "285/75R16"
@@ -17,28 +15,11 @@ struct MoreView: View {
         let photoPickerTitle = viewModel.text(ar: "اختيار صورة كمرجع", en: "Choose reference photo")
         return NavigationStack {
             List {
-                Section(viewModel.text(ar: "اللغة", en: "Language")) { LanguageMenu(viewModel: viewModel) }
-                Section(viewModel.text(ar: "مسارات سريعة", en: "Quick paths")) {
-                    NavigationLink {
-                        SharedFitmentContent(viewModel: viewModel)
-                            .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
-                    } label: {
-                        Label(
-                            viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"),
-                            systemImage: "point.3.connected.trianglepath.dotted"
-                        )
-                    }
-                    NavigationLink {
-                        MaintenanceContent(
-                            viewModel: viewModel,
-                            title: $maintenanceTitle,
-                            odometer: $maintenanceOdometer,
-                            notes: $maintenanceNotes
-                        )
-                        .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
-                    } label: {
-                        Label(viewModel.text(ar: "الصيانة", en: "Maintenance"), systemImage: "wrench.adjustable")
-                    }
+                Section {
+                    ToolsHeroView(viewModel: viewModel)
+                }
+                Section(viewModel.text(ar: "مركز العمل", en: "Action center")) {
+                    ToolsActionGrid(viewModel: viewModel)
                 }
                 Section(viewModel.text(ar: "بحث بالوصف والصورة", en: "Description and photo search")) {
                     TextField(
@@ -46,6 +27,7 @@ struct MoreView: View {
                         text: $descriptionQuery,
                         axis: .vertical
                     )
+                    .lineLimit(2 ... 4)
                     Button { viewModel.applyDescriptionSearch(descriptionQuery) } label: {
                         Label(
                             viewModel.text(ar: "بحث بالوصف", en: "Search by description"),
@@ -69,10 +51,41 @@ struct MoreView: View {
                 Section(viewModel.text(ar: "حاسبة الكفرات", en: "Tire calculator")) {
                     TextField(viewModel.text(ar: "المقاس القديم", en: "Old size"), text: $oldTireSize)
                     TextField(viewModel.text(ar: "المقاس الجديد", en: "New size"), text: $newTireSize)
-                    Button(viewModel.text(ar: "احسب الفرق", en: "Calculate difference")) {
+                    Button {
                         tireResult = viewModel.tireDifference(oldSize: oldTireSize, newSize: newTireSize)
+                    } label: {
+                        Label(
+                            viewModel.text(ar: "احسب الفرق", en: "Calculate difference"),
+                            systemImage: "gauge.with.dots.needle.33percent"
+                        )
                     }
-                    if !tireResult.isEmpty { Text(tireResult).font(.headline) }
+                    if !tireResult.isEmpty {
+                        Text(tireResult)
+                            .font(.headline.monospacedDigit())
+                            .textSelection(.enabled)
+                    }
+                }
+                Section(viewModel.text(ar: "مسارات سريعة", en: "Quick paths")) {
+                    NavigationLink {
+                        SharedFitmentContent(viewModel: viewModel)
+                            .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
+                    } label: {
+                        Label(
+                            viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"),
+                            systemImage: "point.3.connected.trianglepath.dotted"
+                        )
+                    }
+                    NavigationLink {
+                        MaintenanceContent(
+                            viewModel: viewModel,
+                            title: $maintenanceTitle,
+                            odometer: $maintenanceOdometer,
+                            notes: $maintenanceNotes
+                        )
+                        .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
+                    } label: {
+                        Label(viewModel.text(ar: "الصيانة", en: "Maintenance"), systemImage: "wrench.adjustable")
+                    }
                 }
                 Section(viewModel.text(ar: "قائمة الرغبات", en: "Wishlist")) {
                     if viewModel.wishlistParts.isEmpty {
@@ -100,58 +113,17 @@ struct MoreView: View {
                         ) }
                     }
                 }
-                Section {
-                    Map(position: $locationTracking.cameraPosition) {
-                        if let coordinate = locationTracking.coordinate {
-                            Marker(viewModel.text(ar: "موقعي", en: "My location"), coordinate: coordinate)
-                        }
-                    }
-                    .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
-
-                    HStack {
-                        Button { locationTracking.requestAndStart(language: viewModel.language) } label: {
-                            Label(
-                                viewModel.text(ar: "تشغيل التتبع", en: "Start tracking"),
-                                systemImage: "location.fill"
-                            )
-                        }
-                        Button { locationTracking.stop(language: viewModel.language) } label: {
-                            Label(viewModel.text(ar: "إيقاف", en: "Stop"), systemImage: "pause.circle")
-                        }
-                    }
-                    if let coordinate = locationTracking.coordinate {
-                        LabeledContent(
-                            viewModel.text(ar: "الإحداثيات", en: "Coordinates"),
-                            value: String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude)
-                        )
-                    }
-                    if let heading = locationTracking.headingDegrees {
-                        LabeledContent(
-                            viewModel.text(ar: "البوصلة", en: "Compass"),
-                            value: String(format: "%.0f°", heading)
-                        )
-                        CompassDial(degrees: heading)
-                            .frame(height: 120)
-                            .accessibilityLabel(viewModel.text(ar: "اتجاه البوصلة", en: "Compass heading"))
-                    }
-                    if !locationTracking.locationMessage.isEmpty {
-                        Text(locationTracking.locationMessage).font(.caption).foregroundStyle(.secondary)
-                    }
-                } header: {
-                    Text(viewModel.text(ar: "التتبع والبوصلة", en: "Tracking and compass"))
-                        .accessibilityIdentifier("more.section.tracking")
-                }
+                Section(viewModel.text(ar: "اللغة", en: "Language")) { LanguageMenu(viewModel: viewModel) }
                 Section(viewModel.text(ar: "سياسة البيانات", en: "Data policy")) {
                     Text(viewModel.text(
                         ar: "التطبيق مستقل ولا يتبع نيسان، ولا ينسخ أسعار المتاجر أو مخزونها. " +
                             "تُفتح روابط المتاجر الموثقة لإكمال البحث أو الشراء خارج التطبيق. " +
-                            "لا يرسل التطبيق صور البحث أو بيانات السيارة والصيانة أو إحداثيات التتبع " +
+                            "لا يرسل التطبيق صور البحث أو بيانات السيارة أو سجلات الصيانة " +
                             "إلى خادم تابع لنا.",
                         en: "This app is independent from Nissan and does not copy store prices or inventory. " +
                             "Verified store links open externally to continue searching or purchasing. " +
-                            "The app does not send reference photos, vehicle details, maintenance entries, " +
-                            "or tracking coordinates to a developer-operated server."
+                            "The app does not send reference photos, vehicle details, or maintenance entries " +
+                            "to a developer-operated server."
                     ))
                 }
             }
@@ -160,32 +132,93 @@ struct MoreView: View {
             .navigationDestination(for: Part.self) { part in
                 PartDetailView(part: part, viewModel: viewModel)
             }
-            .onDisappear { locationTracking.pauseTracking() }
         }
     }
 }
 
-struct CompassDial: View {
-    let degrees: CLLocationDirection
+struct ToolsHeroView: View {
+    @Bindable var viewModel: CatalogViewModel
+
     var body: some View {
-        ZStack {
-            Circle().stroke(.secondary.opacity(0.35), lineWidth: 2)
-            ForEach(0 ..< 12) { tick in
-                Rectangle()
-                    .fill(.secondary)
-                    .frame(width: 2, height: tick % 3 == 0 ? 14 : 8)
-                    .offset(y: -48)
-                    .rotationEffect(.degrees(Double(tick) * 30))
-            }
-            Image(systemName: "location.north.fill")
-                .font(.system(size: 42, weight: .bold))
-                .foregroundStyle(.red)
-                .rotationEffect(.degrees(degrees))
-            Text(String(format: "%.0f°", degrees))
-                .font(.caption.monospacedDigit().bold())
-                .offset(y: 44)
+        VStack(alignment: .leading, spacing: 10) {
+            Label(viewModel.text(ar: "أدوات بطل الدروب", en: "Batal Al-Droob tools"), systemImage: "sparkles")
+                .font(.title3.bold())
+                .foregroundStyle(.primary)
+            Text(viewModel.text(
+                ar: "كل ما تحتاجه لتحويل رقم القطعة أو الوصف إلى طلب واضح ورابط متجر موثق.",
+                en: "Turn a part number or description into a clear request and verified store handoff."
+            ))
+            .font(.callout)
+            .foregroundStyle(.secondary)
         }
-        .padding(8)
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct ToolsActionGrid: View {
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(viewModel.text(
+                ar: "أدوات مرتبطة مباشرة بقطع الباترول: بحث، توافق، طلب، صيانة، وروابط متاجر موثقة.",
+                en: "Patrol parts tools focused on search, fitment, requests, maintenance, and verified stores."
+            ))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("more.section.action-center")
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
+                ToolsActionCard(
+                    symbol: "text.magnifyingglass",
+                    title: viewModel.text(ar: "بحث ذكي", en: "Smart search"),
+                    detail: viewModel.text(ar: "وصف العطل أو رقم القطعة.", en: "Fault description or part number.")
+                )
+                ToolsActionCard(
+                    symbol: "checkmark.seal",
+                    title: viewModel.text(ar: "تحقق التوافق", en: "Fitment check"),
+                    detail: viewModel.text(
+                        ar: "مطابقة القطعة مع السنوات والمحركات.",
+                        en: "Match parts with years and engines."
+                    )
+                )
+                ToolsActionCard(
+                    symbol: "cart.badge.plus",
+                    title: viewModel.text(ar: "تجهيز طلب", en: "Prepare request"),
+                    detail: viewModel.text(ar: "نص منظم لإرساله للمورد.", en: "Structured text to send to suppliers.")
+                )
+                ToolsActionCard(
+                    symbol: "wrench.and.screwdriver",
+                    title: viewModel.text(ar: "سجل الصيانة", en: "Maintenance log"),
+                    detail: viewModel.text(ar: "حفظ الأعمال والملاحظات محليًا.", en: "Save work and notes locally.")
+                )
+            }
+        }
+        .padding(.vertical, 6)
+    }
+}
+
+struct ToolsActionCard: View {
+    let symbol: String
+    let title: String
+    let detail: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: symbol)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.tint)
+            Text(title)
+                .font(.headline)
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, minHeight: 118, alignment: .topLeading)
+        .padding(14)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
     }
 }
 

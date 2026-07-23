@@ -29,8 +29,6 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>نستخدم موقعك عند تشغيل التتبع والبوصلة لعرض موضعك واتجاهك داخل التطبيق.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

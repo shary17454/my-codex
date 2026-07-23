@@ -20,7 +20,8 @@ There are no widgets, app clips, watch targets, share extensions, notification e
 - `Models.swift`: catalog, store, vehicle, maintenance, request, and API data models.
 - `Services.swift`: bundled-resource loading and StoreKit purchase service protocols/implementations.
 - `CatalogViewModel.swift`: catalog/search/filter state, local persistence, request workflows, StoreKit state.
-- `LocationTrackingViewModel.swift`: Core Location and heading lifecycle.
+- The app intentionally has no map, compass, or location-tracking module. Parts lookup, fitment,
+  maintenance, and supplier handoff are the supported product scope.
 - `Views.swift`: root tabs, dashboard, catalog, shared-fitment, and common state views.
 - `PartDetailViews.swift`: part details and store-link presentation.
 - `WorkflowViews.swift`: request and maintenance workflows.

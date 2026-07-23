@@ -51,7 +51,7 @@ Created/refactored Swift files:
 - `Models.swift`
 - `Services.swift`
 - `CatalogViewModel.swift`
-- `LocationTrackingViewModel.swift`
+- Map, compass, and location tracking code removed from the active native app scope.
 - `Views.swift`
 - `PartDetailViews.swift`
 - `WorkflowViews.swift`
@@ -97,7 +97,7 @@ Removed because empty and unreferenced:
 | Background location/modes | Not enabled |
 | Entitlements file | None required or added |
 | Optional capabilities | None enabled; existing signing/capability state preserved |
-| Privacy manifest | `UserDefaults` reason `CA92.1`; no collected data type declared because tracking coordinates are not sent to a developer-operated server |
+| Privacy manifest | `UserDefaults` reason `CA92.1`; no collected data type declared; the app does not request location permission |
 
 ## 4. Xcode And Scheme Configuration
 
@@ -117,7 +117,7 @@ Removed because empty and unreferenced:
 ## 5. Services Configured
 
 - StoreKit 2: product lookup, purchase, verified transaction handling, current entitlements, updates, finish, and restore for the non-consumable `batal.catalog.permanent.unlock`.
-- Core Location and MapKit: user-initiated location/heading updates with permission/error states and lifecycle cleanup; no external weather provider.
+- MapKit/Core Location: removed from the app. No map, compass, or location-tracking permission remains.
 - Bundled catalog/store data: native Foundation loading/decoding.
 
 No Firebase, Supabase, RevenueCat, OneSignal, Stripe, Google Maps, OpenAI SDK, or other third-party SDK is present.
