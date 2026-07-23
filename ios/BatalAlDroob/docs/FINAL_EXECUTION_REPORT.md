@@ -4,11 +4,10 @@ Date: 2026-07-21
 Status: `READY_WITH_EXTERNAL_REQUIREMENTS`
 
 > Current release update: the local corrected candidate is `1.1.0 (111)`.
-> Xcode Cloud build `110` completed Build and Archive using Xcode 26.6
-> (`17F113`) and iPhoneOS SDK 26.5, but it predates the permanent-IAP
-> correction and build-number update. The next signed cloud candidate must be
-> build `111` or higher from this exact corrected commit. See
-> `CURRENT_RELEASE_STATUS.md` for the authoritative blockers.
+> Commit `66dbc2e` contains the permanent-IAP correction and build-number
+> update for build `111`. The next signed Xcode Cloud/App Store candidate must
+> be build `111` or higher from this corrected commit. See
+> `CURRENT_RELEASE_STATUS.md` for the authoritative remaining manual blockers.
 
 ## 1. Discovery And Fixes
 
@@ -21,6 +20,7 @@ Implemented corrections:
 - made verified StoreKit current entitlements/updates authoritative and implemented restore;
 - separated catalog and store-directory loading/retry state;
 - limited external store links to valid HTTPS hosts;
+- prevented whitespace-only part requests from being saved and covered it with a regression test;
 - removed the unrelated Open-Meteo weather feature and retained only user-initiated location/compass behavior;
 - replaced the incompatible consumable catalog product with the non-consumable `batal.catalog.permanent.unlock` identifier and made StoreKit reject an incorrect product type;
 - added app lifecycle privacy shielding and structured `Logger` categories;
@@ -51,7 +51,7 @@ Created/refactored Swift files:
 - `Models.swift`
 - `Services.swift`
 - `CatalogViewModel.swift`
-- `LocationTrackingViewModel.swift`
+- Map, compass, and location tracking code removed from the active native app scope.
 - `Views.swift`
 - `PartDetailViews.swift`
 - `WorkflowViews.swift`
@@ -97,7 +97,7 @@ Removed because empty and unreferenced:
 | Background location/modes | Not enabled |
 | Entitlements file | None required or added |
 | Optional capabilities | None enabled; existing signing/capability state preserved |
-| Privacy manifest | `UserDefaults` reason `CA92.1`; no collected data type declared because tracking coordinates are not sent to a developer-operated server |
+| Privacy manifest | `UserDefaults` reason `CA92.1`; no collected data type declared; the app does not request location permission |
 
 ## 4. Xcode And Scheme Configuration
 
@@ -117,7 +117,7 @@ Removed because empty and unreferenced:
 ## 5. Services Configured
 
 - StoreKit 2: product lookup, purchase, verified transaction handling, current entitlements, updates, finish, and restore for the non-consumable `batal.catalog.permanent.unlock`.
-- Core Location and MapKit: user-initiated location/heading updates with permission/error states and lifecycle cleanup; no external weather provider.
+- MapKit/Core Location: removed from the app. No map, compass, or location-tracking permission remains.
 - Bundled catalog/store data: native Foundation loading/decoding.
 
 No Firebase, Supabase, RevenueCat, OneSignal, Stripe, Google Maps, OpenAI SDK, or other third-party SDK is present.
@@ -134,7 +134,7 @@ No Firebase, Supabase, RevenueCat, OneSignal, Stripe, Google Maps, OpenAI SDK, o
 | Partnership data validator | PASS | 19 suppliers, 0 errors, 0 warnings |
 | Clean Debug build | PASS | generic iOS simulator build exited 0 |
 | Xcode static analyzer | PASS | clean analyzer run exited 0 |
-| Current iPhone simulator tests after permanent-IAP correction | PASS | 15/15: 13 unit + 2 UI on iPhone 17 Pro, iOS 26.5 |
+| Current iPhone simulator tests after independent certification review | PASS | 16/16: 14 unit + 2 UI on iPhone 17 Pro, iOS 26.5 |
 | Current unsigned Release build after permanent-IAP correction | PASS | Xcode 26.6 device Release build completed with `BUILD SUCCEEDED` |
 | iPad simulator UI tests | PASS | 2/2 on iPad Air 11-inch (M4), iOS 26.5 |
 | Prior physical iPhone unit tests | PASS | 11/11 on iPhone 16 Pro Max before removal of the isolated weather feature |
@@ -163,7 +163,7 @@ No embedded app extension or third-party framework was present in the archive. `
 
 ## 7. Manual Actions Required
 
-1. Commit and push the permanent-IAP correction and build-number update, then create Xcode Cloud build `111` or higher from that exact commit using stable Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release.
+1. Create/verify Xcode Cloud build `111` or higher from commit `66dbc2e` using stable Xcode 26.6 (`17F113`) or a newer Apple-approved non-beta release.
 2. Verify Xcode Cloud Next Build Number and TestFlight Build Uploads before triggering the workflow; do not reuse any uploaded build number.
 3. Complete and attach the non-consumable StoreKit product `batal.catalog.permanent.unlock` (Apple ID `6792436213`), including price, availability, localization, review screenshot, agreements, and review notes. Do not attach legacy consumable `batal.catalog.unlock` (Apple ID `6786440522`).
 4. Replace any promoted-IAP screenshot with unique product artwork. Upload current 6.5-inch iPhone and 13-inch iPad screenshots showing the native app in use.
@@ -175,8 +175,8 @@ No embedded app extension or third-party framework was present in the archive. `
 ## 8. Release Decision
 
 The source, automated tests, prior physical-device smoke tests, static checks,
-and fresh unsigned archive metadata are in a strong releasable state. A new
-signed cloud archive is required after the permanent-IAP correction. Apple also
+and fresh unsigned archive metadata are in a strong releasable state. A signed
+cloud archive from commit `66dbc2e` is required for App Store review. Apple also
 requires that IAP to be complete and included with the new binary in the same
 review submission. It is not honest to label the app fully production-ready
 until those external items and the remaining manual checks are complete.
@@ -186,8 +186,7 @@ Recommended action: complete the manual checklist, then run an internal TestFlig
 ## 9. Git State
 
 - Branch: `main`.
-- Latest pushed commit: `5a80728 fix(batal): remove unrelated weather integration`.
-- Commit `5a80728` is present on `origin/main`.
-- Xcode Cloud build `110` was produced from that commit and completed successfully.
-- The permanent-IAP correction and build-number update are still uncommitted local changes and require cloud build `111` or higher after review and push.
+- Current commit: `66dbc2e fix(batal): prepare build 111 for review`.
+- Xcode Cloud build `110` was produced from older commit `5a80728` and completed successfully, but it predates the permanent-IAP/build-111 correction.
+- Build `111` or higher should be produced from commit `66dbc2e` before the next App Review submission.
 - No App Review submission was performed by the source-code verification step.

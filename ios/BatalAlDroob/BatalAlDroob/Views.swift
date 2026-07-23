@@ -1,5 +1,3 @@
-import MapKit
-import PhotosUI
 import SwiftUI
 
 // MARK: - Views
@@ -116,8 +114,9 @@ struct DashboardView: View {
                         symbol: "wrench.and.screwdriver",
                         title: viewModel.text(ar: "سجل صيانة وأدوات", en: "Maintenance and tools"),
                         detail: viewModel.text(
-                            ar: "حفظ صيانة السيارة، حساب الكفرات، تتبع الموقع، والبوصلة.",
-                            en: "Save maintenance, calculate tire changes, and use location and compass tools."
+                            ar: "حفظ صيانة السيارة، حساب الكفرات، البحث بالوصف، وتجهيز طلبات القطع.",
+                            en: "Save maintenance, calculate tire changes, search by description, " +
+                                "and prepare part requests."
                         )
                     )
                 }

@@ -47,15 +47,15 @@ final class BatalAlDroobUITests: XCTestCase {
         toolsTab.tap()
         XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
 
+        let actionCenter = app.staticTexts["more.section.action-center"]
+        XCTAssertTrue(reveal(actionCenter, in: app))
+
         let maintenanceItem = app.staticTexts["الصيانة"]
-        XCTAssertTrue(maintenanceItem.waitForExistence(timeout: 10))
+        XCTAssertTrue(reveal(maintenanceItem, in: app))
         maintenanceItem.tap()
         XCTAssertTrue(app.navigationBars["الصيانة"].waitForExistence(timeout: 10))
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(app.navigationBars["المزيد"].waitForExistence(timeout: 10))
-
-        let trackingSection = app.staticTexts["more.section.tracking"]
-        XCTAssertTrue(reveal(trackingSection, in: app))
     }
 
     @MainActor

@@ -12,6 +12,7 @@ APP_ROOT = ROOT / "ios" / "BatalAlDroob"
 PROJECT = APP_ROOT / "BatalAlDroob.xcodeproj" / "project.pbxproj"
 INFO_PLIST = APP_ROOT / "BatalAlDroob" / "Info.plist"
 PRIVACY_MANIFEST = APP_ROOT / "BatalAlDroob" / "PrivacyInfo.xcprivacy"
+APPLE_ENGINEERING_STANDARD = APP_ROOT / "docs" / "APPLE_ENGINEERING_STANDARD.md"
 SWIFT_ROOT = APP_ROOT / "BatalAlDroob"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
@@ -37,6 +38,12 @@ def unique_setting_values(project_text: str, key: str) -> set[str]:
 
 
 def main() -> None:
+    if not APPLE_ENGINEERING_STANDARD.exists():
+        fail("Apple engineering standard must exist at docs/APPLE_ENGINEERING_STANDARD.md")
+    standard_text = APPLE_ENGINEERING_STANDARD.read_text(encoding="utf-8")
+    if "Permanent engineering standard for this project." not in standard_text:
+        fail("Apple engineering standard must remain the approved project constitution")
+
     project_text = PROJECT.read_text(encoding="utf-8")
     with INFO_PLIST.open("rb") as stream:
         info = plistlib.load(stream)
@@ -83,8 +90,8 @@ def main() -> None:
         fail("Info.plist must derive CFBundleShortVersionString from MARKETING_VERSION")
     if info.get("CFBundleVersion") != "$(CURRENT_PROJECT_VERSION)":
         fail("Info.plist must derive CFBundleVersion from CURRENT_PROJECT_VERSION")
-    if not info.get("NSLocationWhenInUseUsageDescription"):
-        fail("Info.plist must explain the location permission")
+    if info.get("NSLocationWhenInUseUsageDescription"):
+        fail("Info.plist must not request location permission; map and compass features are not part of this app")
 
     accessed_types = {
         item.get("NSPrivacyAccessedAPIType")
@@ -111,6 +118,15 @@ def main() -> None:
     for term in forbidden_weather_terms:
         if term.lower() in app_text.lower():
             fail(f"External weather integration must not return: {term}")
+    forbidden_navigation_terms = [
+        "import MapKit",
+        "import CoreLocation",
+        "LocationTrackingViewModel",
+        "NSLocationWhenInUseUsageDescription",
+    ]
+    for term in forbidden_navigation_terms:
+        if term.lower() in app_text.lower() or term.lower() in project_text.lower():
+            fail(f"Map, compass, and location tracking code must not return: {term}")
 
     forbidden_version_mutators = [
         r"\bagvtool\b",

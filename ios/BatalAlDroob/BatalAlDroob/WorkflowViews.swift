@@ -64,7 +64,7 @@ struct RequestView: View {
                             systemImage: "square.and.pencil"
                         )
                     }
-                    .disabled(request.partNumber.isEmpty && request.partName.isEmpty)
+                    .disabled(!partRequestHasRequiredInput(request))
                 }
                 Section(viewModel.text(ar: "طلبات محفوظة", en: "Saved requests")) {
                     if viewModel.savedRequests.isEmpty {

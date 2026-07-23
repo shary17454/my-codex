@@ -15,9 +15,9 @@ The `BatalAlDroob/Web/` directory is retained only for bundled catalog/support d
 | Catalog data | Foundation `Bundle`, `Data`, `JSONDecoder` |
 | Local persistence | `UserDefaults` with `Codable` helpers |
 | Purchases | StoreKit 2 |
-| Location/heading | Core Location |
-| Location and compass | Core Location and MapKit; no external weather service |
-| Maps/coordinates | MapKit/Core Location platform types |
+| Location/heading | Removed from native scope; the app does not request location permission |
+| Location and compass | Removed to keep Batal Al-Droob focused on Patrol parts workflows |
+| Maps/coordinates | Not included in the native app |
 | Logging | `OSLog.Logger` |
 | Tests | XCTest/XCUIAutomation |
 

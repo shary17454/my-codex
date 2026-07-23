@@ -120,6 +120,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 ## Engineering Reference
 
+- Mandatory Apple engineering constitution: [`docs/APPLE_ENGINEERING_STANDARD.md`](docs/APPLE_ENGINEERING_STANDARD.md)
 - Permanent quality and release standard: [`docs/PRODUCTION_READINESS_STANDARD.md`](docs/PRODUCTION_READINESS_STANDARD.md)
 - Architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - Flutter/native status: [`docs/FLUTTER_TO_NATIVE_MIGRATION.md`](docs/FLUTTER_TO_NATIVE_MIGRATION.md)
@@ -132,3 +133,7 @@ remaining requirements are deliberately kept visible in the execution report:
 a fresh signed Xcode Cloud build `111` or higher containing the permanent-IAP
 correction, completion and attachment of that IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
+
+`docs/APPLE_ENGINEERING_STANDARD.md` is enforced as a release input by
+`scripts/validate_release.py`; do not remove or bypass it for app, QA,
+accessibility, security, performance, or App Store work.
