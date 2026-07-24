@@ -24,6 +24,9 @@
 		101000000000000000000016 /* WorkflowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000017 /* WorkflowViews.swift */; };
 		101000000000000000000017 /* MoreViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000018 /* MoreViews.swift */; };
 		101000000000000000000018 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102000000000000000000019 /* AppIntents.framework */; };
+		101000000000000000000019 /* CatalogExternalActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10200000000000000000001A /* CatalogExternalActions.swift */; };
+		10100000000000000000001A /* ToolDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10200000000000000000001B /* ToolDetailViews.swift */; };
+		10100000000000000000001B /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102000000000000000000019 /* AppIntents.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +69,8 @@
 		102000000000000000000017 /* WorkflowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowViews.swift; sourceTree = "<group>"; };
 		102000000000000000000018 /* MoreViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreViews.swift; sourceTree = "<group>"; };
 		102000000000000000000019 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
+		10200000000000000000001A /* CatalogExternalActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogExternalActions.swift; sourceTree = "<group>"; };
+		10200000000000000000001B /* ToolDetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolDetailViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10100000000000000000001B /* AppIntents.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,11 +114,13 @@
 			isa = PBXGroup;
 			children = (
 				102000000000000000000001 /* AppDelegate.swift */,
+				10200000000000000000001A /* CatalogExternalActions.swift */,
 				102000000000000000000012 /* CatalogViewModel.swift */,
 				102000000000000000000010 /* Models.swift */,
 				102000000000000000000018 /* MoreViews.swift */,
 				102000000000000000000016 /* PartDetailViews.swift */,
 				102000000000000000000011 /* Services.swift */,
+				10200000000000000000001B /* ToolDetailViews.swift */,
 				102000000000000000000014 /* Utilities.swift */,
 				102000000000000000000013 /* Views.swift */,
 				102000000000000000000017 /* WorkflowViews.swift */,
@@ -295,11 +303,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				101000000000000000000001 /* AppDelegate.swift in Sources */,
+				101000000000000000000019 /* CatalogExternalActions.swift in Sources */,
 				101000000000000000000011 /* CatalogViewModel.swift in Sources */,
 				10100000000000000000000F /* Models.swift in Sources */,
 				101000000000000000000017 /* MoreViews.swift in Sources */,
 				101000000000000000000015 /* PartDetailViews.swift in Sources */,
 				101000000000000000000010 /* Services.swift in Sources */,
+				10100000000000000000001A /* ToolDetailViews.swift in Sources */,
 				101000000000000000000013 /* Utilities.swift in Sources */,
 				101000000000000000000012 /* Views.swift in Sources */,
 				101000000000000000000016 /* WorkflowViews.swift in Sources */,
