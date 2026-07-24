@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
-Updated: 2026-07-23
-Decision: `PREPARING_1.2.1`
+Updated: 2026-07-25
+Decision: `PREPARING_1.2.2`
 
 ## App And Apple Review State
 
@@ -10,23 +10,23 @@ Decision: `PREPARING_1.2.1`
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| App Store version | `1.2.1` for the next code-carrying candidate |
-| Current project build | `126` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
-| Latest App Store-ready version | `1.2.0` |
-| Latest failed Xcode Cloud build | `125` from commit `3f7f728` |
-| Latest successful Xcode Cloud build | `123` |
+| App Store version | `1.2.2` for the next code-carrying candidate |
+| Current project build | `133` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
+| Latest App Store-ready version | `1.2.1` |
+| Latest failed Xcode Cloud build | `132` from commit `998fc21` |
+| Latest successful Xcode Cloud build | `132` compiled and archived, but the upload was rejected by App Store Connect |
 | Latest pushed source commit | pending next commit |
-| Latest App Review submission | `1.2.0 (105)` rejected; `1.2.0` is now closed for new uploads |
+| Latest App Review submission | `1.2.1`/`1.2.0` trains are now closed for new uploads |
 | Required toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 | Latest detailed App Review issue | Guideline 2.1(b), App Completeness |
 | Latest historical rejected submission ID | `0fd0e8d0-ea44-4fe4-8fad-2ef8ea35eff6` |
 | Current submitted submission ID | `00e306d9-8983-4df8-b284-6cbc1fff2c04` |
 
 App Store Connect now reports `ITMS-90062` and `ITMS-90186` for new uploads on
-`1.2.0`: the `1.2.0` train is closed because it matches a previously approved
-version. Builds `124` and `125` failed in Build Uploads for this reason. The
-next valid binary must use `MARKETING_VERSION = 1.2.1` and a build number above
-all prior uploads, starting at `126`.
+`1.2.1`: the `1.2.1` train is closed because it matches a previously approved
+or closed version. Builds `131` and `132` failed in Build Uploads for this
+reason. The next valid binary must use `MARKETING_VERSION = 1.2.2` and a build
+number above all prior uploads, starting at `133`.
 
 The latest Apple issue message says that the app references paid functionality,
 but the associated In-App Purchase was not included in the review submission.
