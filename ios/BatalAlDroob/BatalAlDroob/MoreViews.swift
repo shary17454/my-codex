@@ -1,10 +1,20 @@
 import SwiftUI
 
+private enum ToolsDestination: Hashable {
+    case descriptionSearch
+    case fitmentCheck
+    case tireCalculator
+    case sharedFitment
+    case partRequest
+    case maintenance
+}
+
 struct MoreView: View {
     @Bindable var viewModel: CatalogViewModel
+    @State private var path = NavigationPath()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 Section {
                     ToolsHeroView(viewModel: viewModel)
@@ -96,6 +106,26 @@ struct MoreView: View {
             .listStyle(.insetGrouped)
             .navigationTitle(viewModel.text(ar: "الأدوات", en: "Tools"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
+            .navigationDestination(for: ToolsDestination.self) { destination in
+                switch destination {
+                case .descriptionSearch:
+                    DescriptionSearchToolView(viewModel: viewModel)
+                case .fitmentCheck:
+                    FitmentCheckToolView(viewModel: viewModel)
+                case .tireCalculator:
+                    TireCalculatorToolView(viewModel: viewModel)
+                case .sharedFitment:
+                    SharedFitmentContent(viewModel: viewModel)
+                        .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
+                case .partRequest:
+                    PartRequestContent(viewModel: viewModel)
+                        .navigationTitle(viewModel.text(ar: "طلب قطعة", en: "Part request"))
+                case .maintenance:
+                    MaintenanceToolView(viewModel: viewModel) {
+                        path = NavigationPath()
+                    }
+                }
+            }
             .navigationDestination(for: Part.self) { part in
                 PartDetailView(part: part, viewModel: viewModel)
             }
@@ -137,9 +167,7 @@ struct ToolsActionGrid: View {
             .accessibilityIdentifier("more.section.action-center")
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
-                NavigationLink {
-                    DescriptionSearchToolView(viewModel: viewModel)
-                } label: {
+                NavigationLink(value: ToolsDestination.descriptionSearch) {
                     ToolsActionCard(
                         symbol: "text.magnifyingglass",
                         title: viewModel.text(ar: "بحث ذكي", en: "Smart search"),
@@ -148,9 +176,7 @@ struct ToolsActionGrid: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    FitmentCheckToolView(viewModel: viewModel)
-                } label: {
+                NavigationLink(value: ToolsDestination.fitmentCheck) {
                     ToolsActionCard(
                         symbol: "checkmark.seal",
                         title: viewModel.text(ar: "تحقق التوافق", en: "Fitment check"),
@@ -162,9 +188,7 @@ struct ToolsActionGrid: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    TireCalculatorToolView(viewModel: viewModel)
-                } label: {
+                NavigationLink(value: ToolsDestination.tireCalculator) {
                     ToolsActionCard(
                         symbol: "gauge.with.dots.needle.33percent",
                         title: viewModel.text(ar: "حاسبة الكفرات", en: "Tire calculator"),
@@ -173,10 +197,7 @@ struct ToolsActionGrid: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    SharedFitmentContent(viewModel: viewModel)
-                        .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
-                } label: {
+                NavigationLink(value: ToolsDestination.sharedFitment) {
                     ToolsActionCard(
                         symbol: "point.3.connected.trianglepath.dotted",
                         title: viewModel.text(ar: "قطع مشتركة", en: "Shared parts"),
@@ -185,10 +206,7 @@ struct ToolsActionGrid: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    PartRequestContent(viewModel: viewModel)
-                        .navigationTitle(viewModel.text(ar: "طلب قطعة", en: "Part request"))
-                } label: {
+                NavigationLink(value: ToolsDestination.partRequest) {
                     ToolsActionCard(
                         symbol: "cart.badge.plus",
                         title: viewModel.text(ar: "تجهيز طلب", en: "Prepare request"),
@@ -200,9 +218,7 @@ struct ToolsActionGrid: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    MaintenanceToolView(viewModel: viewModel)
-                } label: {
+                NavigationLink(value: ToolsDestination.maintenance) {
                     ToolsActionCard(
                         symbol: "wrench.and.screwdriver",
                         title: viewModel.text(ar: "سجل الصيانة", en: "Maintenance log"),
@@ -210,6 +226,7 @@ struct ToolsActionGrid: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("tools.maintenance")
             }
         }
         .padding(.vertical, 6)

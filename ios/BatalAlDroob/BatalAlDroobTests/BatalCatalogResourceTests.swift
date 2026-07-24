@@ -53,6 +53,23 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertTrue(candidates.contains("A123456789"))
     }
 
+    func testBundledCatalogContainsCompactAlternatePartNumber() throws {
+        let catalogURL = try XCTUnwrap(bundle.url(
+            forResource: "y60_app_catalog",
+            withExtension: "json",
+            subdirectory: "data"
+        ))
+        let catalogData = try Data(contentsOf: catalogURL)
+        let catalog = try JSONDecoder().decode(CatalogPayload.self, from: catalogData)
+
+        let matches = catalog.parts.filter { part in
+            part.allNumbers.map(normalized).contains("081210401f")
+        }
+
+        XCTAssertFalse(matches.isEmpty)
+        XCTAssertTrue(matches.contains { $0.partNumber == "23378-M4901" || $0.partNumber == "23378-03J00" })
+    }
+
     func testDiagnosticKeywordsMapArabicAndEnglishDescriptions() {
         XCTAssertEqual(diagnosticKeywords("مشكلة في الفرامل"), ["brake"])
         XCTAssertEqual(diagnosticKeywords("radiator heat issue"), ["cooling", "fan", "radiator"])
@@ -238,6 +255,20 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
+    func testCompactAlternatePartNumberSearchIgnoresMismatchedCategoryFilter() async {
+        let viewModel = CatalogViewModel(
+            repository: AlternatePartNumberRepository(),
+            store: TestPurchaseService()
+        )
+
+        await viewModel.load()
+        viewModel.selectedCategory = .engine
+        viewModel.searchText = "081210401F"
+
+        XCTAssertEqual(viewModel.filteredParts.map(\.partNumber), ["23378-M4901"])
+    }
+
+    @MainActor
     func testDescriptionSearchAcceptsDirectPartNumber() async {
         let viewModel = CatalogViewModel(
             repository: RankedCatalogRepository(),
@@ -326,6 +357,35 @@ private struct RankedCatalogRepository: CatalogRepository {
 
     private static func part(_ json: String) throws -> Part {
         try JSONDecoder().decode(Part.self, from: Data(json.utf8))
+    }
+}
+
+private struct AlternatePartNumberRepository: CatalogRepository {
+    func loadCatalog() async throws -> CatalogPayload {
+        let part = try JSONDecoder().decode(Part.self, from: Data("""
+        {
+          "part_number": "23378-M4901",
+          "name_en": "Holder Assy-Brush",
+          "category": "general",
+          "part_numbers": ["23378-M4901", "08121-0401F"],
+          "evidence": []
+        }
+        """.utf8))
+
+        return CatalogPayload(
+            generatedAt: nil,
+            appName: "بطل الدروب",
+            model: "Y60",
+            sourceCount: 0,
+            recordCount: 1,
+            partCount: 1,
+            sources: [],
+            parts: [part]
+        )
+    }
+
+    func loadStores() async throws -> [VerifiedStore] {
+        []
     }
 }
 

@@ -70,17 +70,22 @@ struct PartRequestContent: View {
                 )
                 TextField("Y60", text: $request.generation)
                     .focused($focusedField, equals: .generation)
+                    .accessibilityIdentifier("request.generation")
                 TextField(viewModel.text(ar: "سنة الصنع", en: "Year"), text: $request.year)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .year)
+                    .accessibilityIdentifier("request.year")
                 TextField("VIN", text: $request.vin)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
                     .focused($focusedField, equals: .vin)
+                    .accessibilityIdentifier("request.vin")
                 TextField(viewModel.text(ar: "المحرك", en: "Engine"), text: $request.engine)
                     .focused($focusedField, equals: .engine)
+                    .accessibilityIdentifier("request.engine")
                 TextField(viewModel.text(ar: "القير", en: "Transmission"), text: $request.transmission)
                     .focused($focusedField, equals: .transmission)
+                    .accessibilityIdentifier("request.transmission")
             }
             Section {
                 BatalSectionHeader(
@@ -94,22 +99,23 @@ struct PartRequestContent: View {
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
                     .focused($focusedField, equals: .partNumber)
+                    .accessibilityIdentifier("request.partNumber")
                 TextField(viewModel.text(ar: "اسم القطعة", en: "Part name"), text: $request.partName)
                     .focused($focusedField, equals: .partName)
+                    .accessibilityIdentifier("request.partName")
                 TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $request.notes, axis: .vertical)
                     .focused($focusedField, equals: .notes)
+                    .accessibilityIdentifier("request.notes")
                 Button {
-                    focusedField = nil
-                    if viewModel.saveRequestPlan(selectedPlan, request: request) {
-                        request = SavedPartRequest()
-                    }
+                    saveRequest()
                 } label: {
                     Label(
                         viewModel.text(ar: "تجهيز الطلب وحفظه", en: "Prepare and save request"),
                         systemImage: "square.and.pencil"
                     )
                 }
-                .disabled(!partRequestHasRequiredInput(request))
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("request.save.inline")
             }
             Section {
                 BatalSectionHeader(
@@ -150,6 +156,27 @@ struct PartRequestContent: View {
             }
         }
         .scrollDismissesKeyboard(.interactively)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(viewModel.text(ar: "حفظ", en: "Save")) {
+                    saveRequest()
+                }
+                .accessibilityIdentifier("request.save")
+            }
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button(viewModel.text(ar: "تم", en: "Done")) {
+                    focusedField = nil
+                }
+            }
+        }
+    }
+
+    private func saveRequest() {
+        focusedField = nil
+        if viewModel.saveRequestPlan(selectedPlan, request: request) {
+            request = SavedPartRequest()
+        }
     }
 }
 

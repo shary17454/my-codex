@@ -173,7 +173,9 @@ struct FitmentCheckToolView: View {
 }
 
 struct MaintenanceToolView: View {
+    @Environment(\.dismiss) private var dismiss
     @Bindable var viewModel: CatalogViewModel
+    var returnToTools: (() -> Void)?
     @State private var title = ""
     @State private var odometer = ""
     @State private var notes = ""
@@ -181,5 +183,20 @@ struct MaintenanceToolView: View {
     var body: some View {
         MaintenanceContent(viewModel: viewModel, title: $title, odometer: $odometer, notes: $notes)
             .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        if let returnToTools {
+                            returnToTools()
+                        } else {
+                            dismiss()
+                        }
+                    } label: {
+                        Label(viewModel.text(ar: "الأدوات", en: "Tools"), systemImage: "chevron.backward")
+                    }
+                    .accessibilityIdentifier("tools.back")
+                }
+            }
     }
 }

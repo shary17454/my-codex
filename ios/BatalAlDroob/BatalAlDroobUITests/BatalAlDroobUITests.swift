@@ -20,7 +20,7 @@ final class BatalAlDroobUITests: XCTestCase {
         let catalogTab = navigationItem(named: "الكتالوج", in: app)
         XCTAssertTrue(catalogTab.waitForExistence(timeout: 10))
         catalogTab.tap()
-        let resultsLabel = app.staticTexts["النتائج"]
+        let resultsLabel = app.staticTexts["catalog.results"]
         XCTAssertTrue(reveal(resultsLabel, in: app))
 
         let requestTab = navigationItem(named: "طلب قطعة", in: app)
@@ -28,12 +28,12 @@ final class BatalAlDroobUITests: XCTestCase {
         requestTab.tap()
         XCTAssertTrue(app.navigationBars["طلب قطعة"].waitForExistence(timeout: 10))
 
-        let partNumberField = app.textFields["رقم القطعة"]
+        let partNumberField = app.textFields["request.partNumber"]
         XCTAssertTrue(reveal(partNumberField, in: app))
         partNumberField.tap()
         partNumberField.typeText("21082-4W000")
 
-        let saveButton = app.buttons["تجهيز الطلب وحفظه"]
+        let saveButton = app.buttons["request.save"]
         XCTAssertTrue(reveal(saveButton, in: app))
         saveButton.tap()
         XCTAssertTrue(app.staticTexts["تم تجهيز طلب القطعة وحفظه."].waitForExistence(timeout: 10))
@@ -50,12 +50,12 @@ final class BatalAlDroobUITests: XCTestCase {
         let actionCenter = app.staticTexts["more.section.action-center"]
         XCTAssertTrue(reveal(actionCenter, in: app))
 
-        let maintenanceItem = app.staticTexts["الصيانة"]
+        let maintenanceItem = app.buttons["tools.maintenance"]
         XCTAssertTrue(reveal(maintenanceItem, in: app))
         maintenanceItem.tap()
         XCTAssertTrue(app.navigationBars["الصيانة"].waitForExistence(timeout: 10))
-        app.navigationBars.buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(app.navigationBars["الأدوات"].waitForExistence(timeout: 10))
+        app.buttons["tools.back"].tap()
+        XCTAssertTrue(app.buttons["tools.maintenance"].waitForExistence(timeout: 10))
     }
 
     @MainActor

@@ -148,12 +148,15 @@ extension CatalogViewModel {
     }
 
     var filteredParts: [Part] {
+        let rawQuery = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         let query = normalized(searchText)
+        let isPartNumberLookup = isLikelyPartNumberLookup(rawQuery, normalizedQuery: query)
         return parts.lazy.filter { part in
             let categoryMatch = self.selectedCategory == .all || part.categoryValue == self.selectedCategory
-            guard categoryMatch else { return false }
+            let numberMatch = self.partNumberMatches(part, normalizedQuery: query)
+            guard categoryMatch || (isPartNumberLookup && numberMatch) else { return false }
             guard !query.isEmpty else { return true }
-            return (self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)).contains(query)
+            return numberMatch || (self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)).contains(query)
         }.prefix(250).map(\.self)
     }
 
@@ -246,7 +249,13 @@ extension CatalogViewModel {
 
     @discardableResult
     func saveRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) -> Bool {
-        guard partRequestHasRequiredInput(request) else { return false }
+        guard partRequestHasRequiredInput(request) else {
+            paymentMessage = text(
+                ar: "أدخل رقم القطعة أو اسمها قبل تجهيز الطلب.",
+                en: "Enter a part number or part name before preparing the request."
+            )
+            return false
+        }
         var saved = request.normalizedForStorage()
         saved.planID = plan.id
         saved.draft = buildDraft(for: saved, plan: plan)
@@ -346,7 +355,7 @@ extension CatalogViewModel {
         let mappedKeywords = diagnosticKeywords(trimmed)
         searchText = mappedKeywords.isEmpty ? trimmed : mappedKeywords.joined(separator: " ")
         selectedCategory = .all
-        selectedPart = filteredParts.first
+        selectedPart = rankedFitmentMatches(for: searchText, limit: 1).first ?? filteredParts.first
         if selectedPart == nil {
             paymentMessage = self.text(
                 ar: "لم أجد تطابقًا مباشرًا. جرّب رقم القطعة أو كلمة أوضح مثل radiator أو brake.",
@@ -492,5 +501,19 @@ extension CatalogViewModel {
             part.categoryAr,
             part.model
         ] + part.partNumbers + part.years + part.engines).compactMap(\.self).joined(separator: " "))
+    }
+
+    private func isLikelyPartNumberLookup(_ rawQuery: String, normalizedQuery: String) -> Bool {
+        guard normalizedQuery.count >= 5 else { return false }
+        if !partNumberCandidates(in: rawQuery).isEmpty { return true }
+        return normalizedQuery.contains(where: \.isNumber)
+            && normalizedQuery.contains(where: \.isLetter)
+    }
+
+    private func partNumberMatches(_ part: Part, normalizedQuery query: String) -> Bool {
+        guard !query.isEmpty else { return false }
+        return part.allNumbers.map(normalized).contains { number in
+            number == query || number.contains(query)
+        }
     }
 }

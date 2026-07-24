@@ -281,6 +281,7 @@ struct CatalogView: View {
                             en: "\(viewModel.filteredParts.count.formatted()) displayed catalog results."
                         )
                     )
+                    .accessibilityIdentifier("catalog.results")
                     if viewModel.filteredParts.isEmpty {
                         EmptyStateView(
                             symbol: "magnifyingglass",
