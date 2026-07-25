@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `1.2.2`
-- Project build: `133`
+- Project build: `135`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -85,7 +85,7 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
 - verifies `MARKETING_VERSION = 1.2.2`,
-- verifies `CURRENT_PROJECT_VERSION >= 133`,
+- verifies `CURRENT_PROJECT_VERSION >= 135`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
@@ -96,7 +96,7 @@ App Store Connect has closed the `1.2.1` train for new build uploads. Xcode
 Cloud uploads `131` and `132` failed with `ITMS-90062` and `ITMS-90186` because
 they reused `CFBundleShortVersionString = 1.2.1` after that version was already
 approved or closed. For the next candidate, create/open App Store version `1.2.2`
-and keep Xcode Cloud > Workflow > Next Build Number at `133` or higher. Do not
+and keep Xcode Cloud > Workflow > Next Build Number at `135` or higher. Do not
 reuse any uploaded build number.
 
 ## In-App Purchase
@@ -132,7 +132,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `133` or higher on release train `1.2.2`,
+a fresh signed Xcode Cloud build `135` or higher on release train `1.2.2`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 

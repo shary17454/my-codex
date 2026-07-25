@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-07-25
-Decision: `PREPARING_1.2.2`
+Decision: `PREPARING_1.2.2_BUILD_135`
 
 ## App And Apple Review State
 
@@ -11,11 +11,11 @@ Decision: `PREPARING_1.2.2`
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
 | App Store version | `1.2.2` for the next code-carrying candidate |
-| Current project build | `133` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
+| Current project build | `135` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
 | Latest App Store-ready version | `1.2.1` |
 | Latest failed Xcode Cloud build | `132` from commit `998fc21` |
 | Latest successful Xcode Cloud build | `132` compiled and archived, but the upload was rejected by App Store Connect |
-| Latest pushed source commit | pending next commit |
+| Latest pushed source commit | pending build `135` commit |
 | Latest App Review submission | `1.2.1`/`1.2.0` trains are now closed for new uploads |
 | Required toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 | Latest detailed App Review issue | Guideline 2.1(b), App Completeness |
@@ -26,7 +26,8 @@ App Store Connect now reports `ITMS-90062` and `ITMS-90186` for new uploads on
 `1.2.1`: the `1.2.1` train is closed because it matches a previously approved
 or closed version. Builds `131` and `132` failed in Build Uploads for this
 reason. The next valid binary must use `MARKETING_VERSION = 1.2.2` and a build
-number above all prior uploads, starting at `133`.
+number above all prior uploads. Build `134` was selected for review, so the next
+code-carrying candidate uses build `135`.
 
 The latest Apple issue message says that the app references paid functionality,
 but the associated In-App Purchase was not included in the review submission.
@@ -51,28 +52,35 @@ that issue; the newest Batal-specific mail confirms cloud build `110` succeeded.
 
 | Gate | Result |
 |---|---|
-| SwiftFormat | PASS: 0/12 files require formatting |
+| SwiftFormat | PASS: 0/14 files require formatting |
 | SwiftLint strict | PASS: 0 violations |
 | Release validator | PASS |
-| Release build | PASS with Xcode 26.6 (`17F113`) and iPhoneOS SDK 26.5 |
-| Unit tests | PASS: 11/11 |
+| Release simulator build | PASS locally with Xcode 26.4.1 (`17E202`) and iPhoneOS Simulator SDK 26.4 |
+| Release device build without signing | PASS locally with Xcode 26.4.1 (`17E202`) and iPhoneOS SDK 26.4 |
+| Static analysis | PASS locally with Xcode 26.4.1 (`17E202`) |
+| Unit tests | PASS: 19/19 |
 | UI tests | PASS: 2/2 |
-| Total automated tests | PASS: 13/13 |
+| Total automated tests | PASS: 21/21 |
 | Fresh unsigned archive | PASS |
 | Actual archive metadata | PASS |
 
-Fresh local archive from the previous `1.1.0 (111)` candidate:
-`/tmp/BatalAudit-1.1.0-111.xcarchive`
+Fresh local unsigned archive for the `1.2.2 (135)` candidate:
+`/tmp/BatalAlDroob-1.2.2-135.xcarchive`
 
 Verified app metadata inside that archive:
 
 - `CFBundleIdentifier = com.batalaldroob.parts`
-- `CFBundleShortVersionString = 1.1.0`
-- `CFBundleVersion = 111`
-- `DTXcodeBuild = 17F113`
-- `DTSDKName = iphoneos26.5`
+- `CFBundleShortVersionString = 1.2.2`
+- `CFBundleVersion = 135`
+- `DTXcodeBuild = 17E202`
+- `DTSDKName = iphoneos26.4`
 - `MinimumOSVersion = 17.0`
 - no embedded app extensions or third-party frameworks
+
+This local archive is an unsigned engineering validation artifact only. App
+Store submission must still use a fresh signed Xcode Cloud archive on Xcode
+26.6 (`17F113`) or a newer Apple-approved non-beta Xcode with iPhoneOS SDK
+26.5 or newer.
 
 ## Store Metadata State
 
@@ -95,4 +103,4 @@ Verified app metadata inside that archive:
    submissions; the shipping app uses the approved non-consumable
    `batal.catalog.permanent.unlock`.
 4. Before the next code-bearing release, verify Xcode Cloud Next Build Number is
-   higher than `122`.
+   `135` or higher.

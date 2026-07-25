@@ -24,8 +24,8 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] Dependency resolution succeeds.
 - [ ] Debug build succeeds.
-- [x] Release build succeeds locally with Xcode 26.6 and iPhoneOS SDK 26.5.
-- [x] Unit tests pass on a current iPhone simulator: 11/11.
+- [x] Release build succeeds locally with Xcode 26.4.1 and iPhoneOS SDK 26.4 as an engineering validation fallback.
+- [x] Unit tests pass on a current iPhone simulator: 19/19.
 - [x] iPhone UI smoke tests pass: 2/2, including the redesigned tools surface.
 - [ ] Relevant tests pass on a physical iPhone.
 - [ ] Confirm the removed map, location tracking, and compass surfaces do not appear in the submitted build.
@@ -35,9 +35,9 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Archive
 
-- [x] A fresh unsigned local archive for the permanent-IAP correction succeeds with Xcode 26.6 and iPhoneOS SDK 26.5.
-- [x] Previous local archive metadata confirmed bundle `com.batalaldroob.parts`, version `1.1.0 (111)`, Xcode build `17F113`, SDK `iphoneos26.5`, and iOS 17.0 minimum.
-- [ ] New `1.2.2 (133+)` archive metadata is verified before selecting a new build.
+- [x] A fresh unsigned local archive for build `135` succeeds with Xcode 26.4.1 and iPhoneOS SDK 26.4 as an engineering validation fallback.
+- [x] Local archive metadata confirmed bundle `com.batalaldroob.parts`, version `1.2.2 (135)`, Xcode build `17E202`, SDK `iphoneos26.4`, and iOS 17.0 minimum.
+- [ ] New signed Xcode Cloud `1.2.2 (135+)` archive metadata is verified before selecting a new App Store build.
 - [ ] A fresh signed Xcode Cloud archive is created from the intended commit.
 - [x] `ci_post_xcodebuild.sh` passes against Xcode Cloud build `122`.
 - [ ] Archive metadata confirms bundle `com.batalaldroob.parts`, expected version/build, production Xcode, accepted SDK, and iOS 17.0 minimum.
@@ -61,6 +61,6 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] No unresolved App Review item remains in the selected submission.
 - [ ] Only the newly validated build is selected.
-- [ ] Build `133` or higher is selected for iOS App Version `1.2.2`.
+- [ ] Build `135` or higher is selected for iOS App Version `1.2.2`.
 - [ ] Release notes match implemented behavior.
 - [x] Submitted after explicit approval: App Review submission `00e306d9-8983-4df8-b284-6cbc1fff2c04` is `Waiting for Review`.

@@ -1,13 +1,15 @@
 # Changelog
 
-## 1.2.2 (133+) - 2026-07-25
+## 1.2.2 (135) - 2026-07-25
 
 ### Release
 
 - Moved the next App Store candidate to release train `1.2.2` after App Store
   Connect rejected `1.2.1 (132)` with `ITMS-90062` and `ITMS-90186`.
-- Raised the local project build floor to `133` so Xcode Cloud cannot reuse the
-  failed `1.2.1` build numbers.
+- Raised the local project build floor to `135` after build `134` was selected
+  for review, so Xcode Cloud cannot reuse any submitted or failed build number.
+- Split catalog search and fitment helpers into a focused source file while
+  preserving part-number lookup behavior for searches such as `081210401F`.
 
 ## 1.2.1 (126+) - 2026-07-23
 
