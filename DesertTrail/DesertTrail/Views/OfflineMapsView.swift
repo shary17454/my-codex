@@ -16,7 +16,7 @@ struct OfflineMapsView: View {
             List {
                 Section {
                     Button {
-                        Task { await save(title: "موقعي الحالي", region: region, presetID: nil) }
+                        Task { await save(title: currentRegionTitle, region: region, presetID: nil) }
                     } label: {
                         Label("حفظ الخريطة الحالية", systemImage: "location.viewfinder")
                     }
@@ -105,6 +105,20 @@ struct OfflineMapsView: View {
             $0.title.localizedCaseInsensitiveContains(query) ||
             $0.subtitle.localizedCaseInsensitiveContains(query)
         }
+    }
+
+    private var currentRegionTitle: String {
+        if let nearest = OfflineMapPreset.samples.min(by: {
+            distance(from: region.center, to: $0.region.center) < distance(from: region.center, to: $1.region.center)
+        }), distance(from: region.center, to: nearest.region.center) < 15_000 {
+            return nearest.title
+        }
+        return String(format: "خريطة %.3f, %.3f", region.center.latitude, region.center.longitude)
+    }
+
+    private func distance(from first: CLLocationCoordinate2D, to second: CLLocationCoordinate2D) -> CLLocationDistance {
+        CLLocation(latitude: first.latitude, longitude: first.longitude)
+            .distance(from: CLLocation(latitude: second.latitude, longitude: second.longitude))
     }
 
     private func save(title: String, region: MKCoordinateRegion, presetID: UUID?) async {

@@ -171,19 +171,21 @@ struct HiddenPlaceForm: View {
     }
 
     private var canSubmit: Bool {
-        let hasCoordinate = includeCurrentLocation
-            ? appState.locationManager.currentLocation != nil
-            : selectedCoordinate != nil
-        return !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && hasCoordinate && !isSaving
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && resolvedCoordinate != nil && !isSaving
     }
 
     private var coordinatePreview: String {
-        guard let coordinate = includeCurrentLocation
-            ? appState.locationManager.currentLocation?.coordinate
-            : selectedCoordinate else {
+        guard let coordinate = resolvedCoordinate else {
             return "بانتظار إحداثية صالحة"
         }
         return String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude)
+    }
+
+    private var resolvedCoordinate: CLLocationCoordinate2D? {
+        if includeCurrentLocation {
+            return appState.locationManager.currentLocation?.coordinate ?? selectedCoordinate
+        }
+        return selectedCoordinate
     }
 
     private var parsedCoordinate: CLLocationCoordinate2D? {
@@ -221,24 +223,46 @@ struct HiddenPlaceForm: View {
         )
         do {
             let response = try await MKLocalSearch(request: request).start()
-            mapSearchResults = response.mapItems.prefix(10).map { item in
+            let appleResults = response.mapItems.prefix(12).map { item in
                 PlaceSearchResult(
                     name: item.name ?? cleanQuery,
                     subtitle: item.placemark.title ?? "نتيجة من خرائط Apple",
                     coordinate: item.placemark.coordinate
                 )
             }
-            searchMessage = mapSearchResults.isEmpty ? "لم يتم العثور على نتائج" : "نتائج خرائط Apple"
+            let localResults = HiddenPlace.samples
+                .filter {
+                    $0.name.localizedCaseInsensitiveContains(cleanQuery) ||
+                    $0.notes.localizedCaseInsensitiveContains(cleanQuery)
+                }
+                .map {
+                    PlaceSearchResult(
+                        name: $0.name,
+                        subtitle: "موقع محفوظ داخل الدرب",
+                        coordinate: $0.coordinate
+                    )
+                }
+            mapSearchResults = deduplicated(appleResults + localResults)
+            searchMessage = mapSearchResults.isEmpty ? "لم يتم العثور على نتائج" : "نتائج خرائط Apple والمواقع المحفوظة"
         } catch {
-            mapSearchResults = []
-            searchMessage = "تعذر البحث الآن. يمكنك إدخال الإحداثية مباشرة."
+            mapSearchResults = HiddenPlace.samples
+                .filter {
+                    $0.name.localizedCaseInsensitiveContains(cleanQuery) ||
+                    $0.notes.localizedCaseInsensitiveContains(cleanQuery)
+                }
+                .map {
+                    PlaceSearchResult(
+                        name: $0.name,
+                        subtitle: "نتيجة محلية عند تعذر الاتصال",
+                        coordinate: $0.coordinate
+                    )
+                }
+            searchMessage = mapSearchResults.isEmpty ? "تعذر البحث الآن. يمكنك إدخال الإحداثية مباشرة." : "تم عرض نتائج محلية عند تعذر الاتصال"
         }
     }
 
     private func save() {
-        guard let coordinate = includeCurrentLocation
-            ? appState.locationManager.currentLocation?.coordinate
-            : selectedCoordinate else {
+        guard let coordinate = resolvedCoordinate else {
             searchMessage = "يلزم تحديد موقع صحيح قبل الإرسال"
             return
         }
@@ -246,11 +270,11 @@ struct HiddenPlaceForm: View {
         let cloudStore = appState.cloudStore
         let place = HiddenPlace(
             id: UUID(),
-            name: name,
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
             coordinate: coordinate,
             rating: rating,
             imageSystemName: "camera.macro",
-            notes: notes,
+            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
             status: .pending,
             contributor: "أنت",
             points: 10
@@ -260,6 +284,14 @@ struct HiddenPlaceForm: View {
         dismiss()
         Task {
             try? await cloudStore.saveHiddenPlaceForReview(place)
+        }
+    }
+
+    private func deduplicated(_ results: [PlaceSearchResult]) -> [PlaceSearchResult] {
+        var seen = Set<String>()
+        return results.filter { result in
+            let key = "\(result.name.lowercased())|\(Int(result.coordinate.latitude * 10_000))|\(Int(result.coordinate.longitude * 10_000))"
+            return seen.insert(key).inserted
         }
     }
 }

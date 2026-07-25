@@ -187,7 +187,7 @@ struct CreateTripSheet: View {
         NavigationStack {
             Form {
                 Section("رحلة جديدة") {
-                    TextField("اسم الرحلة", text: $title)
+                    TextField("اسم الرحلة (اختياري)", text: $title)
                     DatePicker("البداية", selection: $startDate)
                     DatePicker("النهاية", selection: $endDate)
                     TextField("ملاحظات الرحلة", text: $notes, axis: .vertical)
@@ -195,7 +195,7 @@ struct CreateTripSheet: View {
                 }
 
                 Section {
-                    Label("سيتم استخدام موقعك الحالي كنقطة بداية إذا كان GPS متاحًا.", systemImage: "location")
+                    Label("إذا تركت الاسم فارغًا سيستخدم التطبيق اسم رحلة جديد. سيتم استخدام موقعك الحالي إذا كان GPS متاحًا، وإلا تُستخدم الوجهة الافتراضية حتى تختار وجهة من الخريطة.", systemImage: "location")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -210,8 +210,11 @@ struct CreateTripSheet: View {
                         appState.createTrip(title: title, startDate: startDate, endDate: endDate, notes: notes)
                         dismiss()
                     }
-                    .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || endDate < startDate)
+                    .disabled(endDate < startDate)
                 }
+            }
+            .onAppear {
+                appState.locationManager.startNavigation()
             }
         }
     }

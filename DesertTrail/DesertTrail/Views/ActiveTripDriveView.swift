@@ -200,7 +200,7 @@ struct ActiveTripDriveView: View {
                         .font(.system(size: 34))
                         .foregroundStyle(DrivePalette.goldGradient)
                         .opacity(headingDegrees == nil ? 0.32 : 1)
-                        .rotationEffect(.degrees(headingDegrees ?? 0))
+                        .rotationEffect(.degrees(northNeedleRotation))
                     VStack {
                         Text("N")
                         Spacer()
@@ -374,6 +374,11 @@ struct ActiveTripDriveView: View {
 
     private var headingDegrees: Double? {
         appState.locationManager.resolvedHeadingDegrees
+    }
+
+    private var northNeedleRotation: Double {
+        guard let headingDegrees else { return 0 }
+        return -headingDegrees
     }
 
     private var weatherIcon: String {

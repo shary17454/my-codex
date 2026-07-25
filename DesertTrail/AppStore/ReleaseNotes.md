@@ -1,5 +1,27 @@
 # سجل إصدار الدرب
 
+## 1.10.0 (96) - 2026-07-25
+
+### العربية - What's New
+
+- تحسين اتجاه البوصلة ومؤشر الشمال داخل شاشة البوصلة ووضع القيادة.
+- جعل اختيار وجهة الرحلة ينشئ رحلة مناسبة تلقائيًا عند عدم وجود رحلة حالية.
+- تحسين إنشاء الرحلات الجديدة بحيث لا يتعطل عند ترك الاسم اختياريًا، مع طلب تشغيل الموقع عند الحاجة.
+- تحسين إضافة المواقع باعتماد الإحداثية المحددة عند تعذر قراءة GPS فورًا.
+- توسيع البحث عن المواقع ليجمع بين خرائط Apple والمواقع المحلية المحفوظة داخل التطبيق.
+- تحسين خرائط بلا إنترنت بتسمية الخريطة المحفوظة حسب المنطقة الأقرب بدل تكرار اسم عام.
+- إعادة تنظيم لوحة التحكم داخل الخريطة لتقليل تداخل النصوص والأزرار على الشاشات الصغيرة.
+
+### English - What's New
+
+- Improved compass heading and north indicator behavior in the compass and driving views.
+- Selecting a destination now creates a usable trip automatically when no trip exists.
+- Improved new trip creation so an optional title no longer blocks saving, with location updates requested when needed.
+- Improved add-place behavior by using the selected coordinate when live GPS is not immediately available.
+- Expanded place search by combining Apple Maps results with saved local in-app destinations.
+- Improved offline map naming by using the nearest region instead of repeated generic names.
+- Reorganized map controls to reduce text and button overlap on smaller screens.
+
 ## 1.9.2 (95) - 2026-07-20
 
 ### العربية - What's New

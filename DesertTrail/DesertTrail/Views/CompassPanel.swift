@@ -36,7 +36,7 @@ struct CompassPanel: View {
                         Image(systemName: "location.north.fill")
                             .font(.system(size: 66))
                             .foregroundStyle(headingDegrees == nil ? Color.secondary : Color.oasisTeal)
-                            .rotationEffect(.degrees(headingDegrees ?? 0))
+                            .rotationEffect(.degrees(northNeedleRotation))
                             .environment(\.layoutDirection, .leftToRight)
                         Text(headingDegrees.map { "\(Int($0.rounded()))°" } ?? "--°")
                             .font(.system(.largeTitle, design: .rounded).monospacedDigit().weight(.bold))
@@ -139,6 +139,11 @@ struct CompassPanel: View {
 
     private var headingDegrees: Double? {
         appState.locationManager.resolvedHeadingDegrees
+    }
+
+    private var northNeedleRotation: Double {
+        guard let headingDegrees else { return 0 }
+        return -headingDegrees
     }
 
     private func compassCardinal(_ text: String, x: CGFloat = 0, y: CGFloat = 0) -> some View {

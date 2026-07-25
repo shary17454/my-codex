@@ -59,110 +59,7 @@ struct DesertMapView: View {
             }
             .ignoresSafeArea(edges: .bottom)
 
-            VStack(spacing: 12) {
-                Picker("Map Layer", selection: $mapLayer) {
-                    Text(appState.text(.satellite)).tag(DesertMapLayer.satellite)
-                    Text(appState.text(.ajajiMaps)).tag(DesertMapLayer.ajaji)
-                    Text(appState.text(.markedPlans)).tag(DesertMapLayer.markedPlans)
-                }
-                .pickerStyle(.segmented)
-                .font(.caption.weight(.semibold))
-
-                if mapLayer == .ajaji {
-                    Picker(appState.text(.ajajiMaps), selection: $ajajiImageIndex) {
-                        Text(appState.text(.ajajiSaudi)).tag(0)
-                        Text(appState.text(.ajajiRiyadh)).tag(1)
-                    }
-                    .pickerStyle(.segmented)
-                }
-
-                if mapLayer != .satellite {
-                    HStack(spacing: 10) {
-                        Label(currentPDFStatus, systemImage: pdfMapStore.isImported(currentPDFDocument) ? "checkmark.seal" : "doc")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button {
-                            showingPDFSourceManager = true
-                        } label: {
-                            Label(appState.text(.managePDFSource), systemImage: "doc.badge.gearshape")
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .padding(10)
-                    .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
-                }
-
-                if mapLayer == .satellite {
-                    HStack(spacing: 10) {
-                        Label(activeTileTemplate == nil ? "لا توجد طبقة GIS فعالة" : "طبقة GIS فعالة", systemImage: activeTileTemplate == nil ? "square.3.layers.3d.slash" : "square.3.layers.3d")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button {
-                            showingGeospatialCatalog = true
-                        } label: {
-                            Label("إدارة الطبقات", systemImage: "slider.horizontal.3")
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .padding(10)
-                    .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
-                }
-
-                EnvironmentBanner(report: appState.environmentalReport)
-
-                if let mapStatusMessage {
-                    Text(mapStatusMessage)
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.center)
-                        .minimumScaleFactor(0.75)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 8)
-                        .background(Color.oasisTeal, in: RoundedRectangle(cornerRadius: 8))
-                        .transition(.opacity)
-                }
-
-                HStack(spacing: 10) {
-                    metricTile(title: "GPS", value: appState.locationManager.isTracking ? appState.text(.gpsActive) : appState.text(.gpsReady), icon: "location")
-                    metricTile(title: "ALT", value: altitudeText, icon: "mountain.2")
-                    metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
-                }
-
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 108), spacing: 8)], spacing: 8) {
-                    compactMapActionButton(
-                        title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
-                        icon: "location.north.line",
-                        isPrimary: true
-                    ) {
-                        if appState.locationManager.isTracking {
-                            appState.locationManager.stopNavigation()
-                            showMapStatus("تم إيقاف الملاحة")
-                        } else {
-                            appState.locationManager.startNavigation()
-                            showMapStatus("تم تشغيل GPS والبوصلة")
-                        }
-                    }
-                    compactMapActionButton(title: appState.text(.addPlace), icon: "plus") {
-                        showingAddPlace = true
-                    }
-                    compactMapActionButton(title: appState.text(.offline), icon: "icloud.and.arrow.down") {
-                        showingOfflineMaps = true
-                    }
-                    compactMapActionButton(title: "GIS", icon: "square.3.layers.3d") {
-                        showingGeospatialCatalog = true
-                    }
-                }
-            }
-            .padding(12)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .padding(.horizontal, 10)
-            .padding(.bottom, 104)
-            .frame(maxHeight: 520, alignment: .bottom)
+            mapControlPanel
         }
         .task {
             await appState.startLocationAndRefreshEnvironment()
@@ -206,6 +103,116 @@ struct DesertMapView: View {
 
     private var currentPDFStatus: String {
         pdfMapStore.isImported(currentPDFDocument) ? appState.text(.officialPDF) : appState.text(.bundledPDF)
+    }
+
+    private var mapControlPanel: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 10) {
+                Picker("Map Layer", selection: $mapLayer) {
+                    Text(appState.text(.satellite)).tag(DesertMapLayer.satellite)
+                    Text(appState.text(.ajajiMaps)).tag(DesertMapLayer.ajaji)
+                    Text(appState.text(.markedPlans)).tag(DesertMapLayer.markedPlans)
+                }
+                .pickerStyle(.segmented)
+                .font(.caption.weight(.semibold))
+
+                if mapLayer == .ajaji {
+                    Picker(appState.text(.ajajiMaps), selection: $ajajiImageIndex) {
+                        Text(appState.text(.ajajiSaudi)).tag(0)
+                        Text(appState.text(.ajajiRiyadh)).tag(1)
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                mapSourceStatusRow
+                EnvironmentBanner(report: appState.environmentalReport)
+                statusMessageView
+
+                HStack(spacing: 8) {
+                    metricTile(title: "GPS", value: appState.locationManager.isTracking ? appState.text(.gpsActive) : appState.text(.gpsReady), icon: "location")
+                    metricTile(title: "ALT", value: altitudeText, icon: "mountain.2")
+                    metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
+                }
+
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 88), spacing: 8)], spacing: 8) {
+                    compactMapActionButton(
+                        title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
+                        icon: "location.north.line",
+                        isPrimary: true
+                    ) {
+                        if appState.locationManager.isTracking {
+                            appState.locationManager.stopNavigation()
+                            showMapStatus("تم إيقاف الملاحة")
+                        } else {
+                            appState.locationManager.startNavigation()
+                            showMapStatus("تم تشغيل GPS والبوصلة")
+                        }
+                    }
+                    compactMapActionButton(title: appState.text(.addPlace), icon: "plus") {
+                        showingAddPlace = true
+                    }
+                    compactMapActionButton(title: appState.text(.offline), icon: "icloud.and.arrow.down") {
+                        showingOfflineMaps = true
+                    }
+                    compactMapActionButton(title: "GIS", icon: "square.3.layers.3d") {
+                        showingGeospatialCatalog = true
+                    }
+                }
+            }
+            .padding(12)
+        }
+        .frame(maxHeight: 430)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .padding(.horizontal, 10)
+        .padding(.bottom, 104)
+    }
+
+    private var mapSourceStatusRow: some View {
+        HStack(spacing: 10) {
+            if mapLayer == .satellite {
+                Label(activeTileTemplate == nil ? "لا توجد طبقة GIS فعالة" : "طبقة GIS فعالة", systemImage: activeTileTemplate == nil ? "square.3.layers.3d.slash" : "square.3.layers.3d")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Label(currentPDFStatus, systemImage: pdfMapStore.isImported(currentPDFDocument) ? "checkmark.seal" : "doc")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+            Button {
+                if mapLayer == .satellite {
+                    showingGeospatialCatalog = true
+                } else {
+                    showingPDFSourceManager = true
+                }
+            } label: {
+                Label(mapLayer == .satellite ? "إدارة الطبقات" : appState.text(.managePDFSource), systemImage: mapLayer == .satellite ? "slider.horizontal.3" : "doc.badge.gearshape")
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding(10)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    @ViewBuilder
+    private var statusMessageView: some View {
+        if let mapStatusMessage {
+            Text(mapStatusMessage)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.white)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.75)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(Color.oasisTeal, in: RoundedRectangle(cornerRadius: 8))
+                .transition(.opacity)
+        }
     }
 
     private var activeTileTemplate: String? {

@@ -156,7 +156,21 @@ final class AppState {
 
     func setTripDestination(to place: HiddenPlace) {
         guard !trips.isEmpty else {
-            statusMessage = "أنشئ رحلة أولًا ثم اختر وجهتها"
+            let trip = TripPlan(
+                id: UUID(),
+                title: place.name,
+                startDate: .now,
+                endDate: Calendar.current.date(byAdding: .hour, value: 8, to: .now) ?? .now,
+                meetingPoint: place.coordinate,
+                routeName: "مسار مباشر",
+                notes: place.notes,
+                participants: []
+            )
+            trips.insert(trip, at: 0)
+            selectedTrip = trip
+            persistTrips()
+            persistSelectedTripID()
+            statusMessage = "تم إنشاء رحلة وتحديد الوجهة: \(place.name)"
             return
         }
         selectedTrip.meetingPoint = place.coordinate
