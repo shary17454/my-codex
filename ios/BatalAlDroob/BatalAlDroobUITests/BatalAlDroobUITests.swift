@@ -22,6 +22,10 @@ final class BatalAlDroobUITests: XCTestCase {
         catalogTab.tap()
         let resultsLabel = app.staticTexts["catalog.results"]
         XCTAssertTrue(reveal(resultsLabel, in: app))
+        app.searchFields.firstMatch.tap()
+        app.searchFields.firstMatch.typeText("081210401F")
+        XCTAssertTrue(app.staticTexts["23378-M4901"].waitForExistence(timeout: 10))
+        dismissKeyboardIfVisible(in: app)
 
         let requestTab = navigationItem(named: "طلب قطعة", in: app)
         XCTAssertTrue(requestTab.waitForExistence(timeout: 10))
@@ -109,5 +113,12 @@ final class BatalAlDroobUITests: XCTestCase {
         }
 
         return false
+    }
+
+    @MainActor
+    private func dismissKeyboardIfVisible(in app: XCUIApplication) {
+        guard app.keyboards.firstMatch.exists else { return }
+
+        app.typeText("\n")
     }
 }
