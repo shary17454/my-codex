@@ -449,22 +449,66 @@ final class StudyVaultCoreTests: XCTestCase {
         }
     }
 
+    func testDecisionSummaryProducesCompassAndActionItems() {
+        let question = makeQuestion(
+            votes: [45, 15],
+            comments: [
+                AskComment(
+                    author: "مستخدم",
+                    text: "الكاميرا ممتازة وسهولة الاستخدام واضحة",
+                    likes: 3,
+                    optionTitle: "الخيار الأول",
+                    trustBadge: "مجرّب فعليًا",
+                    reasonCategory: "الكاميرا"
+                ),
+                AskComment(
+                    author: "مستخدم",
+                    text: "السعر غالي لكن الأداء قوي",
+                    likes: 1,
+                    optionTitle: "الخيار الأول",
+                    reasonCategory: "الأداء"
+                )
+            ]
+        )
+
+        let summary = DecisionSummaryService.makeSummary(for: question)
+
+        XCTAssertTrue(summary.compassTitle.contains("الخيار الأول"))
+        XCTAssertFalse(summary.compassSubtitle.isEmpty)
+        XCTAssertFalse(summary.actionItems.isEmpty)
+        XCTAssertTrue(summary.actionItems.contains { $0.title == "أهم محور في النقاش" })
+    }
+
     private func makeQuestion(
         title: String = "أي خيار أفضل؟",
         category: AskCategory = .phones,
         optionTitles: [String] = ["الخيار الأول", "الخيار الثاني"],
-        votes: [Int]
+        votes: [Int],
+        comments: [AskComment] = []
     ) -> AskQuestion {
-        AskQuestion(
+        let options = zip(optionTitles, votes).map {
+            PollOption(title: $0.0, votes: $0.1)
+        }
+        let comments = comments.map { comment in
+            guard comment.optionID == nil,
+                  let optionTitle = comment.optionTitle,
+                  let optionID = options.first(where: { $0.title == optionTitle })?.id else {
+                return comment
+            }
+
+            var linkedComment = comment
+            linkedComment.optionID = optionID
+            return linkedComment
+        }
+
+        return AskQuestion(
             title: title,
             details: "تفاصيل المقارنة",
             category: category,
             author: "مختبر",
             timeAgo: "الآن",
-            options: zip(optionTitles, votes).map {
-                PollOption(title: $0.0, votes: $0.1)
-            },
-            comments: []
+            options: options,
+            comments: comments
         )
     }
 }

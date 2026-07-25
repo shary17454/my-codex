@@ -39,13 +39,18 @@ Xcode Cloud هو المصدر الوحيد لبناء Release وإنشاء Archi
 
 ## آخر تحقق
 
-نجح Xcode Cloud Build `58` في 20 يوليو 2026 من commit `dda2ea7` باستخدام Xcode `26.6 (17F113)` وmacOS Tahoe `26.5.1`. نجحت عمليتا Build وArchive، وظهر `1.10.0 (58)` في App Store Connect بحالة `Complete`.
+آخر رسالة App Store Connect بتاريخ 23 يوليو 2026 رفضت `1.10.0 (69)` بسبب:
+
+- `ITMS-90186`: مسار `1.10.0` مغلق للإرسالات الجديدة.
+- `ITMS-90062`: `CFBundleShortVersionString` يجب أن يكون أعلى من آخر إصدار معتمد `1.10.0`.
+
+الإصدار المطلوب الآن هو `1.12.0`، ورقم البناء الأدنى هو `72`. يجب ضبط Xcode Cloud Next Build Number على `72` أو رقم أعلى من كل Builds الظاهرة في App Store Connect قبل أي Archive جديد.
 
 ## خطوات الإصدار
 
 1. ادمج تغييرات وش الرأي في `main` وادفعها إلى GitHub.
 2. راقب Workflow `Default` حتى نجاح Build وArchive.
-3. افتح TestFlight > Build Uploads وتأكد من أن البناء الجديد `Complete`.
+3. افتح TestFlight > Build Uploads وتأكد من أن البناء الجديد `Complete` أو أن حالة المراجعة الحالية تسمح بالإجراء المطلوب.
 4. تحقق من أن الإصدار أعلى من آخر إصدار منشور وأن رقم البناء غير مستخدم.
 5. اربط البناء بإصدار App Store المفتوح بعد مراجعة الخصوصية والبيانات الوصفية.
 6. لا ترسل إلى App Review إلا بتصريح صريح وبعد اكتمال الخطوات اليدوية.

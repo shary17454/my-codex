@@ -596,15 +596,6 @@ struct DecisionSummaryCard: View {
         }
     }
 
-    private var winnerTitle: String {
-        guard let winnerID = summary.winningOptionID,
-              let winner = question.options.first(where: { $0.id == winnerID }),
-              summary.totalVotes > 0 else {
-            return "نحتاج مشاركات أكثر"
-        }
-        return "\(winner.title) في الصدارة"
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 17) {
             verdictHero
@@ -692,6 +683,18 @@ struct DecisionSummaryCard: View {
                 WeshStatusBanner(text: warning, kind: .warning)
             }
 
+            if !summary.actionItems.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("ماذا تفعل الآن؟", systemImage: "checklist")
+                        .font(.headline)
+                        .foregroundStyle(WeshTheme.primaryText)
+
+                    ForEach(summary.actionItems) { item in
+                        DecisionActionItemRow(item: item)
+                    }
+                }
+            }
+
             if !summary.optionInsights.isEmpty {
                 Divider().overlay(WeshTheme.hairline)
                 VStack(alignment: .leading, spacing: 10) {
@@ -723,13 +726,18 @@ struct DecisionSummaryCard: View {
 
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 9) {
-                    Label("القرار النهائي", systemImage: "sparkles")
+                    Label("بوصلة القرار", systemImage: "sparkles")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(WeshTheme.goldBright)
 
-                    Text(winnerTitle)
+                    Text(summary.compassTitle)
                         .font(.title2.weight(.bold))
                         .foregroundStyle(WeshTheme.goldBright)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(summary.compassSubtitle)
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(WeshTheme.primaryText.opacity(0.82))
                         .fixedSize(horizontal: false, vertical: true)
 
                     Text(summary.recommendationText)
@@ -840,6 +848,34 @@ struct OptionInsightView: View {
         .padding(13)
         .background(WeshTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
         .overlay { RoundedRectangle(cornerRadius: WeshTheme.controlRadius).stroke(WeshTheme.hairline) }
+    }
+}
+
+struct DecisionActionItemRow: View {
+    let item: DecisionActionItem
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            WeshIconTile(systemImage: item.systemImage, color: WeshTheme.gold, size: 38)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.title)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(WeshTheme.primaryText)
+                Text(item.details)
+                    .font(.caption)
+                    .foregroundStyle(WeshTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(12)
+        .background(WeshTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: WeshTheme.compactRadius))
+        .overlay {
+            RoundedRectangle(cornerRadius: WeshTheme.compactRadius)
+                .stroke(WeshTheme.hairline, lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

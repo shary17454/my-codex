@@ -44,10 +44,10 @@ struct WeshDecisionLogo: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(WeshTheme.gold.opacity(0.42), lineWidth: 1)
-            Image(systemName: "checkmark.circle")
-                .font(.system(size: size * 0.62, weight: .semibold))
-                .foregroundStyle(WeshTheme.goldGradient)
+                .fill(WeshTheme.surface.opacity(0.72))
+            Circle()
+                .stroke(WeshTheme.gold.opacity(0.52), lineWidth: 1)
+            WeshCompassGlyph(size: size * 0.72, showsCheckmark: true)
         }
         .frame(width: size, height: size)
         .shadow(color: WeshTheme.gold.opacity(0.28), radius: 12)
@@ -61,15 +61,19 @@ struct WeshDecisionSeal: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(WeshTheme.gold.opacity(0.08))
-                .frame(width: size * 1.05, height: size * 1.05)
+                .fill(
+                    RadialGradient(
+                        colors: [WeshTheme.gold.opacity(0.22), WeshTheme.gold.opacity(0.03), .clear],
+                        center: .center,
+                        startRadius: 6,
+                        endRadius: size * 0.72
+                    )
+                )
+                .frame(width: size * 1.26, height: size * 1.26)
             Circle()
-                .stroke(WeshTheme.gold.opacity(0.18), lineWidth: 1)
-                .frame(width: size * 0.9, height: size * 0.9)
-            Image(systemName: "checkmark.shield.fill")
-                .font(.system(size: size * 0.68, weight: .bold))
-                .foregroundStyle(WeshTheme.goldGradient)
-                .symbolRenderingMode(.hierarchical)
+                .fill(WeshTheme.surface.opacity(0.44))
+                .frame(width: size * 0.98, height: size * 0.98)
+            WeshCompassGlyph(size: size * 0.84, showsCheckmark: true)
         }
         .frame(width: size, height: size)
         .shadow(color: WeshTheme.gold.opacity(0.32), radius: 18, y: 6)
@@ -97,16 +101,25 @@ struct FeaturedDecisionCard: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [WeshTheme.surface, WeshTheme.accent.opacity(0.12), WeshTheme.gold.opacity(0.08)],
+                colors: [
+                    WeshTheme.elevatedSurface,
+                    WeshTheme.accent.opacity(0.16),
+                    WeshTheme.gold.opacity(0.13)
+                ],
                 startPoint: .topTrailing,
                 endPoint: .bottomLeading
             )
+            .overlay(alignment: .topTrailing) {
+                WeshCompassGlyph(size: 180)
+                    .opacity(0.055)
+                    .offset(x: -8, y: 6)
+            }
 
             HStack(alignment: .center, spacing: 14) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label("ملخص القرار", systemImage: "chart.line.uptrend.xyaxis")
+                    Label("رحلة القرار", systemImage: "location.north.circle.fill")
                         .font(.caption.weight(.bold))
-                        .foregroundStyle(WeshTheme.accentBright)
+                        .foregroundStyle(WeshTheme.goldBright)
 
                     Text(question?.title ?? "ابدأ قرارك الأول")
                         .font(.headline.weight(.bold))
@@ -133,7 +146,7 @@ struct FeaturedDecisionCard: View {
 
                         Button(action: openQuestion) {
                             HStack {
-                                Text("عرض ملخص القرار")
+                                Text("افتح بوصلة القرار")
                                 Spacer()
                                 Image(systemName: "chevron.backward")
                             }
@@ -141,7 +154,7 @@ struct FeaturedDecisionCard: View {
                         .buttonStyle(WeshSecondaryButtonStyle())
                         .accessibilityIdentifier("home.featuredDecision")
                     } else {
-                        Text("أنشئ مقارنة، اجمع الآراء، ثم راجع خلاصة واضحة تساعدك على الحسم.")
+                        Text("اسأل، قارن، ثم شاهد بوصلة واضحة تجمع الأصوات والأسباب في قرار أسهل.")
                             .font(.subheadline)
                             .foregroundStyle(WeshTheme.secondaryText)
                         Button("أنشئ مقارنة", action: startQuestion)
@@ -562,7 +575,19 @@ struct BrowserShortcut: View {
 
 struct AppBackground: View {
     var body: some View {
-        WeshTheme.backgroundGradient
+        ZStack {
+            WeshTheme.backgroundGradient
+            LinearGradient(
+                colors: [
+                    WeshTheme.gold.opacity(0.08),
+                    .clear,
+                    WeshTheme.accent.opacity(0.06)
+                ],
+                startPoint: .topTrailing,
+                endPoint: .bottomLeading
+            )
+            .allowsHitTesting(false)
+        }
             .ignoresSafeArea()
     }
 }

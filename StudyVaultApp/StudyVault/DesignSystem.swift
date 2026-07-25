@@ -2,20 +2,20 @@ import SwiftUI
 import UIKit
 
 enum WeshTheme {
-    static let accent = adaptiveColor(light: 0x168566, dark: 0x27B58A)
-    static let accentBright = adaptiveColor(light: 0x27A880, dark: 0x56D2AD)
-    static let gold = adaptiveColor(light: 0xB78738, dark: 0xD7AE63)
-    static let goldBright = adaptiveColor(light: 0xC79B51, dark: 0xE8C988)
+    static let accent = adaptiveColor(light: 0x146D60, dark: 0x2BBF9B)
+    static let accentBright = adaptiveColor(light: 0x1E9E85, dark: 0x67E0C0)
+    static let gold = adaptiveColor(light: 0xA87634, dark: 0xC99A4B)
+    static let goldBright = adaptiveColor(light: 0xC99955, dark: 0xF0D08A)
     static let warning = adaptiveColor(light: 0xB78738, dark: 0xE5B85C)
     static let highlight = warning
     static let destructive = adaptiveColor(light: 0xB95353, dark: 0xE27373)
     static let success = accent
-    static let secondaryAccent = adaptiveColor(light: 0x496BA8, dark: 0x7397DD)
+    static let secondaryAccent = adaptiveColor(light: 0x536D8E, dark: 0x9FB7D8)
 
-    static let canvas = adaptiveColor(light: 0xF6F3ED, dark: 0x0B0E13)
-    static let canvasBottom = adaptiveColor(light: 0xEFEAE1, dark: 0x11151C)
-    static let surface = adaptiveColor(light: 0xFFFFFF, dark: 0x151A21)
-    static let elevatedSurface = adaptiveColor(light: 0xFFFFFF, dark: 0x1B212A)
+    static let canvas = adaptiveColor(light: 0xF4EFE6, dark: 0x070A0F)
+    static let canvasBottom = adaptiveColor(light: 0xE9E0D3, dark: 0x131821)
+    static let surface = adaptiveColor(light: 0xFFFDF8, dark: 0x111721)
+    static let elevatedSurface = adaptiveColor(light: 0xFFFFFF, dark: 0x192130)
     static let primaryText = adaptiveColor(light: 0x171B21, dark: 0xF7F8FA)
     static let secondaryText = adaptiveColor(light: 0x66707B, dark: 0xA8B0BA)
     static let hairline = adaptiveColor(light: 0xE6E0D6, dark: 0x2B323D)
@@ -29,7 +29,7 @@ enum WeshTheme {
 
     static var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [canvas, canvasBottom],
+            colors: [adaptiveColor(light: 0xF7F2EA, dark: 0x06080C), canvas, canvasBottom],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -37,7 +37,11 @@ enum WeshTheme {
 
     static var heroGradient: LinearGradient {
         LinearGradient(
-            colors: [accent.opacity(0.98), adaptiveColor(light: 0x0F6650, dark: 0x0E4B3E)],
+            colors: [
+                adaptiveColor(light: 0x123B38, dark: 0x0A201F),
+                adaptiveColor(light: 0x155B4E, dark: 0x102E2A),
+                gold.opacity(0.44)
+            ],
             startPoint: .topTrailing,
             endPoint: .bottomLeading
         )
@@ -144,14 +148,40 @@ struct WeshBrandMark: View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
                 .fill(usesGold ? WeshTheme.goldGradient : WeshTheme.heroGradient)
-            Image(systemName: "checkmark.bubble.fill")
-                .font(.system(size: size * 0.47, weight: .bold))
-                .foregroundStyle(.white)
-                .symbolRenderingMode(.hierarchical)
+            WeshCompassGlyph(size: size * 0.72, showsCheckmark: true)
         }
         .frame(width: size, height: size)
         .shadow(color: (usesGold ? WeshTheme.gold : WeshTheme.accent).opacity(0.24), radius: 12, y: 6)
         .accessibilityHidden(true)
+    }
+}
+
+struct WeshCompassGlyph: View {
+    var size: CGFloat = 44
+    var showsCheckmark = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(WeshTheme.goldBright.opacity(0.8), lineWidth: max(1, size * 0.045))
+            Circle()
+                .stroke(WeshTheme.gold.opacity(0.24), lineWidth: max(1, size * 0.018))
+                .frame(width: size * 0.72, height: size * 0.72)
+
+            ForEach(0..<4, id: \.self) { index in
+                Capsule()
+                    .fill(WeshTheme.goldBright.opacity(0.75))
+                    .frame(width: max(1.5, size * 0.035), height: size * 0.14)
+                    .offset(y: -size * 0.39)
+                    .rotationEffect(.degrees(Double(index) * 90))
+            }
+
+            Image(systemName: showsCheckmark ? "checkmark.seal.fill" : "location.north.line.fill")
+                .font(.system(size: size * (showsCheckmark ? 0.52 : 0.58), weight: .bold))
+                .foregroundStyle(WeshTheme.goldGradient)
+                .symbolRenderingMode(.hierarchical)
+        }
+        .frame(width: size, height: size)
     }
 }
 
