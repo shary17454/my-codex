@@ -1,42 +1,124 @@
+import PhotosUI
 import SwiftUI
 
-private enum ToolsDestination: Hashable {
-    case descriptionSearch
-    case fitmentCheck
-    case tireCalculator
-    case sharedFitment
-    case partRequest
+enum MoreToolDestination: Hashable {
+    case smartSearch
+    case fitment
+    case request
     case maintenance
 }
 
 struct MoreView: View {
     @Bindable var viewModel: CatalogViewModel
-    @State private var path = NavigationPath()
+    @State private var toolPath: [MoreToolDestination] = []
+    @State private var descriptionQuery = ""
+    @State private var descriptionMatches: [Part] = []
+    @State private var descriptionStatus = ""
+    @State private var oldTireSize = "265/70R16"
+    @State private var newTireSize = "285/75R16"
+    @State private var tireResult = ""
+    @State private var maintenanceTitle = ""
+    @State private var maintenanceOdometer = ""
+    @State private var maintenanceNotes = ""
 
     var body: some View {
-        NavigationStack(path: $path) {
+        let photoPickerTitle = viewModel.text(ar: "اختيار صورة كمرجع", en: "Choose reference photo")
+        return NavigationStack(path: $toolPath) {
             List {
                 Section {
                     ToolsHeroView(viewModel: viewModel)
                 }
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "مركز العمل", en: "Action center"),
-                        subtitle: viewModel.text(
-                            ar: "كل أداة لها شاشة مستقلة ومسار واضح.",
-                            en: "Each tool has a focused screen and a clear path."
-                        )
+                Section(viewModel.text(ar: "مركز العمل", en: "Action center")) {
+                    ToolsActionGrid(
+                        viewModel: viewModel,
+                        maintenanceTitle: $maintenanceTitle,
+                        maintenanceOdometer: $maintenanceOdometer,
+                        maintenanceNotes: $maintenanceNotes,
+                        openTool: { toolPath.append($0) }
                     )
-                    ToolsActionGrid(viewModel: viewModel)
                 }
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "قائمة الرغبات", en: "Wishlist"),
-                        subtitle: viewModel.text(
-                            ar: "القطع التي حفظتها من شاشة التفاصيل.",
-                            en: "Parts saved from detail screens."
-                        )
+                Section(viewModel.text(ar: "بحث بالوصف والصورة", en: "Description and photo search")) {
+                    TextField(
+                        viewModel.text(ar: "اكتب وصف العطل أو القطعة", en: "Describe the fault or part"),
+                        text: $descriptionQuery,
+                        axis: .vertical
                     )
+                    .lineLimit(2 ... 4)
+                    Button {
+                        viewModel.applyDescriptionSearch(descriptionQuery)
+                        descriptionMatches = viewModel.filteredParts
+                        descriptionStatus = descriptionSearchStatus
+                    } label: {
+                        Label(
+                            viewModel.text(ar: "بحث بالوصف", en: "Search by description"),
+                            systemImage: "text.magnifyingglass"
+                        )
+                    }
+                    .disabled(descriptionQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    if !descriptionStatus.isEmpty {
+                        Text(descriptionStatus)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(descriptionMatches.prefix(6)) { part in
+                        NavigationLink(value: part) {
+                            PartRow(part: part, viewModel: viewModel)
+                        }
+                    }
+                    PhotosPicker(selection: $viewModel.selectedPhoto, matching: .images) {
+                        Label(photoPickerTitle, systemImage: "photo")
+                    }
+                    .task(id: viewModel.selectedPhoto) {
+                        guard let item = viewModel.selectedPhoto else { return }
+                        await viewModel.analyzePhoto(item)
+                    }
+                    if viewModel.isAnalyzingPhoto {
+                        ProgressView(viewModel.text(ar: "تحليل الصورة على الجهاز", en: "Analyzing on device"))
+                    }
+                    if let selectedPhotoName = viewModel.selectedPhotoName {
+                        Text(selectedPhotoName).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                Section(viewModel.text(ar: "حاسبة الكفرات", en: "Tire calculator")) {
+                    TextField(viewModel.text(ar: "المقاس القديم", en: "Old size"), text: $oldTireSize)
+                    TextField(viewModel.text(ar: "المقاس الجديد", en: "New size"), text: $newTireSize)
+                    Button {
+                        tireResult = viewModel.tireDifference(oldSize: oldTireSize, newSize: newTireSize)
+                    } label: {
+                        Label(
+                            viewModel.text(ar: "احسب الفرق", en: "Calculate difference"),
+                            systemImage: "gauge.with.dots.needle.33percent"
+                        )
+                    }
+                    if !tireResult.isEmpty {
+                        Text(tireResult)
+                            .font(.headline.monospacedDigit())
+                            .textSelection(.enabled)
+                    }
+                }
+                Section(viewModel.text(ar: "مسارات سريعة", en: "Quick paths")) {
+                    NavigationLink {
+                        SharedFitmentContent(viewModel: viewModel)
+                            .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
+                    } label: {
+                        Label(
+                            viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"),
+                            systemImage: "point.3.connected.trianglepath.dotted"
+                        )
+                    }
+                    NavigationLink {
+                        MaintenanceContent(
+                            viewModel: viewModel,
+                            title: $maintenanceTitle,
+                            odometer: $maintenanceOdometer,
+                            notes: $maintenanceNotes
+                        )
+                        .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
+                    } label: {
+                        Label(viewModel.text(ar: "الصيانة", en: "Maintenance"), systemImage: "wrench.adjustable")
+                    }
+                }
+                Section(viewModel.text(ar: "قائمة الرغبات", en: "Wishlist")) {
                     if viewModel.wishlistParts.isEmpty {
                         EmptyStateView(
                             symbol: "heart",
@@ -54,41 +136,16 @@ struct MoreView: View {
                         }
                     }
                 }
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "المتاجر الموثقة", en: "Verified stores"),
-                        subtitle: viewModel.text(
-                            ar: "روابط خارجية آمنة فقط، ولا ننسخ أسعارًا أو مخزونًا.",
-                            en: "Safe external handoff links only; prices and inventory are not copied."
-                        )
-                    )
-                    if viewModel.stores.isEmpty {
-                        EmptyStateView(
-                            symbol: "storefront",
-                            title: viewModel.text(ar: "لا توجد متاجر محملة", en: "No stores loaded"),
-                            message: viewModel.text(
-                                ar: "تحقق من اتصال البيانات المضمنة ثم أعد فتح التطبيق.",
-                                en: "Check the bundled data and reopen the app."
-                            )
-                        )
-                    } else {
-                        ForEach(viewModel.stores) { store in
-                            Button { viewModel.openStore(store, part: nil) } label: { Label(
-                                store.name(language: viewModel.language),
-                                systemImage: "link"
-                            ) }
-                        }
+                Section(viewModel.text(ar: "المتاجر الموثقة", en: "Verified stores")) {
+                    ForEach(viewModel.stores) { store in
+                        Button { viewModel.openStore(store, part: nil) } label: { Label(
+                            store.name(language: viewModel.language),
+                            systemImage: "link"
+                        ) }
                     }
                 }
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "إعدادات وخصوصية", en: "Settings and privacy"),
-                        subtitle: viewModel.text(
-                            ar: "اللغة وسياسة التعامل مع البيانات داخل التطبيق.",
-                            en: "Language and app data handling policy."
-                        )
-                    )
-                    LanguageMenu(viewModel: viewModel)
+                Section(viewModel.text(ar: "اللغة", en: "Language")) { LanguageMenu(viewModel: viewModel) }
+                Section(viewModel.text(ar: "سياسة البيانات", en: "Data policy")) {
                     Text(viewModel.text(
                         ar: "التطبيق مستقل ولا يتبع نيسان، ولا ينسخ أسعار المتاجر أو مخزونها. " +
                             "تُفتح روابط المتاجر الموثقة لإكمال البحث أو الشراء خارج التطبيق. " +
@@ -99,37 +156,47 @@ struct MoreView: View {
                             "The app does not send reference photos, vehicle details, or maintenance entries " +
                             "to a developer-operated server."
                     ))
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
                 }
             }
-            .listStyle(.insetGrouped)
-            .navigationTitle(viewModel.text(ar: "الأدوات", en: "Tools"))
+            .navigationTitle(viewModel.text(ar: "المزيد", en: "More"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
-            .navigationDestination(for: ToolsDestination.self) { destination in
-                switch destination {
-                case .descriptionSearch:
-                    DescriptionSearchToolView(viewModel: viewModel)
-                case .fitmentCheck:
-                    FitmentCheckToolView(viewModel: viewModel)
-                case .tireCalculator:
-                    TireCalculatorToolView(viewModel: viewModel)
-                case .sharedFitment:
-                    SharedFitmentContent(viewModel: viewModel)
-                        .navigationTitle(viewModel.text(ar: "القطع المشتركة", en: "Shared fitment"))
-                case .partRequest:
-                    PartRequestContent(viewModel: viewModel)
-                        .navigationTitle(viewModel.text(ar: "طلب قطعة", en: "Part request"))
-                case .maintenance:
-                    MaintenanceToolView(viewModel: viewModel) {
-                        path = NavigationPath()
-                    }
-                }
-            }
             .navigationDestination(for: Part.self) { part in
                 PartDetailView(part: part, viewModel: viewModel)
             }
+            .navigationDestination(for: MoreToolDestination.self) { destination in
+                switch destination {
+                case .smartSearch:
+                    SmartSearchContent(viewModel: viewModel)
+                case .fitment:
+                    SharedFitmentContent(viewModel: viewModel)
+                        .navigationTitle(viewModel.text(ar: "تحقق التوافق", en: "Fitment check"))
+                case .request:
+                    RequestView(viewModel: viewModel)
+                case .maintenance:
+                    MaintenanceContent(
+                        viewModel: viewModel,
+                        title: $maintenanceTitle,
+                        odometer: $maintenanceOdometer,
+                        notes: $maintenanceNotes
+                    )
+                    .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
+                }
+            }
         }
+    }
+
+    private var descriptionSearchStatus: String {
+        let count = viewModel.filteredParts.count
+        if count == 0 {
+            return viewModel.text(
+                ar: "لم أجد نتائج مطابقة. جرّب وصفًا أدق أو رقم قطعة.",
+                en: "No matches found. Try a more specific description or part number."
+            )
+        }
+        return viewModel.text(
+            ar: "تم العثور على \(count) نتيجة. افتح أي قطعة للاطلاع على التفاصيل.",
+            en: "Found \(count) results. Open any part to review details."
+        )
     }
 }
 
@@ -155,6 +222,10 @@ struct ToolsHeroView: View {
 
 struct ToolsActionGrid: View {
     @Bindable var viewModel: CatalogViewModel
+    @Binding var maintenanceTitle: String
+    @Binding var maintenanceOdometer: String
+    @Binding var maintenanceNotes: String
+    let openTool: (MoreToolDestination) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -167,7 +238,9 @@ struct ToolsActionGrid: View {
             .accessibilityIdentifier("more.section.action-center")
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
-                NavigationLink(value: ToolsDestination.descriptionSearch) {
+                Button {
+                    openTool(.smartSearch)
+                } label: {
                     ToolsActionCard(
                         symbol: "text.magnifyingglass",
                         title: viewModel.text(ar: "بحث ذكي", en: "Smart search"),
@@ -175,8 +248,11 @@ struct ToolsActionGrid: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("tools.action.smart-search")
 
-                NavigationLink(value: ToolsDestination.fitmentCheck) {
+                Button {
+                    openTool(.fitment)
+                } label: {
                     ToolsActionCard(
                         symbol: "checkmark.seal",
                         title: viewModel.text(ar: "تحقق التوافق", en: "Fitment check"),
@@ -187,26 +263,11 @@ struct ToolsActionGrid: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("tools.action.fitment")
 
-                NavigationLink(value: ToolsDestination.tireCalculator) {
-                    ToolsActionCard(
-                        symbol: "gauge.with.dots.needle.33percent",
-                        title: viewModel.text(ar: "حاسبة الكفرات", en: "Tire calculator"),
-                        detail: viewModel.text(ar: "قارن مقاسين بسرعة.", en: "Compare two tire sizes quickly.")
-                    )
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink(value: ToolsDestination.sharedFitment) {
-                    ToolsActionCard(
-                        symbol: "point.3.connected.trianglepath.dotted",
-                        title: viewModel.text(ar: "قطع مشتركة", en: "Shared parts"),
-                        detail: viewModel.text(ar: "قطع تغطي أكثر من إعداد.", en: "Parts covering multiple setups.")
-                    )
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink(value: ToolsDestination.partRequest) {
+                Button {
+                    openTool(.request)
+                } label: {
                     ToolsActionCard(
                         symbol: "cart.badge.plus",
                         title: viewModel.text(ar: "تجهيز طلب", en: "Prepare request"),
@@ -217,8 +278,11 @@ struct ToolsActionGrid: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("tools.action.request")
 
-                NavigationLink(value: ToolsDestination.maintenance) {
+                Button {
+                    openTool(.maintenance)
+                } label: {
                     ToolsActionCard(
                         symbol: "wrench.and.screwdriver",
                         title: viewModel.text(ar: "سجل الصيانة", en: "Maintenance log"),
@@ -226,10 +290,55 @@ struct ToolsActionGrid: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .accessibilityIdentifier("tools.maintenance")
+                .accessibilityIdentifier("tools.action.maintenance")
             }
         }
         .padding(.vertical, 6)
+    }
+}
+
+struct SmartSearchContent: View {
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        List {
+            Section {
+                Picker(viewModel.text(ar: "القسم", en: "Category"), selection: $viewModel.selectedCategory) {
+                    ForEach(CatalogCategory.allCases) { category in
+                        Label(category.title(viewModel.language), systemImage: category.symbol).tag(category)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+
+            Section(viewModel.text(ar: "النتائج", en: "Results")) {
+                if viewModel.filteredParts.isEmpty {
+                    EmptyStateView(
+                        symbol: "magnifyingglass",
+                        title: viewModel.text(ar: "لا توجد نتائج", en: "No results"),
+                        message: viewModel.text(
+                            ar: "اكتب رقم قطعة أو وصفًا أدق من خانة البحث في الأعلى.",
+                            en: "Enter a part number or more specific description in the search field above."
+                        )
+                    )
+                } else {
+                    ForEach(viewModel.filteredParts) { part in
+                        NavigationLink(value: part) {
+                            PartRow(part: part, viewModel: viewModel)
+                        }
+                    }
+                }
+            }
+        }
+        .searchable(
+            text: $viewModel.searchText,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: viewModel.text(
+                ar: "رقم القطعة، الوصف، السنة، أو المحرك",
+                en: "Part number, description, year, or engine"
+            )
+        )
+        .navigationTitle(viewModel.text(ar: "بحث ذكي", en: "Smart search"))
     }
 }
 
@@ -249,16 +358,11 @@ struct ToolsActionCard: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-            Image(systemName: "chevron.forward.circle.fill")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, minHeight: 118, alignment: .topLeading)
         .padding(14)
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
+        .contentShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
     }
 }
 

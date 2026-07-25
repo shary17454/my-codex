@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 extension CatalogViewModel {
     func fitmentSummary(for query: String) -> String {
@@ -31,7 +32,28 @@ extension CatalogViewModel {
         return rankedFitmentMatches(for: trimmed, limit: 8)
     }
 
-    func rankedFitmentMatches(for query: String, limit: Int) -> [Part] {
+    func categoryCount(_ category: CatalogCategory) -> Int {
+        guard category != .all else { return parts.count }
+        return parts.lazy.filter { $0.categoryValue == category }.count
+    }
+
+    func openStore(_ store: VerifiedStore, part: Part?) {
+        let url = store.searchURL(partNumber: part?.partNumber ?? "") ?? URL(string: store.website ?? "")
+        guard let url, isAllowedExternalURL(url, for: store) else {
+            errorMessage = text(ar: "رابط المتجر غير صالح.", en: "The store link is invalid.")
+            return
+        }
+        #if os(iOS)
+            Task {
+                let opened = await UIApplication.shared.open(url)
+                if !opened {
+                    errorMessage = text(ar: "تعذر فتح رابط المتجر.", en: "The store link could not be opened.")
+                }
+            }
+        #endif
+    }
+
+    private func rankedFitmentMatches(for query: String, limit: Int) -> [Part] {
         let normalizedQuery = normalized(query)
         return parts.compactMap { part -> (Part, Int)? in
             let normalizedPrimary = normalized(part.partNumber)
@@ -46,6 +68,10 @@ extension CatalogViewModel {
                 score = 300
             } else if normalizedNumbers.contains(where: { $0.contains(normalizedQuery) }) {
                 score = 250
+            } else if
+                isLikelyPartNumberLookup(query, normalizedQuery: normalizedQuery),
+                let distance = closestPartNumberDistance(normalizedNumbers, to: normalizedQuery) {
+                score = 180 - distance
             } else if searchText.contains(normalizedQuery) {
                 score = 100 + (part.confidence ?? 0)
             } else {
@@ -80,10 +106,17 @@ extension CatalogViewModel {
             && normalizedQuery.contains(where: \.isLetter)
     }
 
-    func partNumberMatches(_ part: Part, normalizedQuery query: String) -> Bool {
+    func partNumberMatches(
+        _ part: Part,
+        normalizedQuery query: String,
+        allowingCloseMatches: Bool = true
+    ) -> Bool {
         guard !query.isEmpty else { return false }
-        return part.allNumbers.map(normalized).contains { number in
-            number == query || number.contains(query)
+        let normalizedNumbers = part.allNumbers.map(normalized)
+        if normalizedNumbers.contains(where: { number in number == query || number.contains(query) }) {
+            return true
         }
+        guard allowingCloseMatches else { return false }
+        return closestPartNumberDistance(normalizedNumbers, to: query) != nil
     }
 }

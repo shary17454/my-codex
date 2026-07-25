@@ -151,14 +151,21 @@ extension CatalogViewModel {
         let rawQuery = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         let query = normalized(searchText)
         let isPartNumberLookup = isLikelyPartNumberLookup(rawQuery, normalizedQuery: query)
-        return parts.lazy.filter { part in
+        let exactResults = Array(parts.lazy.filter { part in
             let categoryMatch = self.selectedCategory == .all || part.categoryValue == self.selectedCategory
-            let numberMatch = self.partNumberMatches(part, normalizedQuery: query)
+            let numberMatch = self.partNumberMatches(
+                part,
+                normalizedQuery: query,
+                allowingCloseMatches: false
+            )
             guard categoryMatch || (isPartNumberLookup && numberMatch) else { return false }
             guard !query.isEmpty else { return true }
             let indexedText = self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)
             return numberMatch || indexedText.contains(query)
-        }.prefix(250).map(\.self)
+        }.prefix(250))
+
+        guard exactResults.isEmpty, isPartNumberLookup else { return exactResults }
+        return Array(fitmentMatches(for: rawQuery).prefix(25))
     }
 
     var sharedParts: [Part] {
@@ -248,21 +255,13 @@ extension CatalogViewModel {
         }
     }
 
-    @discardableResult
-    func saveRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) -> Bool {
-        guard partRequestHasRequiredInput(request) else {
-            paymentMessage = text(
-                ar: "أدخل رقم القطعة أو اسمها قبل تجهيز الطلب.",
-                en: "Enter a part number or part name before preparing the request."
-            )
-            return false
-        }
-        var saved = request.normalizedForStorage()
+    func saveRequestPlan(_ plan: PartRequestPlan, request: SavedPartRequest) {
+        guard partRequestHasRequiredInput(request) else { return }
+        var saved = request
         saved.planID = plan.id
         saved.draft = buildDraft(for: saved, plan: plan)
         savedRequests = Array(([saved] + savedRequests).prefix(50))
         paymentMessage = text(ar: "تم تجهيز طلب القطعة وحفظه.", en: "Part request was prepared and saved.")
-        return true
     }
 
     func refreshPurchaseProducts() async {
@@ -343,27 +342,12 @@ extension CatalogViewModel {
         savedRequests.remove(atOffsets: offsets)
     }
 
-    @discardableResult
-    func applyDescriptionSearch(_ text: String) -> Bool {
+    func applyDescriptionSearch(_ text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            errorMessage = self.text(
-                ar: "اكتب وصف العطل أو رقم القطعة قبل البحث.",
-                en: "Enter a fault description or part number before searching."
-            )
-            return false
-        }
-        let mappedKeywords = diagnosticKeywords(trimmed)
-        searchText = mappedKeywords.isEmpty ? trimmed : mappedKeywords.joined(separator: " ")
+        guard !trimmed.isEmpty else { return }
+        searchText = diagnosticKeywords(trimmed).joined(separator: " ")
         selectedCategory = .all
-        selectedPart = rankedFitmentMatches(for: searchText, limit: 1).first ?? filteredParts.first
-        if selectedPart == nil {
-            paymentMessage = self.text(
-                ar: "لم أجد تطابقًا مباشرًا. جرّب رقم القطعة أو كلمة أوضح مثل radiator أو brake.",
-                en: "No direct match was found. Try a part number or a clearer word such as radiator or brake."
-            )
-        }
-        return selectedPart != nil
+        selectedPart = filteredParts.first
     }
 
     func analyzePhoto(_ item: PhotosPickerItem) async {

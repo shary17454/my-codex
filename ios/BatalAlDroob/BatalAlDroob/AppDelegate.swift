@@ -13,6 +13,7 @@ struct BatalAlDroobApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(viewModel: viewModel)
+                .id(viewModel.language.rawValue)
                 .environment(\.layoutDirection, viewModel.language == .arabic ? .rightToLeft : .leftToRight)
                 .environment(\.locale, viewModel.language.locale)
                 .task { await viewModel.load() }

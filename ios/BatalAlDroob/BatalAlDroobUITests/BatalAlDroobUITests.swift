@@ -17,11 +17,11 @@ final class BatalAlDroobUITests: XCTestCase {
 
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
 
-        let catalogTab = navigationItem(named: "الكتالوج", in: app)
-        XCTAssertTrue(catalogTab.waitForExistence(timeout: 10))
-        catalogTab.tap()
-        let resultsLabel = app.staticTexts["catalog.results"]
-        XCTAssertTrue(reveal(resultsLabel, in: app))
+        let quickCatalog = app.buttons["home.quick.catalog"]
+        XCTAssertTrue(reveal(quickCatalog, in: app))
+        quickCatalog.tap()
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 10))
+
         app.searchFields.firstMatch.tap()
         app.searchFields.firstMatch.typeText("081210401F")
         XCTAssertTrue(app.staticTexts["23378-M4901"].waitForExistence(timeout: 10))
@@ -49,17 +49,23 @@ final class BatalAlDroobUITests: XCTestCase {
         let toolsTab = navigationItem(named: "الأدوات", in: app)
         XCTAssertTrue(toolsTab.waitForExistence(timeout: 10))
         toolsTab.tap()
-        XCTAssertTrue(app.navigationBars["الأدوات"].waitForExistence(timeout: 10))
 
         let actionCenter = app.staticTexts["more.section.action-center"]
         XCTAssertTrue(reveal(actionCenter, in: app))
 
-        let maintenanceItem = app.buttons["tools.maintenance"]
-        XCTAssertTrue(reveal(maintenanceItem, in: app))
-        maintenanceItem.tap()
+        let smartSearchAction = app.buttons["tools.action.smart-search"]
+        XCTAssertTrue(reveal(smartSearchAction, in: app))
+        smartSearchAction.tap()
+        XCTAssertTrue(app.staticTexts["النتائج"].waitForExistence(timeout: 10))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(reveal(actionCenter, in: app))
+
+        let maintenanceAction = app.buttons["tools.action.maintenance"]
+        XCTAssertTrue(reveal(maintenanceAction, in: app))
+        maintenanceAction.tap()
         XCTAssertTrue(app.navigationBars["الصيانة"].waitForExistence(timeout: 10))
-        app.buttons["tools.back"].tap()
-        XCTAssertTrue(app.buttons["tools.maintenance"].waitForExistence(timeout: 10))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(reveal(actionCenter, in: app))
     }
 
     @MainActor
@@ -73,6 +79,8 @@ final class BatalAlDroobUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(app.navigationBars["Home"].waitForExistence(timeout: 20))
+        XCTAssertTrue(reveal(app.staticTexts["Start quickly"], in: app))
+        XCTAssertFalse(app.staticTexts["ylkciuq tratS"].exists)
         XCTAssertTrue(navigationItem(named: "Catalog", in: app).waitForExistence(timeout: 10))
         XCTAssertTrue(navigationItem(named: "Request", in: app).waitForExistence(timeout: 10))
 

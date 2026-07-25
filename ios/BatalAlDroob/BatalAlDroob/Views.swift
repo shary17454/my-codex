@@ -2,24 +2,38 @@ import SwiftUI
 
 // MARK: - Views
 
+enum AppTab: Hashable {
+    case dashboard
+    case catalog
+    case request
+    case tools
+}
+
 struct RootView: View {
     @Bindable var viewModel: CatalogViewModel
+    @State private var selectedTab = AppTab.dashboard
 
     var body: some View {
         ZStack {
-            TabView {
-                DashboardView(viewModel: viewModel)
+            TabView(selection: $selectedTab) {
+                DashboardView(viewModel: viewModel) { tab in
+                    selectedTab = tab
+                }
                     .tabItem { Label(
                         viewModel.text(ar: "الرئيسية", en: "Home"),
                         systemImage: "gauge.with.dots.needle.bottom.50percent"
                     ) }
+                    .tag(AppTab.dashboard)
                 CatalogView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الكتالوج", en: "Catalog"), systemImage: "magnifyingglass") }
+                    .tag(AppTab.catalog)
                 RequestView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "طلب قطعة", en: "Request"), systemImage: "cart.badge.plus") }
+                    .tag(AppTab.request)
                 MoreView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الأدوات", en: "Tools"), systemImage: "wrench.and.screwdriver")
                     }
+                    .tag(AppTab.tools)
             }
             .overlay(alignment: .top) {
                 PaymentBanner(
@@ -53,79 +67,100 @@ struct RootView: View {
 
 struct DashboardView: View {
     @Bindable var viewModel: CatalogViewModel
+    let openTab: (AppTab) -> Void
     @State private var fitmentQuery = "21082-4W000"
     @State private var fitmentResult = ""
     @State private var fitmentMatches: [Part] = []
+
+    private func quickAction(
+        tab: AppTab,
+        identifier: String,
+        symbol: String,
+        title: String,
+        detail: String
+    ) -> some View {
+        Button {
+            openTab(tab)
+        } label: {
+            FeatureRow(symbol: symbol, title: title, detail: detail)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
+        .accessibilityHint(viewModel.text(ar: "يفتح القسم المطلوب.", en: "Opens the requested section."))
+    }
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    BatalHeroCard(
-                        eyebrow: viewModel.text(ar: "كتالوج Y60 محلي", en: "Local Y60 catalog"),
-                        title: viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"),
-                        message: viewModel.text(
-                            ar: "ابدأ من رقم القطعة، الوصف، أو التوافق ثم جهز طلبًا واضحًا للمورد.",
-                            en: "Start from a part number, description, or fitment check, " +
-                                "then prepare a clear supplier request."
-                        ),
-                        symbol: "shippingbox.and.arrow.backward"
-                    )
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"))
+                            .font(.largeTitle.bold())
+                        Text(viewModel.text(
+                            ar: "تطبيق أصلي للبحث في قطع نيسان باترول، التحقق من التوافق، " +
+                                "حفظ الصيانة، وتجهيز طلبات القطع.",
+                            en: "A native app for Nissan Patrol parts search, fitment checks, " +
+                                "maintenance logging, and part request preparation."
+                        ))
+                        .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
                 }
 
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "حالة الكتالوج", en: "Catalog status"),
-                        subtitle: viewModel.text(
-                            ar: "قاعدة محلية مدمجة، بدون تسجيل دخول أو اتصال بخادم تابع لنا.",
-                            en: "Bundled local database, with no sign-in or developer-operated server."
-                        )
-                    )
-                    StatsHeader(viewModel: viewModel)
-                }
-
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "ابدأ بسرعة", en: "Start quickly"),
-                        subtitle: viewModel.text(
-                            ar: "الأكثر استخدامًا في التطبيق في مكان واحد.",
-                            en: "The most-used workflows in one place."
-                        )
-                    )
-                    HomeWorkflowRow(
-                        symbol: "magnifyingglass",
+                Section(viewModel.text(ar: "ابدأ بسرعة", en: "Start quickly")) {
+                    quickAction(
+                        tab: .catalog,
+                        identifier: "home.quick.catalog",
+                        symbol: "magnifyingglass.square.fill",
                         title: viewModel.text(ar: "ابحث في الكتالوج", en: "Search the catalog"),
                         detail: viewModel.text(
-                            ar: "استخدم تبويب الكتالوج للبحث برقم القطعة أو الاسم أو القسم.",
-                            en: "Use the Catalog tab to search by part number, name, or category."
+                            ar: "افتح البحث المحلي برقم القطعة أو الاسم أو القسم.",
+                            en: "Open local search by part number, name, or category."
                         )
                     )
-                    HomeWorkflowRow(
+                    quickAction(
+                        tab: .request,
+                        identifier: "home.quick.request",
                         symbol: "cart.badge.plus",
                         title: viewModel.text(ar: "جهز طلب قطعة", en: "Prepare a part request"),
                         detail: viewModel.text(
-                            ar: "احفظ طلبًا منظمًا قابلًا للمشاركة مع المورد.",
-                            en: "Save a structured request that can be shared with a supplier."
+                            ar: "اكتب بيانات السيارة والقطعة واحفظ نصًا جاهزًا للمورد.",
+                            en: "Enter vehicle and part details, then save a supplier-ready request."
                         )
                     )
-                    HomeWorkflowRow(
-                        symbol: "wrench.adjustable",
-                        title: viewModel.text(ar: "سجل الصيانة", en: "Log maintenance"),
+                    quickAction(
+                        tab: .tools,
+                        identifier: "home.quick.tools",
+                        symbol: "wrench.and.screwdriver",
+                        title: viewModel.text(ar: "افتح الأدوات", en: "Open tools"),
                         detail: viewModel.text(
-                            ar: "احفظ أعمال الصيانة محليًا داخل الجهاز.",
-                            en: "Keep maintenance entries locally on the device."
+                            ar: "انتقل إلى البحث الذكي، التوافق، الصيانة، وحاسبة الكفرات.",
+                            en: "Go to smart search, fitment, maintenance, and the tire calculator."
                         )
                     )
                 }
 
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check"),
-                        subtitle: viewModel.text(
-                            ar: "يعطيك أفضل مطابقة من قاعدة الكتالوج قبل فتح التفاصيل.",
-                            en: "Shows the best catalog match before opening details."
+                Section(viewModel.text(ar: "لوحة الكتالوج المحلي", en: "Native catalog dashboard")) {
+                    StatsHeader(viewModel: viewModel, openTab: openTab)
+                    ForEach(CatalogCategory.allCases.filter { $0 != .all }.prefix(6)) { category in
+                        LabeledContent(
+                            category.title(viewModel.language),
+                            value: viewModel.categoryCount(category).formatted()
                         )
-                    )
+                    }
+                }
+
+                Section(viewModel.text(ar: "عينات مدققة قابلة للفتح", en: "Verified native records")) {
+                    ForEach(viewModel.reviewReadyParts) { part in
+                        NavigationLink(value: part) {
+                            PartRow(part: part, viewModel: viewModel)
+                        }
+                    }
+                }
+
+                Section(viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check")) {
                     TextField(
                         viewModel.text(ar: "رقم القطعة أو الوصف", en: "Part number or description"),
                         text: $fitmentQuery
@@ -149,23 +184,7 @@ struct DashboardView: View {
                         }
                     }
                 }
-
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "قطع مدققة", en: "Verified records"),
-                        subtitle: viewModel.text(
-                            ar: "عينات جاهزة للمراجعة من بيانات الكتالوج.",
-                            en: "Review-ready samples from the catalog data."
-                        )
-                    )
-                    ForEach(viewModel.reviewReadyParts) { part in
-                        NavigationLink(value: part) {
-                            PartRow(part: part, viewModel: viewModel)
-                        }
-                    }
-                }
             }
-            .listStyle(.insetGrouped)
             .navigationTitle(viewModel.text(ar: "الرئيسية", en: "Home"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
             .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
@@ -179,59 +198,7 @@ struct DashboardView: View {
     }
 }
 
-struct BatalHeroCard: View {
-    let eyebrow: String
-    let title: String
-    let message: String
-    let symbol: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: symbol)
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 46, height: 46)
-                    .background(.tint, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(eyebrow)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    Text(title)
-                        .font(.largeTitle.bold())
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.78)
-                }
-            }
-            Text(message)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(.vertical, 8)
-        .accessibilityElement(children: .combine)
-    }
-}
-
-struct BatalSectionHeader: View {
-    let title: String
-    let subtitle: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.headline)
-            Text(subtitle)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(.vertical, 4)
-        .accessibilityElement(children: .combine)
-    }
-}
-
-struct HomeWorkflowRow: View {
+struct FeatureRow: View {
     let symbol: String
     let title: String
     let detail: String
@@ -239,10 +206,8 @@ struct HomeWorkflowRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: symbol)
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(width: 34, height: 34)
-                .background(.tint, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+                .foregroundStyle(.tint)
+                .frame(width: 28)
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(.headline)
                 Text(detail).font(.caption).foregroundStyle(.secondary)
@@ -258,14 +223,8 @@ struct CatalogView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section { StatsHeader(viewModel: viewModel) }
                 Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "بحث القطع", en: "Parts search"),
-                        subtitle: viewModel.text(
-                            ar: "اكتب رقم القطعة أو اسمها ثم حدد القسم عند الحاجة.",
-                            en: "Enter a part number or name, then narrow by category if needed."
-                        )
-                    )
                     Picker(viewModel.text(ar: "القسم", en: "Category"), selection: $viewModel.selectedCategory) {
                         ForEach(CatalogCategory.allCases) { category in
                             Label(category.title(viewModel.language), systemImage: category.symbol).tag(category)
@@ -273,15 +232,7 @@ struct CatalogView: View {
                     }
                     .pickerStyle(.menu)
                 }
-                Section {
-                    BatalSectionHeader(
-                        title: viewModel.text(ar: "النتائج", en: "Results"),
-                        subtitle: viewModel.text(
-                            ar: "\(viewModel.filteredParts.count.formatted()) نتيجة معروضة من الكتالوج.",
-                            en: "\(viewModel.filteredParts.count.formatted()) displayed catalog results."
-                        )
-                    )
-                    .accessibilityIdentifier("catalog.results")
+                Section(viewModel.text(ar: "النتائج", en: "Results")) {
                     if viewModel.filteredParts.isEmpty {
                         EmptyStateView(
                             symbol: "magnifyingglass",
@@ -298,7 +249,6 @@ struct CatalogView: View {
                     }
                 }
             }
-            .listStyle(.insetGrouped)
             .searchable(
                 text: $viewModel.searchText,
                 placement: .navigationBarDrawer(displayMode: .always),
@@ -316,32 +266,63 @@ struct CatalogView: View {
 
 struct StatsHeader: View {
     @Bindable var viewModel: CatalogViewModel
+    var openTab: ((AppTab) -> Void)?
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 12) {
-            StatCard(
+            statCard(
                 title: viewModel.text(ar: "قطع مفهرسة", en: "Indexed parts"),
                 value: viewModel.partCount.formatted(),
-                symbol: "shippingbox"
+                symbol: "shippingbox",
+                tab: .catalog,
+                identifier: "home.stats.parts"
             )
-            StatCard(
+            statCard(
                 title: viewModel.text(ar: "سجلات", en: "Records"),
                 value: viewModel.recordCount.formatted(),
-                symbol: "doc.text.magnifyingglass"
+                symbol: "doc.text.magnifyingglass",
+                tab: .catalog,
+                identifier: "home.stats.records"
             )
-            StatCard(
+            statCard(
                 title: viewModel.text(ar: "مصادر", en: "Sources"),
                 value: viewModel.sourceCount.formatted(),
-                symbol: "books.vertical"
+                symbol: "books.vertical",
+                tab: .tools,
+                identifier: "home.stats.sources"
             )
-            StatCard(
+            statCard(
                 title: viewModel.text(ar: "مفضلة", en: "Wishlist"),
                 value: viewModel.wishlist.count.formatted(),
-                symbol: "heart"
+                symbol: "heart",
+                tab: .tools,
+                identifier: "home.stats.wishlist"
             )
         }
         .padding(.vertical, 6)
+    }
+
+    @ViewBuilder
+    private func statCard(
+        title: String,
+        value: String,
+        symbol: String,
+        tab: AppTab,
+        identifier: String
+    ) -> some View {
+        if let openTab {
+            Button {
+                openTab(tab)
+            } label: {
+                StatCard(title: title, value: value, symbol: symbol)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier(identifier)
+            .accessibilityHint(viewModel.text(ar: "يفتح القسم المرتبط.", en: "Opens the related section."))
+        } else {
+            StatCard(title: title, value: value, symbol: symbol)
+        }
     }
 
     private var columns: [GridItem] {

@@ -18,16 +18,13 @@
 		10100000000000000000000F /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000010 /* Models.swift */; };
 		101000000000000000000010 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000011 /* Services.swift */; };
 		101000000000000000000011 /* CatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000012 /* CatalogViewModel.swift */; };
-		10100000000000000000001C /* CatalogSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10200000000000000000001C /* CatalogSearch.swift */; };
+		10100000000000000000001A /* CatalogSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10200000000000000000001A /* CatalogSearch.swift */; };
 		101000000000000000000012 /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000013 /* Views.swift */; };
 		101000000000000000000013 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000014 /* Utilities.swift */; };
 		101000000000000000000015 /* PartDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000016 /* PartDetailViews.swift */; };
 		101000000000000000000016 /* WorkflowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000017 /* WorkflowViews.swift */; };
 		101000000000000000000017 /* MoreViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102000000000000000000018 /* MoreViews.swift */; };
 		101000000000000000000018 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102000000000000000000019 /* AppIntents.framework */; };
-		101000000000000000000019 /* CatalogExternalActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10200000000000000000001A /* CatalogExternalActions.swift */; };
-		10100000000000000000001A /* ToolDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10200000000000000000001B /* ToolDetailViews.swift */; };
-		10100000000000000000001B /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102000000000000000000019 /* AppIntents.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,15 +61,13 @@
 		102000000000000000000010 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		102000000000000000000011 /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
 		102000000000000000000012 /* CatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogViewModel.swift; sourceTree = "<group>"; };
-		10200000000000000000001C /* CatalogSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogSearch.swift; sourceTree = "<group>"; };
+		10200000000000000000001A /* CatalogSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogSearch.swift; sourceTree = "<group>"; };
 		102000000000000000000013 /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		102000000000000000000014 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		102000000000000000000016 /* PartDetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartDetailViews.swift; sourceTree = "<group>"; };
 		102000000000000000000017 /* WorkflowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowViews.swift; sourceTree = "<group>"; };
 		102000000000000000000018 /* MoreViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreViews.swift; sourceTree = "<group>"; };
 		102000000000000000000019 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
-		10200000000000000000001A /* CatalogExternalActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogExternalActions.swift; sourceTree = "<group>"; };
-		10200000000000000000001B /* ToolDetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolDetailViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,7 +90,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				10100000000000000000001B /* AppIntents.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,14 +110,12 @@
 			isa = PBXGroup;
 			children = (
 				102000000000000000000001 /* AppDelegate.swift */,
-				10200000000000000000001A /* CatalogExternalActions.swift */,
-				10200000000000000000001C /* CatalogSearch.swift */,
+				10200000000000000000001A /* CatalogSearch.swift */,
 				102000000000000000000012 /* CatalogViewModel.swift */,
 				102000000000000000000010 /* Models.swift */,
 				102000000000000000000018 /* MoreViews.swift */,
 				102000000000000000000016 /* PartDetailViews.swift */,
 				102000000000000000000011 /* Services.swift */,
-				10200000000000000000001B /* ToolDetailViews.swift */,
 				102000000000000000000014 /* Utilities.swift */,
 				102000000000000000000013 /* Views.swift */,
 				102000000000000000000017 /* WorkflowViews.swift */,
@@ -306,14 +298,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				101000000000000000000001 /* AppDelegate.swift in Sources */,
-				101000000000000000000019 /* CatalogExternalActions.swift in Sources */,
-				10100000000000000000001C /* CatalogSearch.swift in Sources */,
+				10100000000000000000001A /* CatalogSearch.swift in Sources */,
 				101000000000000000000011 /* CatalogViewModel.swift in Sources */,
 				10100000000000000000000F /* Models.swift in Sources */,
 				101000000000000000000017 /* MoreViews.swift in Sources */,
 				101000000000000000000015 /* PartDetailViews.swift in Sources */,
 				101000000000000000000010 /* Services.swift in Sources */,
-				10100000000000000000001A /* ToolDetailViews.swift in Sources */,
 				101000000000000000000013 /* Utilities.swift in Sources */,
 				101000000000000000000012 /* Views.swift in Sources */,
 				101000000000000000000016 /* WorkflowViews.swift in Sources */,
@@ -479,7 +469,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 136;
 				DEVELOPMENT_ASSET_PATHS = "";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BatalAlDroob/Info.plist;
@@ -499,7 +489,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 136;
 				DEVELOPMENT_ASSET_PATHS = "";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BatalAlDroob/Info.plist;
@@ -519,7 +509,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 136;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				EXTRACT_APP_INTENTS_METADATA = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -538,7 +528,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 136;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				EXTRACT_APP_INTENTS_METADATA = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -556,7 +546,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 136;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				EXTRACT_APP_INTENTS_METADATA = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -574,7 +564,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 136;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				EXTRACT_APP_INTENTS_METADATA = NO;
 				GENERATE_INFOPLIST_FILE = YES;

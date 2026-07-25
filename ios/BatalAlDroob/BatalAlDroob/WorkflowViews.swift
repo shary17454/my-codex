@@ -2,180 +2,207 @@ import SwiftUI
 
 struct RequestView: View {
     @Bindable var viewModel: CatalogViewModel
-
-    var body: some View {
-        NavigationStack {
-            PartRequestContent(viewModel: viewModel)
-                .navigationTitle(viewModel.text(ar: "طلب قطعة", en: "Part request"))
-                .toolbar { LanguageMenu(viewModel: viewModel) }
-        }
-    }
-}
-
-struct PartRequestContent: View {
-    private enum Field: Hashable {
-        case generation, year, vin, engine, transmission, partNumber, partName, notes
-    }
-
-    @Bindable var viewModel: CatalogViewModel
     @State private var request = SavedPartRequest()
     @State private var selectedPlanID = "basic"
-    @FocusState private var focusedField: Field?
 
     var selectedPlan: PartRequestPlan {
         viewModel.plans.first { $0.id == selectedPlanID } ?? viewModel.plans[0]
     }
 
-    var body: some View {
-        Form {
-            Section {
-                BatalHeroCard(
-                    eyebrow: viewModel.text(ar: "طلب مورد جاهز", en: "Supplier-ready request"),
-                    title: viewModel.text(ar: "طلب قطعة", en: "Part request"),
-                    message: viewModel.text(
-                        ar: "املأ بيانات السيارة والقطعة وسيجهز التطبيق نصًا منظمًا للمشاركة.",
-                        en: "Fill in vehicle and part details, then the app prepares a structured shareable request."
-                    ),
-                    symbol: "cart.badge.plus"
-                )
-            }
-            Section {
-                BatalSectionHeader(
-                    title: viewModel.text(ar: "1. نوع الطلب", en: "1. Request type"),
-                    subtitle: viewModel.text(
-                        ar: "اختر الصيغة المناسبة قبل تجهيز نص الطلب.",
-                        en: "Choose the right request format before preparing the draft."
-                    )
-                )
-                Picker(viewModel.text(ar: "الخطة", en: "Plan"), selection: $selectedPlanID) {
-                    ForEach(viewModel.plans) { plan in Text(plan.title(viewModel.language)).tag(plan.id) }
-                }
-                Text(selectedPlan.description(viewModel.language)).font(.caption).foregroundStyle(.secondary)
-                Text(viewModel.text(
-                    ar: "طلب القطعة هنا لا يتطلب دفعًا. الشراء داخل التطبيق مخصص فقط " +
-                        "لفتح الكتالوج المحمي عند توفره.",
-                    en: "Part requests do not require payment. In-app purchase is used only " +
-                        "for protected catalog unlock when available."
-                ))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-            Section {
-                BatalSectionHeader(
-                    title: viewModel.text(ar: "2. بيانات السيارة", en: "2. Vehicle details"),
-                    subtitle: viewModel.text(
-                        ar: "كلما زادت دقة البيانات كان رد المورد أسرع وأوضح.",
-                        en: "More accurate details help suppliers respond faster and more clearly."
-                    )
-                )
-                TextField("Y60", text: $request.generation)
-                    .focused($focusedField, equals: .generation)
-                    .accessibilityIdentifier("request.generation")
-                TextField(viewModel.text(ar: "سنة الصنع", en: "Year"), text: $request.year)
-                    .keyboardType(.numberPad)
-                    .focused($focusedField, equals: .year)
-                    .accessibilityIdentifier("request.year")
-                TextField("VIN", text: $request.vin)
-                    .textInputAutocapitalization(.characters)
-                    .autocorrectionDisabled()
-                    .focused($focusedField, equals: .vin)
-                    .accessibilityIdentifier("request.vin")
-                TextField(viewModel.text(ar: "المحرك", en: "Engine"), text: $request.engine)
-                    .focused($focusedField, equals: .engine)
-                    .accessibilityIdentifier("request.engine")
-                TextField(viewModel.text(ar: "القير", en: "Transmission"), text: $request.transmission)
-                    .focused($focusedField, equals: .transmission)
-                    .accessibilityIdentifier("request.transmission")
-            }
-            Section {
-                BatalSectionHeader(
-                    title: viewModel.text(ar: "3. بيانات القطعة", en: "3. Part details"),
-                    subtitle: viewModel.text(
-                        ar: "رقم القطعة أو اسمها مطلوب لحفظ الطلب.",
-                        en: "A part number or part name is required to save the request."
-                    )
-                )
-                TextField(viewModel.text(ar: "رقم القطعة", en: "Part number"), text: $request.partNumber)
-                    .textInputAutocapitalization(.characters)
-                    .autocorrectionDisabled()
-                    .focused($focusedField, equals: .partNumber)
-                    .accessibilityIdentifier("request.partNumber")
-                TextField(viewModel.text(ar: "اسم القطعة", en: "Part name"), text: $request.partName)
-                    .focused($focusedField, equals: .partName)
-                    .accessibilityIdentifier("request.partName")
-                TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $request.notes, axis: .vertical)
-                    .focused($focusedField, equals: .notes)
-                    .accessibilityIdentifier("request.notes")
-                Button {
-                    saveRequest()
-                } label: {
-                    Label(
-                        viewModel.text(ar: "تجهيز الطلب وحفظه", en: "Prepare and save request"),
-                        systemImage: "square.and.pencil"
-                    )
-                }
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("request.save.inline")
-            }
-            Section {
-                BatalSectionHeader(
-                    title: viewModel.text(ar: "الطلبات المحفوظة", en: "Saved requests"),
-                    subtitle: viewModel.text(
-                        ar: "يمكنك مشاركة النص المحفوظ مع المورد من زر المشاركة.",
-                        en: "Share a saved request with a supplier using the share button."
-                    )
-                )
-                if viewModel.savedRequests.isEmpty {
-                    EmptyStateView(
-                        symbol: "tray",
-                        title: viewModel.text(ar: "لا توجد طلبات محفوظة", en: "No saved requests"),
-                        message: viewModel.text(
-                            ar: "بعد تجهيز الطلب سيظهر هنا نص الطلب المحفوظ.",
-                            en: "Prepared part requests will appear here."
-                        )
-                    )
-                } else {
-                    ForEach(viewModel.savedRequests) { saved in
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber).font(.headline)
-                                Spacer()
-                                ShareLink(item: saved.draft) {
-                                    Image(systemName: "square.and.arrow.up")
-                                }
-                                .accessibilityLabel(viewModel.text(
-                                    ar: "مشاركة طلب القطعة",
-                                    en: "Share part request"
-                                ))
-                            }
-                            Text(saved.draft).font(.caption).foregroundStyle(.secondary).lineLimit(4)
-                        }
-                    }
-                    .onDelete(perform: viewModel.deleteSavedRequests)
-                }
-            }
-        }
-        .scrollDismissesKeyboard(.interactively)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button(viewModel.text(ar: "حفظ", en: "Save")) {
-                    saveRequest()
-                }
-                .accessibilityIdentifier("request.save")
-            }
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button(viewModel.text(ar: "تم", en: "Done")) {
-                    focusedField = nil
-                }
-            }
-        }
+    private var canSaveRequest: Bool {
+        partRequestHasRequiredInput(request)
     }
 
     private func saveRequest() {
-        focusedField = nil
-        if viewModel.saveRequestPlan(selectedPlan, request: request) {
-            request = SavedPartRequest()
+        viewModel.saveRequestPlan(selectedPlan, request: request)
+    }
+
+    var body: some View {
+        NavigationStack {
+            FormContent(
+                viewModel: viewModel,
+                request: $request,
+                selectedPlanID: $selectedPlanID,
+                selectedPlan: selectedPlan,
+                canSaveRequest: canSaveRequest,
+                saveRequest: saveRequest
+            )
+            .scrollDismissesKeyboard(.interactively)
+            .navigationTitle(viewModel.text(ar: "طلب قطعة", en: "Part request"))
+            .toolbar {
+                LanguageMenu(viewModel: viewModel)
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    saveRequest()
+                } label: {
+                    Label(viewModel.text(ar: "حفظ طلب القطعة", en: "Save part request"), systemImage: "tray.and.arrow.down")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!canSaveRequest)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(.bar)
+                .accessibilityIdentifier("request.save")
+            }
+        }
+    }
+}
+
+private struct FormContent: View {
+    @Bindable var viewModel: CatalogViewModel
+    @Binding var request: SavedPartRequest
+    @Binding var selectedPlanID: String
+    let selectedPlan: PartRequestPlan
+    let canSaveRequest: Bool
+    let saveRequest: () -> Void
+
+    var body: some View {
+        Form {
+            RequestTypeSection(
+                viewModel: viewModel,
+                selectedPlanID: $selectedPlanID,
+                selectedPlan: selectedPlan
+            )
+            PartDetailsSection(
+                viewModel: viewModel,
+                request: $request,
+                canSaveRequest: canSaveRequest,
+                saveRequest: saveRequest
+            )
+            VehicleDetailsSection(viewModel: viewModel, request: $request)
+            SavedRequestsSection(viewModel: viewModel)
+        }
+    }
+}
+
+private struct RequestTypeSection: View {
+    @Bindable var viewModel: CatalogViewModel
+    @Binding var selectedPlanID: String
+    let selectedPlan: PartRequestPlan
+
+    var body: some View {
+        Section(viewModel.text(ar: "نوع الطلب", en: "Request type")) {
+            Picker(viewModel.text(ar: "الخطة", en: "Plan"), selection: $selectedPlanID) {
+                ForEach(viewModel.plans) { plan in
+                    Text(plan.title(viewModel.language)).tag(plan.id)
+                }
+            }
+            Text(selectedPlan.description(viewModel.language))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(viewModel.text(
+                ar: "طلب القطعة هنا لا يتطلب دفعًا. الشراء داخل التطبيق مخصص فقط " +
+                    "لفتح الكتالوج المحمي عند توفره.",
+                en: "Part requests do not require payment. In-app purchase is used only " +
+                    "for protected catalog unlock when available."
+            ))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct PartDetailsSection: View {
+    @Bindable var viewModel: CatalogViewModel
+    @Binding var request: SavedPartRequest
+    let canSaveRequest: Bool
+    let saveRequest: () -> Void
+
+    var body: some View {
+        Section(viewModel.text(ar: "بيانات القطعة", en: "Part")) {
+            TextField(viewModel.text(ar: "رقم القطعة", en: "Part number"), text: $request.partNumber)
+                .textInputAutocapitalization(.characters)
+                .autocorrectionDisabled()
+                .accessibilityIdentifier("request.partNumber")
+            TextField(viewModel.text(ar: "اسم القطعة", en: "Part name"), text: $request.partName)
+                .accessibilityIdentifier("request.partName")
+            TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $request.notes, axis: .vertical)
+                .accessibilityIdentifier("request.notes")
+            Button {
+                saveRequest()
+            } label: {
+                Label(
+                    viewModel.text(ar: "تجهيز الطلب وحفظه", en: "Prepare and save request"),
+                    systemImage: "square.and.pencil"
+                )
+            }
+            .disabled(!canSaveRequest)
+            .accessibilityIdentifier("request.save.inline")
+        }
+    }
+}
+
+private struct VehicleDetailsSection: View {
+    @Bindable var viewModel: CatalogViewModel
+    @Binding var request: SavedPartRequest
+
+    var body: some View {
+        Section(viewModel.text(ar: "بيانات السيارة", en: "Vehicle")) {
+            TextField("Y60", text: $request.generation)
+                .accessibilityIdentifier("request.generation")
+            TextField(viewModel.text(ar: "سنة الصنع", en: "Year"), text: $request.year)
+                .keyboardType(.numberPad)
+                .accessibilityIdentifier("request.year")
+            TextField("VIN", text: $request.vin)
+                .textInputAutocapitalization(.characters)
+                .autocorrectionDisabled()
+                .accessibilityIdentifier("request.vin")
+            TextField(viewModel.text(ar: "المحرك", en: "Engine"), text: $request.engine)
+                .accessibilityIdentifier("request.engine")
+            TextField(viewModel.text(ar: "القير", en: "Transmission"), text: $request.transmission)
+                .accessibilityIdentifier("request.transmission")
+        }
+    }
+}
+
+private struct SavedRequestsSection: View {
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        Section(viewModel.text(ar: "طلبات محفوظة", en: "Saved requests")) {
+            if viewModel.savedRequests.isEmpty {
+                EmptyStateView(
+                    symbol: "tray",
+                    title: viewModel.text(ar: "لا توجد طلبات محفوظة", en: "No saved requests"),
+                    message: viewModel.text(
+                        ar: "بعد تجهيز الطلب سيظهر هنا نص الطلب المحفوظ.",
+                        en: "Prepared part requests will appear here."
+                    )
+                )
+            } else {
+                ForEach(viewModel.savedRequests) { saved in
+                    SavedRequestRow(saved: saved, viewModel: viewModel)
+                }
+                .onDelete(perform: viewModel.deleteSavedRequests)
+            }
+        }
+    }
+}
+
+private struct SavedRequestRow: View {
+    let saved: SavedPartRequest
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber)
+                    .font(.headline)
+                Spacer()
+                ShareLink(item: saved.draft) {
+                    Image(systemName: "square.and.arrow.up")
+                }
+                .accessibilityLabel(viewModel.text(
+                    ar: "مشاركة طلب القطعة",
+                    en: "Share part request"
+                ))
+            }
+            Text(saved.draft)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(4)
         }
     }
 }
@@ -254,5 +281,6 @@ struct MaintenanceContent: View {
                 }
             }
         }
+        .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
     }
 }

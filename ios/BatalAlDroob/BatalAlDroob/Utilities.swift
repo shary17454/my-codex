@@ -56,6 +56,54 @@ func partNumberCandidates(in text: String) -> [String] {
     return candidates.uniqued()
 }
 
+func closestPartNumberDistance(_ numbers: [String], to query: String) -> Int? {
+    let maxDistance = maximumPartNumberDistance(for: query)
+    return numbers
+        .filter { abs($0.count - query.count) <= maxDistance }
+        .map { levenshteinDistance($0, query, maximumDistance: maxDistance) }
+        .filter { $0 <= maxDistance }
+        .min()
+}
+
+func maximumPartNumberDistance(for query: String) -> Int {
+    query.count >= 10 ? 3 : 1
+}
+
+func levenshteinDistance(_ lhs: String, _ rhs: String, maximumDistance: Int? = nil) -> Int {
+    if lhs == rhs { return 0 }
+    if lhs.isEmpty { return rhs.count }
+    if rhs.isEmpty { return lhs.count }
+    if let maximumDistance, abs(lhs.count - rhs.count) > maximumDistance {
+        return maximumDistance + 1
+    }
+
+    let left = Array(lhs)
+    let right = Array(rhs)
+    var previous = Array(0 ... right.count)
+
+    for row in 1 ... left.count {
+        var current = [row] + Array(repeating: 0, count: right.count)
+        var rowMinimum = current[0]
+
+        for column in 1 ... right.count {
+            let substitutionCost = left[row - 1] == right[column - 1] ? 0 : 1
+            current[column] = min(
+                previous[column] + 1,
+                current[column - 1] + 1,
+                previous[column - 1] + substitutionCost
+            )
+            rowMinimum = min(rowMinimum, current[column])
+        }
+
+        if let maximumDistance, rowMinimum > maximumDistance {
+            return maximumDistance + 1
+        }
+        previous = current
+    }
+
+    return previous[right.count]
+}
+
 func isAllowedExternalURL(_ url: URL) -> Bool {
     guard
         let scheme = url.scheme?.lowercased(),
