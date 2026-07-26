@@ -14,7 +14,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Version And Build
 
-- [ ] `MARKETING_VERSION` exactly matches the open App Store version; after App Store Connect closed `1.2.1`, this must be `1.2.2` or higher.
+- [ ] `MARKETING_VERSION` exactly matches the open App Store version; after App Store Connect closed `1.2.1`, this must be `2.0` or higher for the redesigned major candidate.
 - [ ] Xcode Cloud Next Build Number is greater than every prior upload.
 - [ ] `ci_pre_xcodebuild.sh` runs before archive and synchronizes `CURRENT_PROJECT_VERSION` to the actual `CI_BUILD_NUMBER`.
 - [ ] All targets have one matching marketing version and build number.
@@ -35,9 +35,9 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Archive
 
-- [x] A fresh unsigned local archive for build `135` succeeds with Xcode 26.4.1 and iPhoneOS SDK 26.4 as an engineering validation fallback.
-- [x] Local archive metadata confirmed bundle `com.batalaldroob.parts`, version `1.2.2 (135)`, Xcode build `17E202`, SDK `iphoneos26.4`, and iOS 17.0 minimum.
-- [ ] New signed Xcode Cloud `1.2.2 (135+)` archive metadata is verified before selecting a new App Store build.
+- [x] A fresh unsigned local archive for build `137` succeeds with Xcode 26.4.1 and iPhoneOS SDK 26.4 as an engineering validation fallback.
+- [x] Local archive metadata confirmed bundle `com.batalaldroob.parts`, version `2.0 (137)`, Xcode build `17E202`, SDK `iphoneos26.4`, and iOS 17.0 minimum.
+- [ ] New signed Xcode Cloud `2.0 (137+)` archive metadata is verified before selecting a new App Store build.
 - [ ] A fresh signed Xcode Cloud archive is created from the intended commit.
 - [x] `ci_post_xcodebuild.sh` passes against Xcode Cloud build `122`.
 - [ ] Archive metadata confirms bundle `com.batalaldroob.parts`, expected version/build, production Xcode, accepted SDK, and iOS 17.0 minimum.
@@ -61,6 +61,6 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] No unresolved App Review item remains in the selected submission.
 - [ ] Only the newly validated build is selected.
-- [ ] Build `135` or higher is selected for iOS App Version `1.2.2`.
+- [ ] Build `137` or higher is selected for iOS App Version `2.0`.
 - [ ] Release notes match implemented behavior.
 - [x] Submitted after explicit approval: App Review submission `00e306d9-8983-4df8-b284-6cbc1fff2c04` is `Waiting for Review`.
