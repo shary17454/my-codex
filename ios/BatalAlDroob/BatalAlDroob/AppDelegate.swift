@@ -35,7 +35,11 @@ enum BatalDesign {
     static let screenPadding: CGFloat = 16
     static let controlHeight: CGFloat = 52
 
-    static let brand = Color(red: 0.02, green: 0.34, blue: 0.29)
+    static let brand = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.33, green: 0.75, blue: 0.66, alpha: 1.0)
+            : UIColor(red: 0.02, green: 0.34, blue: 0.29, alpha: 1.0)
+    })
     static let accent = Color(red: 0.83, green: 0.56, blue: 0.18)
     static let surface = Color(uiColor: .secondarySystemGroupedBackground)
     static let canvas = Color(uiColor: .systemGroupedBackground)
