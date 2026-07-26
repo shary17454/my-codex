@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0 (137) - 2026-07-26
+
+### Release
+
+- Moved the redesigned Batal Al-Droob candidate to major release train `2.0`.
+- Kept the bundle identifier, development team, signing style, entitlements, and capabilities unchanged.
+- Preserved build `137` as the current project build for the redesigned app experience.
+
 ## 1.2.2 (135) - 2026-07-25
 
 ### Release

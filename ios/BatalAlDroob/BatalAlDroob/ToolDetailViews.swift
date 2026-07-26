@@ -72,6 +72,9 @@ struct DescriptionSearchToolView: View {
             }
         }
         .navigationTitle(viewModel.text(ar: "بحث ذكي", en: "Smart search"))
+        .scrollContentBackground(.hidden)
+        .background(BatalDesign.canvas)
+        .listStyle(.insetGrouped)
     }
 }
 
@@ -106,6 +109,9 @@ struct TireCalculatorToolView: View {
             }
         }
         .navigationTitle(viewModel.text(ar: "حاسبة الكفرات", en: "Tire calculator"))
+        .scrollContentBackground(.hidden)
+        .background(BatalDesign.canvas)
+        .listStyle(.insetGrouped)
     }
 }
 
@@ -169,6 +175,9 @@ struct FitmentCheckToolView: View {
             }
         }
         .navigationTitle(viewModel.text(ar: "تحقق التوافق", en: "Fitment check"))
+        .scrollContentBackground(.hidden)
+        .background(BatalDesign.canvas)
+        .listStyle(.insetGrouped)
     }
 }
 

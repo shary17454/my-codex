@@ -28,6 +28,8 @@ struct RequestView: View {
                 saveRequest: saveRequest
             )
             .scrollDismissesKeyboard(.interactively)
+            .scrollContentBackground(.hidden)
+            .background(BatalDesign.canvas)
             .navigationTitle(viewModel.text(ar: "طلب قطعة", en: "Part request"))
             .toolbar {
                 LanguageMenu(viewModel: viewModel)
@@ -60,6 +62,22 @@ private struct FormContent: View {
 
     var body: some View {
         Form {
+            Section {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label(
+                        viewModel.text(ar: "طلب جاهز للمورد", en: "Supplier-ready request"),
+                        systemImage: "doc.text.magnifyingglass"
+                    )
+                    .font(.headline)
+                    Text(viewModel.text(
+                        ar: "اكتب الحد الأدنى من البيانات، واحفظ نصًا واضحًا يمكنك مشاركته خارج التطبيق.",
+                        en: "Enter the minimum details and save a clear request you can share outside the app."
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 4)
+            }
             RequestTypeSection(
                 viewModel: viewModel,
                 selectedPlanID: $selectedPlanID,
@@ -235,6 +253,22 @@ struct MaintenanceContent: View {
 
     var body: some View {
         Form {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label(
+                        viewModel.text(ar: "سجل محلي للسيارة", en: "Local vehicle log"),
+                        systemImage: "wrench.and.screwdriver"
+                    )
+                    .font(.headline)
+                    Text(viewModel.text(
+                        ar: "احفظ بيانات السيارة وأعمال الصيانة على الجهاز لتسهيل الطلبات القادمة.",
+                        en: "Keep vehicle details and service entries on device for faster future requests."
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 4)
+            }
             Section(viewModel.text(ar: "ملف السيارة", en: "Vehicle profile")) {
                 TextField("Y60", text: $viewModel.vehicleProfile.generation)
                 TextField(viewModel.text(ar: "السنة", en: "Year"), text: $viewModel.vehicleProfile.year)
@@ -281,6 +315,8 @@ struct MaintenanceContent: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(BatalDesign.canvas)
         .navigationTitle(viewModel.text(ar: "الصيانة", en: "Maintenance"))
     }
 }

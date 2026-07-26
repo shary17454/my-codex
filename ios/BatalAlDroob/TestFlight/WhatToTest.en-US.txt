@@ -1,4 +1,4 @@
-Batal Al-Droob 1.2.2
+Batal Al-Droob 2.0
 
 Please verify the updated Tools experience:
 - Open the Tools tab and confirm the new premium layout is clear and stable.

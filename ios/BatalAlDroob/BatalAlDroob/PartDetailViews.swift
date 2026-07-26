@@ -8,8 +8,22 @@ struct PartDetailView: View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(viewModel.title(for: part)).font(.title2.bold())
-                    Text(viewModel.protectedNumber(part)).font(.title3.monospaced()).foregroundStyle(.tint)
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: part.categoryValue.symbol)
+                            .font(.title2.weight(.semibold))
+                            .foregroundStyle(BatalDesign.brand)
+                            .frame(width: 48, height: 48)
+                            .background(BatalDesign.brand.opacity(0.12), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(viewModel.title(for: part))
+                                .font(.title2.bold())
+                                .fixedSize(horizontal: false, vertical: true)
+                            Text(viewModel.protectedNumber(part))
+                                .font(.title3.monospaced())
+                                .foregroundStyle(BatalDesign.brand)
+                                .textSelection(.enabled)
+                        }
+                    }
                     if !viewModel.isUnlocked(part) {
                         Text(viewModel.purchaseSetupMessage)
                             .font(.caption)
@@ -37,6 +51,7 @@ struct PartDetailView: View {
                         }
                     }
                 }
+                .padding(.vertical, 4)
             }
             Section(viewModel.text(ar: "معلومات", en: "Information")) {
                 LabeledContent(viewModel.text(ar: "الموديل", en: "Model"), value: part.model ?? "Y60")
@@ -105,6 +120,9 @@ struct PartDetailView: View {
             }
         }
         .navigationTitle(part.partNumber)
+        .scrollContentBackground(.hidden)
+        .background(BatalDesign.canvas)
+        .listStyle(.insetGrouped)
         .toolbar {
             Button { viewModel.toggleWishlist(part) } label: {
                 Image(systemName: viewModel.wishlist.contains(part.partNumber) ? "heart.fill" : "heart")
@@ -149,6 +167,13 @@ struct SharedFitmentContent: View {
 
     var body: some View {
         List {
+            Section {
+                Label(
+                    viewModel.text(ar: "قطع تعمل على أكثر من إعداد موثق", en: "Parts with more than one verified fitment"),
+                    systemImage: "point.3.connected.trianglepath.dotted"
+                )
+                .font(.headline)
+            }
             if viewModel.sharedParts.isEmpty {
                 EmptyStateView(
                     symbol: "point.3.connected.trianglepath.dotted",
@@ -164,6 +189,9 @@ struct SharedFitmentContent: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(BatalDesign.canvas)
+        .listStyle(.insetGrouped)
         .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
     }
 }

@@ -159,6 +159,9 @@ struct MoreView: View {
                 }
             }
             .navigationTitle(viewModel.text(ar: "المزيد", en: "More"))
+            .scrollContentBackground(.hidden)
+            .background(BatalDesign.canvas)
+            .listStyle(.insetGrouped)
             .toolbar { LanguageMenu(viewModel: viewModel) }
             .navigationDestination(for: Part.self) { part in
                 PartDetailView(part: part, viewModel: viewModel)
@@ -204,10 +207,21 @@ struct ToolsHeroView: View {
     @Bindable var viewModel: CatalogViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label(viewModel.text(ar: "أدوات بطل الدروب", en: "Batal Al-Droob tools"), systemImage: "sparkles")
-                .font(.title3.bold())
-                .foregroundStyle(.primary)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(BatalDesign.accent)
+                    .frame(width: 44, height: 44)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.text(ar: "أدوات بطل الدروب", en: "Batal Al-Droob tools"))
+                        .font(.title3.bold())
+                    Text(viewModel.text(ar: "مركز تشغيل سريع", en: "Fast operating center"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
             Text(viewModel.text(
                 ar: "كل ما تحتاجه لتحويل رقم القطعة أو الوصف إلى طلب واضح ورابط متجر موثق.",
                 en: "Turn a part number or description into a clear request and verified store handoff."
@@ -215,7 +229,19 @@ struct ToolsHeroView: View {
             .font(.callout)
             .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 6)
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [BatalDesign.brand.opacity(0.16), BatalDesign.surface],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
+                .stroke(BatalDesign.border)
+        )
         .accessibilityElement(children: .combine)
     }
 }
@@ -361,7 +387,11 @@ struct ToolsActionCard: View {
         }
         .frame(maxWidth: .infinity, minHeight: 118, alignment: .topLeading)
         .padding(14)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
+        .background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
+                .stroke(BatalDesign.border)
+        )
         .contentShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
     }
 }

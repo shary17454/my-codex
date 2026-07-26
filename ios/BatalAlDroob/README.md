@@ -8,8 +8,8 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
-- App Store version: `1.2.2`
-- Project build: `135`
+- App Store version: `2.0`
+- Project build: `137`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -84,7 +84,7 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
-- verifies `MARKETING_VERSION = 1.2.2`,
+- verifies `MARKETING_VERSION = 2.0`,
 - verifies `CURRENT_PROJECT_VERSION >= 135`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
@@ -95,8 +95,8 @@ In App Store Connect, set the Batal Al-Droob workflow environment to a productio
 App Store Connect has closed the `1.2.1` train for new build uploads. Xcode
 Cloud uploads `131` and `132` failed with `ITMS-90062` and `ITMS-90186` because
 they reused `CFBundleShortVersionString = 1.2.1` after that version was already
-approved or closed. For the next candidate, create/open App Store version `1.2.2`
-and keep Xcode Cloud > Workflow > Next Build Number at `135` or higher. Do not
+approved or closed. For the next candidate, create/open App Store version `2.0`
+and keep Xcode Cloud > Workflow > Next Build Number at `137` or higher. Do not
 reuse any uploaded build number.
 
 ## In-App Purchase
@@ -132,7 +132,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `135` or higher on release train `1.2.2`,
+a fresh signed Xcode Cloud build `137` or higher on release train `2.0`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 

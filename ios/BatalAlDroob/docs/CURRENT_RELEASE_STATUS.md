@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-07-25
-Decision: `PREPARING_1.2.2_BUILD_135`
+Decision: `PREPARING_2.0_BUILD_137`
 
 ## App And Apple Review State
 
@@ -10,8 +10,8 @@ Decision: `PREPARING_1.2.2_BUILD_135`
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| App Store version | `1.2.2` for the next code-carrying candidate |
-| Current project build | `135` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
+| App Store version | `2.0` for the next code-carrying candidate |
+| Current project build | `137` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
 | Latest App Store-ready version | `1.2.1` |
 | Latest failed Xcode Cloud build | `132` from commit `998fc21` |
 | Latest successful Xcode Cloud build | `132` compiled and archived, but the upload was rejected by App Store Connect |
@@ -25,9 +25,8 @@ Decision: `PREPARING_1.2.2_BUILD_135`
 App Store Connect now reports `ITMS-90062` and `ITMS-90186` for new uploads on
 `1.2.1`: the `1.2.1` train is closed because it matches a previously approved
 or closed version. Builds `131` and `132` failed in Build Uploads for this
-reason. The next valid binary must use `MARKETING_VERSION = 1.2.2` and a build
-number above all prior uploads. Build `134` was selected for review, so the next
-code-carrying candidate uses build `135`.
+reason. The next valid binary must use `MARKETING_VERSION = 2.0` and a build
+number above all prior uploads. The redesigned major candidate uses build `137`.
 
 The latest Apple issue message says that the app references paid functionality,
 but the associated In-App Purchase was not included in the review submission.
@@ -64,14 +63,14 @@ that issue; the newest Batal-specific mail confirms cloud build `110` succeeded.
 | Fresh unsigned archive | PASS |
 | Actual archive metadata | PASS |
 
-Fresh local unsigned archive for the `1.2.2 (135)` candidate:
-`/tmp/BatalAlDroob-1.2.2-135.xcarchive`
+Fresh local unsigned archive for the `2.0 (137)` candidate:
+`/tmp/BatalAlDroob-2.0-137.xcarchive`
 
 Verified app metadata inside that archive:
 
 - `CFBundleIdentifier = com.batalaldroob.parts`
-- `CFBundleShortVersionString = 1.2.2`
-- `CFBundleVersion = 135`
+- `CFBundleShortVersionString = 2.0`
+- `CFBundleVersion = 137`
 - `DTXcodeBuild = 17E202`
 - `DTSDKName = iphoneos26.4`
 - `MinimumOSVersion = 17.0`
