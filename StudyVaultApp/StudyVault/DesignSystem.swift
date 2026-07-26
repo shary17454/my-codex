@@ -2,34 +2,40 @@ import SwiftUI
 import UIKit
 
 enum WeshTheme {
-    static let accent = adaptiveColor(light: 0x168566, dark: 0x27B58A)
-    static let accentBright = adaptiveColor(light: 0x27A880, dark: 0x56D2AD)
-    static let gold = adaptiveColor(light: 0xB78738, dark: 0xD7AE63)
-    static let goldBright = adaptiveColor(light: 0xC79B51, dark: 0xE8C988)
+    static let accent = adaptiveColor(light: 0x126F5B, dark: 0x27B58A)
+    static let accentBright = adaptiveColor(light: 0x168F74, dark: 0x56D2AD)
+    static let gold = adaptiveColor(light: 0xA8732C, dark: 0xD7AE63)
+    static let goldBright = adaptiveColor(light: 0xC78F42, dark: 0xE8C988)
     static let warning = adaptiveColor(light: 0xB78738, dark: 0xE5B85C)
     static let highlight = warning
     static let destructive = adaptiveColor(light: 0xB95353, dark: 0xE27373)
     static let success = accent
-    static let secondaryAccent = adaptiveColor(light: 0x496BA8, dark: 0x7397DD)
+    static let secondaryAccent = adaptiveColor(light: 0x416988, dark: 0x8FB4D4)
 
-    static let canvas = adaptiveColor(light: 0xF6F3ED, dark: 0x0B0E13)
-    static let canvasBottom = adaptiveColor(light: 0xEFEAE1, dark: 0x11151C)
-    static let surface = adaptiveColor(light: 0xFFFFFF, dark: 0x151A21)
-    static let elevatedSurface = adaptiveColor(light: 0xFFFFFF, dark: 0x1B212A)
+    static let canvas = adaptiveColor(light: 0xF6F3ED, dark: 0x070A0E)
+    static let canvasBottom = adaptiveColor(light: 0xECE4D8, dark: 0x111822)
+    static let surface = adaptiveColor(light: 0xFFFDF8, dark: 0x111820)
+    static let elevatedSurface = adaptiveColor(light: 0xFFFFFF, dark: 0x19222D)
+    static let premiumSurface = adaptiveColor(light: 0xFFFCF4, dark: 0x101A1D)
     static let primaryText = adaptiveColor(light: 0x171B21, dark: 0xF7F8FA)
     static let secondaryText = adaptiveColor(light: 0x66707B, dark: 0xA8B0BA)
     static let hairline = adaptiveColor(light: 0xE6E0D6, dark: 0x2B323D)
 
-    static let cardRadius: CGFloat = 22
-    static let controlRadius: CGFloat = 16
+    static let cardRadius: CGFloat = 26
+    static let controlRadius: CGFloat = 18
     static let compactRadius: CGFloat = 12
     static let cornerRadius = compactRadius
     static let contentMaxWidth: CGFloat = 1180
-    static let horizontalPadding: CGFloat = 18
+    static let horizontalPadding: CGFloat = 20
+    static let touchTarget: CGFloat = 54
 
     static var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [canvas, canvasBottom],
+            colors: [
+                adaptiveColor(light: 0xF9F5EE, dark: 0x05070A),
+                canvas,
+                canvasBottom
+            ],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -37,7 +43,23 @@ enum WeshTheme {
 
     static var heroGradient: LinearGradient {
         LinearGradient(
-            colors: [accent.opacity(0.98), adaptiveColor(light: 0x0F6650, dark: 0x0E4B3E)],
+            colors: [
+                adaptiveColor(light: 0x0E3D35, dark: 0x071211),
+                adaptiveColor(light: 0x126F5B, dark: 0x0D2A24),
+                adaptiveColor(light: 0x8B642F, dark: 0x4C3315)
+            ],
+            startPoint: .topTrailing,
+            endPoint: .bottomLeading
+        )
+    }
+
+    static var decisionGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                adaptiveColor(light: 0xFEFBF3, dark: 0x0B1117),
+                accent.opacity(0.18),
+                gold.opacity(0.18)
+            ],
             startPoint: .topTrailing,
             endPoint: .bottomLeading
         )
@@ -93,20 +115,35 @@ struct WeshSurfaceModifier: ViewModifier {
         content
             .padding(padding)
             .background(
-                emphasized ? WeshTheme.elevatedSurface : WeshTheme.surface,
+                emphasized ? WeshTheme.premiumSurface : WeshTheme.surface,
                 in: RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous)
             )
+            .overlay(alignment: .topTrailing) {
+                if emphasized {
+                    LinearGradient(
+                        colors: [
+                            WeshTheme.gold.opacity(0.10),
+                            WeshTheme.accent.opacity(0.06),
+                            .clear
+                        ],
+                        startPoint: .topTrailing,
+                        endPoint: .bottomLeading
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous))
+                    .allowsHitTesting(false)
+                }
+            }
             .overlay {
                 RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous)
                     .stroke(
-                        goldAccent ? WeshTheme.gold.opacity(0.46) : WeshTheme.hairline,
-                        lineWidth: goldAccent ? 1.2 : 1
+                        goldAccent ? WeshTheme.gold.opacity(0.55) : WeshTheme.hairline,
+                        lineWidth: goldAccent ? 1.25 : 1
                     )
             }
             .shadow(
-                color: Color.black.opacity(colorScheme == .dark ? 0.18 : 0.055),
-                radius: emphasized ? 18 : 10,
-                y: emphasized ? 8 : 4
+                color: Color.black.opacity(colorScheme == .dark ? 0.28 : 0.065),
+                radius: emphasized ? 24 : 12,
+                y: emphasized ? 12 : 5
             )
     }
 }
@@ -127,7 +164,7 @@ extension View {
 
     func weshField() -> some View {
         padding(.horizontal, 14)
-            .frame(minHeight: 52)
+            .frame(minHeight: WeshTheme.touchTarget)
             .background(WeshTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
             .overlay {
                 RoundedRectangle(cornerRadius: WeshTheme.controlRadius)
@@ -144,14 +181,42 @@ struct WeshBrandMark: View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
                 .fill(usesGold ? WeshTheme.goldGradient : WeshTheme.heroGradient)
-            Image(systemName: "checkmark.bubble.fill")
-                .font(.system(size: size * 0.47, weight: .bold))
-                .foregroundStyle(.white)
-                .symbolRenderingMode(.hierarchical)
+            RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
+                .stroke(WeshTheme.goldBright.opacity(0.32), lineWidth: max(1, size * 0.025))
+            WeshCompassGlyph(size: size * 0.72, showsCheckmark: true)
         }
         .frame(width: size, height: size)
         .shadow(color: (usesGold ? WeshTheme.gold : WeshTheme.accent).opacity(0.24), radius: 12, y: 6)
         .accessibilityHidden(true)
+    }
+}
+
+struct WeshCompassGlyph: View {
+    var size: CGFloat = 44
+    var showsCheckmark = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(WeshTheme.goldBright.opacity(0.8), lineWidth: max(1, size * 0.045))
+            Circle()
+                .stroke(WeshTheme.gold.opacity(0.24), lineWidth: max(1, size * 0.018))
+                .frame(width: size * 0.72, height: size * 0.72)
+
+            ForEach(0..<4, id: \.self) { index in
+                Capsule()
+                    .fill(WeshTheme.goldBright.opacity(0.75))
+                    .frame(width: max(1.5, size * 0.035), height: size * 0.14)
+                    .offset(y: -size * 0.39)
+                    .rotationEffect(.degrees(Double(index) * 90))
+            }
+
+            Image(systemName: showsCheckmark ? "checkmark.seal.fill" : "location.north.line.fill")
+                .font(.system(size: size * (showsCheckmark ? 0.52 : 0.58), weight: .bold))
+                .foregroundStyle(WeshTheme.goldGradient)
+                .symbolRenderingMode(.hierarchical)
+        }
+        .frame(width: size, height: size)
     }
 }
 
@@ -277,12 +342,20 @@ struct WeshPrimaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.headline)
             .foregroundStyle(isEnabled ? .white : WeshTheme.secondaryText)
-            .frame(maxWidth: .infinity, minHeight: 54)
+            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
             .padding(.horizontal, 16)
             .background(
-                isEnabled ? WeshTheme.accent.opacity(configuration.isPressed ? 0.82 : 1) : WeshTheme.hairline,
+                LinearGradient(
+                    colors: isEnabled
+                        ? [WeshTheme.accentBright, WeshTheme.accent]
+                        : [WeshTheme.hairline, WeshTheme.hairline],
+                    startPoint: .topTrailing,
+                    endPoint: .bottomLeading
+                )
+                .opacity(configuration.isPressed ? 0.84 : 1),
                 in: RoundedRectangle(cornerRadius: 18, style: .continuous)
             )
+            .shadow(color: isEnabled ? WeshTheme.accent.opacity(0.22) : .clear, radius: 12, y: 5)
             .scaleEffect(reduceMotion ? 1 : (configuration.isPressed ? 0.98 : 1))
             .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: configuration.isPressed)
     }
@@ -296,7 +369,7 @@ struct WeshGoldButtonStyle: ButtonStyle {
         configuration.label
             .font(.headline)
             .foregroundStyle(isEnabled ? Color.black.opacity(0.82) : WeshTheme.secondaryText)
-            .frame(maxWidth: .infinity, minHeight: 54)
+            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
             .padding(.horizontal, 16)
             .background(
                 LinearGradient(
@@ -320,7 +393,7 @@ struct WeshSecondaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.headline)
             .foregroundStyle(isEnabled ? WeshTheme.primaryText : WeshTheme.secondaryText)
-            .frame(maxWidth: .infinity, minHeight: 54)
+            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
             .padding(.horizontal, 16)
             .background(
                 WeshTheme.surface.opacity(configuration.isPressed ? 0.72 : 1),
@@ -412,6 +485,7 @@ struct WeshEmptyState: View {
         }
         .frame(maxWidth: .infinity, minHeight: 240)
         .padding(24)
+        .background(WeshTheme.surface.opacity(0.65), in: RoundedRectangle(cornerRadius: WeshTheme.cardRadius))
         .accessibilityElement(children: .contain)
     }
 }

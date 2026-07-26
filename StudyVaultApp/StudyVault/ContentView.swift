@@ -398,14 +398,19 @@ private struct WeshCompactTabBar: View {
             tabButton(tabs[2])
             tabButton(tabs[3])
         }
-        .frame(height: 76)
-        .padding(.horizontal, 8)
-        .background(.ultraThinMaterial)
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(WeshTheme.hairline)
-                .frame(height: 1)
+        .frame(height: 82)
+        .padding(.horizontal, 10)
+        .background {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(WeshTheme.hairline.opacity(0.9), lineWidth: 1)
+                }
+                .shadow(color: Color.black.opacity(0.18), radius: 18, y: -3)
         }
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("main-tab-bar")
     }
@@ -424,6 +429,12 @@ private struct WeshCompactTabBar: View {
             }
             .foregroundStyle(selection == tab ? WeshTheme.accentBright : WeshTheme.secondaryText)
             .frame(maxWidth: .infinity, minHeight: 58)
+            .overlay(alignment: .bottom) {
+                Capsule()
+                    .fill(selection == tab ? WeshTheme.accentBright : .clear)
+                    .frame(width: 18, height: 3)
+                    .offset(y: 2)
+            }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -439,8 +450,8 @@ private struct WeshCompactTabBar: View {
                     .foregroundStyle(.white)
                     .frame(width: 56, height: 56)
                     .background(WeshTheme.heroGradient, in: Circle())
-                    .overlay { Circle().stroke(Color.white.opacity(0.18), lineWidth: 1) }
-                    .shadow(color: WeshTheme.accent.opacity(0.34), radius: 14, y: 6)
+                    .overlay { Circle().stroke(WeshTheme.goldBright.opacity(0.36), lineWidth: 1) }
+                    .shadow(color: WeshTheme.accent.opacity(0.36), radius: 16, y: 6)
                 Text("مقارنة جديدة")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(WeshTheme.primaryText)

@@ -1,3 +1,45 @@
+# ملاحظات الإصدار 2.0
+
+- تصميم جديد بالكامل لهوية «بوصلة القرار» مع واجهة فحمية فاخرة، زمرد للأفعال، وذهب للخلاصة.
+- تجربة رئيسية جديدة تركّز على رحلات القرار، المقارنات التي تحتاج حسمًا، وجودة الأدلة.
+- تحسين شاشة تفاصيل المقارنة وملخص القرار حتى تظهر النسب، الأسباب، والثقة بصورة أوضح.
+- تحسين الوضع الداكن، التباين، أحجام اللمس، ودعم Dynamic Type وVoiceOver.
+- تحسينات أداء واستقرار عامة مع الحفاظ على بيانات المستخدمين والمقارنات المحفوظة.
+
+## English Release Notes 2.0
+
+- Fully refreshed Decision Compass identity with a premium charcoal, emerald, and gold interface.
+- Redesigned the home experience around decision journeys, comparisons that need resolution, and evidence quality.
+- Improved comparison details and decision summaries for clearer percentages, reasons, and confidence.
+- Enhanced Dark Mode, contrast, touch targets, Dynamic Type, and VoiceOver support.
+- General performance and stability improvements while preserving saved comparisons and user data.
+
+# ملاحظات الإصدار 1.12.0
+
+- تطوير بوصلة القرار داخل ملخص المقارنة لتعرض عنوانًا تنفيذيًا، تفسيرًا مختصرًا، وخطوات عملية بعد قراءة النتائج.
+- تحسين عرض جودة الأدلة وأسباب التصويت حتى يعرف المستخدم متى يعتمد على النتيجة ومتى يحتاج مشاركات أكثر.
+- تحسين تجربة القرار في الواجهة مع الحفاظ على التصميم العربي الفاخر، دعم RTL، والوضع الداكن.
+- رفع رقم الإصدار والبناء استعدادًا لبناء Xcode Cloud جديد بعد إصدار 1.11.0.
+
+## English Release Notes 1.12.0
+
+- Enhanced the decision compass with a clearer executive recommendation, short rationale, and practical next steps.
+- Improved evidence-quality and voting-reason presentation so users can understand when results are reliable.
+- Polished the Arabic-first decision UI while preserving RTL, accessibility, and Dark Mode support.
+- Increased version and build numbers for the next Xcode Cloud/App Store release.
+
+# ملاحظات الإصدار 1.11.0
+
+- رفع رقم الإصدار لمعالجة إغلاق مسار 1.10.0 في App Store Connect.
+- تحسينات استقرار وتجهيزات إصدار تمنع إعادة استخدام مسار إصدار منشور أو مغلق.
+- الحفاظ على تجربة المقارنات والقرار الذكي مع نفس Bundle ID وإعدادات التوقيع.
+
+## English Release Notes 1.11.0
+
+- Increased the app version after the 1.10.0 App Store Connect train was closed.
+- Improved release safeguards to avoid reusing a published or closed version train.
+- Preserved the comparison and decision-summary experience with the same bundle identifier and signing setup.
+
 # ملاحظات الإصدار 1.10.0
 
 - تصميم عربي جديد أكثر وضوحًا وسرعة على iPhone وiPad.
