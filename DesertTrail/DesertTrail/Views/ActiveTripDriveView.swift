@@ -5,6 +5,7 @@ import UIKit
 
 struct ActiveTripDriveView: View {
     @Environment(AppState.self) private var appState: AppState
+    @Environment(\.colorScheme) private var colorScheme
     @State private var isTripStarted = false
     @State private var followsUserLocation = true
     @State private var statusMessage: String?
@@ -21,7 +22,7 @@ struct ActiveTripDriveView: View {
 
     var body: some View {
         ZStack {
-            Color.driveBlack.ignoresSafeArea()
+            activeTripBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 brandHeader
@@ -39,8 +40,8 @@ struct ActiveTripDriveView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Color.driveBlack, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbarBackground(activeTripHeaderBackground, for: .navigationBar)
+        .toolbarColorScheme(activeTripToolbarScheme, for: .navigationBar)
         .task {
             appState.locationManager.startNavigation()
             await appState.refreshEnvironmentReport()
@@ -84,14 +85,14 @@ struct ActiveTripDriveView: View {
                 .foregroundStyle(DrivePalette.goldGradient)
             Text("وضع الرحلة النشطة")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.62))
+                .foregroundStyle(headerSecondaryText)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 10)
         .padding(.bottom, 8)
         .background(
             LinearGradient(
-                colors: [Color.driveBlack, Color(red: 0.16, green: 0.13, blue: 0.10)],
+                colors: activeTripHeaderGradientColors,
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -125,7 +126,7 @@ struct ActiveTripDriveView: View {
         .padding(.vertical, 11)
         .background(
             RoundedRectangle(cornerRadius: 0)
-                .fill(Color.black.opacity(0.72))
+                .fill(telemetryBackground)
                 .overlay(alignment: .bottom) {
                     Rectangle()
                         .fill(DrivePalette.goldGradient)
@@ -142,7 +143,8 @@ struct ActiveTripDriveView: View {
             places: appState.hiddenPlaces.filter { $0.status == .approved },
             tileTemplateURL: nil,
             tileOpacity: 0.7,
-            showsUserLocation: appState.locationManager.isTracking
+            showsUserLocation: appState.locationManager.isTracking,
+            userInterfaceStyle: mapUserInterfaceStyle
         )
         .ignoresSafeArea(edges: .horizontal)
         .overlay {
@@ -157,6 +159,10 @@ struct ActiveTripDriveView: View {
             )
             .allowsHitTesting(false)
         }
+    }
+
+    private var mapUserInterfaceStyle: UIUserInterfaceStyle {
+        colorScheme == .dark ? .dark : .light
     }
 
     private var topFloatingTools: some View {
@@ -337,8 +343,50 @@ struct ActiveTripDriveView: View {
 
     private var driveDivider: some View {
         Rectangle()
-            .fill(Color.white.opacity(0.16))
+            .fill(driveDividerColor)
             .frame(width: 1, height: 38)
+    }
+
+    private var activeTripBackground: Color {
+        colorScheme == .dark ? .driveBlack : Color(.systemGroupedBackground)
+    }
+
+    private var activeTripHeaderBackground: Color {
+        colorScheme == .dark ? .driveBlack : Color(.systemBackground)
+    }
+
+    private var activeTripToolbarScheme: ColorScheme {
+        colorScheme == .dark ? .dark : .light
+    }
+
+    private var activeTripHeaderGradientColors: [Color] {
+        if colorScheme == .dark {
+            return [Color.driveBlack, Color(red: 0.16, green: 0.13, blue: 0.10)]
+        }
+        return [
+            Color(.systemBackground),
+            Color.desertSand.opacity(0.18)
+        ]
+    }
+
+    private var headerSecondaryText: Color {
+        colorScheme == .dark ? .white.opacity(0.62) : .secondary
+    }
+
+    private var telemetryBackground: Color {
+        colorScheme == .dark ? Color.black.opacity(0.72) : Color(.secondarySystemGroupedBackground)
+    }
+
+    private var telemetryPrimaryText: Color {
+        colorScheme == .dark ? .white : .primary
+    }
+
+    private var telemetrySecondaryText: Color {
+        colorScheme == .dark ? .white.opacity(0.74) : .secondary
+    }
+
+    private var driveDividerColor: Color {
+        colorScheme == .dark ? .white.opacity(0.16) : Color(.separator).opacity(0.55)
     }
 
     fileprivate var batteryText: String {
@@ -436,12 +484,12 @@ struct ActiveTripDriveView: View {
             VStack(spacing: 4) {
                 Text(title)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.74))
+                    .foregroundStyle(telemetrySecondaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.55)
                 Text(value)
                     .font(.subheadline.weight(.bold).monospacedDigit())
-                    .foregroundStyle(valueColor ?? .white)
+                    .foregroundStyle(valueColor ?? telemetryPrimaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.55)
             }

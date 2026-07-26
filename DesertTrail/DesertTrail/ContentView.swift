@@ -58,6 +58,7 @@ enum ScreenshotConfiguration {
 
 struct ContentView: View {
     @Environment(AppState.self) private var appState: AppState
+    @Environment(\.colorScheme) private var colorScheme
     @State private var selectedTab = ScreenshotConfiguration.initialTab
 
     var body: some View {
@@ -122,14 +123,21 @@ struct ContentView: View {
             .tag(AppTab.tools)
         }
         .tint(.trailSignal)
-        .toolbarBackground(Color.trailBase, for: .tabBar)
-        .toolbarColorScheme(.dark, for: .tabBar)
+        .toolbarBackground(tabBarBackground, for: .tabBar)
+        .toolbarColorScheme(tabBarColorScheme, for: .tabBar)
         .environment(\.layoutDirection, appState.language == .arabic ? .rightToLeft : .leftToRight)
         .onAppear {
             UIDevice.current.isBatteryMonitoringEnabled = true
         }
     }
 
+    private var tabBarBackground: Color {
+        colorScheme == .dark ? .trailBase : Color(.systemBackground)
+    }
+
+    private var tabBarColorScheme: ColorScheme {
+        colorScheme == .dark ? .dark : .light
+    }
 }
 
 private struct LanguagePicker: View {

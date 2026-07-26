@@ -4,6 +4,7 @@ import SwiftUI
 
 struct HomeDashboardView: View {
     @Environment(AppState.self) private var appState: AppState
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var selectedTab: AppTab
     @State private var showingQR = false
     @State private var showingActiveTrip = false
@@ -190,6 +191,7 @@ struct HomeDashboardView: View {
                 tileTemplateURL: nil,
                 tileOpacity: 0.7,
                 showsUserLocation: appState.locationManager.isTracking,
+                userInterfaceStyle: mapUserInterfaceStyle,
                 onRegionChange: { dashboardRegion = $0 }
             )
             .frame(height: 218)
@@ -599,6 +601,10 @@ struct HomeDashboardView: View {
 
     private var gpsPillColor: Color {
         appState.locationManager.currentLocation == nil ? .orange : .green
+    }
+
+    private var mapUserInterfaceStyle: UIUserInterfaceStyle {
+        colorScheme == .dark ? .dark : .light
     }
 
     private var homeBackground: some View {
