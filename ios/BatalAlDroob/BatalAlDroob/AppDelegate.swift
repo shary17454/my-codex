@@ -32,6 +32,14 @@ enum BatalDesign {
     static let compactSpacing: CGFloat = 8
     static let sectionSpacing: CGFloat = 12
     static let roomySpacing: CGFloat = 16
+    static let screenPadding: CGFloat = 16
+    static let controlHeight: CGFloat = 52
+
+    static let brand = Color(red: 0.02, green: 0.34, blue: 0.29)
+    static let accent = Color(red: 0.83, green: 0.56, blue: 0.18)
+    static let surface = Color(uiColor: .secondarySystemGroupedBackground)
+    static let canvas = Color(uiColor: .systemGroupedBackground)
+    static let border = Color.primary.opacity(0.08)
 }
 
 enum BatalLog {

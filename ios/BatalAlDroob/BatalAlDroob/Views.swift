@@ -47,6 +47,8 @@ struct RootView: View {
             if viewModel.isLoading { LoadingOverlay(message: viewModel.loadingMessage) }
             if viewModel.isPrivacyShieldVisible { PrivacyShieldView(language: viewModel.language) }
         }
+        .tint(BatalDesign.brand)
+        .background(BatalDesign.canvas)
         .alert(
             viewModel.text(ar: "تنبيه", en: "Notice"),
             isPresented: Binding(
@@ -93,98 +95,106 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: BatalDesign.roomySpacing) {
+                    DashboardHero(viewModel: viewModel)
+
+                    DashboardSectionTitle(
+                        title: viewModel.text(ar: "ابدأ بسرعة", en: "Start quickly"),
+                        subtitle: viewModel.text(ar: "اختصر أكثر المسارات استخدامًا.", en: "Jump into the most-used workflows.")
+                    )
+                    VStack(spacing: 10) {
+                        quickAction(
+                            tab: .catalog,
+                            identifier: "home.quick.catalog",
+                            symbol: "magnifyingglass.square.fill",
+                            title: viewModel.text(ar: "ابحث في الكتالوج", en: "Search the catalog"),
+                            detail: viewModel.text(
+                                ar: "افتح البحث المحلي برقم القطعة أو الاسم أو القسم.",
+                                en: "Open local search by part number, name, or category."
+                            )
+                        )
+                        quickAction(
+                            tab: .request,
+                            identifier: "home.quick.request",
+                            symbol: "cart.badge.plus",
+                            title: viewModel.text(ar: "جهز طلب قطعة", en: "Prepare a part request"),
+                            detail: viewModel.text(
+                                ar: "اكتب بيانات السيارة والقطعة واحفظ نصًا جاهزًا للمورد.",
+                                en: "Enter vehicle and part details, then save a supplier-ready request."
+                            )
+                        )
+                        quickAction(
+                            tab: .tools,
+                            identifier: "home.quick.tools",
+                            symbol: "wrench.and.screwdriver",
+                            title: viewModel.text(ar: "افتح الأدوات", en: "Open tools"),
+                            detail: viewModel.text(
+                                ar: "انتقل إلى البحث الذكي، التوافق، الصيانة، وحاسبة الكفرات.",
+                                en: "Go to smart search, fitment, maintenance, and the tire calculator."
+                            )
+                        )
+                    }
+
+                    DashboardSectionTitle(
+                        title: viewModel.text(ar: "لوحة الكتالوج المحلي", en: "Native catalog dashboard"),
+                        subtitle: viewModel.text(ar: "أرقام سريعة من قاعدة البيانات المدمجة.", en: "Fast signals from the bundled database.")
+                    )
+                    VStack(spacing: 12) {
+                        StatsHeader(viewModel: viewModel, openTab: openTab)
+                        CategorySummaryGrid(viewModel: viewModel)
+                    }
+
+                    DashboardSectionTitle(
+                        title: viewModel.text(ar: "عينات مدققة قابلة للفتح", en: "Verified native records"),
+                        subtitle: viewModel.text(ar: "نتائج جاهزة للفحص والتجربة.", en: "Review-ready records for quick inspection.")
+                    )
+                    VStack(spacing: 10) {
+                        ForEach(viewModel.reviewReadyParts) { part in
+                            NavigationLink(value: part) {
+                                PremiumPartRow(part: part, viewModel: viewModel)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    DashboardSectionTitle(
+                        title: viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check"),
+                        subtitle: viewModel.text(ar: "اختبر رقم قطعة قبل تجهيز الطلب.", en: "Check a part number before preparing a request.")
+                    )
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"))
-                            .font(.largeTitle.bold())
-                        Text(viewModel.text(
-                            ar: "تطبيق أصلي للبحث في قطع نيسان باترول، التحقق من التوافق، " +
-                                "حفظ الصيانة، وتجهيز طلبات القطع.",
-                            en: "A native app for Nissan Patrol parts search, fitment checks, " +
-                                "maintenance logging, and part request preparation."
-                        ))
-                        .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-
-                Section(viewModel.text(ar: "ابدأ بسرعة", en: "Start quickly")) {
-                    quickAction(
-                        tab: .catalog,
-                        identifier: "home.quick.catalog",
-                        symbol: "magnifyingglass.square.fill",
-                        title: viewModel.text(ar: "ابحث في الكتالوج", en: "Search the catalog"),
-                        detail: viewModel.text(
-                            ar: "افتح البحث المحلي برقم القطعة أو الاسم أو القسم.",
-                            en: "Open local search by part number, name, or category."
+                        TextField(
+                            viewModel.text(ar: "رقم القطعة أو الوصف", en: "Part number or description"),
+                            text: $fitmentQuery
                         )
-                    )
-                    quickAction(
-                        tab: .request,
-                        identifier: "home.quick.request",
-                        symbol: "cart.badge.plus",
-                        title: viewModel.text(ar: "جهز طلب قطعة", en: "Prepare a part request"),
-                        detail: viewModel.text(
-                            ar: "اكتب بيانات السيارة والقطعة واحفظ نصًا جاهزًا للمورد.",
-                            en: "Enter vehicle and part details, then save a supplier-ready request."
-                        )
-                    )
-                    quickAction(
-                        tab: .tools,
-                        identifier: "home.quick.tools",
-                        symbol: "wrench.and.screwdriver",
-                        title: viewModel.text(ar: "افتح الأدوات", en: "Open tools"),
-                        detail: viewModel.text(
-                            ar: "انتقل إلى البحث الذكي، التوافق، الصيانة، وحاسبة الكفرات.",
-                            en: "Go to smart search, fitment, maintenance, and the tire calculator."
-                        )
-                    )
-                }
-
-                Section(viewModel.text(ar: "لوحة الكتالوج المحلي", en: "Native catalog dashboard")) {
-                    StatsHeader(viewModel: viewModel, openTab: openTab)
-                    ForEach(CatalogCategory.allCases.filter { $0 != .all }.prefix(6)) { category in
-                        LabeledContent(
-                            category.title(viewModel.language),
-                            value: viewModel.categoryCount(category).formatted()
-                        )
-                    }
-                }
-
-                Section(viewModel.text(ar: "عينات مدققة قابلة للفتح", en: "Verified native records")) {
-                    ForEach(viewModel.reviewReadyParts) { part in
-                        NavigationLink(value: part) {
-                            PartRow(part: part, viewModel: viewModel)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                        .textFieldStyle(.roundedBorder)
+                        Button {
+                            fitmentResult = viewModel.fitmentSummary(for: fitmentQuery)
+                            fitmentMatches = viewModel.fitmentMatches(for: fitmentQuery)
+                        } label: {
+                            Label(viewModel.text(ar: "تحقق الآن", en: "Check now"), systemImage: "checkmark.seal")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        if !fitmentResult.isEmpty {
+                            Text(fitmentResult)
+                                .font(.callout.monospaced())
+                                .textSelection(.enabled)
+                        }
+                        ForEach(fitmentMatches) { part in
+                            NavigationLink(value: part) {
+                                PremiumPartRow(part: part, viewModel: viewModel)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
+                    .premiumPanel()
                 }
-
-                Section(viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check")) {
-                    TextField(
-                        viewModel.text(ar: "رقم القطعة أو الوصف", en: "Part number or description"),
-                        text: $fitmentQuery
-                    )
-                    .textInputAutocapitalization(.characters)
-                    .autocorrectionDisabled()
-                    Button {
-                        fitmentResult = viewModel.fitmentSummary(for: fitmentQuery)
-                        fitmentMatches = viewModel.fitmentMatches(for: fitmentQuery)
-                    } label: {
-                        Label(viewModel.text(ar: "تحقق الآن", en: "Check now"), systemImage: "checkmark.seal")
-                    }
-                    if !fitmentResult.isEmpty {
-                        Text(fitmentResult)
-                            .font(.callout.monospaced())
-                            .textSelection(.enabled)
-                    }
-                    ForEach(fitmentMatches) { part in
-                        NavigationLink(value: part) {
-                            PartRow(part: part, viewModel: viewModel)
-                        }
-                    }
-                }
+                .padding(BatalDesign.screenPadding)
             }
+            .background(BatalDesign.canvas)
             .navigationTitle(viewModel.text(ar: "الرئيسية", en: "Home"))
             .toolbar { LanguageMenu(viewModel: viewModel) }
             .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
@@ -214,6 +224,145 @@ struct FeatureRow: View {
             }
         }
         .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, minHeight: BatalDesign.controlHeight, alignment: .leading)
+        .padding(14)
+        .premiumPanel()
+    }
+}
+
+struct DashboardHero: View {
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"))
+                        .font(.largeTitle.bold())
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                    Text(viewModel.text(
+                        ar: "منضدة عمل سريعة لقطع نيسان باترول: بحث، توافق، طلبات، وصيانة محلية.",
+                        en: "A focused workbench for Nissan Patrol parts: search, fitment, requests, and local service history."
+                    ))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 12)
+                Image(systemName: "shield.lefthalf.filled.badge.checkmark")
+                    .font(.system(size: 34, weight: .semibold))
+                    .foregroundStyle(BatalDesign.accent)
+                    .frame(width: 56, height: 56)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+            }
+
+            HStack(spacing: 8) {
+                HeroMetric(
+                    value: viewModel.partCount.formatted(),
+                    label: viewModel.text(ar: "قطعة", en: "Parts")
+                )
+                HeroMetric(
+                    value: viewModel.sourceCount.formatted(),
+                    label: viewModel.text(ar: "مصدر", en: "Sources")
+                )
+                HeroMetric(
+                    value: viewModel.stores.count.formatted(),
+                    label: viewModel.text(ar: "متجر", en: "Stores")
+                )
+            }
+        }
+        .padding(18)
+        .background(
+            LinearGradient(
+                colors: [BatalDesign.brand.opacity(0.18), BatalDesign.accent.opacity(0.12), BatalDesign.surface],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
+                .stroke(BatalDesign.border)
+        )
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct HeroMetric: View {
+    let value: String
+    let label: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value)
+                .font(.headline.monospacedDigit())
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+    }
+}
+
+struct DashboardSectionTitle: View {
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(.title3.bold())
+            Text(subtitle)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct CategorySummaryGrid: View {
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 10)], spacing: 10) {
+            ForEach(CatalogCategory.allCases.filter { $0 != .all }.prefix(6)) { category in
+                HStack(spacing: 8) {
+                    Image(systemName: category.symbol)
+                        .foregroundStyle(BatalDesign.brand)
+                        .frame(width: 24)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(category.title(viewModel.language))
+                            .font(.caption.weight(.medium))
+                            .lineLimit(1)
+                        Text(viewModel.categoryCount(category).formatted())
+                            .font(.footnote.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(10)
+                .background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+            }
+        }
+        .premiumPanel()
+    }
+}
+
+struct PremiumPartRow: View {
+    let part: Part
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        PartRow(part: part, viewModel: viewModel)
+            .padding(12)
+            .premiumPanel()
     }
 }
 
@@ -223,6 +372,22 @@ struct CatalogView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label(
+                            viewModel.text(ar: "كتالوج محلي سريع", en: "Fast local catalog"),
+                            systemImage: "shippingbox.and.arrow.backward"
+                        )
+                        .font(.headline)
+                        Text(viewModel.text(
+                            ar: "ابحث في الأرقام والأوصاف والفئات بدون انتظار شبكة أو تسجيل دخول.",
+                            en: "Search numbers, descriptions, and categories without network delay or sign-in."
+                        ))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
                 Section { StatsHeader(viewModel: viewModel) }
                 Section {
                     Picker(viewModel.text(ar: "القسم", en: "Category"), selection: $viewModel.selectedCategory) {
@@ -258,6 +423,9 @@ struct CatalogView: View {
                 )
             )
             .navigationTitle(viewModel.text(ar: "بطل الدروب", en: "Batal Al-Droob"))
+            .scrollContentBackground(.hidden)
+            .background(BatalDesign.canvas)
+            .listStyle(.insetGrouped)
             .toolbar { LanguageMenu(viewModel: viewModel) }
             .navigationDestination(for: Part.self) { part in PartDetailView(part: part, viewModel: viewModel) }
         }
@@ -347,7 +515,11 @@ struct StatCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+        .background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: BatalDesign.cardRadius)
+                .stroke(BatalDesign.border)
+        )
     }
 }
 
@@ -381,5 +553,16 @@ struct ConfidenceBadge: View {
             .padding(.horizontal, 8).padding(.vertical, 4)
             .background(value >= 80 ? .green.opacity(0.18) : .orange.opacity(0.18), in: Capsule())
             .foregroundStyle(value >= 80 ? .green : .orange)
+    }
+}
+
+extension View {
+    func premiumPanel() -> some View {
+        self
+            .background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
+                    .stroke(BatalDesign.border)
+            )
     }
 }
