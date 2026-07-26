@@ -4,6 +4,7 @@ import SwiftUI
 
 struct DesertMapView: View {
     @Environment(AppState.self) private var appState: AppState
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showingAddPlace = false
     @State private var showingOfflineMaps = false
     @State private var showingPDFSourceManager = false
@@ -33,6 +34,7 @@ struct DesertMapView: View {
                         tileTemplateURL: activeTileTemplate,
                         tileOpacity: wildernessTileOpacity,
                         showsUserLocation: appState.locationManager.isTracking,
+                        userInterfaceStyle: mapUserInterfaceStyle,
                         onRegionChange: { mapRegion = $0 }
                     )
                 case .ajaji:
@@ -60,6 +62,15 @@ struct DesertMapView: View {
                 }
             }
             .ignoresSafeArea(edges: .bottom)
+            .overlay {
+                if mapLayer == .satellite, colorScheme == .dark {
+                    Color.black
+                        .opacity(0.30)
+                        .blendMode(.multiply)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
 
             mapControlPanel
         }
@@ -223,6 +234,10 @@ struct DesertMapView: View {
             return nil
         }
         return trimmed
+    }
+
+    private var mapUserInterfaceStyle: UIUserInterfaceStyle {
+        colorScheme == .dark ? .dark : .light
     }
 
     private var navigationRoute: [CLLocationCoordinate2D] {
@@ -927,11 +942,13 @@ struct MapCanvasView: UIViewRepresentable {
     var tileTemplateURL: String?
     var tileOpacity: Double
     var showsUserLocation = false
+    var userInterfaceStyle: UIUserInterfaceStyle = .unspecified
     var onRegionChange: ((MKCoordinateRegion) -> Void)? = nil
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
+        mapView.overrideUserInterfaceStyle = userInterfaceStyle
         mapView.showsUserLocation = showsUserLocation
         mapView.showsCompass = false
         mapView.showsScale = true
@@ -949,6 +966,7 @@ struct MapCanvasView: UIViewRepresentable {
     func updateUIView(_ mapView: MKMapView, context: Context) {
         context.coordinator.tileOpacity = tileOpacity
         context.coordinator.onRegionChange = onRegionChange
+        mapView.overrideUserInterfaceStyle = userInterfaceStyle
         mapView.showsUserLocation = showsUserLocation
         mapView.mapType = .hybrid
         mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .flat)
