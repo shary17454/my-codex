@@ -42,6 +42,11 @@ struct DashboardView: View {
 
                 connectionStatus
 
+                WeshStatusBanner(
+                    text: "نسخة 2 تقدم تجربة قرار جديدة: أوضح، أهدأ، وأكثر تركيزًا على الأسباب وجودة الأدلة.",
+                    kind: .information
+                )
+
                 FeaturedDecisionCard(
                     question: questions.first,
                     openQuestion: {
@@ -133,7 +138,13 @@ struct DashboardView: View {
             .weshSurface()
         } else {
             VStack(alignment: .leading, spacing: 10) {
-                WeshSectionHeader("مقارناتك", actionTitle: "عرض الكل", action: openDiscover)
+                WeshSectionHeader(
+                    "رحلات قرارك",
+                    subtitle: "تابع المقارنات التي تحتاج حسمًا أو آراء أكثر",
+                    systemImage: "point.topleft.down.curvedto.point.bottomright.up",
+                    actionTitle: "عرض الكل",
+                    action: openDiscover
+                )
                 ForEach(questions.prefix(3)) { question in
                     ReferenceComparisonRow(question: question) {
                         openQuestion(question)
@@ -198,7 +209,7 @@ struct DashboardView: View {
         if !questions.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
                 WeshSectionHeader(
-                    "جديد المقارنات",
+                    "قرارات بانتظار الحسم",
                     subtitle: "شاهد الاتجاه، ثم اقرأ الأسباب قبل أن تحسم",
                     systemImage: "clock.fill"
                 )
@@ -231,7 +242,7 @@ struct DashboardView: View {
         if !highlightedItems.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
                 WeshSectionHeader(
-                    "خيارات جاهزة",
+                    "مكتبة القرار",
                     subtitle: "حوّل عنصرًا من المكتبة إلى مقارنة خلال ثوانٍ",
                     systemImage: "bolt.fill"
                 )

@@ -1,3 +1,19 @@
+# ملاحظات الإصدار 2.0
+
+- تصميم جديد بالكامل لهوية «بوصلة القرار» مع واجهة فحمية فاخرة، زمرد للأفعال، وذهب للخلاصة.
+- تجربة رئيسية جديدة تركّز على رحلات القرار، المقارنات التي تحتاج حسمًا، وجودة الأدلة.
+- تحسين شاشة تفاصيل المقارنة وملخص القرار حتى تظهر النسب، الأسباب، والثقة بصورة أوضح.
+- تحسين الوضع الداكن، التباين، أحجام اللمس، ودعم Dynamic Type وVoiceOver.
+- تحسينات أداء واستقرار عامة مع الحفاظ على بيانات المستخدمين والمقارنات المحفوظة.
+
+## English Release Notes 2.0
+
+- Fully refreshed Decision Compass identity with a premium charcoal, emerald, and gold interface.
+- Redesigned the home experience around decision journeys, comparisons that need resolution, and evidence quality.
+- Improved comparison details and decision summaries for clearer percentages, reasons, and confidence.
+- Enhanced Dark Mode, contrast, touch targets, Dynamic Type, and VoiceOver support.
+- General performance and stability improvements while preserving saved comparisons and user data.
+
 # ملاحظات الإصدار 1.12.0
 
 - تطوير بوصلة القرار داخل ملخص المقارنة لتعرض عنوانًا تنفيذيًا، تفسيرًا مختصرًا، وخطوات عملية بعد قراءة النتائج.

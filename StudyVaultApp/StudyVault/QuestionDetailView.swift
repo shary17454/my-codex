@@ -404,41 +404,52 @@ private struct QuestionDetailHero: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            HStack {
-                WeshPill(
-                    question.category.title,
-                    systemImage: question.category.systemImage,
-                    color: WeshTheme.categoryColor(question.category)
-                )
-                Spacer()
-                Text(question.timeAgo)
-                    .font(.caption)
+        ZStack(alignment: .topTrailing) {
+            WeshTheme.decisionGradient
+            WeshCompassGlyph(size: 170)
+                .opacity(0.055)
+                .offset(x: -4, y: 10)
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .center) {
+                    WeshPill(
+                        question.category.title,
+                        systemImage: question.category.systemImage,
+                        color: WeshTheme.categoryColor(question.category)
+                    )
+                    Spacer()
+                    Text(question.timeAgo)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(WeshTheme.secondaryText)
+                }
+
+                Text(question.title)
+                    .font(.system(.title, design: .rounded, weight: .heavy))
+                    .foregroundStyle(WeshTheme.primaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(question.details)
+                    .font(.body)
                     .foregroundStyle(WeshTheme.secondaryText)
-            }
+                    .fixedSize(horizontal: false, vertical: true)
 
-            Text(question.title)
-                .font(.title.weight(.bold))
-                .foregroundStyle(WeshTheme.primaryText)
-                .fixedSize(horizontal: false, vertical: true)
-            Text(question.details)
-                .font(.body)
+                HStack(spacing: 10) {
+                    Label(question.author, systemImage: "person.crop.circle")
+                    Label("\(question.totalVotes) مشاركًا", systemImage: "person.2.fill")
+                    Label("\(reasonCount) سببًا", systemImage: "quote.bubble.fill")
+                }
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(WeshTheme.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Divider().overlay(WeshTheme.hairline)
-
-            HStack(spacing: 14) {
-                Label(question.author, systemImage: "person.crop.circle")
-                Label("\(question.totalVotes) مشاركًا", systemImage: "person.2.fill")
-                Label("\(reasonCount) سببًا", systemImage: "quote.bubble.fill")
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
             }
-            .font(.caption)
-            .foregroundStyle(WeshTheme.secondaryText)
-            .lineLimit(1)
-            .minimumScaleFactor(0.68)
+            .padding(18)
         }
-        .padding(.vertical, 4)
+        .clipShape(RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: WeshTheme.cardRadius, style: .continuous)
+                .stroke(WeshTheme.gold.opacity(0.26), lineWidth: 1)
+        }
+        .shadow(color: WeshTheme.accent.opacity(0.10), radius: 18, y: 8)
         .accessibilityElement(children: .combine)
     }
 }
@@ -561,11 +572,16 @@ struct VoteOptionRow: View {
             }
             .frame(maxWidth: .infinity, minHeight: 198, alignment: .topLeading)
             .padding(17)
-            .background(WeshTheme.surface, in: RoundedRectangle(cornerRadius: WeshTheme.cardRadius))
+            .background(
+                isSelected || isUserChoice || isWinning
+                    ? WeshTheme.decisionGradient
+                    : LinearGradient(colors: [WeshTheme.surface, WeshTheme.surface], startPoint: .top, endPoint: .bottom),
+                in: RoundedRectangle(cornerRadius: WeshTheme.cardRadius)
+            )
             .overlay {
                 RoundedRectangle(cornerRadius: WeshTheme.cardRadius)
                     .stroke(
-                        isSelected || isUserChoice ? WeshTheme.accent : WeshTheme.hairline,
+                        isSelected || isUserChoice ? WeshTheme.accent : (isWinning ? WeshTheme.gold.opacity(0.52) : WeshTheme.hairline),
                         lineWidth: isSelected || isUserChoice ? 2 : 1
                     )
             }
@@ -718,11 +734,7 @@ struct DecisionSummaryCard: View {
 
     private var verdictHero: some View {
         ZStack {
-            LinearGradient(
-                colors: [WeshTheme.gold.opacity(0.14), WeshTheme.surface, WeshTheme.gold.opacity(0.05)],
-                startPoint: .topTrailing,
-                endPoint: .bottomLeading
-            )
+            WeshTheme.decisionGradient
 
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 9) {
@@ -731,7 +743,7 @@ struct DecisionSummaryCard: View {
                         .foregroundStyle(WeshTheme.goldBright)
 
                     Text(summary.compassTitle)
-                        .font(.title2.weight(.bold))
+                        .font(.system(.title2, design: .rounded, weight: .heavy))
                         .foregroundStyle(WeshTheme.goldBright)
                         .fixedSize(horizontal: false, vertical: true)
 
