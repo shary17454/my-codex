@@ -1,5 +1,29 @@
 # سجل إصدار الدرب
 
+## 2.1 (102) - 2026-07-26
+
+### العربية - What's New
+
+- تحديث رئيسي للدروب بتصميم ميداني جديد وتجربة استخدام أوضح للرحلات البرية.
+- إضافة طبقة طرق ترابية مع بدائل قريبة حسب الوجهة وحالة الطريق.
+- تحسين حفظ المسارات البرية المفضلة واعتمادها في الرحلة ولوحة القيادة.
+- تحسين البوصلة بمؤشرات متعددة للشمال، وجهة الرحلة، واتجاه الرياح.
+- تحسين تفاعل بطاقات الارتفاع، الرياح، وملفات GPX مع تفاصيل وإجراءات مباشرة.
+- تحسين أزرار إنشاء الرحلة والمشاركة والملاحة حتى تقود المستخدم للخطوة الصحيحة.
+- دعم أفضل للمظهر النهاري والليلي وحسب إعدادات النظام، مع إصلاح توافق الخرائط المضمنة مع الوضع الداكن.
+- تحسينات في قابلية القراءة، أحجام اللمس، الوصول، والاستقرار العام.
+
+### English - What's New
+
+- Major Al Darb update with a redesigned field-focused experience for desert trips.
+- Added dirt-road route overlays with nearby alternatives based on destination and road condition.
+- Improved favorite dirt-route saving and use in active trips and the driving dashboard.
+- Improved the compass with multiple indicators for north, trip destination, and wind direction.
+- Improved altitude, wind, and GPX cards with clearer details and direct actions.
+- Improved trip creation, sharing, and navigation actions so they lead to the right next step.
+- Better support for light, dark, and system appearance, including embedded map dark-mode handling.
+- General readability, touch-target, accessibility, and stability improvements.
+
 ## 1.10.0 (96) - 2026-07-25
 
 ### العربية - What's New
