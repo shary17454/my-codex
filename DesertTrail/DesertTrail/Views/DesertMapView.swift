@@ -28,9 +28,11 @@ struct DesertMapView: View {
                     MapCanvasView(
                         region: mapRegion,
                         route: navigationRoute,
+                        dirtRoadRoutes: visibleDirtRoadRoutes,
                         places: appState.hiddenPlaces.filter { $0.status == .approved },
                         tileTemplateURL: activeTileTemplate,
                         tileOpacity: wildernessTileOpacity,
+                        showsUserLocation: appState.locationManager.isTracking,
                         onRegionChange: { mapRegion = $0 }
                     )
                 case .ajaji:
@@ -62,11 +64,10 @@ struct DesertMapView: View {
             mapControlPanel
         }
         .task {
-            await appState.startLocationAndRefreshEnvironment()
-            centerMapOnCurrentLocation()
-        }
-        .onAppear {
-            appState.locationManager.startNavigation()
+            await appState.refreshEnvironmentReport()
+            if appState.locationManager.isTracking {
+                centerMapOnCurrentLocation()
+            }
         }
         .sheet(isPresented: $showingAddPlace) {
             HiddenPlaceForm()
@@ -126,6 +127,7 @@ struct DesertMapView: View {
 
                 mapSourceStatusRow
                 EnvironmentBanner(report: appState.environmentalReport)
+                dirtRoadRoutesPanel
                 statusMessageView
 
                 HStack(spacing: 8) {
@@ -144,7 +146,7 @@ struct DesertMapView: View {
                             appState.locationManager.stopNavigation()
                             showMapStatus("تم إيقاف الملاحة")
                         } else {
-                            appState.locationManager.startNavigation()
+                            appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
                             showMapStatus("تم تشغيل GPS والبوصلة")
                         }
                     }
@@ -228,6 +230,108 @@ struct DesertMapView: View {
             return [appState.selectedTrip.meetingPoint]
         }
         return [current, appState.selectedTrip.meetingPoint]
+    }
+
+    private var visibleDirtRoadRoutes: [DirtRoadRoute] {
+        appState.suggestedDirtRoadRoutes(destination: appState.selectedTrip.meetingPoint)
+    }
+
+    private var dirtRoadRoutesPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Label("الطرق الترابية المقترحة", systemImage: "road.lanes")
+                    .font(.subheadline.weight(.bold))
+                Spacer(minLength: 0)
+                Text("\(visibleDirtRoadRoutes.count) بدائل")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(Color.oasisTeal)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color.oasisTeal.opacity(0.12), in: Capsule())
+            }
+
+            ForEach(visibleDirtRoadRoutes) { route in
+                dirtRoadRouteRow(route)
+            }
+        }
+        .padding(10)
+        .background(Color(.systemBackground).opacity(0.86), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func dirtRoadRouteRow(_ route: DirtRoadRoute) -> some View {
+        let isSelected = appState.preferredDirtRoadRouteID == route.id
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 8) {
+                Circle()
+                    .fill(route.difficulty.color)
+                    .frame(width: 10, height: 10)
+                    .padding(.top, 5)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(route.name)
+                        .font(.caption.weight(.bold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                    Text(route.subtitle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+                Spacer(minLength: 0)
+                if isSelected {
+                    Label("مفعل", systemImage: "checkmark.seal.fill")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(Color.oasisTeal)
+                }
+            }
+
+            Text(route.condition)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
+
+            HStack(spacing: 8) {
+                Button {
+                    appState.selectDirtRoadRoute(route)
+                    mapRegion.center = route.endCoordinate
+                    mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
+                    showMapStatus("تم اختيار \(route.name) وعرضه على الخريطة")
+                } label: {
+                    Label("اعتماد", systemImage: "location.north.line")
+                        .font(.caption2.weight(.bold))
+                        .lineLimit(1)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(route.difficulty.color)
+
+                Button {
+                    appState.toggleFavoriteDirtRoadRoute(route)
+                    showMapStatus(appState.isFavoriteDirtRoadRoute(route) ? "تم حفظ المسار في المفضلة" : "تمت إزالة المسار من المفضلة")
+                } label: {
+                    Label(appState.isFavoriteDirtRoadRoute(route) ? "محفوظ" : "حفظ", systemImage: appState.isFavoriteDirtRoadRoute(route) ? "star.fill" : "star")
+                        .font(.caption2.weight(.bold))
+                        .lineLimit(1)
+                }
+                .buttonStyle(.bordered)
+
+                Text("\(route.estimatedMinutes) د")
+                    .font(.caption2.monospacedDigit().weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+        .padding(9)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isSelected ? route.difficulty.color.opacity(0.13) : Color(.secondarySystemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(isSelected ? route.difficulty.color.opacity(0.55) : Color.clear, lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(route.name)، \(route.subtitle)، \(route.condition)")
     }
 
     private func centerMapOnCurrentLocation() {
@@ -818,15 +922,17 @@ enum DesertMapLayer: String, CaseIterable, Identifiable {
 struct MapCanvasView: UIViewRepresentable {
     let region: MKCoordinateRegion
     let route: [CLLocationCoordinate2D]
+    var dirtRoadRoutes: [DirtRoadRoute] = []
     let places: [HiddenPlace]
     var tileTemplateURL: String?
     var tileOpacity: Double
+    var showsUserLocation = false
     var onRegionChange: ((MKCoordinateRegion) -> Void)? = nil
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
-        mapView.showsUserLocation = true
+        mapView.showsUserLocation = showsUserLocation
         mapView.showsCompass = false
         mapView.showsScale = true
         mapView.isZoomEnabled = true
@@ -834,6 +940,7 @@ struct MapCanvasView: UIViewRepresentable {
         mapView.isPitchEnabled = true
         mapView.isRotateEnabled = true
         mapView.mapType = .hybrid
+        mapView.showsUserLocation = showsUserLocation
         mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .flat)
         mapView.setRegion(region, animated: false)
         return mapView
@@ -842,6 +949,7 @@ struct MapCanvasView: UIViewRepresentable {
     func updateUIView(_ mapView: MKMapView, context: Context) {
         context.coordinator.tileOpacity = tileOpacity
         context.coordinator.onRegionChange = onRegionChange
+        mapView.showsUserLocation = showsUserLocation
         mapView.mapType = .hybrid
         mapView.preferredConfiguration = MKHybridMapConfiguration(elevationStyle: .flat)
         let nextRegionKey = context.coordinator.regionKey(region)
@@ -853,6 +961,7 @@ struct MapCanvasView: UIViewRepresentable {
         let nextSignature = context.coordinator.signature(
             region: region,
             route: route,
+            dirtRoadRoutes: dirtRoadRoutes,
             places: places,
             tileTemplateURL: tileTemplateURL,
             tileOpacity: tileOpacity
@@ -872,8 +981,21 @@ struct MapCanvasView: UIViewRepresentable {
             mapView.addOverlay(overlay, level: .aboveLabels)
         }
 
+        for dirtRoute in dirtRoadRoutes where dirtRoute.coordinates.count > 1 {
+            let polyline = StyledMapPolyline(coordinates: dirtRoute.coordinates, count: dirtRoute.coordinates.count)
+            polyline.routeID = dirtRoute.id
+            polyline.strokeColor = UIColor(dirtRoute.difficulty.color)
+            polyline.lineWidth = context.coordinator.dirtRoadLineWidth(routeID: dirtRoute.id)
+            polyline.isDirtRoad = true
+            mapView.addOverlay(polyline, level: .aboveRoads)
+            context.coordinator.addDirtRoadAnnotation(dirtRoute, to: mapView)
+        }
+
         if route.count > 1 {
-            mapView.addOverlay(MKPolyline(coordinates: route, count: route.count), level: .aboveLabels)
+            let polyline = StyledMapPolyline(coordinates: route, count: route.count)
+            polyline.strokeColor = UIColor(Color.oasisTeal)
+            polyline.lineWidth = 5
+            mapView.addOverlay(polyline, level: .aboveLabels)
         }
 
         for place in places {
@@ -922,14 +1044,29 @@ struct MapCanvasView: UIViewRepresentable {
         func signature(
             region: MKCoordinateRegion,
             route: [CLLocationCoordinate2D],
+            dirtRoadRoutes: [DirtRoadRoute],
             places: [HiddenPlace],
             tileTemplateURL: String?,
             tileOpacity: Double
         ) -> String {
             let routeStart = route.first.map { "\($0.latitude),\($0.longitude)" } ?? "none"
             let routeEnd = route.last.map { "\($0.latitude),\($0.longitude)" } ?? "none"
+            let dirtRouteIDs = dirtRoadRoutes.map { "\($0.id):\($0.coordinates.count)" }.joined(separator: ",")
             let placeIDs = places.map(\.id.uuidString).sorted().joined(separator: ",")
-            return "\(regionKey(region))|\(tileTemplateURL ?? "none")|\(tileOpacity)|\(route.count)|\(routeStart)|\(routeEnd)|\(placeIDs)"
+            return "\(regionKey(region))|\(tileTemplateURL ?? "none")|\(tileOpacity)|\(route.count)|\(routeStart)|\(routeEnd)|\(dirtRouteIDs)|\(placeIDs)"
+        }
+
+        func addDirtRoadAnnotation(_ route: DirtRoadRoute, to mapView: MKMapView) {
+            guard let coordinate = route.coordinates.dropFirst().first ?? route.coordinates.first else { return }
+            let annotation = MKPointAnnotation()
+            annotation.title = route.name
+            annotation.subtitle = "\(route.difficulty.rawValue) - \(route.condition)"
+            annotation.coordinate = coordinate
+            mapView.addAnnotation(annotation)
+        }
+
+        func dirtRoadLineWidth(routeID: String) -> CGFloat {
+            4.5
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
@@ -940,8 +1077,14 @@ struct MapCanvasView: UIViewRepresentable {
             }
             if let polyline = overlay as? MKPolyline {
                 let renderer = MKPolylineRenderer(polyline: polyline)
-                renderer.strokeColor = UIColor(Color.oasisTeal)
-                renderer.lineWidth = 5
+                if let styled = overlay as? StyledMapPolyline {
+                    renderer.strokeColor = styled.strokeColor
+                    renderer.lineWidth = styled.lineWidth
+                    renderer.lineDashPattern = styled.isDirtRoad ? [9, 6] : nil
+                } else {
+                    renderer.strokeColor = UIColor(Color.oasisTeal)
+                    renderer.lineWidth = 5
+                }
                 return renderer
             }
             return MKOverlayRenderer(overlay: overlay)
@@ -957,4 +1100,11 @@ struct MapCanvasView: UIViewRepresentable {
             return view
         }
     }
+}
+
+final class StyledMapPolyline: MKPolyline {
+    var routeID: String?
+    var strokeColor = UIColor(Color.oasisTeal)
+    var lineWidth: CGFloat = 5
+    var isDirtRoad = false
 }

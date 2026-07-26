@@ -106,6 +106,172 @@ struct RouteCondition: Identifiable, Hashable {
     ]
 }
 
+enum DirtRoadDifficulty: String, CaseIterable, Identifiable {
+    case easy = "سهل"
+    case moderate = "متوسط"
+    case technical = "يتطلب دفع رباعي"
+    case avoid = "تجنب حاليًا"
+
+    var id: String { rawValue }
+
+    var color: Color {
+        switch self {
+        case .easy: return .green
+        case .moderate: return .orange
+        case .technical: return .desertCopper
+        case .avoid: return .red
+        }
+    }
+
+    var score: Int {
+        switch self {
+        case .easy: return 1
+        case .moderate: return 2
+        case .technical: return 3
+        case .avoid: return 8
+        }
+    }
+}
+
+struct DirtRoadRoute: Identifiable {
+    enum Surface: String, CaseIterable, Identifiable {
+        case compactDirt = "ترابي ممسوك"
+        case gravel = "حصى"
+        case sand = "رمل"
+        case wadiBed = "بطن وادي"
+        case rocky = "صخري"
+
+        var id: String { rawValue }
+    }
+
+    var id: String
+    var name: String
+    var summary: String
+    var surface: Surface
+    var difficulty: DirtRoadDifficulty
+    var condition: String
+    var lastUpdated: String
+    var distanceKilometers: Double
+    var estimatedMinutes: Int
+    var requiresFourWheelDrive: Bool
+    var coordinates: [CLLocationCoordinate2D]
+
+    var startCoordinate: CLLocationCoordinate2D { coordinates.first ?? CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730) }
+    var endCoordinate: CLLocationCoordinate2D { coordinates.last ?? startCoordinate }
+
+    var subtitle: String {
+        "\(surface.rawValue) • \(difficulty.rawValue) • \(String(format: "%.1f", distanceKilometers)) كم"
+    }
+
+    var recommendationText: String {
+        switch difficulty {
+        case .easy:
+            return "مناسب لمعظم السيارات عند جفاف الطريق."
+        case .moderate:
+            return "افحص ضغط الإطارات وخذ مسار رجعة احتياطي."
+        case .technical:
+            return "يفضل دفع رباعي وخبرة قيادة برية."
+        case .avoid:
+            return "لا ينصح به الآن إلا بعد تحديث الحالة ميدانيًا."
+        }
+    }
+
+    func proximityScore(to destination: CLLocationCoordinate2D) -> Double {
+        let destinationLocation = CLLocation(latitude: destination.latitude, longitude: destination.longitude)
+        let nearestMeters = coordinates
+            .map { CLLocation(latitude: $0.latitude, longitude: $0.longitude).distance(from: destinationLocation) }
+            .min() ?? .greatestFiniteMagnitude
+        return nearestMeters / 1_000 + Double(difficulty.score * 3)
+    }
+
+    static func nearestRoutes(to destination: CLLocationCoordinate2D, limit: Int = 3) -> [DirtRoadRoute] {
+        samples
+            .sorted { $0.proximityScore(to: destination) < $1.proximityScore(to: destination) }
+            .prefix(limit)
+            .map { $0 }
+    }
+
+    static func route(withID id: String?) -> DirtRoadRoute? {
+        guard let id else { return nil }
+        return samples.first { $0.id == id }
+    }
+
+    static let samples: [DirtRoadRoute] = [
+        DirtRoadRoute(
+            id: "wadi-hanifah-ridge",
+            name: "درب وادي حنيفة العلوي",
+            summary: "مسار ترابي محاذٍ للوادي مع مخارج قريبة للطرق المعبدة.",
+            surface: .compactDirt,
+            difficulty: .easy,
+            condition: "مناسب بعد الجفاف، انتبه للمشاة والدراجات قرب المتنزهات.",
+            lastUpdated: "تحديث مجتمعي اليوم",
+            distanceKilometers: 18.4,
+            estimatedMinutes: 34,
+            requiresFourWheelDrive: false,
+            coordinates: [
+                CLLocationCoordinate2D(latitude: 24.5840, longitude: 46.5400),
+                CLLocationCoordinate2D(latitude: 24.5965, longitude: 46.5520),
+                CLLocationCoordinate2D(latitude: 24.6120, longitude: 46.5660),
+                CLLocationCoordinate2D(latitude: 24.6275, longitude: 46.5790),
+                CLLocationCoordinate2D(latitude: 24.6460, longitude: 46.5960)
+            ]
+        ),
+        DirtRoadRoute(
+            id: "hidden-overlook-loop",
+            name: "لفة المطل الحجري",
+            summary: "طريق حصوي صاعد إلى مطلات صخرية مع انحدارات قصيرة.",
+            surface: .gravel,
+            difficulty: .moderate,
+            condition: "حصى ظاهر وحفر متفرقة، مناسب نهارًا فقط عند الرؤية الجيدة.",
+            lastUpdated: "قبل ساعتين",
+            distanceKilometers: 12.7,
+            estimatedMinutes: 29,
+            requiresFourWheelDrive: false,
+            coordinates: [
+                CLLocationCoordinate2D(latitude: 24.6180, longitude: 46.5660),
+                CLLocationCoordinate2D(latitude: 24.6260, longitude: 46.5530),
+                CLLocationCoordinate2D(latitude: 24.6390, longitude: 46.5460),
+                CLLocationCoordinate2D(latitude: 24.6500, longitude: 46.5580)
+            ]
+        ),
+        DirtRoadRoute(
+            id: "sandy-wadi-bypass",
+            name: "تحويلة الوادي الرملية",
+            summary: "بديل أقصر يمر ببطن وادي رملي؛ استخدمه فقط مع دفع رباعي.",
+            surface: .wadiBed,
+            difficulty: .technical,
+            condition: "رمال ناعمة بعد المنعطف الثاني واحتمال تغريز عند الحرارة العالية.",
+            lastUpdated: "قبل 35 دقيقة",
+            distanceKilometers: 9.6,
+            estimatedMinutes: 38,
+            requiresFourWheelDrive: true,
+            coordinates: [
+                CLLocationCoordinate2D(latitude: 24.5950, longitude: 46.5900),
+                CLLocationCoordinate2D(latitude: 24.6040, longitude: 46.5810),
+                CLLocationCoordinate2D(latitude: 24.6150, longitude: 46.5730),
+                CLLocationCoordinate2D(latitude: 24.6250, longitude: 46.5630)
+            ]
+        ),
+        DirtRoadRoute(
+            id: "flood-risk-cut",
+            name: "مقطع السيل المنخفض",
+            summary: "طريق قريب لكنه منخفض ويتأثر بسرعة عند جريان الشعاب.",
+            surface: .sand,
+            difficulty: .avoid,
+            condition: "يُتجنب عند توقع المطر أو بعد السيول حتى لو بدا جافًا.",
+            lastUpdated: "تنبيه طقس نشط",
+            distanceKilometers: 7.9,
+            estimatedMinutes: 32,
+            requiresFourWheelDrive: true,
+            coordinates: [
+                CLLocationCoordinate2D(latitude: 24.6070, longitude: 46.5350),
+                CLLocationCoordinate2D(latitude: 24.6155, longitude: 46.5440),
+                CLLocationCoordinate2D(latitude: 24.6230, longitude: 46.5520)
+            ]
+        )
+    ]
+}
+
 struct WildlifeGuideItem: Identifiable, Hashable {
     let id = UUID()
     var name: String

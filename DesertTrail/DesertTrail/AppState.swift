@@ -20,6 +20,18 @@ final class AppState {
     var consentedToTripSharing = false {
         didSet { UserDefaults.standard.set(consentedToTripSharing, forKey: AppStorageKey.tripSharingConsent) }
     }
+    var preferredDirtRoadRouteID: String? {
+        didSet {
+            if let preferredDirtRoadRouteID {
+                UserDefaults.standard.set(preferredDirtRoadRouteID, forKey: AppStorageKey.preferredDirtRoadRouteID)
+            } else {
+                UserDefaults.standard.removeObject(forKey: AppStorageKey.preferredDirtRoadRouteID)
+            }
+        }
+    }
+    var favoriteDirtRoadRouteIDs: [String] = [] {
+        didSet { UserDefaults.standard.set(favoriteDirtRoadRouteIDs, forKey: AppStorageKey.favoriteDirtRoadRouteIDs) }
+    }
     var statusMessage: String?
 
     let locationManager = LocationManager()
@@ -48,6 +60,8 @@ final class AppState {
             selectedTrip = trips.first ?? TripPlan.draft
         }
         consentedToTripSharing = defaults.bool(forKey: AppStorageKey.tripSharingConsent)
+        preferredDirtRoadRouteID = defaults.string(forKey: AppStorageKey.preferredDirtRoadRouteID)
+        favoriteDirtRoadRouteIDs = defaults.stringArray(forKey: AppStorageKey.favoriteDirtRoadRouteIDs) ?? []
     }
 
     func refreshEnvironmentReport() async {
@@ -75,8 +89,8 @@ final class AppState {
         }
     }
 
-    func startLocationAndRefreshEnvironment() async {
-        locationManager.startNavigation()
+    func startLocationAndRefreshEnvironment(userInitiated: Bool = false) async {
+        locationManager.requestNavigationAccessAndStart(userInitiated: userInitiated)
         if locationManager.currentLocation == nil {
             for _ in 0..<8 where locationManager.currentLocation == nil {
                 try? await Task.sleep(nanoseconds: 250_000_000)
@@ -179,6 +193,41 @@ final class AppState {
         statusMessage = "تم تحديد الوجهة: \(place.name)"
     }
 
+    func suggestedDirtRoadRoutes(destination: CLLocationCoordinate2D? = nil) -> [DirtRoadRoute] {
+        let target = destination ?? selectedTrip.meetingPoint
+        var routes = DirtRoadRoute.nearestRoutes(to: target, limit: 4)
+        if let preferred = selectedDirtRoadRoute, !routes.contains(where: { $0.id == preferred.id }) {
+            routes.insert(preferred, at: 0)
+        }
+        return routes
+    }
+
+    var selectedDirtRoadRoute: DirtRoadRoute? {
+        DirtRoadRoute.route(withID: preferredDirtRoadRouteID)
+    }
+
+    func selectDirtRoadRoute(_ route: DirtRoadRoute) {
+        preferredDirtRoadRouteID = route.id
+        selectedTrip.meetingPoint = route.endCoordinate
+        selectedTrip.routeName = route.name
+        saveSelectedTrip()
+        statusMessage = "تم تفعيل \(route.name) كمسار بري مفضل"
+    }
+
+    func toggleFavoriteDirtRoadRoute(_ route: DirtRoadRoute) {
+        if favoriteDirtRoadRouteIDs.contains(route.id) {
+            favoriteDirtRoadRouteIDs.removeAll { $0 == route.id }
+            statusMessage = "تمت إزالة \(route.name) من المفضلة"
+        } else {
+            favoriteDirtRoadRouteIDs.insert(route.id, at: 0)
+            statusMessage = "تم حفظ \(route.name) في المفضلة"
+        }
+    }
+
+    func isFavoriteDirtRoadRoute(_ route: DirtRoadRoute) -> Bool {
+        favoriteDirtRoadRouteIDs.contains(route.id)
+    }
+
     func text(_ key: LocalizedKey) -> String {
         key.value(for: language)
     }
@@ -211,6 +260,8 @@ private enum AppStorageKey {
     static let trips = "desertTrail.trips.v1"
     static let hiddenPlaces = "desertTrail.hiddenPlaces.v1"
     static let tripSharingConsent = "desertTrail.tripSharingConsent"
+    static let preferredDirtRoadRouteID = "desertTrail.preferredDirtRoadRouteID"
+    static let favoriteDirtRoadRouteIDs = "desertTrail.favoriteDirtRoadRouteIDs"
 }
 
 enum AppAppearance: String, CaseIterable, Identifiable {

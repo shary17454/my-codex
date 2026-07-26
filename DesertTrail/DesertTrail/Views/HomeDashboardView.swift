@@ -19,8 +19,9 @@ struct HomeDashboardView: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 14) {
+            VStack(spacing: 16) {
                 header
+                versionTwoHero
                 mapHero
                 tripMetricBar
                 quickActions
@@ -42,10 +43,10 @@ struct HomeDashboardView: View {
                 alertStrip
             }
             .padding(.horizontal, 16)
-            .padding(.top, 18)
+            .padding(.top, 16)
             .padding(.bottom, 110)
         }
-        .background(Color.desertBackground.ignoresSafeArea())
+        .background(homeBackground)
         .sheet(isPresented: $showingQR) {
             TripQRCodeSheet(trip: appState.selectedTrip)
         }
@@ -70,8 +71,10 @@ struct HomeDashboardView: View {
             }
         }
         .task {
-            await appState.startLocationAndRefreshEnvironment()
-            centerMapOnCurrentLocation()
+            await appState.refreshEnvironmentReport()
+            if appState.locationManager.isTracking {
+                centerMapOnCurrentLocation()
+            }
         }
         .onChange(of: appState.locationManager.currentLocation?.timestamp) { _, _ in
             guard appState.locationManager.isTracking else { return }
@@ -87,8 +90,9 @@ struct HomeDashboardView: View {
                 Image(systemName: "line.3.horizontal")
                     .font(.headline)
                     .frame(width: 44, height: 44)
-                    .background(Color.desertSurface, in: Circle())
-                    .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+                    .background(.ultraThinMaterial, in: Circle())
+                    .overlay(Circle().stroke(Color.trailSignal.opacity(0.24), lineWidth: 1))
+                    .shadow(color: Color.trailSignal.opacity(0.18), radius: 12, y: 4)
             }
             .buttonStyle(.plain)
 
@@ -97,13 +101,14 @@ struct HomeDashboardView: View {
             VStack(spacing: 3) {
                 HStack(spacing: 8) {
                     Text(appState.text(.appTitle))
-                        .font(.title2.weight(.bold))
+                        .font(.title.weight(.black))
+                        .foregroundStyle(trailTitleGradient)
                     Image(systemName: "mountain.2.fill")
-                        .foregroundStyle(Color.desertCopper)
+                        .foregroundStyle(Color.trailAmber)
                 }
                 Text(appState.language == .arabic ? "رحلتك تبدأ من هنا" : "Your trail starts here")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.trailMist.opacity(0.64))
             }
 
             Spacer()
@@ -115,17 +120,64 @@ struct HomeDashboardView: View {
                     Image(systemName: "bell")
                         .font(.headline)
                         .frame(width: 44, height: 44)
-                        .background(Color.desertSurface, in: Circle())
-                        .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+                        .background(.ultraThinMaterial, in: Circle())
+                        .overlay(Circle().stroke(Color.trailAmber.opacity(0.26), lineWidth: 1))
+                        .shadow(color: Color.trailAmber.opacity(0.18), radius: 12, y: 4)
                     Circle()
-                        .fill(Color.orange)
+                        .fill(Color.trailAmber)
                         .frame(width: 9, height: 9)
                         .offset(x: -7, y: 8)
                 }
             }
             .buttonStyle(.plain)
         }
-        .foregroundStyle(Color.desertInk)
+        .foregroundStyle(Color.trailMist)
+    }
+
+    private var versionTwoHero: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.trailSignal, Color.trailAmber],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    Image(systemName: "sparkles")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(Color.trailBase)
+                }
+                .frame(width: 58, height: 58)
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("إصدار 2.1")
+                        .font(.title3.weight(.black))
+                        .foregroundStyle(Color.trailMist)
+                    Text("تصميم ليلي ميداني جديد يبرز الملاحة والطقس والرحلات بوضوح أعلى.")
+                        .font(.subheadline)
+                        .foregroundStyle(Color.trailMist.opacity(0.70))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            HStack(spacing: 8) {
+                trailPill("ملاحة", "location.north.fill")
+                trailPill("طقس", "cloud.sun.fill")
+                trailPill("تنبيهات", "bell.badge.fill")
+            }
+        }
+        .padding(16)
+        .background(heroSurface, in: RoundedRectangle(cornerRadius: 22))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(Color.trailSignal.opacity(0.20), lineWidth: 1)
+        )
+        .shadow(color: Color.trailSignal.opacity(0.12), radius: 18, y: 8)
     }
 
     private var mapHero: some View {
@@ -133,20 +185,23 @@ struct HomeDashboardView: View {
             MapCanvasView(
                 region: dashboardRegion,
                 route: dashboardRoute,
+                dirtRoadRoutes: dashboardDirtRoutes,
                 places: appState.hiddenPlaces.filter { $0.status == .approved },
                 tileTemplateURL: nil,
                 tileOpacity: 0.7,
+                showsUserLocation: appState.locationManager.isTracking,
                 onRegionChange: { dashboardRegion = $0 }
             )
             .frame(height: 218)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 22))
+            .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color.trailSignal.opacity(0.18), lineWidth: 1))
 
             VStack(spacing: 10) {
                 mapToolButton("square.3.layers.3d", label: "طبقات الخريطة") {
                     showingGeospatialCatalog = true
                 }
                 mapToolButton("location", label: "إظهار موقعي") {
-                    appState.locationManager.startNavigation()
+                    appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
                     centerMapOnCurrentLocation()
                 }
                 mapToolButton("plus", label: "تكبير الخريطة") {
@@ -196,7 +251,7 @@ struct HomeDashboardView: View {
             Text("1 كم")
                 .font(.caption2.weight(.semibold))
             Rectangle()
-                .fill(Color.desertInk)
+                .fill(Color.trailMist)
                 .frame(width: 70, height: 3)
         }
         .padding(8)
@@ -204,40 +259,36 @@ struct HomeDashboardView: View {
     }
 
     private var tripMetricBar: some View {
-        HStack(spacing: 0) {
-            dashboardMetric(title: "الاتجاه", value: headingText, subtitle: headingSubtitle, icon: "safari") {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 118), spacing: 8)], spacing: 8) {
+            dashboardMetric(title: "الاتجاه", value: headingText, subtitle: headingSubtitle, icon: "safari", tint: .trailSignal) {
                 selectedTab = .compass
             }
-            Divider().frame(height: 54)
-            dashboardMetric(title: "الارتفاع", value: altitudeText, subtitle: "متر", icon: "mountain.2") {
-                appState.locationManager.startNavigation()
+            dashboardMetric(title: "الارتفاع", value: altitudeText, subtitle: "متر", icon: "mountain.2", tint: .trailAmber) {
+                appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
                 showStatus("يتم تحديث الارتفاع من GPS")
             }
-            Divider().frame(height: 54)
-            dashboardMetric(title: "السرعة", value: speedText, subtitle: "كم/س", icon: "speedometer") {
+            dashboardMetric(title: "السرعة", value: speedText, subtitle: "كم/س", icon: "speedometer", tint: .orange) {
                 openActiveTrip()
             }
-            Divider().frame(height: 54)
-            dashboardMetric(title: "المسافة", value: distanceText, subtitle: "كم", icon: "mappin") {
+            dashboardMetric(title: "المسافة", value: distanceText, subtitle: "كم", icon: "mappin", tint: .blue) {
                 openActiveTrip()
             }
-            Divider().frame(height: 54)
-            dashboardMetric(title: "حالة الموقع", value: gpsStatusText, subtitle: appState.locationManager.isTracking ? "نشط" : "جاهز", icon: "location.north") {
+            dashboardMetric(title: "حالة الموقع", value: gpsStatusText, subtitle: appState.locationManager.isTracking ? "نشط" : "جاهز", icon: "location.north", tint: gpsPillColor) {
                 toggleLocationTracking()
             }
         }
-        .padding(.vertical, 14)
-        .background(Color.desertPanel, in: RoundedRectangle(cornerRadius: 8))
-        .foregroundStyle(.white)
+        .padding(10)
+        .background(Color.desertPanel, in: RoundedRectangle(cornerRadius: 18))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.trailSignal.opacity(0.16), lineWidth: 1))
     }
 
     private var quickActions: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
-            quickAction(title: "البوصلة", icon: "safari") { selectedTab = .compass }
-            quickAction(title: "لوحة القيادة", icon: "speedometer") { openActiveTrip() }
-            quickAction(title: "الطقس", icon: "cloud.sun.fill") { openEnvironmentDetails() }
-            quickAction(title: "جودة الهواء", icon: "leaf.fill") { openEnvironmentDetails() }
-            quickAction(title: "أدوات الرحلة", icon: "briefcase.fill") { selectedTab = .tools }
+            quickAction(title: "البوصلة", icon: "safari", tint: .trailSignal) { selectedTab = .compass }
+            quickAction(title: "لوحة القيادة", icon: "speedometer", tint: .trailAmber) { openActiveTrip() }
+            quickAction(title: "الطقس", icon: "cloud.sun.fill", tint: .blue) { openEnvironmentDetails() }
+            quickAction(title: "جودة الهواء", icon: "leaf.fill", tint: .green) { openEnvironmentDetails() }
+            quickAction(title: "أدوات الرحلة", icon: "briefcase.fill", tint: .purple) { selectedTab = .tools }
         }
     }
 
@@ -395,13 +446,12 @@ struct HomeDashboardView: View {
             .buttonStyle(DashboardActionButtonStyle())
 
             Button {
-                showingQR = true
+                shareCurrentTrip()
             } label: {
                 Label("مشاركة رحلة", systemImage: "qrcode")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(DashboardActionButtonStyle())
-            .disabled(!appState.hasSelectedTrip)
         }
     }
 
@@ -535,6 +585,10 @@ struct HomeDashboardView: View {
         return [current, appState.selectedTrip.meetingPoint]
     }
 
+    private var dashboardDirtRoutes: [DirtRoadRoute] {
+        appState.suggestedDirtRoadRoutes(destination: appState.selectedTrip.meetingPoint)
+    }
+
     private var gpsPillTitle: String {
         switch appState.locationManager.authorizationStatus {
         case .denied, .restricted: return "GPS غير مسموح"
@@ -547,14 +601,70 @@ struct HomeDashboardView: View {
         appState.locationManager.currentLocation == nil ? .orange : .green
     }
 
+    private var homeBackground: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color.trailBase, Color.trailNight, Color(red: 0.10, green: 0.075, blue: 0.050)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            RadialGradient(
+                colors: [Color.trailSignal.opacity(0.20), .clear],
+                center: .topLeading,
+                startRadius: 20,
+                endRadius: 420
+            )
+            RadialGradient(
+                colors: [Color.trailAmber.opacity(0.16), .clear],
+                center: .bottomTrailing,
+                startRadius: 10,
+                endRadius: 360
+            )
+        }
+        .ignoresSafeArea()
+    }
+
+    private var heroSurface: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color.white.opacity(0.115),
+                Color.trailSignal.opacity(0.105),
+                Color.trailAmber.opacity(0.075)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var trailTitleGradient: LinearGradient {
+        LinearGradient(
+            colors: [Color.trailMist, Color.trailAmber, Color.trailSignal],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
+
+    private func trailPill(_ title: String, _ icon: String) -> some View {
+        Label(title, systemImage: icon)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(Color.trailMist)
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(Color.white.opacity(0.08), in: Capsule())
+            .overlay(Capsule().stroke(Color.trailSignal.opacity(0.18), lineWidth: 1))
+    }
+
     private func mapToolButton(_ icon: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.headline)
-                .foregroundStyle(Color.desertInk)
+                .foregroundStyle(Color.trailMist)
                 .frame(width: 38, height: 38)
-                .background(Color.desertSurface, in: RoundedRectangle(cornerRadius: 8))
-                .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.trailSignal.opacity(0.18), lineWidth: 1))
+                .shadow(color: .black.opacity(0.20), radius: 8, y: 3)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
@@ -562,52 +672,75 @@ struct HomeDashboardView: View {
 
     private func openActiveTrip() {
         guard appState.hasSelectedTrip else {
-            statusMessage = "أنشئ رحلة أولًا لتفعيل التوجيه والمسافة"
+            statusMessage = "أنشئ رحلة أولًا لتفعيل لوحة القيادة والتوجيه."
             showingCreateTrip = true
             return
         }
         showingActiveTrip = true
     }
 
-    private func dashboardMetric(title: String, value: String, subtitle: String, icon: String, action: @escaping () -> Void) -> some View {
+    private func shareCurrentTrip() {
+        guard appState.hasSelectedTrip else {
+            statusMessage = "أنشئ رحلة أولًا ثم شارك رمز QR الخاص بها."
+            showingCreateTrip = true
+            return
+        }
+        showingQR = true
+    }
+
+    private func dashboardMetric(title: String, value: String, subtitle: String, icon: String, tint: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 5) {
-                Text(title)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.76))
+            HStack(spacing: 9) {
                 Image(systemName: icon)
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.92))
-                Text(value)
-                    .font(.headline.monospacedDigit())
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                Text(subtitle)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.72))
+                    .foregroundStyle(tint)
+                    .frame(width: 30, height: 30)
+                    .background(tint.opacity(0.16), in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.72))
+                        .lineLimit(1)
+                    Text(value)
+                        .font(.headline.monospacedDigit().weight(.black))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.68)
+                    Text(subtitle)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.66))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
             }
-            .frame(maxWidth: .infinity, minHeight: 74)
+            .frame(maxWidth: .infinity, minHeight: 76, alignment: .leading)
+            .padding(10)
+            .background(Color.white.opacity(0.075), in: RoundedRectangle(cornerRadius: 8))
+            .contentShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(title): \(value) \(subtitle)")
     }
 
-    private func quickAction(title: String, icon: String, action: @escaping () -> Void) -> some View {
+    private func quickAction(title: String, icon: String, tint: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 7) {
                 Image(systemName: icon)
                     .font(.title3)
-                    .foregroundStyle(Color.desertCopper)
+                    .foregroundStyle(tint)
+                    .frame(width: 34, height: 34)
+                    .background(tint.opacity(0.16), in: Circle())
                 Text(title)
                     .font(.caption2.weight(.semibold))
-                    .foregroundStyle(Color.desertInk)
+                    .foregroundStyle(Color.trailMist)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .minimumScaleFactor(0.7)
             }
-            .frame(maxWidth: .infinity, minHeight: 64)
+            .frame(maxWidth: .infinity, minHeight: 72)
             .padding(.horizontal, 4)
-            .background(Color.desertSurface, in: RoundedRectangle(cornerRadius: 8))
+            .background(Color.white.opacity(0.075), in: RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(tint.opacity(0.18), lineWidth: 1))
         }
         .buttonStyle(.plain)
     }
@@ -641,7 +774,7 @@ struct HomeDashboardView: View {
     }
 
     private func refreshWeather() {
-        appState.locationManager.startNavigation()
+        appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
         showStatus("جاري تحديث بيانات الطقس وجودة الهواء")
         Task {
             await appState.refreshEnvironmentReport()
@@ -677,7 +810,7 @@ struct HomeDashboardView: View {
             appState.locationManager.stopNavigation()
             showStatus("تم إيقاف تتبع الموقع")
         } else {
-            appState.locationManager.startNavigation()
+            appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
             showStatus("تم تشغيل تتبع الموقع")
         }
     }
@@ -790,7 +923,7 @@ private struct EnvironmentDetailsView: View {
     }
 
     private func refresh() {
-        appState.locationManager.startNavigation()
+        appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
         Task {
             await appState.refreshEnvironmentReport()
         }
@@ -802,10 +935,11 @@ private struct DashboardCard<Content: View>: View {
 
     var body: some View {
         content
-            .padding(12)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .topLeading)
-            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-            .shadow(color: .black.opacity(0.04), radius: 8, y: 3)
+            .background(Color.white.opacity(0.085), in: RoundedRectangle(cornerRadius: 18))
+            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.trailSignal.opacity(0.13), lineWidth: 1))
+            .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
     }
 }
 
@@ -813,11 +947,17 @@ private struct DashboardActionButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.subheadline.weight(.bold))
-            .foregroundStyle(Color.desertInk)
+            .foregroundStyle(Color.trailMist)
             .padding(.vertical, 14)
             .padding(.horizontal, 10)
-            .background(configuration.isPressed ? Color.desertSand.opacity(0.45) : Color.desertSurface, in: RoundedRectangle(cornerRadius: 8))
-            .shadow(color: .black.opacity(0.04), radius: 8, y: 3)
+            .background(
+                configuration.isPressed
+                ? Color.trailAmber.opacity(0.32)
+                : Color.white.opacity(0.09),
+                in: RoundedRectangle(cornerRadius: 16)
+            )
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.trailAmber.opacity(0.18), lineWidth: 1))
+            .shadow(color: .black.opacity(0.14), radius: 10, y: 5)
     }
 }
 
@@ -864,18 +1004,22 @@ private struct TripQRCodeSheet: View {
 extension Color {
     static let desertBackground = Color(uiColor: UIColor { traits in
         traits.userInterfaceStyle == .dark
-            ? UIColor(red: 0.055, green: 0.047, blue: 0.039, alpha: 1)
-            : UIColor(red: 0.97, green: 0.94, blue: 0.88, alpha: 1)
+            ? UIColor(red: 0.025, green: 0.035, blue: 0.040, alpha: 1)
+            : UIColor(red: 0.075, green: 0.090, blue: 0.090, alpha: 1)
     })
-    static let desertSurface = Color(uiColor: .secondarySystemGroupedBackground)
+    static let desertSurface = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.090, green: 0.105, blue: 0.105, alpha: 1)
+            : UIColor(red: 0.105, green: 0.120, blue: 0.115, alpha: 1)
+    })
     static let desertInk = Color(uiColor: UIColor { traits in
         traits.userInterfaceStyle == .dark
-            ? UIColor(red: 0.96, green: 0.92, blue: 0.85, alpha: 1)
-            : UIColor(red: 0.20, green: 0.14, blue: 0.09, alpha: 1)
+            ? UIColor(red: 0.88, green: 0.94, blue: 0.91, alpha: 1)
+            : UIColor(red: 0.88, green: 0.94, blue: 0.91, alpha: 1)
     })
     static let desertPanel = Color(uiColor: UIColor { traits in
         traits.userInterfaceStyle == .dark
-            ? UIColor(red: 0.12, green: 0.10, blue: 0.085, alpha: 0.96)
-            : UIColor(red: 0.26, green: 0.18, blue: 0.11, alpha: 0.88)
+            ? UIColor(red: 0.080, green: 0.095, blue: 0.092, alpha: 0.96)
+            : UIColor(red: 0.090, green: 0.105, blue: 0.100, alpha: 0.94)
     })
 }

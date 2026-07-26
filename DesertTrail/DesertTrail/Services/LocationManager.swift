@@ -111,8 +111,9 @@ final class LocationManager: NSObject {
         authorizationStatus = manager.authorizationStatus
         switch authorizationStatus {
         case .notDetermined:
-            shouldStartWhenAuthorized = true
-            requestWhenInUse()
+            shouldStartWhenAuthorized = false
+            isTracking = false
+            locationErrorMessage = "اضغط زر التشغيل للسماح بالموقع وبدء الملاحة."
             return
         case .denied, .restricted:
             shouldStartWhenAuthorized = false
@@ -121,6 +122,24 @@ final class LocationManager: NSObject {
             return
         default:
             beginNavigationUpdates()
+        }
+    }
+
+    func requestNavigationAccessAndStart(userInitiated: Bool = false) {
+        authorizationStatus = manager.authorizationStatus
+        switch authorizationStatus {
+        case .notDetermined:
+            guard userInitiated else {
+                shouldStartWhenAuthorized = false
+                isTracking = false
+                locationErrorMessage = "اضغط زر التشغيل للسماح بالموقع وبدء الملاحة."
+                return
+            }
+            shouldStartWhenAuthorized = true
+            locationErrorMessage = nil
+            requestWhenInUse()
+        default:
+            startNavigation()
         }
     }
 

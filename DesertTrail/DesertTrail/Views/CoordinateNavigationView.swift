@@ -93,7 +93,7 @@ struct CoordinateNavigationView: View {
             }
             Spacer()
             Button("تشغيل") {
-                appState.locationManager.startNavigation()
+                appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
                 showStatus("تم طلب/تشغيل GPS والبوصلة")
             }
             .font(.caption.weight(.bold))

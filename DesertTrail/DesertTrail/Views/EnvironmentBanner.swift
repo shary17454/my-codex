@@ -7,8 +7,7 @@ struct EnvironmentBanner: View {
     var body: some View {
         Button {
             Task {
-                appState.locationManager.startNavigation()
-                await appState.refreshEnvironmentReport()
+                await appState.startLocationAndRefreshEnvironment(userInitiated: true)
             }
         } label: {
             HStack(spacing: 12) {

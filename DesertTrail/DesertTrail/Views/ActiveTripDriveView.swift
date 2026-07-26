@@ -12,6 +12,7 @@ struct ActiveTripDriveView: View {
     @State private var showingAddPlace = false
     @State private var showingDestinationPicker = false
     @State private var showingSOS = false
+    @State private var selectedTelemetryMetric: DriveTelemetryMetric?
 
     @State private var driveRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
@@ -41,7 +42,8 @@ struct ActiveTripDriveView: View {
         .toolbarBackground(Color.driveBlack, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .task {
-            await appState.startLocationAndRefreshEnvironment()
+            appState.locationManager.startNavigation()
+            await appState.refreshEnvironmentReport()
             updateVisibleRegion()
         }
         .onChange(of: appState.locationManager.currentLocation?.timestamp) { _, _ in
@@ -65,6 +67,10 @@ struct ActiveTripDriveView: View {
         }
         .sheet(isPresented: $showingSOS) {
             SOSView(coordinate: appState.locationManager.currentLocation?.coordinate ?? appState.selectedTrip.meetingPoint)
+        }
+        .sheet(item: $selectedTelemetryMetric) { metric in
+            telemetryDetailSheet(for: metric)
+                .presentationDetents([.medium])
         }
     }
 
@@ -95,25 +101,25 @@ struct ActiveTripDriveView: View {
     private var telemetryStrip: some View {
         HStack(spacing: 0) {
             driveMetric("البطارية", batteryText, nil) {
-                showStatus(batteryText == "--" ? "تعذر قراءة البطارية حاليًا" : "مستوى بطارية الجهاز: \(batteryText)")
+                selectedTelemetryMetric = .battery
             }
             driveDivider
             driveMetric("GPS", gpsText, gpsColor) {
-                toggleTracking()
+                selectedTelemetryMetric = .gps
             }
             driveDivider
             driveMetric("المسافة", distanceText, nil) {
-                openAppleMapsDirections()
+                selectedTelemetryMetric = .distance
             }
             driveDivider
             driveMetric("الارتفاع", altitudeText, nil) {
                 appState.locationManager.startNavigation()
-                showStatus(altitudeText == "--" ? "بانتظار قراءة ارتفاع دقيقة من GPS" : "الارتفاع الحالي \(altitudeText)")
+                selectedTelemetryMetric = .altitude
             }
             driveDivider
             driveMetric("السرعة", speedText, nil) {
                 appState.locationManager.startNavigation()
-                showStatus(speedText == "--" ? "بانتظار حركة الجهاز وقراءة GPS" : "السرعة الحالية \(speedText)")
+                selectedTelemetryMetric = .speed
             }
         }
         .padding(.vertical, 11)
@@ -132,9 +138,11 @@ struct ActiveTripDriveView: View {
         MapCanvasView(
             region: driveRegion,
             route: navigationRoute,
+            dirtRoadRoutes: driveDirtRoutes,
             places: appState.hiddenPlaces.filter { $0.status == .approved },
             tileTemplateURL: nil,
-            tileOpacity: 0.7
+            tileOpacity: 0.7,
+            showsUserLocation: appState.locationManager.isTracking
         )
         .ignoresSafeArea(edges: .horizontal)
         .overlay {
@@ -333,13 +341,13 @@ struct ActiveTripDriveView: View {
             .frame(width: 1, height: 38)
     }
 
-    private var batteryText: String {
+    fileprivate var batteryText: String {
         let level = UIDevice.current.batteryLevel
         guard level >= 0 else { return "--" }
         return "\(Int(level * 100))%"
     }
 
-    private var gpsText: String {
+    fileprivate var gpsText: String {
         if appState.locationManager.authorizationStatus == .denied || appState.locationManager.authorizationStatus == .restricted {
             return "مرفوض"
         }
@@ -356,17 +364,17 @@ struct ActiveTripDriveView: View {
         return accuracy <= 30 ? .green : .orange
     }
 
-    private var speedText: String {
+    fileprivate var speedText: String {
         guard let speed = appState.locationManager.speedKPH else { return "--" }
         return "\(Int(speed.rounded())) كم/س"
     }
 
-    private var altitudeText: String {
+    fileprivate var altitudeText: String {
         guard let altitude = appState.locationManager.altitudeMeters else { return "--" }
         return "\(Int(altitude.rounded())) م"
     }
 
-    private var distanceText: String {
+    fileprivate var distanceText: String {
         guard let distance = appState.locationManager.distance(to: appState.selectedTrip.meetingPoint) else { return "--" }
         if distance < 1_000 { return "\(Int(distance.rounded())) م" }
         return String(format: "%.1f كم", distance / 1_000)
@@ -408,7 +416,14 @@ struct ActiveTripDriveView: View {
 
     private var navigationRoute: [CLLocationCoordinate2D] {
         guard let current = appState.locationManager.currentLocation?.coordinate else { return [] }
+        if let selectedRoute = appState.selectedDirtRoadRoute {
+            return [current] + selectedRoute.coordinates + [appState.selectedTrip.meetingPoint]
+        }
         return [current, appState.selectedTrip.meetingPoint]
+    }
+
+    private var driveDirtRoutes: [DirtRoadRoute] {
+        appState.suggestedDirtRoadRoutes(destination: appState.selectedTrip.meetingPoint)
     }
 
     private func driveMetric(
@@ -456,6 +471,62 @@ struct ActiveTripDriveView: View {
         .buttonStyle(.plain)
         .contentShape(Rectangle())
         .accessibilityLabel(title)
+    }
+
+    private func telemetryDetailSheet(for metric: DriveTelemetryMetric) -> some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 18) {
+                Label(metric.title, systemImage: metric.icon)
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(Color.driveGold)
+
+                Text(metric.value(in: self))
+                    .font(.system(.largeTitle, design: .rounded).monospacedDigit().weight(.black))
+                    .foregroundStyle(.primary)
+
+                Text(metric.explanation)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                telemetryContextCard(for: metric)
+
+                Button {
+                    runTelemetryAction(metric)
+                } label: {
+                    Label(metric.actionTitle, systemImage: metric.actionIcon)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(Color.driveGold)
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("تفاصيل لوحة القيادة")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(appState.text(.done)) {
+                        selectedTelemetryMetric = nil
+                    }
+                }
+            }
+        }
+    }
+
+    private func telemetryContextCard(for metric: DriveTelemetryMetric) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(metric.contextTitle, systemImage: "info.circle")
+                .font(.headline.weight(.bold))
+            Text(metric.context(in: self, appState: appState))
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func showStatus(_ message: String) {
@@ -513,6 +584,129 @@ struct ActiveTripDriveView: View {
             if !opened {
                 showStatus("تعذر فتح خرائط Apple")
             }
+        }
+    }
+
+    private func runTelemetryAction(_ metric: DriveTelemetryMetric) {
+        switch metric {
+        case .battery:
+            showStatus(batteryText == "--" ? "تعذر قراءة البطارية حاليًا" : "مستوى بطارية الجهاز: \(batteryText)")
+        case .gps:
+            toggleTracking()
+        case .distance:
+            openAppleMapsDirections()
+        case .altitude:
+            appState.locationManager.startNavigation()
+            showStatus("تم تشغيل GPS لتحديث الارتفاع")
+        case .speed:
+            appState.locationManager.startNavigation()
+            showStatus("تم تشغيل GPS لتحديث السرعة")
+        }
+    }
+}
+
+private enum DriveTelemetryMetric: String, Identifiable {
+    case battery
+    case gps
+    case distance
+    case altitude
+    case speed
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .battery: return "البطارية"
+        case .gps: return "حالة GPS"
+        case .distance: return "المسافة إلى الوجهة"
+        case .altitude: return "الارتفاع"
+        case .speed: return "السرعة"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .battery: return "battery.75percent"
+        case .gps: return "location.fill"
+        case .distance: return "mappin.and.ellipse"
+        case .altitude: return "mountain.2"
+        case .speed: return "speedometer"
+        }
+    }
+
+    var actionTitle: String {
+        switch self {
+        case .battery: return "عرض الحالة الحالية"
+        case .gps: return "تشغيل أو إيقاف GPS"
+        case .distance: return "فتح الاتجاه في خرائط Apple"
+        case .altitude: return "تحديث الارتفاع من GPS"
+        case .speed: return "تحديث السرعة من GPS"
+        }
+    }
+
+    var actionIcon: String {
+        switch self {
+        case .battery: return "info.circle"
+        case .gps: return "location.north.line"
+        case .distance: return "arrow.triangle.turn.up.right.diamond"
+        case .altitude, .speed: return "arrow.clockwise"
+        }
+    }
+
+    var explanation: String {
+        switch self {
+        case .battery:
+            return "تعتمد قراءة البطارية على نظام iOS بعد تفعيل مراقبة البطارية داخل التطبيق."
+        case .gps:
+            return "يتحكم هذا المؤشر بتحديث الموقع والبوصلة. عند رفض الصلاحية يجب تفعيلها من إعدادات النظام."
+        case .distance:
+            return "تحسب المسافة بين موقعك الحالي ووجهة الرحلة المحددة، ويمكن فتح التوجيه مباشرة في خرائط Apple."
+        case .altitude:
+            return "تأتي قراءة الارتفاع من GPS. في المحاكي قد تكون ثابتة أو تقريبية، وعلى الجهاز الحقيقي تعتمد على جودة الإشارة."
+        case .speed:
+            return "تأتي السرعة من حركة GPS. تظهر القراءة بعد التحرك فعليًا، وقد تبقى فارغة في المحاكي أو عند ثبات الجهاز."
+        }
+    }
+
+    var contextTitle: String {
+        switch self {
+        case .battery: return "مراقبة الطاقة"
+        case .gps: return "صلاحية الموقع"
+        case .distance: return "وجهة الرحلة"
+        case .altitude: return "دقة الارتفاع"
+        case .speed: return "دقة الحركة"
+        }
+    }
+
+    @MainActor
+    func value(in view: ActiveTripDriveView) -> String {
+        switch self {
+        case .battery: return view.batteryText
+        case .gps: return view.gpsText
+        case .distance: return view.distanceText
+        case .altitude: return view.altitudeText
+        case .speed: return view.speedText
+        }
+    }
+
+    @MainActor
+    func context(in view: ActiveTripDriveView, appState: AppState) -> String {
+        switch self {
+        case .battery:
+            return view.batteryText == "--"
+                ? "لم يسمح النظام بقراءة البطارية بعد. افتح الشاشة مرة أخرى أو استخدم جهازًا حقيقيًا للتحقق."
+                : "القراءة الحالية \(view.batteryText). خفّض سطوع الشاشة واستخدم الخرائط دون اتصال عند الرحلات الطويلة."
+        case .gps:
+            let accuracy = appState.locationManager.horizontalAccuracyMeters.map { "±\(Int($0)) م" } ?? "غير متوفرة"
+            return "الحالة الحالية: \(view.gpsText). الدقة: \(accuracy)."
+        case .distance:
+            return appState.hasSelectedTrip
+                ? "الوجهة الحالية: \(appState.selectedTrip.title). المسافة المعروضة تتحدث عند وصول قراءات GPS جديدة."
+                : "لا توجد رحلة محددة. أنشئ رحلة أو اختر وجهة حتى تعمل المسافة والتوجيه."
+        case .altitude:
+            return "الارتفاع الحالي: \(view.altitudeText). إذا ظهرت -- فاضغط تحديث الارتفاع واسمح للموقع."
+        case .speed:
+            return "السرعة الحالية: \(view.speedText). إذا ظهرت -- فذلك يعني أن GPS لم يلتقط حركة كافية بعد."
         }
     }
 }

@@ -121,7 +121,9 @@ struct ContentView: View {
             }
             .tag(AppTab.tools)
         }
-        .tint(.desertCopper)
+        .tint(.trailSignal)
+        .toolbarBackground(Color.trailBase, for: .tabBar)
+        .toolbarColorScheme(.dark, for: .tabBar)
         .environment(\.layoutDirection, appState.language == .arabic ? .rightToLeft : .leftToRight)
         .onAppear {
             UIDevice.current.isBatteryMonitoringEnabled = true
@@ -149,8 +151,13 @@ private struct LanguagePicker: View {
 }
 
 extension Color {
-    static let desertSand = Color(red: 0.95, green: 0.83, blue: 0.58)
-    static let desertCopper = Color(red: 0.68, green: 0.36, blue: 0.14)
-    static let desertRock = Color(red: 0.28, green: 0.24, blue: 0.20)
-    static let oasisTeal = Color(red: 0.04, green: 0.45, blue: 0.48)
+    static let desertSand = Color(red: 0.86, green: 0.69, blue: 0.39)
+    static let desertCopper = Color(red: 0.78, green: 0.40, blue: 0.16)
+    static let desertRock = Color(red: 0.20, green: 0.17, blue: 0.14)
+    static let oasisTeal = Color(red: 0.02, green: 0.55, blue: 0.58)
+    static let trailBase = Color(red: 0.025, green: 0.035, blue: 0.040)
+    static let trailNight = Color(red: 0.035, green: 0.055, blue: 0.060)
+    static let trailSignal = Color(red: 0.09, green: 0.78, blue: 0.74)
+    static let trailAmber = Color(red: 0.92, green: 0.54, blue: 0.18)
+    static let trailMist = Color(red: 0.88, green: 0.94, blue: 0.91)
 }

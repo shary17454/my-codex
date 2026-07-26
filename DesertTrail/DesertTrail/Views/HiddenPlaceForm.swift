@@ -242,7 +242,8 @@ struct HiddenPlaceForm: View {
                         coordinate: $0.coordinate
                     )
                 }
-            mapSearchResults = deduplicated(appleResults + localResults)
+            let dirtRoadResults = dirtRoadSearchResults(for: cleanQuery)
+            mapSearchResults = deduplicated(appleResults + localResults + dirtRoadResults)
             searchMessage = mapSearchResults.isEmpty ? "لم يتم العثور على نتائج" : "نتائج خرائط Apple والمواقع المحفوظة"
         } catch {
             mapSearchResults = HiddenPlace.samples
@@ -257,8 +258,27 @@ struct HiddenPlaceForm: View {
                         coordinate: $0.coordinate
                     )
                 }
+                + dirtRoadSearchResults(for: cleanQuery)
             searchMessage = mapSearchResults.isEmpty ? "تعذر البحث الآن. يمكنك إدخال الإحداثية مباشرة." : "تم عرض نتائج محلية عند تعذر الاتصال"
         }
+    }
+
+    private func dirtRoadSearchResults(for query: String) -> [PlaceSearchResult] {
+        DirtRoadRoute.samples
+            .filter {
+                $0.name.localizedCaseInsensitiveContains(query) ||
+                $0.summary.localizedCaseInsensitiveContains(query) ||
+                $0.condition.localizedCaseInsensitiveContains(query) ||
+                $0.surface.rawValue.localizedCaseInsensitiveContains(query) ||
+                $0.difficulty.rawValue.localizedCaseInsensitiveContains(query)
+            }
+            .map {
+                PlaceSearchResult(
+                    name: $0.name,
+                    subtitle: "طريق بري: \($0.subtitle)",
+                    coordinate: $0.endCoordinate
+                )
+            }
     }
 
     private func save() {
