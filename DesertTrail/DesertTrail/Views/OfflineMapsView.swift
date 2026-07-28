@@ -36,39 +36,16 @@ struct OfflineMapsView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
 
-                    ForEach(filteredPresets) { preset in
-                        Button {
-                            Task { await save(title: preset.title, region: preset.region, presetID: preset.id) }
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: "map.fill")
-                                    .foregroundStyle(Color.desertCopper)
-                                    .frame(width: 32, height: 32)
-                                    .background(Color.desertCopper.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                    Label("\(filteredPresets.count) منطقة جاهزة للحفظ المحلي", systemImage: "square.grid.2x2")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(preset.title)
-                                        .font(.headline)
-                                    Text(preset.subtitle)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    Text(String(format: "%.4f, %.4f", preset.region.center.latitude, preset.region.center.longitude))
-                                        .font(.caption2.monospacedDigit())
-                                        .foregroundStyle(.secondary)
-                                }
-
-                                Spacer()
-
-                                if savingPresetID == preset.id {
-                                    ProgressView()
-                                } else {
-                                    Image(systemName: "icloud.and.arrow.down")
-                                        .foregroundStyle(Color.oasisTeal)
-                                }
-                            }
+                ForEach(groupedFilteredPresets, id: \.title) { group in
+                    Section(group.title) {
+                        ForEach(group.presets) { preset in
+                            presetRow(preset)
                         }
-                        .buttonStyle(.plain)
-                        .disabled(savingPresetID != nil)
                     }
                 }
 
@@ -107,6 +84,64 @@ struct OfflineMapsView: View {
         }
     }
 
+    private var groupedFilteredPresets: [OfflineMapPresetGroup] {
+        let presets = filteredPresets
+        let groups = [
+            OfflineMapPresetGroup(title: "الرياض ونجد", presets: presets.filter { containsAny($0, ["الرياض", "طويق", "حنيفة", "خريم", "الصمان", "الدهناء"]) }),
+            OfflineMapPresetGroup(title: "الشمال والشمال الغربي", presets: presets.filter { containsAny($0, ["العلا", "اللوز", "جبة", "أجا", "سلمى", "خيبر", "الديسة", "حسمي"]) }),
+            OfflineMapPresetGroup(title: "الغرب والحجاز", presets: presets.filter { containsAny($0, ["رهط", "ورقان", "الفرع", "وج", "كشب"]) }),
+            OfflineMapPresetGroup(title: "الجنوب والمرتفعات", presets: presets.filter { containsAny($0, ["السودة", "فيفاء", "لجب", "شدا", "بيشة", "نجران", "القهر"]) }),
+            OfflineMapPresetGroup(title: "الصحارى والمسارات الطويلة", presets: presets.filter { containsAny($0, ["الربع", "الدواسر", "يبرين", "نفود"]) })
+        ]
+        let groupedIDs = Set(groups.flatMap { $0.presets.map(\.id) })
+        let uncategorized = presets.filter { !groupedIDs.contains($0.id) }
+        return (groups + [OfflineMapPresetGroup(title: "مناطق أخرى", presets: uncategorized)])
+            .filter { !$0.presets.isEmpty }
+    }
+
+    @ViewBuilder
+    private func presetRow(_ preset: OfflineMapPreset) -> some View {
+        Button {
+            Task { await save(title: preset.title, region: preset.region, presetID: preset.id) }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "map.fill")
+                    .foregroundStyle(Color.desertCopper)
+                    .frame(width: 32, height: 32)
+                    .background(Color.desertCopper.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(preset.title)
+                        .font(.headline)
+                    Text(preset.subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(String(format: "%.4f, %.4f", preset.region.center.latitude, preset.region.center.longitude))
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                if savingPresetID == preset.id {
+                    ProgressView()
+                } else {
+                    Image(systemName: "icloud.and.arrow.down")
+                        .foregroundStyle(Color.oasisTeal)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(savingPresetID != nil)
+    }
+
+    private func containsAny(_ preset: OfflineMapPreset, _ words: [String]) -> Bool {
+        words.contains { word in
+            preset.title.localizedCaseInsensitiveContains(word) ||
+            preset.subtitle.localizedCaseInsensitiveContains(word)
+        }
+    }
+
     private var currentRegionTitle: String {
         if let nearest = OfflineMapPreset.samples.min(by: {
             distance(from: region.center, to: $0.region.center) < distance(from: region.center, to: $1.region.center)
@@ -132,6 +167,11 @@ struct OfflineMapsView: View {
         }
         savingPresetID = nil
     }
+}
+
+private struct OfflineMapPresetGroup {
+    let title: String
+    let presets: [OfflineMapPreset]
 }
 
 private struct SavedOfflineMapRow: View {

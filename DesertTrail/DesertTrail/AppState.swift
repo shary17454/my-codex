@@ -20,6 +20,9 @@ final class AppState {
     var consentedToTripSharing = false {
         didSet { UserDefaults.standard.set(consentedToTripSharing, forKey: AppStorageKey.tripSharingConsent) }
     }
+    var acceptedTermsAndPrivacy = false {
+        didSet { UserDefaults.standard.set(acceptedTermsAndPrivacy, forKey: AppStorageKey.termsAndPrivacyAccepted) }
+    }
     var preferredDirtRoadRouteID: String? {
         didSet {
             if let preferredDirtRoadRouteID {
@@ -50,7 +53,14 @@ final class AppState {
         }
 
         trips = AppStateStorage.loadTrips() ?? []
-        hiddenPlaces = AppStateStorage.loadHiddenPlaces() ?? HiddenPlace.samples
+        if let storedHiddenPlaces = AppStateStorage.loadHiddenPlaces() {
+            hiddenPlaces = Self.mergedHiddenPlaces(storedHiddenPlaces, with: HiddenPlace.samples)
+            if hiddenPlaces.count != storedHiddenPlaces.count {
+                AppStateStorage.saveHiddenPlaces(hiddenPlaces)
+            }
+        } else {
+            hiddenPlaces = HiddenPlace.samples
+        }
 
         if let selectedID = defaults.string(forKey: AppStorageKey.selectedTripID),
            let uuid = UUID(uuidString: selectedID),
@@ -60,8 +70,14 @@ final class AppState {
             selectedTrip = trips.first ?? TripPlan.draft
         }
         consentedToTripSharing = defaults.bool(forKey: AppStorageKey.tripSharingConsent)
+        acceptedTermsAndPrivacy = defaults.bool(forKey: AppStorageKey.termsAndPrivacyAccepted)
         preferredDirtRoadRouteID = defaults.string(forKey: AppStorageKey.preferredDirtRoadRouteID)
         favoriteDirtRoadRouteIDs = defaults.stringArray(forKey: AppStorageKey.favoriteDirtRoadRouteIDs) ?? []
+    }
+
+    func acceptTermsAndPrivacy() {
+        acceptedTermsAndPrivacy = true
+        statusMessage = "تم قبول شروط الاستخدام والخصوصية"
     }
 
     func refreshEnvironmentReport() async {
@@ -251,6 +267,28 @@ final class AppState {
         }
         UserDefaults.standard.set(selectedTrip.id.uuidString, forKey: AppStorageKey.selectedTripID)
     }
+
+    private static func mergedHiddenPlaces(_ stored: [HiddenPlace], with bundled: [HiddenPlace]) -> [HiddenPlace] {
+        var merged = stored
+        for place in bundled where !merged.contains(where: { samePlace($0, place) }) {
+            merged.append(place)
+        }
+        return merged
+    }
+
+    private static func samePlace(_ first: HiddenPlace, _ second: HiddenPlace) -> Bool {
+        let firstName = first.name
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "ar"))
+        let secondName = second.name
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "ar"))
+        let sameName = firstName == secondName
+
+        let firstLocation = CLLocation(latitude: first.coordinate.latitude, longitude: first.coordinate.longitude)
+        let secondLocation = CLLocation(latitude: second.coordinate.latitude, longitude: second.coordinate.longitude)
+        return sameName && firstLocation.distance(from: secondLocation) < 1_500
+    }
 }
 
 private enum AppStorageKey {
@@ -260,6 +298,7 @@ private enum AppStorageKey {
     static let trips = "desertTrail.trips.v1"
     static let hiddenPlaces = "desertTrail.hiddenPlaces.v1"
     static let tripSharingConsent = "desertTrail.tripSharingConsent"
+    static let termsAndPrivacyAccepted = "desertTrail.termsAndPrivacyAccepted.v1"
     static let preferredDirtRoadRouteID = "desertTrail.preferredDirtRoadRouteID"
     static let favoriteDirtRoadRouteIDs = "desertTrail.favoriteDirtRoadRouteIDs"
 }
@@ -500,7 +539,7 @@ enum LocalizedKey {
 
     private var arabicValue: String {
         switch self {
-        case .appTitle: return "الدرب"
+        case .appTitle: return "الدروب"
         case .map: return "الخريطة"
         case .compass: return "البوصلة"
         case .planner: return "التقويم"
@@ -575,7 +614,7 @@ enum LocalizedKey {
 
     private var englishValue: String {
         switch self {
-        case .appTitle: return "Al Darb"
+        case .appTitle: return "Al Droob"
         case .map: return "Map"
         case .compass: return "Compass"
         case .planner: return "Planner"
@@ -650,7 +689,7 @@ enum LocalizedKey {
 
     private var frenchValue: String {
         switch self {
-        case .appTitle: return "Al Darb"
+        case .appTitle: return "Al Droob"
         case .map: return "Carte"
         case .compass: return "Boussole"
         case .planner: return "Planificateur"
@@ -681,7 +720,7 @@ enum LocalizedKey {
 
     private var spanishValue: String {
         switch self {
-        case .appTitle: return "Al Darb"
+        case .appTitle: return "Al Droob"
         case .map: return "Mapa"
         case .compass: return "Brújula"
         case .planner: return "Planificador"
@@ -712,7 +751,7 @@ enum LocalizedKey {
 
     private var chineseValue: String {
         switch self {
-        case .appTitle: return "Al Darb"
+        case .appTitle: return "Al Droob"
         case .map: return "地图"
         case .compass: return "指南针"
         case .planner: return "行程"

@@ -277,6 +277,7 @@ struct AdvancedToolsView: View {
             }
 
             Button {
+                interactionFeedback()
                 refreshEnvironmentFromTools()
             } label: {
                 Label("تحديث بيانات اللوحة", systemImage: "arrow.clockwise")
@@ -288,7 +289,7 @@ struct AdvancedToolsView: View {
     }
 
     private var platformVisionCard: some View {
-        featureCard(title: "منصة الدرب المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
+        featureCard(title: "منصة الدروب المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
             Text("هذه الشاشة تجمع التخطيط، الملاحة، الخرائط دون اتصال، السلامة، المجتمع، الذكاء الاصطناعي، والتكامل مع أجهزة Apple في تجربة واحدة للرحلة البرية.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -296,17 +297,21 @@ struct AdvancedToolsView: View {
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow {
                     toolActionMetric("AI", "تخطيط واقتراح", "sparkles") {
+                        interactionFeedback()
                         showingAssistant = true
                     }
                     toolActionMetric("أوفلاين", "خرائط وطبقات", "arrow.down.app") {
+                        interactionFeedback()
                         showingOfflineMaps = true
                     }
                 }
                 GridRow {
                     toolActionMetric("السلامة", "SOS وتنبيهات", "shield.lefthalf.filled") {
+                        interactionFeedback()
                         showingSOS = true
                     }
                     toolActionMetric("المجتمع", "حالة مباشرة", "person.3") {
+                        interactionFeedback()
                         showingLiveShare = true
                     }
                 }
@@ -405,6 +410,7 @@ struct AdvancedToolsView: View {
             }
 
             Button {
+                interactionFeedback()
                 showingAssistant = true
             } label: {
                 Label("فتح المساعد وتحليل الطلب", systemImage: "brain.head.profile")
@@ -532,9 +538,10 @@ struct AdvancedToolsView: View {
             }
 
             Button {
+                interactionFeedback()
                 scheduleRiskNotification()
             } label: {
-                Label("تفعيل إشعار تجريبي", systemImage: "bell.badge")
+                Label("تفعيل تنبيه مخاطر محلي", systemImage: "bell.badge")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -559,6 +566,7 @@ struct AdvancedToolsView: View {
 
             HStack {
                 Button {
+                    interactionFeedback()
                     if isRecording {
                         updateRecordingMetrics(with: appState.locationManager.currentLocation)
                         isRecording = false
@@ -573,6 +581,7 @@ struct AdvancedToolsView: View {
                 .buttonStyle(.borderedProminent)
 
                 Button {
+                    interactionFeedback()
                     openTripReport()
                 } label: {
                     Image(systemName: "doc.richtext")
@@ -589,6 +598,7 @@ struct AdvancedToolsView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             Button {
+                interactionFeedback()
                 openEmergencyTools()
             } label: {
                 Label("فتح زر الطوارئ", systemImage: "sos.circle.fill")
@@ -615,6 +625,7 @@ struct AdvancedToolsView: View {
                 .foregroundStyle(.secondary)
 
             Button {
+                interactionFeedback()
                 showingOfflineMaps = true
             } label: {
                 Label("اختيار منطقة وإدارة الخرائط المحفوظة", systemImage: "map.fill")
@@ -631,6 +642,7 @@ struct AdvancedToolsView: View {
                 .foregroundStyle(.secondary)
 
             Button {
+                interactionFeedback()
                 openNearbyServices()
             } label: {
                 Label("البحث عن خدمات قريبة", systemImage: "magnifyingglass.circle.fill")
@@ -648,6 +660,7 @@ struct AdvancedToolsView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             Button {
+                interactionFeedback()
                 showingLiveShare = true
             } label: {
                 Label("إنشاء رابط وQR للرحلة", systemImage: "qrcode")
@@ -670,6 +683,7 @@ struct AdvancedToolsView: View {
 
             HStack {
                 Button {
+                    interactionFeedback()
                     showingLiveShare = true
                 } label: {
                     Label("مشاركة المجموعة", systemImage: "location.viewfinder")
@@ -678,7 +692,8 @@ struct AdvancedToolsView: View {
                 .buttonStyle(.bordered)
 
                 Button {
-                    showToolStatus("تم إرسال تنبيه تجريبي لأعضاء الرحلة")
+                    interactionFeedback()
+                    showToolStatus("سيتم إرسال تنبيه محلي لأعضاء الرحلة عند منح صلاحية الإشعارات")
                     scheduleRiskNotification()
                 } label: {
                     Label("تنبيه جماعي", systemImage: "bell.badge")
@@ -894,6 +909,7 @@ struct AdvancedToolsView: View {
                 .foregroundStyle(.secondary)
             row(icon: "mappin", title: "موقع الالتقاط", subtitle: captureLocationText, trailing: altitudeText)
             Button {
+                interactionFeedback()
                 showingTripCamera = true
             } label: {
                 Label("فتح الكاميرا", systemImage: "camera.fill")
@@ -1135,24 +1151,37 @@ struct AdvancedToolsView: View {
     }
 
     private func metric(_ title: String, _ value: String, _ icon: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Image(systemName: icon)
-                .foregroundStyle(Color.desertCopper)
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.68)
-            Text(value)
-                .font(.subheadline.monospacedDigit().weight(.bold))
-                .foregroundStyle(.primary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.50)
-                .fixedSize(horizontal: false, vertical: true)
+        Button {
+            interactionFeedback()
+            showToolStatus("\(title): \(value)")
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundStyle(Color.desertCopper)
+                    Spacer(minLength: 4)
+                    Image(systemName: "info.circle")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.secondary)
+                }
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+                Text(value)
+                    .font(.subheadline.monospacedDigit().weight(.bold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.50)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+            .padding(9)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+            .contentShape(RoundedRectangle(cornerRadius: 8))
         }
-        .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
-        .padding(9)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .buttonStyle(.plain)
         .accessibilityLabel("\(title) \(value)")
     }
 
@@ -1162,7 +1191,10 @@ struct AdvancedToolsView: View {
         _ icon: String,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button {
+            interactionFeedback()
+            action()
+        } label: {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Image(systemName: icon)
@@ -1245,7 +1277,7 @@ struct AdvancedToolsView: View {
         wasRecordingMoving = false
         lastRecordedLocation = appState.locationManager.currentLocation
         isRecording = true
-        appState.locationManager.startNavigation()
+        appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
         showToolStatus(
             availableCoordinate == nil
                 ? "بدأ التسجيل، وبانتظار أول قراءة GPS صحيحة"
@@ -1254,7 +1286,7 @@ struct AdvancedToolsView: View {
     }
 
     private func openTripReport() {
-        appState.locationManager.startNavigation()
+        appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
         guard availableCoordinate != nil else {
             showToolStatus("بانتظار موقع GPS قبل إنشاء تقرير الرحلة")
             return
@@ -1263,7 +1295,7 @@ struct AdvancedToolsView: View {
     }
 
     private func openEmergencyTools() {
-        appState.locationManager.startNavigation()
+        appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
         guard availableCoordinate != nil else {
             showToolStatus("بانتظار موقع GPS لإرفاق إحداثية صحيحة برسالة الطوارئ")
             return
@@ -1272,7 +1304,7 @@ struct AdvancedToolsView: View {
     }
 
     private func openNearbyServices() {
-        appState.locationManager.startNavigation()
+        appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
         guard availableCoordinate != nil else {
             showToolStatus("بانتظار موقع GPS للبحث عن الخدمات القريبة منك")
             return
@@ -1314,8 +1346,12 @@ struct AdvancedToolsView: View {
         }
     }
 
+    private func interactionFeedback() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+
     private func refreshEnvironmentFromTools() {
-        appState.locationManager.startNavigation()
+        appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
         showToolStatus("جاري تحديث الطقس وجودة الهواء")
         Task {
             await appState.refreshEnvironmentReport()
@@ -1359,14 +1395,27 @@ struct AdvancedToolsView: View {
 
     private func scheduleRiskNotification() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, _ in
-            guard granted else { return }
+            guard granted else {
+                Task { @MainActor in
+                    showToolStatus("لم يتم تفعيل التنبيه لأن صلاحية الإشعارات غير ممنوحة")
+                }
+                return
+            }
             let content = UNMutableNotificationContent()
-            content.title = "تحذير الدرب"
+            content.title = "تحذير الدروب"
             content.body = "اقتربت من مسار رملي ناعم. تحقق من ضغط الإطارات قبل الدخول."
             content.sound = .default
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false)
             let request = UNNotificationRequest(identifier: "desert-risk-demo", content: content, trigger: trigger)
-            UNUserNotificationCenter.current().add(request)
+            UNUserNotificationCenter.current().add(request) { error in
+                Task { @MainActor in
+                    if error == nil {
+                        showToolStatus("تم تفعيل تنبيه مخاطر محلي وسيظهر خلال لحظات")
+                    } else {
+                        showToolStatus("تعذر تفعيل التنبيه المحلي، تحقق من إعدادات الإشعارات")
+                    }
+                }
+            }
         }
     }
 }
@@ -1598,7 +1647,7 @@ struct SOSView: View {
 
     private var message: String {
         """
-        SOS الدرب
+        SOS الدروب
         آخر موقع معروف:
         \(coordinate.latitude), \(coordinate.longitude)
         الوقت: \(Date().formatted(date: .numeric, time: .shortened))
@@ -1764,7 +1813,7 @@ struct TripReportView: View {
 
     private var report: String {
         """
-        تقرير رحلة الدرب
+        تقرير رحلة الدروب
         البداية: \(startedAt.formatted(date: .numeric, time: .shortened))
         النهاية: \(Date().formatted(date: .numeric, time: .shortened))
         المسافة المسجلة: \(String(format: "%.2f", distanceMeters / 1_000)) كم
@@ -1867,7 +1916,7 @@ struct WildlifeSafetyGuideView: View {
 
     private var recognitionCard: some View {
         guideCard(title: "التعرف بالذكاء الاصطناعي", icon: "camera.viewfinder", color: .indigo) {
-            Text("يلتقط المستخدم صورة لحيوان أو أثر أو نبات، ثم يعرض التطبيق محاولة التعرف، مستوى الخطورة، وطريقة التعامل. الواجهة جاهزة للربط بنموذج رؤية حاسوبية عند تفعيل الخدمة.")
+            Text("يعرض التطبيق تحليلًا ميدانيًا مبدئيًا للحيوان أو الأثر أو النبات، مع مستوى الخطورة وطريقة التعامل، ويستطيع لاحقًا الارتباط بنموذج رؤية حاسوبية عند توفر الخدمة.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
@@ -1878,7 +1927,7 @@ struct WildlifeSafetyGuideView: View {
                     .frame(width: 48, height: 48)
                     .background(Color.indigo, in: RoundedRectangle(cornerRadius: 8))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("نتيجة تجريبية")
+                    Text("تحليل مبدئي")
                         .font(.headline)
                     Text("عقرب صحراوي محتمل - الخطورة مرتفعة - افحص مكان الجلوس ولا تلمسه.")
                         .font(.footnote)
@@ -2132,8 +2181,11 @@ struct WildlifeSafetyGuideView: View {
                 )
                 .overlay(
                     VStack(spacing: 4) {
+                        Text(wildlifeVisualMark(item))
+                            .font(.system(size: 24))
+                            .accessibilityHidden(true)
                         Image(systemName: item.imageName)
-                            .font(.system(size: 30, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundStyle(.white)
                         Text(wildlifeVisualLabel(item))
                             .font(.system(size: 9, weight: .bold))
@@ -2158,9 +2210,32 @@ struct WildlifeSafetyGuideView: View {
         if item.arabicName.contains("ثعبان") || item.arabicName.contains("أفعى") { return "زاحف" }
         if item.arabicName.contains("عقرب") { return "عقرب" }
         if item.arabicName.contains("عنكبوت") { return "عنكبوت" }
-        if item.arabicName.contains("ذئب") || item.arabicName.contains("ضبع") { return "مفترس" }
-        if item.arabicName.contains("ضب") || item.arabicName.contains("ورل") { return "سحلية" }
+        if item.arabicName.contains("ذئب") || item.arabicName.contains("ضبع") || item.arabicName.contains("وشق") || item.arabicName.contains("غرير") { return "مفترس" }
+        if item.arabicName.contains("ضب") || item.arabicName.contains("ورل") || item.arabicName.contains("سلحفاة") { return "سحلية" }
+        if item.arabicName.contains("غزال") || item.arabicName.contains("مها") || item.arabicName.contains("وعل") { return "ظبي" }
+        if item.arabicName.contains("حبارى") || item.arabicName.contains("قطا") || item.arabicName.contains("عقاب") || item.arabicName.contains("بومة") { return "طائر" }
+        if item.arabicName.contains("جمل") { return "إبل" }
+        if item.arabicName.contains("ثعلب") || item.arabicName.contains("قط") || item.arabicName.contains("نمس") { return "ثديي" }
         return "بري"
+    }
+
+    private func wildlifeVisualMark(_ item: WildlifeSpeciesProfile) -> String {
+        if item.arabicName.contains("ثعبان") || item.arabicName.contains("أفعى") { return "🐍" }
+        if item.arabicName.contains("عقرب") { return "🦂" }
+        if item.arabicName.contains("عنكبوت") { return "🕷️" }
+        if item.arabicName.contains("ذئب") { return "🐺" }
+        if item.arabicName.contains("ضبع") { return "🐾" }
+        if item.arabicName.contains("ضب") || item.arabicName.contains("ورل") { return "🦎" }
+        if item.arabicName.contains("جمل") { return "🐪" }
+        if item.arabicName.contains("مها") || item.arabicName.contains("غزال") || item.arabicName.contains("وعل") { return "🦌" }
+        if item.arabicName.contains("أرنب") { return "🐇" }
+        if item.arabicName.contains("ثعلب") { return "🦊" }
+        if item.arabicName.contains("وشق") || item.arabicName.contains("قط") { return "🐈" }
+        if item.arabicName.contains("غرير") || item.arabicName.contains("نمس") { return "🦡" }
+        if item.arabicName.contains("نيص") || item.arabicName.contains("قنفذ") { return "🦔" }
+        if item.arabicName.contains("خفاش") { return "🦇" }
+        if item.arabicName.contains("حبارى") || item.arabicName.contains("قطا") || item.arabicName.contains("عقاب") || item.arabicName.contains("بومة") { return "🦅" }
+        return "🌿"
     }
 
     private func dangerBadge(_ text: String, color: Color) -> some View {

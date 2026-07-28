@@ -151,6 +151,7 @@ final class LocationManager: NSObject {
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         locationErrorMessage = nil
         manager.startUpdatingLocation()
+        manager.requestLocation()
         if CLLocationManager.headingAvailable() {
             headingErrorMessage = nil
             manager.startUpdatingHeading()
@@ -196,6 +197,7 @@ final class LocationManager: NSObject {
             return
         } else if authorizationStatus == .authorizedWhenInUse {
             manager.requestAlwaysAuthorization()
+            authorizationStatus = manager.authorizationStatus
         }
         manager.allowsBackgroundLocationUpdates = authorizationStatus == .authorizedAlways
         manager.pausesLocationUpdatesAutomatically = true
@@ -204,7 +206,7 @@ final class LocationManager: NSObject {
         configureDefaultProximityAlerts()
     }
 
-    private func requestNotificationAccess() {
+    func requestNotificationAccess() {
         notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
     }
 

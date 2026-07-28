@@ -14,6 +14,9 @@ struct ActiveTripDriveView: View {
     @State private var showingDestinationPicker = false
     @State private var showingSOS = false
     @State private var selectedTelemetryMetric: DriveTelemetryMetric?
+    @AppStorage("wildernessTileOverlayEnabled") private var wildernessTileOverlayEnabled = false
+    @AppStorage("wildernessTileTemplate") private var wildernessTileTemplate = ""
+    @AppStorage("wildernessTileOpacity") private var wildernessTileOpacity = 0.72
 
     @State private var driveRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
@@ -43,7 +46,7 @@ struct ActiveTripDriveView: View {
         .toolbarBackground(activeTripHeaderBackground, for: .navigationBar)
         .toolbarColorScheme(activeTripToolbarScheme, for: .navigationBar)
         .task {
-            appState.locationManager.startNavigation()
+            appState.locationManager.requestNavigationAccessAndStart(userInitiated: false)
             await appState.refreshEnvironmentReport()
             updateVisibleRegion()
         }
@@ -114,12 +117,12 @@ struct ActiveTripDriveView: View {
             }
             driveDivider
             driveMetric("الارتفاع", altitudeText, nil) {
-                appState.locationManager.startNavigation()
+                startNavigationFromUserAction("تم تشغيل GPS لتحديث الارتفاع")
                 selectedTelemetryMetric = .altitude
             }
             driveDivider
             driveMetric("السرعة", speedText, nil) {
-                appState.locationManager.startNavigation()
+                startNavigationFromUserAction("تم تشغيل GPS لتحديث السرعة")
                 selectedTelemetryMetric = .speed
             }
         }
@@ -141,8 +144,8 @@ struct ActiveTripDriveView: View {
             route: navigationRoute,
             dirtRoadRoutes: driveDirtRoutes,
             places: appState.hiddenPlaces.filter { $0.status == .approved },
-            tileTemplateURL: nil,
-            tileOpacity: 0.7,
+            tileTemplateURL: activeTileTemplate,
+            tileOpacity: wildernessTileOpacity,
             showsUserLocation: appState.locationManager.isTracking,
             userInterfaceStyle: mapUserInterfaceStyle
         )
@@ -163,6 +166,17 @@ struct ActiveTripDriveView: View {
 
     private var mapUserInterfaceStyle: UIUserInterfaceStyle {
         colorScheme == .dark ? .dark : .light
+    }
+
+    private var activeTileTemplate: String? {
+        let trimmed = wildernessTileTemplate.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard wildernessTileOverlayEnabled,
+              trimmed.contains("{z}"),
+              trimmed.contains("{x}"),
+              trimmed.contains("{y}") else {
+            return nil
+        }
+        return trimmed
     }
 
     private var topFloatingTools: some View {
@@ -248,7 +262,7 @@ struct ActiveTripDriveView: View {
         HStack {
             VStack(spacing: 10) {
                 driveRoundButton(icon: "location.fill", title: "موقعي") {
-                    appState.locationManager.startNavigation()
+                    startNavigationFromUserAction("تم تشغيل GPS")
                     followsUserLocation = true
                     updateVisibleRegion()
                     showStatus(appState.locationManager.currentLocation == nil ? "بانتظار إشارة GPS" : "تم توسيط الخريطة على موقعك")
@@ -266,13 +280,13 @@ struct ActiveTripDriveView: View {
 
             VStack(spacing: 10) {
                 driveRoundButton(icon: "arrow.up.right.navigation.fill", title: "اتجاه") {
-                    appState.locationManager.startNavigation()
+                    startNavigationFromUserAction("تم تشغيل GPS للتوجيه")
                     openAppleMapsDirections()
                 }
                 driveRoundButton(icon: "scope", title: "تتبع") {
                     followsUserLocation.toggle()
                     if followsUserLocation {
-                        appState.locationManager.startNavigation()
+                        startNavigationFromUserAction("متابعة الموقع مفعلة")
                         updateVisibleRegion()
                     }
                     showStatus(followsUserLocation ? "متابعة الموقع مفعلة" : "يمكنك الآن تحريك الخريطة بحرية")
@@ -292,9 +306,10 @@ struct ActiveTripDriveView: View {
         VStack {
             Spacer()
             Button {
+                interactionFeedback()
                 isTripStarted.toggle()
                 if isTripStarted {
-                    appState.locationManager.startNavigation()
+                    startNavigationFromUserAction("بدأت الرحلة وتم تشغيل GPS")
                     followsUserLocation = true
                     updateVisibleRegion()
                 } else {
@@ -480,7 +495,10 @@ struct ActiveTripDriveView: View {
         _ valueColor: Color?,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button {
+            interactionFeedback()
+            action()
+        } label: {
             VStack(spacing: 4) {
                 Text(title)
                     .font(.caption.weight(.semibold))
@@ -500,7 +518,10 @@ struct ActiveTripDriveView: View {
     }
 
     private func driveRoundButton(icon: String, title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            interactionFeedback()
+            action()
+        } label: {
             VStack(spacing: 3) {
                 Image(systemName: icon)
                     .font(.headline.weight(.bold))
@@ -586,13 +607,27 @@ struct ActiveTripDriveView: View {
         }
     }
 
+    private func interactionFeedback() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+
     private func toggleTracking() {
         if appState.locationManager.isTracking {
             appState.locationManager.stopNavigation()
             showStatus("تم إيقاف تحديث GPS")
         } else {
-            appState.locationManager.startNavigation()
+            startNavigationFromUserAction("تم تشغيل تحديث GPS")
             showStatus("تم تشغيل تحديث GPS")
+        }
+    }
+
+    private func startNavigationFromUserAction(_ message: String) {
+        switch appState.locationManager.authorizationStatus {
+        case .denied, .restricted:
+            showStatus("فعّل صلاحية الموقع من إعدادات iOS")
+        default:
+            appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
+            showStatus(message)
         }
     }
 
@@ -644,11 +679,9 @@ struct ActiveTripDriveView: View {
         case .distance:
             openAppleMapsDirections()
         case .altitude:
-            appState.locationManager.startNavigation()
-            showStatus("تم تشغيل GPS لتحديث الارتفاع")
+            startNavigationFromUserAction("تم تشغيل GPS لتحديث الارتفاع")
         case .speed:
-            appState.locationManager.startNavigation()
-            showStatus("تم تشغيل GPS لتحديث السرعة")
+            startNavigationFromUserAction("تم تشغيل GPS لتحديث السرعة")
         }
     }
 }
@@ -785,7 +818,7 @@ private struct DestinationPickerSheet: View {
                     ForEach(places) { place in
                         Button {
                             appState.setTripDestination(to: place)
-                            appState.locationManager.startNavigation()
+                            appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
                             dismiss()
                         } label: {
                             HStack(spacing: 12) {

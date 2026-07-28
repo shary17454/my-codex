@@ -1,6 +1,7 @@
 import CoreLocation
 import MapKit
 import SwiftUI
+import UIKit
 
 struct DesertMapView: View {
     @Environment(AppState.self) private var appState: AppState
@@ -9,6 +10,7 @@ struct DesertMapView: View {
     @State private var showingOfflineMaps = false
     @State private var showingPDFSourceManager = false
     @State private var showingGeospatialCatalog = false
+    @State private var selectedMapMetric: MapMetricDetail?
     @State private var mapStatusMessage: String?
     @StateObject private var pdfMapStore = PDFMapStore()
     @State private var mapLayer: DesertMapLayer = ScreenshotConfiguration.initialMapLayer
@@ -92,6 +94,9 @@ struct DesertMapView: View {
         .sheet(isPresented: $showingGeospatialCatalog) {
             GeospatialLayerCatalogView()
         }
+        .sheet(item: $selectedMapMetric) { metric in
+            MapMetricDetailSheet(metric: metric)
+        }
     }
 
     private var ajajiPDFURLs: [URL] {
@@ -142,9 +147,46 @@ struct DesertMapView: View {
                 statusMessageView
 
                 HStack(spacing: 8) {
-                    metricTile(title: "GPS", value: appState.locationManager.isTracking ? appState.text(.gpsActive) : appState.text(.gpsReady), icon: "location")
-                    metricTile(title: "ALT", value: altitudeText, icon: "mountain.2")
-                    metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up")
+                    metricTile(
+                        title: "GPS",
+                        value: appState.locationManager.isTracking ? appState.text(.gpsActive) : appState.text(.gpsReady),
+                        icon: "location"
+                    ) {
+                        selectedMapMetric = MapMetricDetail(
+                            title: "حالة GPS",
+                            value: appState.locationManager.isTracking ? appState.text(.gpsActive) : appState.text(.gpsReady),
+                            icon: "location.fill",
+                            details: gpsDetailText,
+                            primaryActionTitle: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
+                            action: toggleNavigationFromMap
+                        )
+                    }
+                    metricTile(title: "ALT", value: altitudeText, icon: "mountain.2") {
+                        selectedMapMetric = MapMetricDetail(
+                            title: "الارتفاع",
+                            value: altitudeText,
+                            icon: "mountain.2.fill",
+                            details: altitudeDetailText,
+                            primaryActionTitle: "تحديث GPS",
+                            action: {
+                                appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
+                                showMapStatus("يتم تحديث الارتفاع من GPS")
+                            }
+                        )
+                    }
+                    metricTile(title: "DIST", value: distanceText, icon: "point.topleft.down.curvedto.point.bottomright.up") {
+                        selectedMapMetric = MapMetricDetail(
+                            title: "المسافة للوجهة",
+                            value: distanceText,
+                            icon: "point.topleft.down.curvedto.point.bottomright.up",
+                            details: distanceDetailText,
+                            primaryActionTitle: "توسيط الخريطة",
+                            action: {
+                                centerMapOnCurrentLocation()
+                                showMapStatus("تم توجيه الخريطة نحو موقعك والوجهة الحالية")
+                            }
+                        )
+                    }
                 }
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 88), spacing: 8)], spacing: 8) {
@@ -194,6 +236,7 @@ struct DesertMapView: View {
             }
             Spacer(minLength: 0)
             Button {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 if mapLayer == .satellite {
                     showingGeospatialCatalog = true
                 } else {
@@ -308,6 +351,7 @@ struct DesertMapView: View {
 
             HStack(spacing: 8) {
                 Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     appState.selectDirtRoadRoute(route)
                     mapRegion.center = route.endCoordinate
                     mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
@@ -321,6 +365,7 @@ struct DesertMapView: View {
                 .tint(route.difficulty.color)
 
                 Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     appState.toggleFavoriteDirtRoadRoute(route)
                     showMapStatus(appState.isFavoriteDirtRoadRoute(route) ? "تم حفظ المسار في المفضلة" : "تمت إزالة المسار من المفضلة")
                 } label: {
@@ -350,13 +395,16 @@ struct DesertMapView: View {
     }
 
     private func centerMapOnCurrentLocation() {
-        guard let coordinate = appState.locationManager.currentLocation?.coordinate else { return }
+        guard let coordinate = appState.locationManager.currentLocation?.coordinate else {
+            appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
+            return
+        }
         mapRegion.center = coordinate
         mapRegion.span = MKCoordinateSpan(latitudeDelta: 0.06, longitudeDelta: 0.06)
     }
 
     private var altitudeText: String {
-        guard let altitude = appState.locationManager.currentLocation?.altitude else { return "-- m" }
+        guard let altitude = appState.locationManager.altitudeMeters else { return "-- m" }
         return "\(Int(altitude)) m"
     }
 
@@ -366,21 +414,58 @@ struct DesertMapView: View {
         return String(format: "%.1f km", current.distance(from: target) / 1000)
     }
 
-    private func metricTile(title: String, value: String, icon: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Image(systemName: icon)
-                .foregroundStyle(Color.oasisTeal)
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.headline.monospacedDigit().weight(.bold))
-                .lineLimit(1)
-                .minimumScaleFactor(0.56)
+    private var gpsDetailText: String {
+        switch appState.locationManager.authorizationStatus {
+        case .authorizedAlways:
+            return "الموقع مفعل دائمًا. يمكن تشغيل تنبيهات القرب أثناء الرحلة في الخلفية."
+        case .authorizedWhenInUse:
+            return "الموقع مفعل أثناء استخدام التطبيق. للتنبيهات الدائمة افتح إعدادات iOS واسمح بالموقع دائمًا."
+        case .denied, .restricted:
+            return "صلاحية الموقع مرفوضة. افتح إعدادات الجهاز وفعّل الموقع لتعمل الخريطة والبوصلة والتوجيه."
+        case .notDetermined:
+            return "اضغط تشغيل لطلب صلاحية الموقع وبدء GPS والبوصلة."
+        @unknown default:
+            return "حالة صلاحية الموقع غير معروفة."
         }
-        .frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
-        .padding(10)
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var altitudeDetailText: String {
+        guard appState.locationManager.altitudeMeters != nil else {
+            return "لم تصل قراءة ارتفاع دقيقة بعد. في المحاكي قد تكون القراءة ثابتة، وعلى الجهاز الحقيقي تعتمد على GPS."
+        }
+        return "هذه القراءة تأتي من CoreLocation وتتغير حسب جودة إشارة GPS ودقة الجهاز."
+    }
+
+    private var distanceDetailText: String {
+        guard appState.locationManager.currentLocation != nil else {
+            return "شغّل GPS أولًا ليحسب التطبيق المسافة من موقعك الحالي إلى وجهة الرحلة."
+        }
+        return "المسافة محسوبة بين موقعك الحالي ووجهة الرحلة المحددة. اختيار مسار ترابي يغير الوجهة والمسافة."
+    }
+
+    private func metricTile(title: String, value: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Image(systemName: icon)
+                    .foregroundStyle(Color.oasisTeal)
+                Text(title)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.headline.monospacedDigit().weight(.bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.56)
+            }
+            .frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
+            .padding(10)
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+            .contentShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title): \(value)")
     }
 
     private func compactMapActionButton(
@@ -389,7 +474,10 @@ struct DesertMapView: View {
         isPrimary: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.subheadline.weight(.bold))
@@ -422,6 +510,72 @@ struct DesertMapView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             if mapStatusMessage == message {
                 mapStatusMessage = nil
+            }
+        }
+    }
+
+    private func toggleNavigationFromMap() {
+        if appState.locationManager.isTracking {
+            appState.locationManager.stopNavigation()
+            showMapStatus("تم إيقاف GPS والبوصلة")
+        } else {
+            appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
+            showMapStatus("تم تشغيل GPS والبوصلة")
+        }
+    }
+}
+
+private struct MapMetricDetail: Identifiable {
+    let id = UUID()
+    var title: String
+    var value: String
+    var icon: String
+    var details: String
+    var primaryActionTitle: String
+    var action: () -> Void
+}
+
+private struct MapMetricDetailSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let metric: MapMetricDetail
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                Label(metric.title, systemImage: metric.icon)
+                    .font(.title3.weight(.black))
+                    .foregroundStyle(Color.desertCopper)
+
+                Text(metric.value)
+                    .font(.largeTitle.monospacedDigit().weight(.black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                Text(metric.details)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button {
+                    metric.action()
+                    dismiss()
+                } label: {
+                    Label(metric.primaryActionTitle, systemImage: "arrow.clockwise")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(Color.desertCopper)
+
+                Spacer()
+            }
+            .padding()
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle(metric.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("تم") { dismiss() }
+                }
             }
         }
     }
@@ -473,6 +627,7 @@ struct LicensedMapPlaceholderView: View {
 struct GeospatialLayerCatalogView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.colorScheme) private var colorScheme
     @State private var query = ""
     @State private var selectedFormat: GeospatialLayerFormat?
     @State private var layers = GeospatialMapLayer.officialSamples
@@ -508,7 +663,7 @@ struct GeospatialLayerCatalogView: View {
                 }
                 .padding()
             }
-            .background(Color(.systemGroupedBackground))
+            .background(managerBackground.ignoresSafeArea())
             .navigationTitle("مصادر الخرائط البرية")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -534,13 +689,17 @@ struct GeospatialLayerCatalogView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(managerCardBackground, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var searchPanel: some View {
         VStack(alignment: .leading, spacing: 10) {
             TextField("ابحث باسم الطبقة، المصدر، الوادي، الشعيب أو الهضبة", text: $query)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(.plain)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 44)
+                .background(managerFieldBackground, in: RoundedRectangle(cornerRadius: 8))
+                .foregroundStyle(.primary)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -558,7 +717,7 @@ struct GeospatialLayerCatalogView: View {
             }
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(managerCardBackground, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var liveTileOverlayPanel: some View {
@@ -566,10 +725,18 @@ struct GeospatialLayerCatalogView: View {
             sectionTitle("طبقة Tiles فعلية فوق الخريطة")
 
             TextField("اسم الطبقة", text: $wildernessTileName)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(.plain)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 44)
+                .background(managerFieldBackground, in: RoundedRectangle(cornerRadius: 8))
+                .foregroundStyle(.primary)
 
             TextField("https://server/tiles/{z}/{x}/{y}.png", text: $wildernessTileTemplate)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(.plain)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 44)
+                .background(managerFieldBackground, in: RoundedRectangle(cornerRadius: 8))
+                .foregroundStyle(.primary)
                 .keyboardType(.URL)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -601,7 +768,7 @@ struct GeospatialLayerCatalogView: View {
                         ],
                         spacing: 8
                     ) {
-                        mapSourceSmallButton("تجربة") { applyDemoTileTemplate() }
+                        mapSourceSmallButton("اختبار الرابط") { applyDemoTileTemplate() }
                         mapSourceSmallButton("تطبيق") { applyTileTemplate() }
                             .disabled(!isTileTemplateValid)
                         mapSourceSmallButton("إيقاف") { disableTileOverlay() }
@@ -625,7 +792,19 @@ struct GeospatialLayerCatalogView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(managerCardBackground, in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var managerBackground: Color {
+        colorScheme == .dark ? Color(red: 0.06, green: 0.07, blue: 0.07) : Color(.systemGroupedBackground)
+    }
+
+    private var managerCardBackground: Color {
+        colorScheme == .dark ? Color(red: 0.13, green: 0.14, blue: 0.15) : Color(.secondarySystemGroupedBackground)
+    }
+
+    private var managerFieldBackground: Color {
+        colorScheme == .dark ? Color(red: 0.19, green: 0.20, blue: 0.21) : Color(.systemBackground)
     }
 
     private var sourceLayersPanel: some View {
@@ -739,7 +918,7 @@ struct GeospatialLayerCatalogView: View {
             }
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(managerCardBackground, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var searchResultsPanel: some View {
@@ -779,7 +958,7 @@ struct GeospatialLayerCatalogView: View {
             }
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(managerCardBackground, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var performancePanel: some View {
@@ -792,7 +971,7 @@ struct GeospatialLayerCatalogView: View {
         }
         .font(.footnote)
         .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(managerCardBackground, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var isTileTemplateValid: Bool {
@@ -808,21 +987,27 @@ struct GeospatialLayerCatalogView: View {
     }
 
     private func filterButton(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
             Text(title)
                 .font(.caption.weight(.bold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.60)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
-                .foregroundStyle(isSelected ? .white : .primary)
-                .background(isSelected ? Color.oasisTeal : Color(.tertiarySystemFill), in: Capsule())
+                .foregroundStyle(isSelected ? .white : (colorScheme == .dark ? .white.opacity(0.88) : .primary))
+                .background(isSelected ? Color.oasisTeal : managerFieldBackground, in: Capsule())
         }
         .buttonStyle(.plain)
     }
 
     private func mapSourceSmallButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
             Text(title)
                 .font(.caption2.weight(.bold))
                 .lineLimit(2)
@@ -830,14 +1015,16 @@ struct GeospatialLayerCatalogView: View {
                 .minimumScaleFactor(0.58)
                 .frame(maxWidth: .infinity, minHeight: 34)
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(.plain)
+        .foregroundStyle(colorScheme == .dark ? .white : .oasisTeal)
+        .background(Color.oasisTeal.opacity(colorScheme == .dark ? 0.28 : 0.14), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func applyDemoTileTemplate() {
-        wildernessTileName = "طبقة OpenStreetMap تجريبية"
+        wildernessTileName = "طبقة OpenStreetMap"
         wildernessTileTemplate = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         wildernessTileOverlayEnabled = true
-        showCatalogStatus("تم تفعيل طبقة تجريبية فوق القمر الصناعي")
+        showCatalogStatus("تم تفعيل رابط اختبار جاهز فوق القمر الصناعي")
     }
 
     private func applyTileTemplate() {
@@ -922,7 +1109,7 @@ struct GeospatialLayerCatalogView: View {
         }
         .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
         .padding(8)
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(managerFieldBackground, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
@@ -977,7 +1164,6 @@ struct MapCanvasView: UIViewRepresentable {
         }
 
         let nextSignature = context.coordinator.signature(
-            region: region,
             route: route,
             dirtRoadRoutes: dirtRoadRoutes,
             places: places,
@@ -1060,7 +1246,6 @@ struct MapCanvasView: UIViewRepresentable {
         }
 
         func signature(
-            region: MKCoordinateRegion,
             route: [CLLocationCoordinate2D],
             dirtRoadRoutes: [DirtRoadRoute],
             places: [HiddenPlace],
@@ -1071,7 +1256,7 @@ struct MapCanvasView: UIViewRepresentable {
             let routeEnd = route.last.map { "\($0.latitude),\($0.longitude)" } ?? "none"
             let dirtRouteIDs = dirtRoadRoutes.map { "\($0.id):\($0.coordinates.count)" }.joined(separator: ",")
             let placeIDs = places.map(\.id.uuidString).sorted().joined(separator: ",")
-            return "\(regionKey(region))|\(tileTemplateURL ?? "none")|\(tileOpacity)|\(route.count)|\(routeStart)|\(routeEnd)|\(dirtRouteIDs)|\(placeIDs)"
+            return "\(tileTemplateURL ?? "none")|\(tileOpacity)|\(route.count)|\(routeStart)|\(routeEnd)|\(dirtRouteIDs)|\(placeIDs)"
         }
 
         func addDirtRoadAnnotation(_ route: DirtRoadRoute, to mapView: MKMapView) {

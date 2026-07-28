@@ -62,6 +62,21 @@ struct ContentView: View {
     @State private var selectedTab = ScreenshotConfiguration.initialTab
 
     var body: some View {
+        Group {
+            if appState.acceptedTermsAndPrivacy {
+                mainTabs
+            } else {
+                FirstLaunchConsentView()
+            }
+        }
+        .tint(.trailSignal)
+        .environment(\.layoutDirection, appState.language == .arabic ? .rightToLeft : .leftToRight)
+        .onAppear {
+            UIDevice.current.isBatteryMonitoringEnabled = true
+        }
+    }
+
+    private var mainTabs: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
                 HomeDashboardView(selectedTab: $selectedTab)
@@ -122,13 +137,8 @@ struct ContentView: View {
             }
             .tag(AppTab.tools)
         }
-        .tint(.trailSignal)
         .toolbarBackground(tabBarBackground, for: .tabBar)
         .toolbarColorScheme(tabBarColorScheme, for: .tabBar)
-        .environment(\.layoutDirection, appState.language == .arabic ? .rightToLeft : .leftToRight)
-        .onAppear {
-            UIDevice.current.isBatteryMonitoringEnabled = true
-        }
     }
 
     private var tabBarBackground: Color {
@@ -137,6 +147,219 @@ struct ContentView: View {
 
     private var tabBarColorScheme: ColorScheme {
         colorScheme == .dark ? .dark : .light
+    }
+}
+
+private struct FirstLaunchConsentView: View {
+    @Environment(AppState.self) private var appState: AppState
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var acceptedTerms = false
+    @State private var requestedLocation = false
+    @State private var requestedNotifications = false
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                header
+                termsCard
+                permissionsCard
+                privacyCard
+                actionButtons
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 30)
+            .padding(.bottom, 36)
+        }
+        .background(consentBackground.ignoresSafeArea())
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Image(systemName: "mountain.2.fill")
+                .font(.system(size: 42, weight: .bold))
+                .foregroundStyle(Color.trailAmber)
+                .accessibilityHidden(true)
+
+            Text("الدروب")
+                .font(.largeTitle.bold())
+                .foregroundStyle(primaryText)
+
+            Text("قبل بدء الملاحة، راجع شروط الاستخدام واختر الأذونات التي تحتاجها للرحلات والتنبيهات.")
+                .font(.body)
+                .foregroundStyle(secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var termsCard: some View {
+        ConsentCard(title: "شروط الاستخدام", icon: "doc.text.fill") {
+            consentRow("استخدم التطبيق كأداة مساعدة للملاحة البرية، ولا تعتمد عليه وحده في السلامة أو الطوارئ.")
+            consentRow("دقة الموقع، البوصلة، الطقس، وجودة الهواء تعتمد على حساسات الجهاز والاتصال بالخدمات.")
+            consentRow("الخرائط غير المتصلة تحفظ مناطق مرجعية ولا تستبدل الخرائط الرسمية أو تعليمات الجهات المختصة.")
+            consentRow("أنت مسؤول عن التحقق من حالة الطريق والتصاريح والطقس قبل الرحلة.")
+
+            Toggle(isOn: $acceptedTerms) {
+                Text("أوافق على شروط الاستخدام والخصوصية")
+                    .font(.headline)
+                    .foregroundStyle(primaryText)
+            }
+            .toggleStyle(.switch)
+            .padding(.top, 6)
+        }
+    }
+
+    private var permissionsCard: some View {
+        ConsentCard(title: "الأذونات المطلوبة", icon: "hand.raised.fill") {
+            permissionRow(
+                title: "الموقع وتتبع الرحلة",
+                detail: "يُستخدم موقعك لحساب المسافة والاتجاه والارتفاع وتشغيل تنبيهات القرب أثناء الرحلة.",
+                icon: "location.fill",
+                isDone: requestedLocation || appState.locationManager.authorizationStatus != .notDetermined
+            ) {
+                requestedLocation = true
+                appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
+            }
+
+            permissionRow(
+                title: "الإشعارات",
+                detail: "تُستخدم للتنبيه عند الاقتراب من أودية أو مناطق تحتاج انتباهًا، وعند تنبيهات الرحلة المهمة.",
+                icon: "bell.badge.fill",
+                isDone: requestedNotifications
+            ) {
+                requestedNotifications = true
+                appState.locationManager.requestNotificationAccess()
+            }
+
+            permissionRow(
+                title: "الموقع الدائم اختياري",
+                detail: "لا يُطلب إلا عند تفعيل تنبيهات القرب في الخلفية. يمكنك رفضه واستخدام التطبيق أثناء التشغيل فقط.",
+                icon: "location.circle.fill",
+                isDone: appState.locationManager.authorizationStatus == .authorizedAlways
+            ) {
+                requestedLocation = true
+                appState.locationManager.requestBackgroundTripUpdates()
+            }
+        }
+    }
+
+    private var privacyCard: some View {
+        ConsentCard(title: "الخصوصية", icon: "lock.shield.fill") {
+            consentRow("لا يستخدم الدروب تتبعًا إعلانيًا عبر التطبيقات أو المواقع الأخرى.")
+            consentRow("بيانات الرحلات والمواقع تُحفظ محليًا على الجهاز، ولا تُشارك إلا عند اختيارك المشاركة.")
+            consentRow("يمكنك تغيير صلاحيات الموقع والإشعارات لاحقًا من إعدادات iOS.")
+        }
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 12) {
+            Button {
+                appState.acceptTermsAndPrivacy()
+            } label: {
+                Label("الدخول إلى التطبيق", systemImage: "checkmark.circle.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(!acceptedTerms)
+
+            Button {
+                appState.language = appState.language == .arabic ? .english : .arabic
+            } label: {
+                Label(appState.language == .arabic ? "English" : "العربية", systemImage: "globe")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    private func consentRow(_ text: String) -> some View {
+        Label {
+            Text(text)
+                .font(.callout)
+                .foregroundStyle(secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundStyle(Color.trailSignal)
+        }
+    }
+
+    private func permissionRow(
+        title: String,
+        detail: String,
+        icon: String,
+        isDone: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Color.trailAmber)
+                    .frame(width: 28)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(primaryText)
+                    Text(detail)
+                        .font(.footnote)
+                        .foregroundStyle(secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+            }
+
+            Button {
+                action()
+            } label: {
+                Label(isDone ? "تم الطلب" : "طلب الإذن", systemImage: isDone ? "checkmark.circle.fill" : "arrow.up.forward.app.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .disabled(isDone)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var consentBackground: Color {
+        colorScheme == .dark ? .trailBase : Color(.systemGroupedBackground)
+    }
+
+    private var primaryText: Color {
+        colorScheme == .dark ? .white : .primary
+    }
+
+    private var secondaryText: Color {
+        colorScheme == .dark ? Color.white.opacity(0.72) : .secondary
+    }
+}
+
+private struct ConsentCard<Content: View>: View {
+    var title: String
+    var icon: String
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label(title, systemImage: icon)
+                .font(.title3.bold())
+                .foregroundStyle(.primary)
+
+            content
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.08))
+        }
     }
 }
 

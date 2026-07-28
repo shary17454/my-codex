@@ -1,6 +1,7 @@
 import CoreLocation
 import MapKit
 import SwiftUI
+import UIKit
 
 struct HomeDashboardView: View {
     @Environment(AppState.self) private var appState: AppState
@@ -26,18 +27,6 @@ struct HomeDashboardView: View {
                 mapHero
                 tripMetricBar
                 quickActions
-                if let statusMessage {
-                    Text(statusMessage)
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.white)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.75)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 9)
-                        .background(Color.oasisTeal, in: RoundedRectangle(cornerRadius: 8))
-                }
                 contentCards
                 primaryActions
                 communitySummary
@@ -48,6 +37,26 @@ struct HomeDashboardView: View {
             .padding(.bottom, 110)
         }
         .background(homeBackground)
+        .overlay(alignment: .bottom) {
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.78)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color.oasisTeal.opacity(0.94), in: Capsule())
+                    .overlay(Capsule().stroke(Color.white.opacity(0.18), lineWidth: 1))
+                    .shadow(color: .black.opacity(0.26), radius: 12, y: 5)
+                    .padding(.horizontal, 18)
+                    .padding(.bottom, 86)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(.snappy(duration: 0.22), value: statusMessage)
         .sheet(isPresented: $showingQR) {
             TripQRCodeSheet(trip: appState.selectedTrip)
         }
@@ -72,6 +81,7 @@ struct HomeDashboardView: View {
             }
         }
         .task {
+            appState.locationManager.requestNavigationAccessAndStart(userInitiated: false)
             await appState.refreshEnvironmentReport()
             if appState.locationManager.isTracking {
                 centerMapOnCurrentLocation()
@@ -86,6 +96,7 @@ struct HomeDashboardView: View {
     private var header: some View {
         HStack(spacing: 12) {
             Button {
+                interactionFeedback()
                 selectedTab = .tools
             } label: {
                 Image(systemName: "line.3.horizontal")
@@ -115,6 +126,7 @@ struct HomeDashboardView: View {
             Spacer()
 
             Button {
+                interactionFeedback()
                 selectedTab = .community
             } label: {
                 ZStack(alignment: .topTrailing) {
@@ -167,9 +179,18 @@ struct HomeDashboardView: View {
             }
 
             HStack(spacing: 8) {
-                trailPill("ملاحة", "location.north.fill")
-                trailPill("طقس", "cloud.sun.fill")
-                trailPill("تنبيهات", "bell.badge.fill")
+                trailPill("ملاحة", "location.north.fill") {
+                    appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
+                    selectedTab = .compass
+                    showStatus("تم تشغيل أدوات الملاحة والبوصلة")
+                }
+                trailPill("طقس", "cloud.sun.fill") {
+                    openEnvironmentDetails()
+                }
+                trailPill("تنبيهات", "bell.badge.fill") {
+                    appState.locationManager.requestBackgroundTripUpdates()
+                    showStatus("تم تفعيل تنبيهات القرب عند توفر صلاحية الموقع دائمًا")
+                }
             }
         }
         .padding(16)
@@ -343,6 +364,7 @@ struct HomeDashboardView: View {
                     .tint(Color.desertCopper)
 
                     Button {
+                        interactionFeedback()
                         openActiveTrip()
                 } label: {
                     HStack {
@@ -365,6 +387,7 @@ struct HomeDashboardView: View {
                     Text("أنشئ رحلة وحدد اسمها ووقتها، ثم اختر وجهتها لتفعيل المسافة والاتجاه والتوجيه.")
                 } actions: {
                     Button("إنشاء رحلة") {
+                        interactionFeedback()
                         showingCreateTrip = true
                     }
                     .buttonStyle(.borderedProminent)
@@ -385,6 +408,7 @@ struct HomeDashboardView: View {
                     Text("أضف موقعًا جديدًا ليظهر هنا بعد حفظه.")
                 } actions: {
                     Button("إضافة موقع") {
+                        interactionFeedback()
                         showingAddPlace = true
                     }
                     .buttonStyle(.borderedProminent)
@@ -440,6 +464,7 @@ struct HomeDashboardView: View {
     private var primaryActions: some View {
         HStack(spacing: 12) {
             Button {
+                interactionFeedback()
                 showingCreateTrip = true
             } label: {
                 Label("إنشاء رحلة جديدة", systemImage: "plus.circle.fill")
@@ -448,6 +473,7 @@ struct HomeDashboardView: View {
             .buttonStyle(DashboardActionButtonStyle())
 
             Button {
+                interactionFeedback()
                 shareCurrentTrip()
             } label: {
                 Label("مشاركة رحلة", systemImage: "qrcode")
@@ -475,7 +501,7 @@ struct HomeDashboardView: View {
                     VStack(alignment: .trailing, spacing: 3) {
                         Text("المجتمع")
                             .font(.headline)
-                        Text("شارك مواقعك وتجاربك مع رحالة الدرب")
+                        Text("شارك مواقعك وتجاربك مع رحالة الدروب")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -505,7 +531,10 @@ struct HomeDashboardView: View {
                     alertChip(appState.environmentalReport.weatherSummary, "cloud.sun", .blue)
                 }
             } else {
-                Button(action: refreshWeather) {
+                Button {
+                    interactionFeedback()
+                    refreshWeather()
+                } label: {
                     Label(appState.isEnvironmentRefreshing ? "جاري تحديث الطقس" : "اضغط لتحديث الطقس وجودة الهواء", systemImage: "arrow.clockwise")
                         .font(.caption.weight(.semibold))
                         .frame(maxWidth: .infinity, minHeight: 44)
@@ -650,20 +679,30 @@ struct HomeDashboardView: View {
         )
     }
 
-    private func trailPill(_ title: String, _ icon: String) -> some View {
-        Label(title, systemImage: icon)
-            .font(.caption.weight(.bold))
-            .foregroundStyle(Color.trailMist)
-            .lineLimit(1)
-            .minimumScaleFactor(0.72)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(Color.white.opacity(0.08), in: Capsule())
-            .overlay(Capsule().stroke(Color.trailSignal.opacity(0.18), lineWidth: 1))
+    private func trailPill(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
+        Button {
+            interactionFeedback()
+            action()
+        } label: {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.trailMist)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(Color.white.opacity(0.08), in: Capsule())
+                .overlay(Capsule().stroke(Color.trailSignal.opacity(0.18), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
     }
 
     private func mapToolButton(_ icon: String, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            interactionFeedback()
+            action()
+        } label: {
             Image(systemName: icon)
                 .font(.headline)
                 .foregroundStyle(Color.trailMist)
@@ -695,7 +734,10 @@ struct HomeDashboardView: View {
     }
 
     private func dashboardMetric(title: String, value: String, subtitle: String, icon: String, tint: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            interactionFeedback()
+            action()
+        } label: {
             HStack(spacing: 9) {
                 Image(systemName: icon)
                     .font(.headline)
@@ -729,7 +771,10 @@ struct HomeDashboardView: View {
     }
 
     private func quickAction(title: String, icon: String, tint: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            interactionFeedback()
+            action()
+        } label: {
             VStack(spacing: 7) {
                 Image(systemName: icon)
                     .font(.title3)
@@ -799,6 +844,7 @@ struct HomeDashboardView: View {
 
     private func centerMapOnCurrentLocation() {
         guard let coordinate = appState.locationManager.currentLocation?.coordinate else {
+            appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
             showStatus("بانتظار إشارة GPS لتحديد موقعك")
             return
         }
@@ -828,6 +874,10 @@ struct HomeDashboardView: View {
                 statusMessage = nil
             }
         }
+    }
+
+    private func interactionFeedback() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 }
 

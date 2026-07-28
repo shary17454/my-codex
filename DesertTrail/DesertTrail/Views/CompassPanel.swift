@@ -170,6 +170,7 @@ struct CompassPanel: View {
 
                 VStack(spacing: 10) {
                     Button {
+                        triggerHaptic()
                         startCompassAndLocation()
                     } label: {
                         Label(navigationButtonTitle, systemImage: "safari")
@@ -178,6 +179,7 @@ struct CompassPanel: View {
                     .buttonStyle(.borderedProminent)
 
                     Button {
+                        triggerHaptic()
                         appState.locationManager.requestBackgroundTripUpdates()
                         showStatus("تم تفعيل تنبيهات القرب عند توفر الصلاحية")
                     } label: {
@@ -558,7 +560,10 @@ struct CompassPanel: View {
     }
 
     private func readingButton(title: String, value: String, icon: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            triggerHaptic()
+            action()
+        } label: {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Image(systemName: icon)
@@ -622,6 +627,7 @@ struct CompassPanel: View {
                 readingExtraContent(for: reading)
 
                 Button {
+                    triggerHaptic()
                     runAction(for: reading)
                 } label: {
                     Label(reading.actionTitle, systemImage: reading.actionIcon)
@@ -663,6 +669,7 @@ struct CompassPanel: View {
                 pointerExtraContent(for: pointer)
 
                 Button {
+                    triggerHaptic()
                     runAction(for: pointer)
                 } label: {
                     Label(pointer.actionTitle, systemImage: pointer.actionIcon)

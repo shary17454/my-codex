@@ -67,6 +67,101 @@ struct OfflineMapPreset: Identifiable {
             title: "الصمان",
             subtitle: "دحول وكثبان ومسارات برية",
             region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 26.6320, longitude: 47.2130), span: MKCoordinateSpan(latitudeDelta: 0.24, longitudeDelta: 0.24))
+        ),
+        OfflineMapPreset(
+            title: "الدهناء",
+            subtitle: "كثبان طولية ومسارات عبور بين نجد والأحساء",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 24.7000, longitude: 47.9000), span: MKCoordinateSpan(latitudeDelta: 0.28, longitudeDelta: 0.28))
+        ),
+        OfflineMapPreset(
+            title: "وادي الرمة",
+            subtitle: "مجرى واد طويل ومناطق رعي ومخيمات",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 26.0000, longitude: 43.8000), span: MKCoordinateSpan(latitudeDelta: 0.24, longitudeDelta: 0.24))
+        ),
+        OfflineMapPreset(
+            title: "جبال أجا وسلمى",
+            subtitle: "حائل - جبال جرانيتية وشعاب وممرات",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 27.5200, longitude: 41.6900), span: MKCoordinateSpan(latitudeDelta: 0.22, longitudeDelta: 0.22))
+        ),
+        OfflineMapPreset(
+            title: "حرة خيبر",
+            subtitle: "حرات بركانية ومسارات وعرة شمال المدينة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 25.6300, longitude: 39.7500), span: MKCoordinateSpan(latitudeDelta: 0.28, longitudeDelta: 0.28))
+        ),
+        OfflineMapPreset(
+            title: "حرة رهط",
+            subtitle: "مسارات بركانية واسعة بين مكة والمدينة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 23.0000, longitude: 39.7500), span: MKCoordinateSpan(latitudeDelta: 0.30, longitudeDelta: 0.30))
+        ),
+        OfflineMapPreset(
+            title: "وادي الديسة",
+            subtitle: "تبوك - واد جبلي ومياه ومزارع",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 27.6500, longitude: 36.4500), span: MKCoordinateSpan(latitudeDelta: 0.18, longitudeDelta: 0.18))
+        ),
+        OfflineMapPreset(
+            title: "جبال حسمي",
+            subtitle: "تكوينات رملية وصخرية شمال غرب المملكة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 28.3000, longitude: 35.3000), span: MKCoordinateSpan(latitudeDelta: 0.26, longitudeDelta: 0.26))
+        ),
+        OfflineMapPreset(
+            title: "السودة",
+            subtitle: "عسير - مرتفعات وضباب وطرق جبلية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 18.2700, longitude: 42.3700), span: MKCoordinateSpan(latitudeDelta: 0.14, longitudeDelta: 0.14))
+        ),
+        OfflineMapPreset(
+            title: "جبال فيفاء",
+            subtitle: "جازان - مدرجات جبلية وطرق متعرجة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 17.2500, longitude: 43.1000), span: MKCoordinateSpan(latitudeDelta: 0.14, longitudeDelta: 0.14))
+        ),
+        OfflineMapPreset(
+            title: "وادي لجب",
+            subtitle: "جازان - واد صخري ومجرى مائي ضيق",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 17.6000, longitude: 42.9500), span: MKCoordinateSpan(latitudeDelta: 0.12, longitudeDelta: 0.12))
+        ),
+        OfflineMapPreset(
+            title: "جبل شدا",
+            subtitle: "الباحة - جبال وكهوف وطرق جبلية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 19.8400, longitude: 41.3100), span: MKCoordinateSpan(latitudeDelta: 0.13, longitudeDelta: 0.13))
+        ),
+        OfflineMapPreset(
+            title: "جبل ورقان",
+            subtitle: "المدينة - مرتفعات ومسارات برية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 24.2100, longitude: 39.2700), span: MKCoordinateSpan(latitudeDelta: 0.16, longitudeDelta: 0.16))
+        ),
+        OfflineMapPreset(
+            title: "وادي الفرع",
+            subtitle: "جنوب المدينة - أودية ومزارع ومسارات",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 23.1500, longitude: 39.0500), span: MKCoordinateSpan(latitudeDelta: 0.18, longitudeDelta: 0.18))
+        ),
+        OfflineMapPreset(
+            title: "وادي وج",
+            subtitle: "الطائف - مجرى واد ومعالم حضرية وبرية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 21.3800, longitude: 40.4300), span: MKCoordinateSpan(latitudeDelta: 0.12, longitudeDelta: 0.12))
+        ),
+        OfflineMapPreset(
+            title: "وادي بيشة",
+            subtitle: "عسير - مجرى واد واسع ومناطق زراعية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 19.9800, longitude: 42.6000), span: MKCoordinateSpan(latitudeDelta: 0.20, longitudeDelta: 0.20))
+        ),
+        OfflineMapPreset(
+            title: "وادي نجران",
+            subtitle: "جنوب المملكة - سد ووادي ومعالم صحراوية",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 17.4900, longitude: 44.1300), span: MKCoordinateSpan(latitudeDelta: 0.18, longitudeDelta: 0.18))
+        ),
+        OfflineMapPreset(
+            title: "حرة كشب",
+            subtitle: "غرب المملكة - فوهات بركانية وحواف حرة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 22.8300, longitude: 41.3500), span: MKCoordinateSpan(latitudeDelta: 0.24, longitudeDelta: 0.24))
+        ),
+        OfflineMapPreset(
+            title: "جبل القهر",
+            subtitle: "جازان - قمم ومنحدرات وشعاب وعرة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 17.8700, longitude: 43.0800), span: MKCoordinateSpan(latitudeDelta: 0.14, longitudeDelta: 0.14))
+        ),
+        OfflineMapPreset(
+            title: "يبرين",
+            subtitle: "أطراف الربع الخالي - كثبان ومسارات طويلة",
+            region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 23.2500, longitude: 49.0000), span: MKCoordinateSpan(latitudeDelta: 0.34, longitudeDelta: 0.34))
         )
     ]
 }
