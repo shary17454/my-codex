@@ -136,7 +136,7 @@ struct AdvancedToolsView: View {
             }
             .pickerStyle(.segmented)
 
-            Text("يمكن للدرب اتباع إعداد الجهاز أو استخدام المظهر النهاري أو الليلي دائمًا.")
+            Text("يمكن للدروب اتباع إعداد الجهاز أو استخدام المظهر النهاري أو الليلي دائمًا.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -2171,21 +2171,32 @@ struct WildlifeSafetyGuideView: View {
 
     private func wildlifeIllustration(_ item: WildlifeSpeciesProfile) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(
                     LinearGradient(
-                        colors: [item.dangerLevel.color.opacity(0.85), Color.black.opacity(0.72)],
+                        colors: [
+                            wildlifeVisualBackground(item).opacity(0.92),
+                            item.dangerLevel.color.opacity(0.74),
+                            Color.black.opacity(0.80)
+                        ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .overlay(
+                    Image(systemName: wildlifeHabitatSymbol(item))
+                        .font(.system(size: 42, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.12))
+                        .offset(x: -18, y: -18),
+                    alignment: .topLeading
+                )
+                .overlay(
                     VStack(spacing: 4) {
                         Text(wildlifeVisualMark(item))
-                            .font(.system(size: 24))
+                            .font(.system(size: 28))
                             .accessibilityHidden(true)
                         Image(systemName: item.imageName)
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 19, weight: .semibold))
                             .foregroundStyle(.white)
                         Text(wildlifeVisualLabel(item))
                             .font(.system(size: 9, weight: .bold))
@@ -2202,8 +2213,32 @@ struct WildlifeSafetyGuideView: View {
                 .background(.black.opacity(0.38), in: Capsule())
                 .padding(5)
         }
-        .frame(width: 72, height: 72)
+        .frame(width: 78, height: 78)
         .accessibilityLabel("صورة توضيحية: \(item.arabicName)")
+    }
+
+    private func wildlifeVisualBackground(_ item: WildlifeSpeciesProfile) -> Color {
+        if item.arabicName.contains("ثعبان") || item.arabicName.contains("أفعى") || item.arabicName.contains("ضب") || item.arabicName.contains("ورل") || item.arabicName.contains("سلحفاة") {
+            return Color(red: 0.45, green: 0.38, blue: 0.18)
+        }
+        if item.arabicName.contains("عقرب") || item.arabicName.contains("عنكبوت") {
+            return Color(red: 0.48, green: 0.25, blue: 0.12)
+        }
+        if item.arabicName.contains("حبارى") || item.arabicName.contains("قطا") || item.arabicName.contains("عقاب") || item.arabicName.contains("بومة") {
+            return Color(red: 0.18, green: 0.30, blue: 0.42)
+        }
+        if item.arabicName.contains("مها") || item.arabicName.contains("غزال") || item.arabicName.contains("وعل") || item.arabicName.contains("وبر") || item.arabicName.contains("جربوع") {
+            return Color(red: 0.57, green: 0.42, blue: 0.20)
+        }
+        return Color(red: 0.25, green: 0.30, blue: 0.24)
+    }
+
+    private func wildlifeHabitatSymbol(_ item: WildlifeSpeciesProfile) -> String {
+        if item.habitat.contains("جبل") || item.habitat.contains("صخر") || item.habitat.contains("حواف") { return "mountain.2.fill" }
+        if item.habitat.contains("رمل") || item.habitat.contains("كثبان") { return "sun.max.fill" }
+        if item.habitat.contains("وادي") || item.habitat.contains("ماء") { return "water.waves" }
+        if item.habitat.contains("كهوف") || item.habitat.contains("ليل") { return "moon.stars.fill" }
+        return "leaf.fill"
     }
 
     private func wildlifeVisualLabel(_ item: WildlifeSpeciesProfile) -> String {
@@ -2212,6 +2247,7 @@ struct WildlifeSafetyGuideView: View {
         if item.arabicName.contains("عنكبوت") { return "عنكبوت" }
         if item.arabicName.contains("ذئب") || item.arabicName.contains("ضبع") || item.arabicName.contains("وشق") || item.arabicName.contains("غرير") { return "مفترس" }
         if item.arabicName.contains("ضب") || item.arabicName.contains("ورل") || item.arabicName.contains("سلحفاة") { return "سحلية" }
+        if item.arabicName.contains("نمر") { return "قط كبير" }
         if item.arabicName.contains("غزال") || item.arabicName.contains("مها") || item.arabicName.contains("وعل") { return "ظبي" }
         if item.arabicName.contains("حبارى") || item.arabicName.contains("قطا") || item.arabicName.contains("عقاب") || item.arabicName.contains("بومة") { return "طائر" }
         if item.arabicName.contains("جمل") { return "إبل" }
@@ -2229,10 +2265,14 @@ struct WildlifeSafetyGuideView: View {
         if item.arabicName.contains("جمل") { return "🐪" }
         if item.arabicName.contains("مها") || item.arabicName.contains("غزال") || item.arabicName.contains("وعل") { return "🦌" }
         if item.arabicName.contains("أرنب") { return "🐇" }
+        if item.arabicName.contains("نمر") { return "🐆" }
         if item.arabicName.contains("ثعلب") { return "🦊" }
         if item.arabicName.contains("وشق") || item.arabicName.contains("قط") { return "🐈" }
         if item.arabicName.contains("غرير") || item.arabicName.contains("نمس") { return "🦡" }
         if item.arabicName.contains("نيص") || item.arabicName.contains("قنفذ") { return "🦔" }
+        if item.arabicName.contains("وبر") { return "🪨" }
+        if item.arabicName.contains("جربوع") { return "🐁" }
+        if item.arabicName.contains("سلحفاة") { return "🐢" }
         if item.arabicName.contains("خفاش") { return "🦇" }
         if item.arabicName.contains("حبارى") || item.arabicName.contains("قطا") || item.arabicName.contains("عقاب") || item.arabicName.contains("بومة") { return "🦅" }
         return "🌿"
