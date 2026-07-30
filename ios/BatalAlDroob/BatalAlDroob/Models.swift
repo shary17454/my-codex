@@ -72,6 +72,62 @@ struct CatalogPayload: Decodable {
     }
 }
 
+enum CatalogAccessLevel: String, Identifiable, CaseIterable {
+    case singleUnlock
+    case fullCatalog
+
+    var id: String { rawValue }
+
+    var productID: String {
+        switch self {
+        case .singleUnlock:
+            StoreProductID.singleCatalogUnlock
+        case .fullCatalog:
+            StoreProductID.catalogFullUnlock
+        }
+    }
+
+    var fallbackPriceAr: String {
+        switch self {
+        case .singleUnlock: "4 ر.س"
+        case .fullCatalog: "100 ر.س"
+        }
+    }
+
+    var fallbackPriceEn: String {
+        switch self {
+        case .singleUnlock: "SAR 4"
+        case .fullCatalog: "SAR 100"
+        }
+    }
+
+    func title(_ language: AppLanguage) -> String {
+        switch self {
+        case .singleUnlock:
+            language == .arabic ? "فتح صفحة كتالوج واحدة" : "Unlock one catalog page"
+        case .fullCatalog:
+            language == .arabic ? "فتح الكتالوج الكامل" : "Unlock full catalog"
+        }
+    }
+
+    func description(_ language: AppLanguage) -> String {
+        switch self {
+        case .singleUnlock:
+            language == .arabic
+                ? "يفتح رقم القطعة، الأرقام البديلة، وصورة/مؤشر صفحة الكتالوج للصفحة الحالية فقط."
+                : "Unlocks the part number, alternates, and catalog page image/locator for the current page only."
+        case .fullCatalog:
+            language == .arabic
+                ? "يفتح كل القطع المدفوعة في قاعدة الكتالوج الحالية بشكل دائم وقابل للاستعادة."
+                : "Permanently unlocks all paid records in the current catalog and supports restore."
+        }
+    }
+
+    func priceText(_ language: AppLanguage) -> String {
+        language == .arabic ? fallbackPriceAr : fallbackPriceEn
+    }
+}
+
 struct CatalogSource: Decodable, Identifiable, Hashable {
     let sourceID: String
     let filename: String?

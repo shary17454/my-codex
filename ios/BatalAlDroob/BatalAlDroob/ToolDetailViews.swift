@@ -1,13 +1,16 @@
 import PhotosUI
 import SwiftUI
+import UIKit
 
 struct DescriptionSearchToolView: View {
     @Bindable var viewModel: CatalogViewModel
     @State private var descriptionQuery = ""
     @State private var hasSearched = false
+    @State private var isCameraPresented = false
 
     var body: some View {
         let choosePhotoTitle = viewModel.text(ar: "اختيار صورة كمرجع", en: "Choose reference photo")
+        let cameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
 
         Form {
             Section(viewModel.text(ar: "بحث بالوصف", en: "Description search")) {
@@ -21,6 +24,7 @@ struct DescriptionSearchToolView: View {
                 )
                 .lineLimit(2 ... 4)
                 Button {
+                    AppHaptics.lightImpact()
                     hasSearched = true
                     viewModel.applyDescriptionSearch(descriptionQuery)
                 } label: {
@@ -28,6 +32,25 @@ struct DescriptionSearchToolView: View {
                         viewModel.text(ar: "بحث", en: "Search"),
                         systemImage: "text.magnifyingglass"
                     )
+                }
+                Button {
+                    AppHaptics.lightImpact()
+                    hasSearched = true
+                    isCameraPresented = true
+                } label: {
+                    Label(
+                        viewModel.text(ar: "تصوير القطعة أو رقمها", en: "Capture part or number"),
+                        systemImage: "camera.viewfinder"
+                    )
+                }
+                .disabled(!cameraAvailable)
+                if !cameraAvailable {
+                    Text(viewModel.text(
+                        ar: "الكاميرا غير متاحة على هذا الجهاز أو المحاكي.",
+                        en: "Camera is not available on this device or simulator."
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
                 PhotosPicker(selection: $viewModel.selectedPhoto, matching: .images) {
                     Label(choosePhotoTitle, systemImage: "photo")
@@ -72,6 +95,12 @@ struct DescriptionSearchToolView: View {
             }
         }
         .navigationTitle(viewModel.text(ar: "بحث ذكي", en: "Smart search"))
+        .fullScreenCover(isPresented: $isCameraPresented) {
+            CameraCaptureView { image in
+                Task { await viewModel.analyzeCapturedPartImage(image) }
+            }
+            .ignoresSafeArea()
+        }
         .scrollContentBackground(.hidden)
         .background(BatalDesign.canvas)
         .listStyle(.insetGrouped)
@@ -94,6 +123,7 @@ struct TireCalculatorToolView: View {
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
                 Button {
+                    AppHaptics.lightImpact()
                     tireResult = viewModel.tireDifference(oldSize: oldTireSize, newSize: newTireSize)
                 } label: {
                     Label(
@@ -132,6 +162,7 @@ struct FitmentCheckToolView: View {
                 .textInputAutocapitalization(.characters)
                 .autocorrectionDisabled()
                 Button {
+                    AppHaptics.lightImpact()
                     didCheck = true
                     summary = viewModel.fitmentSummary(for: query)
                     matches = viewModel.fitmentMatches(for: query)

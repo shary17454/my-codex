@@ -30,7 +30,7 @@ def main():
             raise SystemExit(f"{s['id']} importance_score must be int")
 
     with (BASE / 'suppliers.csv').open('w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=fields)
+        writer = csv.DictWriter(f, fieldnames=fields, lineterminator='\n')
         writer.writeheader()
         for s in suppliers:
             writer.writerow({field: val(s.get(field)) for field in fields})

@@ -37,7 +37,7 @@
 
 - كل الشاشات الأساسية تمت مراجعتها: الرئيسية، الكتالوج، طلب قطعة، المزيد، تفاصيل القطعة، الصيانة، القطع المشتركة.
 - كل أزرار المسارات الحرجة تمت تغطيتها يدويًا بالكود أو عبر UI smoke tests.
-- StoreKit يستخدم المنتج الدائم `batal.catalog.permanent.unlock` كـ non-consumable.
+- StoreKit يستخدم `batal.catalog.single.unlock` للفتح الجزئي، و`batal.catalog.full.unlock` للفتح الكامل، مع إبقاء `batal.catalog.permanent.unlock` كاستحقاق دائم قديم عند وجوده في App Store Connect.
 - لا توجد خريطة أو بوصلة أو تتبع موقع في التطبيق، ولا توجد صلاحية موقع مطلوبة.
 - OCR يتم محليًا عبر Vision ولا يرسل الصورة لخادم.
 - الروابط الخارجية لا تفتح إلا عبر HTTPS وضمن نطاق المتجر الموثق.
@@ -65,8 +65,8 @@
 
 ### High - عناصر App Store Connect خارج الكود
 
-- المنتج `batal.catalog.permanent.unlock` يجب أن يكون مكتمل البيانات، السعر، التوفر، صورة App Review، والملاحظات.
-- يجب إرفاق أول non-consumable IAP مع إصدار التطبيق نفسه عند الإرسال.
+- منتجات StoreKit الجديدة `batal.catalog.single.unlock` و`batal.catalog.full.unlock`، وأي استحقاق قديم نشط `batal.catalog.permanent.unlock`، يجب أن تكون مكتملة البيانات، السعر، التوفر، صور App Review، والملاحظات.
+- يجب إرفاق أول IAP جديد مع إصدار التطبيق نفسه عند الإرسال.
 - يجب أن تكون صور 6.5-inch iPhone و13-inch iPad من التطبيق الحالي في الاستخدام الفعلي.
 - يجب تشغيل Xcode Cloud ببناء `111` أو أعلى من commit المصحح وبـ Xcode إنتاجي مقبول.
 

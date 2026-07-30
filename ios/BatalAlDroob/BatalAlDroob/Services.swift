@@ -77,19 +77,42 @@ protocol PurchaseService: Sendable {
 enum PurchaseOutcome: Equatable { case success, cancelled, pending }
 
 enum StoreProductID {
+    static let singleCatalogUnlock = "batal.catalog.single.unlock"
+    static let catalogFullUnlock = "batal.catalog.full.unlock"
     static let catalogPermanentUnlock = "batal.catalog.permanent.unlock"
+
+    static let allCatalogProducts = [
+        singleCatalogUnlock,
+        catalogFullUnlock,
+        catalogPermanentUnlock
+    ]
+
+    static func expectedType(for productID: String) -> Product.ProductType? {
+        switch productID {
+        case singleCatalogUnlock:
+            return .consumable
+        case catalogFullUnlock, catalogPermanentUnlock:
+            return .nonConsumable
+        default:
+            return nil
+        }
+    }
 }
 
 struct StoreKitPurchaseService: PurchaseService {
     func availableProductIDs(for productIDs: [String]) async throws -> Set<String> {
         let products = try await Product.products(for: productIDs)
-        return Set(products.filter { $0.type == .nonConsumable }.map(\.id))
+        return Set(products.filter { product in
+            StoreProductID.expectedType(for: product.id) == product.type
+        }.map(\.id))
     }
 
     func purchase(productID: String) async throws -> PurchaseOutcome {
         let products = try await Product.products(for: [productID])
         guard let product = products.first else { throw AppError.productUnavailable }
-        guard product.type == .nonConsumable else { throw AppError.invalidProductType }
+        guard StoreProductID.expectedType(for: product.id) == product.type else {
+            throw AppError.invalidProductType
+        }
         let result = try await product.purchase()
         switch result {
         case let .success(verification):
@@ -146,7 +169,7 @@ enum AppError: LocalizedError {
         switch self {
         case let .missingResource(name): "Missing bundled resource: \(name)"
         case .productUnavailable: "In-app purchase is not ready yet."
-        case .invalidProductType: "The catalog unlock must be configured as a non-consumable product."
+        case .invalidProductType: "The StoreKit product is configured with an unexpected type."
         case .unverifiedTransaction: "Transaction verification failed."
         case .unknownPurchaseResult: "Unknown purchase result."
         case .unreadablePhoto: "The selected photo could not be read."

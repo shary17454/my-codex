@@ -16,7 +16,7 @@
 - Preserve the native SwiftUI implementation and do not reintroduce Flutter or Dart runtime dependencies.
 - Keep user-facing strings localized in Arabic and English where they are part of shipped UI.
 - Use bundled catalog data under `BatalAlDroob/Web/data/` as the offline source of truth unless a reviewed migration replaces it.
-- Paid catalog access must use Apple In-App Purchase only, through the non-consumable product `batal.catalog.permanent.unlock`.
+- Paid catalog access must use Apple In-App Purchase only. Approved identifiers are `batal.catalog.single.unlock` for a one-record consumable unlock, `batal.catalog.full.unlock` for the current full-catalog non-consumable unlock, and `batal.catalog.permanent.unlock` as the legacy permanent non-consumable entitlement while active in App Store Connect.
 - Do not add third-party dependencies unless they are necessary, reviewed, and compatible with App Store privacy requirements.
 - Avoid force unwraps, `try!`, global warning suppression, temporary debug UI, placeholder flows, or production `print` logging.
 

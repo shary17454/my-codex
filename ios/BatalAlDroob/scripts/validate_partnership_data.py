@@ -29,9 +29,15 @@ for supplier in suppliers:
     for field in fields:
         if field not in supplier:
             fail(f'{sid}: missing field {field}')
-    if supplier.get('negotiation_status') == 'approved':
+    written_approval = supplier.get('written_approval') or {}
+    has_written_approval = (
+        written_approval.get('status') == 'verified'
+        and written_approval.get('gmail_thread_id')
+        and written_approval.get('gmail_reply_message_id')
+    )
+    if supplier.get('negotiation_status') == 'approved' and not has_written_approval:
         fail(f'{sid}: marked approved without stored written approval')
-    if supplier.get('external_link_allowed') is True:
+    if supplier.get('external_link_allowed') is True and not has_written_approval:
         fail(f'{sid}: external_link_allowed cannot be true before permission')
     if supplier.get('api_available') is True:
         warn(f'{sid}: API marked true, verify supporting proof')

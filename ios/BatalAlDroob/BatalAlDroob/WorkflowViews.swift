@@ -36,12 +36,13 @@ struct RequestView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 Button {
+                    AppHaptics.lightImpact()
                     saveRequest()
                 } label: {
                     Label(viewModel.text(ar: "حفظ طلب القطعة", en: "Save part request"), systemImage: "tray.and.arrow.down")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.batalPrimary)
                 .disabled(!canSaveRequest)
                 .padding(.horizontal)
                 .padding(.vertical, 8)
@@ -139,6 +140,7 @@ private struct PartDetailsSection: View {
             TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $request.notes, axis: .vertical)
                 .accessibilityIdentifier("request.notes")
             Button {
+                AppHaptics.lightImpact()
                 saveRequest()
             } label: {
                 Label(
@@ -288,6 +290,7 @@ struct MaintenanceContent: View {
                     .keyboardType(.numberPad)
                 TextField(viewModel.text(ar: "ملاحظات", en: "Notes"), text: $notes, axis: .vertical)
                 Button(viewModel.text(ar: "حفظ", en: "Save")) {
+                    AppHaptics.lightImpact()
                     viewModel.addMaintenance(title: title, odometer: odometer, notes: notes)
                     title = ""; odometer = ""; notes = ""
                 }

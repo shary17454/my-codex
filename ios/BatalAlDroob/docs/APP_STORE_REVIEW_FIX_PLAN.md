@@ -16,8 +16,8 @@ Connect.
 | Bundle ID | `com.batalaldroob.parts` |
 | Release train | `1.1.0` |
 | Project build | `111` |
-| IAP product | `batal.catalog.permanent.unlock` |
-| IAP type | Non-consumable |
+| IAP products | `batal.catalog.single.unlock`, `batal.catalog.full.unlock`, `batal.catalog.permanent.unlock` |
+| IAP types | Consumable single-record unlock; non-consumable full-catalog unlocks |
 
 ## Apple Review Issues To Clear
 
@@ -36,8 +36,8 @@ Connect.
 - [ ] Uploaded build is created from the current source commit.
 - [ ] App Store version is exactly `1.1.0`.
 - [ ] Selected build number is `111` or higher and has not been reused.
-- [ ] In-App Purchase `batal.catalog.permanent.unlock` is complete.
-- [ ] IAP type is Non-consumable.
+- [ ] In-App Purchases `batal.catalog.single.unlock`, `batal.catalog.full.unlock`, and any still-active `batal.catalog.permanent.unlock` legacy entitlement are complete.
+- [ ] IAP product types match the app: single unlock is Consumable; full/legacy catalog unlocks are Non-consumable.
 - [ ] IAP price, availability, localization, and review notes are complete.
 - [ ] IAP App Review screenshot shows the current native purchase surface.
 - [ ] Promoted-IAP image is not a direct screenshot of the app.
@@ -57,8 +57,10 @@ offline catalog, inspect fitment evidence, prepare part requests locally, keep a
 local maintenance log, and open verified external store links. It does not copy
 store prices or inventory.
 
-Paid access is handled only through Apple In-App Purchase using the
-non-consumable product `batal.catalog.permanent.unlock`. The product unlocks
-alternate part numbers and advanced catalog evidence. Part request preparation,
+Paid access is handled only through Apple In-App Purchase. The consumable
+`batal.catalog.single.unlock` unlocks one selected part record, while
+`batal.catalog.full.unlock` unlocks the protected catalog permanently. The
+legacy non-consumable `batal.catalog.permanent.unlock` remains supported only
+for existing App Store Connect entitlement continuity. Part request preparation,
 catalog search, maintenance, and tools remain usable without payment. No
 external payment method is used.

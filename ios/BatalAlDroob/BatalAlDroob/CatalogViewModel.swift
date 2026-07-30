@@ -12,6 +12,7 @@ final class CatalogViewModel {
     private let repository: CatalogRepository
     private let store: PurchaseService
     private let photoTextRecognizer: any PhotoTextRecognizing
+    private let aiService: AIAssistantServicing
     private let catalogUnlockToken = "__catalog_unlock__"
     private var hasLoadedCatalog = false
     private var hasLoadedStores = false
@@ -28,11 +29,19 @@ final class CatalogViewModel {
     var errorMessage: String?
     var paymentMessage: String?
     var isPrivacyShieldVisible = false
+    var aiMessages: [AIAssistantMessage] = []
+    var aiQuestion = ""
+    var aiSuggestions: [AISuggestion] = []
+    var isAIResponding = false
+    var aiErrorMessage: String?
     var selectedPhoto: PhotosPickerItem?
     var selectedPhotoName: String?
     var isAnalyzingPhoto = false
     var isLoadingPurchases = false
     var availableProductIDs = Set<String>()
+    var isVehicleFilterEnabled = UserDefaults.standard.object(forKey: "batalVehicleFilterEnabled") as? Bool ?? false {
+        didSet { UserDefaults.standard.set(isVehicleFilterEnabled, forKey: "batalVehicleFilterEnabled") }
+    }
 
     private(set) var parts: [Part] = []
     private(set) var sources: [CatalogSource] = []
@@ -90,17 +99,19 @@ final class CatalogViewModel {
         )
     ]
     var purchaseProductIDs: [String] {
-        [StoreProductID.catalogPermanentUnlock]
+        StoreProductID.allCatalogProducts
     }
 
     init(
         repository: CatalogRepository,
         store: PurchaseService,
-        photoTextRecognizer: any PhotoTextRecognizing = VisionPhotoTextRecognizer()
+        photoTextRecognizer: any PhotoTextRecognizing = VisionPhotoTextRecognizer(),
+        aiService: AIAssistantServicing = CompositeAIAssistantService(remote: BatalRemoteAIService())
     ) {
         self.repository = repository
         self.store = store
         self.photoTextRecognizer = photoTextRecognizer
+        self.aiService = aiService
     }
 }
 
@@ -164,8 +175,8 @@ extension CatalogViewModel {
             return numberMatch || indexedText.contains(query)
         }.prefix(250))
 
-        guard exactResults.isEmpty, isPartNumberLookup else { return exactResults }
-        return Array(fitmentMatches(for: rawQuery).prefix(25))
+        guard exactResults.isEmpty, isPartNumberLookup else { return applyVehicleFilter(to: exactResults) }
+        return applyVehicleFilter(to: Array(fitmentMatches(for: rawQuery).prefix(25)))
     }
 
     var sharedParts: [Part] {
@@ -183,6 +194,86 @@ extension CatalogViewModel {
             .prefix(8)
             .map(\.self)
     }
+
+    func generationRecordCount(for generationID: String) -> Int {
+        let target = normalized(generationID)
+        return parts.filter { part in
+            normalized(part.model ?? "").contains(target)
+                || part.years.contains { normalized($0).contains(target) }
+                || part.evidence.contains { normalized($0.sourceID ?? "").contains(target) }
+        }.count
+    }
+
+    func focusCatalog(onGeneration generationID: String) {
+        searchText = generationID
+        selectedCategory = .all
+        selectedPart = filteredParts.first
+    }
+
+    var vehicleFilterSummary: String {
+        let profile = vehicleProfile
+        let values = [
+            nonEmpty(profile.generation),
+            nonEmpty(profile.year),
+            nonEmpty(profile.engine),
+            nonEmpty(profile.transmission)
+        ].compactMap(\.self)
+        return values.isEmpty ? text(ar: "لم يتم تحديد سيارة بعد.", en: "No vehicle selected yet.") : values.joined(separator: " · ")
+    }
+
+    var isRemoteAIConfigured: Bool {
+        aiService.isRemoteAIConfigured
+    }
+
+    func vehicleMatchSummary(for part: Part) -> String {
+        guard isVehicleProfileMeaningful else {
+            return text(ar: "أضف بيانات سيارتك لتقييم التوافق.", en: "Add your vehicle to evaluate fitment.")
+        }
+        if matchesVehicleProfile(part) {
+            return text(ar: "متوافق مع ملف سيارتك", en: "Matches your vehicle profile")
+        }
+        return text(ar: "لا يطابق ملف سيارتك الحالي", en: "Does not match your current vehicle profile")
+    }
+
+    func photoCandidateSummary(for part: Part) -> String {
+        let confidenceText = (part.confidence ?? 0) > 0 ? "\((part.confidence ?? 0).formatted())%" : text(ar: "غير محددة", en: "Unknown")
+        return text(
+            ar: "سبب الترشيح: قراءة رقم/نص من الصورة · الثقة: \(confidenceText) · \(vehicleMatchSummary(for: part))",
+            en: "Reason: number/text read from image · Confidence: \(confidenceText) · \(vehicleMatchSummary(for: part))"
+        )
+    }
+
+    private var isVehicleProfileMeaningful: Bool {
+        [vehicleProfile.generation, vehicleProfile.year, vehicleProfile.engine, vehicleProfile.transmission]
+            .contains { !normalized($0).isEmpty }
+    }
+
+    private func applyVehicleFilter(to candidates: [Part]) -> [Part] {
+        guard isVehicleFilterEnabled, isVehicleProfileMeaningful else { return candidates }
+        return candidates.filter(matchesVehicleProfile)
+    }
+
+    private func matchesVehicleProfile(_ part: Part) -> Bool {
+        let generation = normalized(vehicleProfile.generation)
+        let year = normalized(vehicleProfile.year)
+        let engine = normalized(vehicleProfile.engine)
+        let transmission = normalized(vehicleProfile.transmission)
+
+        let modelText = searchableText(for: part)
+        let generationMatches = generation.isEmpty
+            || normalized(part.model ?? "").contains(generation)
+            || modelText.contains(generation)
+        let yearMatches = year.isEmpty
+            || part.years.contains { normalized($0).contains(year) }
+            || part.dateRanges.contains { normalized($0).contains(year) }
+            || modelText.contains(year)
+        let engineMatches = engine.isEmpty
+            || part.engines.contains { normalized($0).contains(engine) || engine.contains(normalized($0)) }
+            || modelText.contains(engine)
+        let transmissionMatches = transmission.isEmpty || modelText.contains(transmission)
+
+        return generationMatches && yearMatches && engineMatches && transmissionMatches
+    }
 }
 
 extension CatalogViewModel {
@@ -196,6 +287,10 @@ extension CatalogViewModel {
 
     func isUnlocked(_ part: Part) -> Bool {
         paidUnlocks.contains(catalogUnlockToken) || paidUnlocks.contains(part.partNumber)
+    }
+
+    func isFullCatalogUnlocked() -> Bool {
+        paidUnlocks.contains(catalogUnlockToken)
     }
 
     func isProductAvailable(_ productID: String) -> Bool {
@@ -218,7 +313,7 @@ extension CatalogViewModel {
     }
 
     func protectedNumber(_ part: Part) -> String {
-        part.partNumber
+        isUnlocked(part) ? part.partNumber : masked(part.partNumber)
     }
 
     func premiumNumber(_ number: String, for part: Part) -> String {
@@ -233,18 +328,22 @@ extension CatalogViewModel {
         }
     }
 
-    func unlock(_: Part) async {
-        guard isProductAvailable(StoreProductID.catalogPermanentUnlock) else {
+    func unlock(_ part: Part, level: CatalogAccessLevel = .fullCatalog) async {
+        let productID = level.productID
+        guard isProductAvailable(productID) else {
             paymentMessage = purchaseSetupMessage
             return
         }
-        paymentMessage = text(ar: "جاري طلب الدفع...", en: "Requesting purchase...")
+        paymentMessage = text(
+            ar: "جاري طلب الدفع: \(level.title(language))...",
+            en: "Requesting purchase: \(level.title(language))..."
+        )
         do {
-            let outcome = try await store.purchase(productID: StoreProductID.catalogPermanentUnlock)
+            let outcome = try await store.purchase(productID: productID)
             switch outcome {
             case .success:
-                applyEntitlements([StoreProductID.catalogPermanentUnlock])
-                paymentMessage = text(ar: "تم الدفع وفتح المحتوى", en: "Payment complete. Content unlocked.")
+                applySuccessfulPurchase(productID: productID, part: part)
+                paymentMessage = text(ar: "تم الدفع وفتح المحتوى.", en: "Payment complete. Content unlocked.")
             case .cancelled:
                 paymentMessage = text(ar: "تم إلغاء عملية الدفع.", en: "Purchase was cancelled.")
             case .pending:
@@ -284,7 +383,7 @@ extension CatalogViewModel {
         do {
             let restored = try await store.restorePurchasedProductIDs()
             applyEntitlements(restored)
-            if restored.contains(StoreProductID.catalogPermanentUnlock) {
+            if containsFullCatalogEntitlement(restored) {
                 paymentMessage = text(ar: "تمت استعادة فتح الكتالوج.", en: "Catalog unlock was restored.")
             } else {
                 paymentMessage = text(
@@ -305,12 +404,27 @@ extension CatalogViewModel {
     }
 
     private func applyEntitlements(_ productIDs: Set<String>) {
-        if productIDs.contains(StoreProductID.catalogPermanentUnlock) {
+        if containsFullCatalogEntitlement(productIDs) {
             paidUnlocks.insert(catalogUnlockToken)
         } else {
             paidUnlocks.remove(catalogUnlockToken)
-            paidUnlocks.subtract(parts.map(\.partNumber))
         }
+    }
+
+    private func applySuccessfulPurchase(productID: String, part: Part) {
+        switch productID {
+        case StoreProductID.singleCatalogUnlock:
+            paidUnlocks.insert(part.partNumber)
+        case StoreProductID.catalogFullUnlock, StoreProductID.catalogPermanentUnlock:
+            applyEntitlements([productID])
+        default:
+            break
+        }
+    }
+
+    private func containsFullCatalogEntitlement(_ productIDs: Set<String>) -> Bool {
+        productIDs.contains(StoreProductID.catalogFullUnlock)
+            || productIDs.contains(StoreProductID.catalogPermanentUnlock)
     }
 
     private func purchaseErrorMessage(_ error: Error) -> String {
@@ -327,6 +441,112 @@ extension CatalogViewModel {
 extension CatalogViewModel {
     func buildDraft(for request: SavedPartRequest, plan: PartRequestPlan) -> String {
         partRequestDraft(for: request, plan: plan, language: language)
+    }
+
+    func askAssistant(_ question: String? = nil) async {
+        let rawQuestion = question ?? aiQuestion
+        let trimmed = rawQuestion.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed.count <= 800 else {
+            aiErrorMessage = text(
+                ar: "اكتب سؤالًا واضحًا لا يتجاوز 800 حرف.",
+                en: "Enter a clear question under 800 characters."
+            )
+            return
+        }
+        guard !isAIResponding else { return }
+
+        aiQuestion = ""
+        aiErrorMessage = nil
+        aiMessages.append(.init(role: .user, text: trimmed, generatedByAI: false, createdAt: Date()))
+        isAIResponding = true
+        defer { isAIResponding = false }
+
+        do {
+            let response = try await aiService.answer(assistantContextRequest(message: trimmed))
+            aiSuggestions = response.suggestions
+            let responseText = response.answer + "\n\n" + response.privacyNote
+            aiMessages.append(.init(
+                role: .assistant,
+                text: responseText,
+                generatedByAI: response.generatedByAI,
+                createdAt: Date()
+            ))
+        } catch {
+            BatalLog.ai.error("Assistant failed: \(String(describing: error), privacy: .public)")
+            aiErrorMessage = text(
+                ar: "تعذر تشغيل المساعد الآن. حاول مرة أخرى، أو استخدم البحث المحلي.",
+                en: "The assistant is unavailable right now. Try again, or use local search."
+            )
+        }
+    }
+
+    func retryLastAssistantQuestion() async {
+        guard let lastQuestion = aiMessages.last(where: { $0.role == .user })?.text else { return }
+        await askAssistant(lastQuestion)
+    }
+
+    func assistantContextRequest(message: String) -> AIAssistantRequest {
+        let contextParts = filteredParts.prefix(8).map { part in
+            AIContextPart(
+                partNumber: isUnlocked(part) ? part.partNumber : "",
+                protectedNumber: protectedNumber(part),
+                title: title(for: part),
+                category: part.categoryValue.title(language),
+                model: part.model ?? "",
+                years: Array(part.years.prefix(8)),
+                engines: Array(part.engines.prefix(6)),
+                confidence: part.confidence,
+                evidenceCount: part.evidence.count,
+                unlocked: isUnlocked(part)
+            )
+        }
+        let safeMaintenance = maintenanceItems.prefix(5).map { item in
+            AISafeMaintenanceItem(
+                title: safePreview(item.title, limit: 80),
+                odometer: safePreview(item.odometer, limit: 32),
+                notesPreview: safePreview(item.notes, limit: 120)
+            )
+        }
+        return AIAssistantRequest(
+            message: safeAIPreview(message, limit: 800),
+            language: language.rawValue,
+            currentSearch: safeAIPreview(searchText, limit: 160),
+            selectedCategory: selectedCategory.title(language),
+            vehicleSummary: safeVehicleSummary(),
+            parts: contextParts,
+            maintenance: Array(safeMaintenance),
+            savedRequestCount: savedRequests.count
+        )
+    }
+
+    private func safeVehicleSummary() -> String {
+        let values = [
+            nonEmpty(vehicleProfile.generation),
+            nonEmpty(vehicleProfile.year),
+            nonEmpty(vehicleProfile.engine),
+            nonEmpty(vehicleProfile.transmission)
+        ].compactMap(\.self)
+        return values.isEmpty
+            ? text(ar: "لم يتم تحديد سيارة بعد.", en: "No vehicle selected yet.")
+            : values.joined(separator: " · ")
+    }
+
+    private func safePreview(_ value: String, limit: Int) -> String {
+        let trimmed = value
+            .replacingOccurrences(of: "\n", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count > limit else { return trimmed }
+        return String(trimmed.prefix(limit)) + "..."
+    }
+
+    private func safeAIPreview(_ value: String, limit: Int) -> String {
+        let protected = parts.reduce(value) { partial, part in
+            guard !isUnlocked(part) else { return partial }
+            return part.allNumbers.reduce(partial) { text, number in
+                text.replacingOccurrences(of: number, with: protectedNumber(part), options: [.caseInsensitive])
+            }
+        }
+        return safePreview(protected, limit: limit)
     }
 
     func addMaintenance(title: String, odometer: String, notes: String) {
@@ -359,10 +579,7 @@ extension CatalogViewModel {
             guard let data = try await item.loadTransferable(type: Data.self), !data.isEmpty else {
                 throw AppError.unreadablePhoto
             }
-            try Task.checkCancellation()
-            let recognizedLines = try await photoTextRecognizer.recognizeText(in: data)
-            try Task.checkCancellation()
-            applyRecognizedPhotoText(recognizedLines)
+            try await analyzePhotoData(data)
         } catch is CancellationError {
             return
         } catch {
@@ -372,6 +589,37 @@ extension CatalogViewModel {
                 en: "No clear text could be read from the photo. Try a sharper image showing the part number."
             )
         }
+    }
+
+    func analyzeCapturedPartImage(_ image: UIImage) async {
+        isAnalyzingPhoto = true
+        selectedPhotoName = text(
+            ar: "جاري تحليل صورة الكاميرا محليًا...",
+            en: "Analyzing the camera image on device..."
+        )
+        defer { isAnalyzingPhoto = false }
+
+        do {
+            guard let data = image.jpegData(compressionQuality: 0.9), !data.isEmpty else {
+                throw AppError.unreadablePhoto
+            }
+            try await analyzePhotoData(data)
+        } catch is CancellationError {
+            return
+        } catch {
+            selectedPhotoName = nil
+            errorMessage = text(
+                ar: "تعذر قراءة رقم قطعة واضح من صورة الكاميرا. صوّر الملصق أو النقش بوضوح أكبر.",
+                en: "No clear part number could be read from the camera image. Capture the label or stamping more clearly."
+            )
+        }
+    }
+
+    private func analyzePhotoData(_ data: Data) async throws {
+        try Task.checkCancellation()
+        let recognizedLines = try await photoTextRecognizer.recognizeText(in: data)
+        try Task.checkCancellation()
+        applyRecognizedPhotoText(recognizedLines)
     }
 
     func applyRecognizedPhotoText(_ lines: [String]) {
@@ -395,11 +643,22 @@ extension CatalogViewModel {
         let fallback = diagnosticKeywords(recognizedText).joined(separator: " ")
         searchText = matchingNumber ?? fallback
         selectedCategory = .all
-        selectedPart = filteredParts.first
-        selectedPhotoName = text(
-            ar: "تمت قراءة الصورة والبحث عن: \(searchText)",
-            en: "Photo analyzed. Searching for: \(searchText)"
-        )
+        if let matchingNumber {
+            selectedPart = fitmentMatches(for: matchingNumber).first ?? filteredParts.first
+        } else {
+            selectedPart = filteredParts.first
+        }
+        if let selectedPart {
+            selectedPhotoName = text(
+                ar: "تم العثور على مرشح: \(protectedNumber(selectedPart)). \(photoCandidateSummary(for: selectedPart)). افتح صفحة الكتالوج بـ 4 ر.س لعرض الرقم الكامل وصورة القطعة.",
+                en: "Candidate found: \(protectedNumber(selectedPart)). \(photoCandidateSummary(for: selectedPart)). Unlock this catalog page for SAR 4 to show the full number and part image."
+            )
+        } else {
+            selectedPhotoName = text(
+                ar: "تمت قراءة الصورة. افتح نتيجة مطابقة، ثم افتح القطعة لعرض الرقم الكامل وصورة القطعة.",
+                en: "Photo analyzed. Open a matching result, then unlock the part to reveal the full number and part image."
+            )
+        }
     }
 }
 
