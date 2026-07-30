@@ -106,6 +106,43 @@ Authorization: Bearer <token>
 }
 ```
 
+## AI MVP
+
+المسارات التالية تستخدم سياق المقارنات المسموح للعميل رؤيتها، ولا تخزن المحادثات:
+
+```http
+POST /api/v1/ai/chat
+Content-Type: application/json
+X-Client-ID: local-device-id
+Authorization: Bearer <token>
+
+{ "prompt": "لخص مقارنة الكاميرا" }
+```
+
+```http
+POST /api/v1/ai/search
+Content-Type: application/json
+
+{ "query": "السعر والكاميرا" }
+```
+
+```http
+POST /api/v1/ai/summarize
+Content-Type: application/json
+X-Invite-Code: ABC123DEF4
+
+{ "comparisonID": "uuid" }
+```
+
+```http
+POST /api/v1/ai/suggestions
+Content-Type: application/json
+
+{}
+```
+
+الاستجابات تحمل إجابات إرشادية ومصادر مختصرة. لا يوجد مزود AI خارجي في النسخة الحالية، ولا يوجد مفتاح داخل التطبيق أو الكود. أي مزود خارجي مستقبلي يجب أن يمر عبر Backend فقط باستخدام Secret في بيئة التشغيل.
+
 ## حدود الإنتاج
 
 هذا العقد مختبر محليًا، لكن هوية الإنتاج غير منفذة. قبل النشر العام يجب استخدام PostgreSQL ومعاملات، والتحقق الخادمي من Sign in with Apple، وجلسات آمنة، وAPNs، وإشراف ونسخ احتياطية. لا يوضع API token مشترك داخل نسخة App Store.

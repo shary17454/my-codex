@@ -49,7 +49,7 @@ final class StudyVaultUITests: XCTestCase {
         XCTAssertTrue(summaryButton.waitForExistence(timeout: 15))
         summaryButton.tap()
 
-        XCTAssertTrue(app.staticTexts["بوصلة القرار"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.scrollViews["decision-summary-screen"].waitForExistence(timeout: 10))
 
         let screenshot = XCTAttachment(screenshot: app.screenshot())
         screenshot.name = "Decision Summary Reference Design"

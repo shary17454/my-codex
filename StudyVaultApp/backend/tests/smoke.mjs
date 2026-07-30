@@ -154,6 +154,48 @@ await request("/api/v1/reports", {
   })
 });
 
+await expectStatus(400, "/api/v1/ai/chat", {
+  method: "POST",
+  headers: headers(`ai-empty-${suffix}`),
+  body: JSON.stringify({ prompt: "" })
+});
+
+const aiSearch = await request("/api/v1/ai/search", {
+  method: "POST",
+  headers: headers(`ai-search-${suffix}`),
+  body: JSON.stringify({ query: "الكاميرا" })
+});
+if (!aiSearch.results.some((item) => item.id === comparison.id)) {
+  throw new Error("AI search did not return the expected public comparison.");
+}
+
+const aiSummary = await request("/api/v1/ai/summarize", {
+  method: "POST",
+  headers: headers(`ai-summary-${suffix}`),
+  body: JSON.stringify({ comparisonID: comparison.id })
+});
+if (!aiSummary.summary || aiSummary.summary.id !== comparison.id || aiSummary.summary.totalVotes !== 1) {
+  throw new Error("AI summarize did not return the expected comparison summary.");
+}
+
+const aiChat = await request("/api/v1/ai/chat", {
+  method: "POST",
+  headers: headers(`ai-chat-${suffix}`),
+  body: JSON.stringify({ prompt: "لخص مقارنة الكاميرا" })
+});
+if (!aiChat.answer.includes("إجابة ذكية") || !aiChat.sources.some((item) => item.id === comparison.id)) {
+  throw new Error("AI chat did not produce a sourced answer.");
+}
+
+const aiSuggestions = await request("/api/v1/ai/suggestions", {
+  method: "POST",
+  headers: headers(`ai-suggestions-${suffix}`),
+  body: JSON.stringify({})
+});
+if (!Array.isArray(aiSuggestions.suggestions)) {
+  throw new Error("AI suggestions response shape is invalid.");
+}
+
 console.log("PASS backend smoke test", {
   publicComparisonID: comparison.id,
   privateComparisonID: privateComparison.id

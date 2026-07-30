@@ -118,7 +118,7 @@ struct FeaturedDecisionCard: View {
 
             HStack(alignment: .center, spacing: 14) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label("بوصلة القرار 2", systemImage: "location.north.circle.fill")
+                    Label("بوصلة القرار", systemImage: "location.north.circle.fill")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(WeshTheme.goldBright)
 
