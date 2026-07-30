@@ -1729,39 +1729,383 @@ struct LiveShareView: View {
 struct SmartAssistantView: View {
     @Binding var prompt: String
     let weather: EnvironmentalReport
+    @Environment(AppState.self) private var appState: AppState
     @Environment(\.dismiss) private var dismiss
+    @State private var response: TrailAIResponse?
+    @State private var isLoading = false
+    @State private var errorMessage: String?
 
-    private var suggestion: String {
-        if prompt.contains("عائ") {
-            return "اقتراحي: فيضة الندى مناسبة للعائلات إذا كانت الأرض جافة. الرياح \(Int(weather.windSpeedKPH)) km/h والحرارة \(Int(weather.temperatureCelsius))°C، فاجعل الرحلة بعد العصر."
-        }
-        if prompt.contains("جبال") {
-            return "اقتراحي: مطل الحجر، تضاريس صخرية وإطلالة مناسبة للغروب، مع ضرورة الانتباه للرياح على الحواف."
-        }
-        return "اقتراحي: كشتة وادي مخفي لمسار متوسط، مع تجهيز ماء إضافي وفحص تنبيهات السيول قبل الانطلاق."
+    private let assistant = TrailAIService()
+    private let quickPrompts = [
+        "اقترح مكان عائلي قريب",
+        "لخص رحلتي الحالية",
+        "هل الطقس مناسب الآن؟",
+        "اقترح مسار ترابي سهل",
+        "وش أهم تنبيهات السلامة؟"
+    ]
+
+    private var currentResponse: TrailAIResponse {
+        response ?? assistant.answer(currentContext)
+    }
+
+    private var currentContext: TrailAIContext {
+        TrailAIContext(
+            prompt: prompt,
+            trip: appState.selectedTrip,
+            hasSelectedTrip: appState.hasSelectedTrip,
+            hiddenPlaces: appState.hiddenPlaces,
+            routes: appState.suggestedDirtRoadRoutes(destination: appState.selectedTrip.meetingPoint),
+            weather: weather,
+            currentLocation: appState.locationManager.currentLocation
+        )
     }
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                TextField("طلبك", text: $prompt, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(3...5)
-                Text(suggestion)
-                    .font(.title3.weight(.semibold))
-                    .padding()
-                    .background(Color.desertSand.opacity(0.35), in: RoundedRectangle(cornerRadius: 8))
-                Label("يعتمد الاقتراح على الطقس، المسافة، حالة الطريق، وتفضيلات المستخدم.", systemImage: "sparkles")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                Spacer()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    privacyNotice
+                    promptComposer
+                    quickPromptChips
+                    assistantAnswerCard
+                    smartSearchSection
+                    suggestionsSection
+                    alertsSection
+                    limitationsNote
+                }
+                .padding()
             }
-            .padding()
             .navigationTitle("المساعد الذكي")
             .toolbar {
                 Button("تم") { dismiss() }
             }
+            .task {
+                if response == nil {
+                    await runAssistant()
+                }
+            }
+            .onChange(of: prompt) { _, _ in
+                response = nil
+                errorMessage = nil
+            }
         }
+    }
+
+    private var privacyNotice: some View {
+        Label("تحليل محلي داخل التطبيق ولا يتم إرسال بياناتك لأي مزود AI خارجي.", systemImage: "lock.shield.fill")
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(Color.oasisTeal)
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.oasisTeal.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var promptComposer: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("اسأل عن رحلة، موقع، طقس، مسار، أو سلامة")
+                .font(.headline)
+
+            TextField("مثال: أبغى مسار سهل للعائلة قريب من الرياض", text: $prompt, axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+                .lineLimit(2...5)
+                .submitLabel(.done)
+
+            HStack {
+                Button {
+                    Task { await runAssistant() }
+                } label: {
+                    Label(isLoading ? "جار التحليل" : "تحليل الطلب", systemImage: "sparkles")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(isLoading)
+
+                Button {
+                    prompt = ""
+                    response = nil
+                    errorMessage = nil
+                } label: {
+                    Image(systemName: "xmark.circle")
+                }
+                .buttonStyle(.bordered)
+                .accessibilityLabel("مسح الطلب")
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private var quickPromptChips: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(quickPrompts, id: \.self) { item in
+                    Button {
+                        prompt = item
+                        Task { await runAssistant() }
+                    } label: {
+                        Text(item)
+                            .font(.caption.weight(.bold))
+                            .lineLimit(1)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.desertCopper.opacity(0.14), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var assistantAnswerCard: some View {
+        let result = currentResponse
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label(result.title, systemImage: "brain.head.profile")
+                    .font(.headline)
+                Spacer()
+                if isLoading {
+                    ProgressView()
+                }
+            }
+
+            if let errorMessage {
+                ErrorStateView(message: errorMessage) {
+                    Task { await runAssistant() }
+                }
+            } else {
+                Text(result.answer)
+                    .font(.body.weight(.semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Divider()
+
+                Label(result.summary, systemImage: "doc.text.magnifyingglass")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.desertCopper.opacity(0.18), lineWidth: 1))
+    }
+
+    @ViewBuilder
+    private var smartSearchSection: some View {
+        let matches = currentResponse.matches
+        VStack(alignment: .leading, spacing: 10) {
+            SectionHeaderView(title: "نتائج البحث الذكي", subtitle: matches.isEmpty ? "لا توجد نتائج مطابقة" : "\(matches.count) نتائج من بيانات الدروب", icon: "magnifyingglass")
+
+            if matches.isEmpty {
+                EmptyStateView(title: "لا توجد نتائج", detail: "جرّب اسم وادي، جبل، منطقة، عائلات، رمل، أو دفع رباعي.", icon: "map")
+            } else {
+                ForEach(matches) { match in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: "mappin.circle.fill")
+                                .foregroundStyle(Color.desertCopper)
+                                .font(.title3)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(match.title)
+                                    .font(.headline)
+                                Text(match.subtitle)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(match.reason)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                        }
+
+                        if match.coordinate != nil {
+                            Button {
+                                setDestination(from: match)
+                            } label: {
+                                Label("تحديد كوجهة", systemImage: "location.fill")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                    }
+                    .padding(12)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var suggestionsSection: some View {
+        let suggestions = currentResponse.suggestions
+        VStack(alignment: .leading, spacing: 10) {
+            SectionHeaderView(title: "اقتراحات قابلة للتنفيذ", subtitle: "الاقتراحات مبنية على الرحلة والطقس والنتائج", icon: "lightbulb.max.fill")
+
+            if suggestions.isEmpty {
+                EmptyStateView(title: "لا توجد اقتراحات بعد", detail: "اكتب طلبًا أو حدّث الطقس والموقع.", icon: "sparkles")
+            } else {
+                ForEach(suggestions) { suggestion in
+                    Label {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(suggestion.title)
+                                .font(.subheadline.weight(.bold))
+                            Text(suggestion.detail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: suggestion.icon)
+                            .foregroundStyle(Color.oasisTeal)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var alertsSection: some View {
+        let alerts = currentResponse.alerts
+        VStack(alignment: .leading, spacing: 10) {
+            SectionHeaderView(title: "التنبيهات الذكية", subtitle: alerts.isEmpty ? "لا توجد تنبيهات حرجة" : "راجعها قبل الانطلاق", icon: "exclamationmark.triangle.fill")
+
+            if alerts.isEmpty {
+                Label("لا توجد تنبيهات حرجة من البيانات الحالية.", systemImage: "checkmark.shield.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.green)
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 12))
+            } else {
+                ForEach(alerts) { alert in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(alert.title)
+                            .font(.subheadline.weight(.bold))
+                        Text(alert.detail)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(alertColor(alert.severity).opacity(0.13), in: RoundedRectangle(cornerRadius: 12))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(alertColor(alert.severity).opacity(0.20), lineWidth: 1))
+                }
+            }
+        }
+    }
+
+    private var limitationsNote: some View {
+        Text("تنبيه: هذه توصيات مساعدة مبنية على بيانات التطبيق، ولا تستبدل التحقق الميداني أو تعليمات الجهات الرسمية.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func runAssistant() async {
+        let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count <= 240 else {
+            errorMessage = "اختصر الطلب إلى أقل من 240 حرفًا حتى يبقى التحليل واضحًا وآمنًا."
+            return
+        }
+        isLoading = true
+        errorMessage = nil
+        try? await Task.sleep(nanoseconds: 180_000_000)
+        response = assistant.answer(currentContext)
+        isLoading = false
+    }
+
+    private func setDestination(from match: TrailAISearchResult) {
+        guard let coordinate = match.coordinate else { return }
+        if appState.hasSelectedTrip {
+            appState.selectedTrip.meetingPoint = coordinate
+            appState.selectedTrip.routeName = "اقتراح ذكي"
+            appState.saveSelectedTrip()
+        } else {
+            _ = appState.createTrip(
+                title: match.title,
+                startDate: .now,
+                endDate: Calendar.current.date(byAdding: .hour, value: 8, to: .now) ?? .now,
+                notes: "تم إنشاء الرحلة من المساعد الذكي."
+            )
+            appState.selectedTrip.meetingPoint = coordinate
+            appState.selectedTrip.routeName = "اقتراح ذكي"
+            appState.saveSelectedTrip()
+        }
+        response = assistant.answer(currentContext)
+    }
+
+    private func alertColor(_ severity: TrailAIAlert.Severity) -> Color {
+        switch severity {
+        case .info: return .oasisTeal
+        case .warning: return .orange
+        case .critical: return .red
+        }
+    }
+}
+
+private struct SectionHeaderView: View {
+    var title: String
+    var subtitle: String
+    var icon: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundStyle(Color.desertCopper)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.headline)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+    }
+}
+
+private struct EmptyStateView: View {
+    var title: String
+    var detail: String
+    var icon: String
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(Color.desertCopper)
+            Text(title)
+                .font(.headline)
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+private struct ErrorStateView: View {
+    var message: String
+    var retry: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("تعذر التحليل", systemImage: "exclamationmark.triangle.fill")
+                .font(.headline)
+                .foregroundStyle(.red)
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            Button("إعادة المحاولة", action: retry)
+                .buttonStyle(.bordered)
+        }
+        .padding(12)
+        .background(Color.red.opacity(0.10), in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

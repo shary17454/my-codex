@@ -41,6 +41,24 @@ struct OfflineMapsView: View {
                         .foregroundStyle(.secondary)
                 }
 
+                Section {
+                    if filteredLandmarks.isEmpty {
+                        ContentUnavailableView {
+                            Label("لا توجد نتائج", systemImage: "magnifyingglass")
+                        } description: {
+                            Text("جرّب البحث باسم وادٍ أو جبل أو منطقة مثل: حنيفة، طويق، الديسة، أجا.")
+                        }
+                    } else {
+                        ForEach(filteredLandmarks.prefix(8)) { landmark in
+                            landmarkRow(landmark)
+                        }
+                    }
+                } header: {
+                    Text("فهرس المعالم والأودية دون إنترنت")
+                } footer: {
+                    Text("الفهرس المحلي يعمل دون اتصال ويعرض أسماء الأودية والجبال والمعالم القريبة. حفظ الخريطة هنا يحفظ لقطة مرجعية من خرائط Apple، وليس بيانات ملاحة كاملة.")
+                }
+
                 ForEach(groupedFilteredPresets, id: \.title) { group in
                     Section(group.title) {
                         ForEach(group.presets) { preset in
@@ -80,7 +98,21 @@ struct OfflineMapsView: View {
         guard !query.isEmpty else { return OfflineMapPreset.samples }
         return OfflineMapPreset.samples.filter {
             $0.title.localizedCaseInsensitiveContains(query) ||
-            $0.subtitle.localizedCaseInsensitiveContains(query)
+            $0.subtitle.localizedCaseInsensitiveContains(query) ||
+            landmarkSummary(for: $0.region).localizedCaseInsensitiveContains(query)
+        }
+    }
+
+    private var filteredLandmarks: [GeospatialSearchResult] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let matches = GeospatialSearchResult.samples.filter { landmark in
+            query.isEmpty ||
+            landmark.name.localizedCaseInsensitiveContains(query) ||
+            landmark.type.localizedCaseInsensitiveContains(query) ||
+            landmark.source.localizedCaseInsensitiveContains(query)
+        }
+        return matches.sorted {
+            distance(from: region.center, to: $0.coordinate) < distance(from: region.center, to: $1.coordinate)
         }
     }
 
@@ -119,6 +151,11 @@ struct OfflineMapsView: View {
                     Text(String(format: "%.4f, %.4f", preset.region.center.latitude, preset.region.center.longitude))
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.secondary)
+                    Text(landmarkSummary(for: preset.region))
+                        .font(.caption2)
+                        .foregroundStyle(Color.oasisTeal)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.72)
                 }
 
                 Spacer()
@@ -133,6 +170,56 @@ struct OfflineMapsView: View {
         }
         .buttonStyle(.plain)
         .disabled(savingPresetID != nil)
+    }
+
+    private func landmarkRow(_ landmark: GeospatialSearchResult) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: landmarkIcon(for: landmark.type))
+                .foregroundStyle(Color.oasisTeal)
+                .frame(width: 32, height: 32)
+                .background(Color.oasisTeal.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text(landmark.name)
+                        .font(.headline)
+                    Text(landmark.type)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(Color.desertCopper)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(Color.desertCopper.opacity(0.12), in: Capsule())
+                }
+
+                Text("\(landmark.source) · \(String(format: "%.0f", distance(from: region.center, to: landmark.coordinate) / 1_000)) كم من مركز الخريطة")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Text(String(format: "%.4f, %.4f", landmark.coordinate.latitude, landmark.coordinate.longitude))
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(landmark.name)، \(landmark.type)، \(landmark.source)")
+    }
+
+    private func landmarkSummary(for region: MKCoordinateRegion) -> String {
+        let nearby = GeospatialSearchResult.samples
+            .sorted { distance(from: region.center, to: $0.coordinate) < distance(from: region.center, to: $1.coordinate) }
+            .prefix(3)
+            .map(\.name)
+        guard !nearby.isEmpty else { return "لا توجد معالم قريبة في الفهرس المحلي" }
+        return "معالم قريبة: \(nearby.joined(separator: "، "))"
+    }
+
+    private func landmarkIcon(for type: String) -> String {
+        if type.contains("وادي") || type.contains("شعيب") { return "water.waves" }
+        if type.contains("جبل") || type.contains("مرتفع") || type.contains("هضبة") { return "mountain.2" }
+        if type.contains("نفود") || type.contains("صحراء") { return "sun.max" }
+        if type.contains("حرة") { return "flame" }
+        if type.contains("روضة") { return "leaf" }
+        return "mappin.and.ellipse"
     }
 
     private func containsAny(_ preset: OfflineMapPreset, _ words: [String]) -> Bool {

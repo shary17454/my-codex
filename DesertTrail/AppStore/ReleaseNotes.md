@@ -1,4 +1,20 @@
-# سجل إصدار الدرب
+# سجل إصدار الدروب
+
+## 2.2 (128) - 2026-07-30
+
+### العربية - What's New
+
+- إصدار جديد أعلى من مسار `2.1` المغلق في App Store Connect.
+- تحسين فهرس الخرائط بلا إنترنت بإظهار أودية وجبال ومعالم محلية قريبة قابلة للبحث.
+- تحسين اتساق اسم التطبيق إلى `الدروب` داخل إعدادات الإصدار وبيانات النشر.
+- تحسينات استقرار وتجهيزات رفع تمنع إعادة استخدام إصدار أو رقم بناء مرفوض.
+
+### English - What's New
+
+- New release above the closed `2.1` App Store Connect pre-release train.
+- Improved offline maps with searchable nearby local valleys, mountains, and landmarks.
+- Aligned the app display name as `الدروب` across release and submission metadata.
+- Stability and release-preparation improvements to avoid reusing rejected versions or build numbers.
 
 ## 2.1 (102) - 2026-07-26
 

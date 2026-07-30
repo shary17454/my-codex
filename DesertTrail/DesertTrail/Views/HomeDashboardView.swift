@@ -166,7 +166,7 @@ struct HomeDashboardView: View {
                 .frame(width: 58, height: 58)
 
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("إصدار 2.1")
+                    Text("إصدار 2.2")
                         .font(.title3.weight(.black))
                         .foregroundStyle(Color.trailMist)
                     Text("تصميم ليلي ميداني جديد يبرز الملاحة والطقس والرحلات بوضوح أعلى.")
