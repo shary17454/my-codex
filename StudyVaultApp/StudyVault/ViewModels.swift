@@ -984,6 +984,7 @@ final class CreateComparisonViewModel {
     var hideResultsUntilVote = false
     var validationMessage: String?
     var didPublish = false
+    var lastCameraDraft: CameraDecisionDraft?
     private let persistence: WeshPersistenceStore?
 
     init(
@@ -1143,6 +1144,42 @@ final class CreateComparisonViewModel {
         if details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             details = "ساعدني أقرر بناءً على التجربة والسعر والجودة والقيمة."
         }
+    }
+
+    func applyCameraDecisionDraft(_ draft: CameraDecisionDraft) {
+        lastCameraDraft = draft
+
+        if title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            title = draft.title
+        }
+
+        if details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            details = draft.details
+        } else if !details.contains("تم إنشاء هذه المسودة من صورة") {
+            details += "\n\nاقتراح الكاميرا: \(draft.details)"
+        }
+
+        category = draft.category
+
+        if optionTitles[0].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            optionTitles[0] = draft.primaryOption
+        }
+        if optionTitles[1].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            optionTitles[1] = "بديل مناسب"
+        }
+        optionCount = max(optionCount, 2)
+
+        let existingTags = tagsText
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        let mergedTags = Array(Set(existingTags + draft.tags)).sorted()
+        if !mergedTags.isEmpty {
+            tagsText = mergedTags.joined(separator: ", ")
+        }
+
+        validationMessage = "حللنا الصورة محليًا وجهزنا مسودة قابلة للتعديل."
+        saveDraftSilently()
     }
 
     func saveDraftOnDismissIfNeeded() {

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct NewQuestionView: View {
     @Environment(\.dismiss) private var dismiss
@@ -6,8 +7,10 @@ struct NewQuestionView: View {
     @State private var viewModel: CreateComparisonViewModel
     @State private var currentStep = 0
     @State private var showingPreview = false
+    @State private var showingCamera = false
     @State private var isPublishing = false
     @State private var publishedQuestion: AskQuestion?
+    @StateObject private var cameraAssistant = CameraDecisionAssistant()
 
     let authorName: String
     let saveAction: (AskQuestion) async -> AskQuestion?
@@ -80,6 +83,25 @@ struct NewQuestionView: View {
                 .presentationDragIndicator(.visible)
             }
         }
+        .sheet(isPresented: $showingCamera) {
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                WeshCameraCaptureView { image in
+                    showingCamera = false
+                    Task {
+                        if let draft = await cameraAssistant.analyze(image) {
+                            viewModel.applyCameraDecisionDraft(draft)
+                        }
+                    }
+                } onCancel: {
+                    showingCamera = false
+                }
+                .ignoresSafeArea()
+            } else {
+                CameraUnavailableView()
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
+        }
         .sensoryFeedback(.success, trigger: publishedQuestion?.id)
     }
 
@@ -92,7 +114,11 @@ struct NewQuestionView: View {
                 Group {
                     switch currentStep {
                     case 0:
-                        ComparisonBasicsStep(viewModel: viewModel)
+                        ComparisonBasicsStep(
+                            viewModel: viewModel,
+                            cameraAssistant: cameraAssistant,
+                            showingCamera: $showingCamera
+                        )
                     case 1:
                         ComparisonOptionsStep(viewModel: viewModel)
                     default:
@@ -196,6 +222,8 @@ struct NewQuestionView: View {
 
 private struct ComparisonBasicsStep: View {
     @Bindable var viewModel: CreateComparisonViewModel
+    @ObservedObject var cameraAssistant: CameraDecisionAssistant
+    @Binding var showingCamera: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -241,6 +269,13 @@ private struct ComparisonBasicsStep: View {
             }
             .weshSurface()
 
+            CameraDecisionAssistantCard(
+                isAnalyzing: cameraAssistant.isAnalyzing,
+                errorMessage: cameraAssistant.errorMessage,
+                lastDraft: viewModel.lastCameraDraft,
+                openCamera: { showingCamera = true }
+            )
+
             VStack(alignment: .leading, spacing: 12) {
                 WeshSectionHeader("قوالب جاهزة", subtitle: "اختر مثالًا وعدّله بما يناسب قرارك")
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -262,6 +297,21 @@ private struct ComparisonBasicsStep: View {
             }
             .weshSurface()
         }
+    }
+}
+
+private struct CameraUnavailableView: View {
+    var body: some View {
+        ZStack {
+            AppBackground()
+            WeshEmptyState(
+                title: "الكاميرا غير متاحة",
+                message: "الكاميرا لا تعمل في هذا الجهاز أو في المحاكي. جرّب الميزة على iPhone فعلي.",
+                systemImage: "camera.badge.ellipsis"
+            )
+            .padding(WeshTheme.horizontalPadding)
+        }
+        .environment(\.layoutDirection, .rightToLeft)
     }
 }
 

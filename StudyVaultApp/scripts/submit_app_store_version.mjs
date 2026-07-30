@@ -11,7 +11,7 @@ const shouldSubmit = process.env.ASC_SUBMIT === "1";
 const shouldCreateVersion = process.env.ASC_CREATE_VERSION === "1";
 const shouldListBuilds = process.env.ASC_LIST_BUILDS === "1";
 const shouldUpdateMetadata = process.env.ASC_UPDATE_METADATA === "1";
-const appStoreName = process.env.ASC_APP_NAME || "وش الراي";
+const appStoreName = process.env.ASC_APP_NAME || "وش الرأي";
 const whatsNew =
   process.env.ASC_WHATS_NEW ||
   [

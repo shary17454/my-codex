@@ -290,6 +290,144 @@ function appendAudit(store, action, details = {}) {
   }
 }
 
+function publicComparisonsForAI(store, req) {
+  const viewerHash = clientHash(req, false);
+  return store.comparisons
+    .filter((comparison) => (comparison.visibility || "publicRoom") === "publicRoom")
+    .slice(0, 50)
+    .map((comparison) => publicComparison(comparison, store, viewerHash));
+}
+
+function scoreAIComparison(comparison, query) {
+  if (!query) return 0;
+  const haystack = normalizeArabic(
+    [
+      comparison.title,
+      comparison.details,
+      comparison.category,
+      ...(comparison.tags || []),
+      ...(comparison.options || []).map((option) => option.title),
+      ...(comparison.comments || []).map((comment) => comment.text)
+    ].flat().join(" ")
+  );
+  const tokens = query.split(" ").filter((token) => token.length >= 2);
+  return tokens.reduce((score, token) => score + (haystack.includes(token) ? 1 : 0), haystack.includes(query) ? 3 : 0);
+}
+
+function summarizeComparisonForAI(comparison) {
+  const options = (comparison.options || []).slice().sort((a, b) => b.votes - a.votes);
+  const winner = options[0];
+  const runnerUp = options[1];
+  const totalVotes = options.reduce((sum, option) => sum + Number(option.votes || 0), 0);
+  const reasons = (comparison.comments || []).filter((comment) => comment.optionID);
+  const winnerPercent = winner && totalVotes > 0 ? Math.round((winner.votes / totalVotes) * 100) : 0;
+  const margin = winner && runnerUp && totalVotes > 0 ? Math.round(((winner.votes - runnerUp.votes) / totalVotes) * 100) : 0;
+  const state = totalVotes < 10 ? "بيانات غير كافية" : margin < 5 ? "نتيجة متقاربة" : margin >= 25 ? "ميل واضح" : "ميل متوسط";
+
+  return {
+    id: comparison.id,
+    title: comparison.title,
+    state,
+    totalVotes,
+    reasonCount: reasons.length,
+    winner: winner ? { title: winner.title, percentage: winnerPercent } : null,
+    margin,
+    summary: winner
+      ? `${winner.title} في الصدارة بنسبة ${winnerPercent}%، والفارق ${margin} نقطة.`
+      : "لا توجد أصوات كافية لتحديد متصدر."
+  };
+}
+
+function aiSearch(store, req, query) {
+  const normalizedQuery = normalizeArabic(query);
+  return publicComparisonsForAI(store, req)
+    .map((comparison) => ({ comparison, score: scoreAIComparison(comparison, normalizedQuery) }))
+    .filter((item) => item.score > 0)
+    .sort((lhs, rhs) => rhs.score - lhs.score)
+    .slice(0, 6)
+    .map((item) => summarizeComparisonForAI(item.comparison));
+}
+
+async function aiChat(req, store) {
+  const body = await readBody(req);
+  const prompt = cleanText(body.prompt, 800);
+  if (prompt.length < 2) throw new RequestError(400, "اكتب سؤالًا أوضح للمساعد.");
+  const query = normalizeArabic(prompt);
+  const matches = aiSearch(store, req, prompt);
+  const asksForSuggestion = ["اقترح", "اقتراح", "التالي", "وش اسوي", "تحسين"].some((term) => query.includes(term));
+  const asksForSummary = ["لخص", "تلخيص", "ملخص", "خلاصه"].some((term) => query.includes(term));
+
+  let answer;
+  if (asksForSuggestion) {
+    const weak = publicComparisonsForAI(store, req)
+      .map(summarizeComparisonForAI)
+      .filter((item) => item.state === "بيانات غير كافية" || item.state === "نتيجة متقاربة")
+      .slice(0, 3);
+    answer = [
+      "إجابة ذكية إرشادية من بيانات التطبيق المتاحة.",
+      "اقتراحي: ركّز على المقارنات التي تحتاج أصواتًا وأسبابًا أكثر، ولا تعتمد على النسبة وحدها.",
+      ...weak.map((item) => `- ${item.title}: ${item.state}، الأصوات ${item.totalVotes}، الأسباب ${item.reasonCount}.`)
+    ].join("\n");
+  } else if (asksForSummary && matches[0]) {
+    const item = matches[0];
+    answer = [
+      "إجابة ذكية إرشادية من بيانات التطبيق المتاحة.",
+      `${item.title}`,
+      item.summary,
+      `الحالة: ${item.state}. الأصوات: ${item.totalVotes}. الأسباب: ${item.reasonCount}.`
+    ].join("\n");
+  } else if (matches.length) {
+    answer = [
+      "إجابة ذكية إرشادية من بيانات التطبيق المتاحة.",
+      "أقرب النتائج:",
+      ...matches.slice(0, 4).map((item) => `- ${item.title}: ${item.summary} الحالة ${item.state}.`)
+    ].join("\n");
+  } else {
+    answer = "ما لقيت بيانات كافية داخل المقارنات العامة للإجابة بثقة. جرّب سؤالًا باسم خيار أو تصنيف محدد.";
+  }
+
+  return {
+    answer,
+    sources: matches.map((item) => ({ id: item.id, title: item.title })).slice(0, 4),
+    stored: false
+  };
+}
+
+async function aiSearchEndpoint(req, store) {
+  const body = await readBody(req);
+  const query = cleanText(body.query, 300);
+  if (query.length < 2) throw new RequestError(400, "اكتب عبارة بحث أوضح.");
+  return { results: aiSearch(store, req, query), stored: false };
+}
+
+async function aiSummarizeEndpoint(req, store) {
+  const body = await readBody(req);
+  const comparisonID = cleanText(body.comparisonID, 80);
+  const comparison = findComparison(store, comparisonID);
+  if (!comparison) throw new RequestError(404, "لم يتم العثور على المقارنة.");
+  const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
+  assertPrivateAccess(comparison, req, url, body);
+  return { summary: summarizeComparisonForAI(publicComparison(comparison, store, clientHash(req, false))), stored: false };
+}
+
+async function aiSuggestionsEndpoint(req, store) {
+  await readBody(req);
+  const candidates = publicComparisonsForAI(store, req)
+    .map(summarizeComparisonForAI)
+    .filter((item) => item.state === "بيانات غير كافية" || item.state === "نتيجة متقاربة")
+    .slice(0, 5);
+  return {
+    suggestions: candidates.map((item) => ({
+      comparisonID: item.id,
+      title: item.title,
+      recommendation: item.totalVotes < 10
+        ? "اطلب مشاركات أكثر قبل الاعتماد على النتيجة."
+        : "الفارق متقارب؛ راجع الأسباب وأضف معايير قرار واضحة."
+    })),
+    stored: false
+  };
+}
+
 async function createComparison(req, url, store) {
   requireAuth(req);
   const body = await readBody(req);
@@ -485,6 +623,29 @@ const server = http.createServer(async (req, res) => {
       const viewerHash = clientHash(req, false);
       send(res, 200, publicComparison(comparison, store, viewerHash));
       return;
+    }
+
+    if (segments[0] === "api" && segments[1] === "v1" && segments[2] === "ai") {
+      if (method !== "POST" || segments[4]) throw new RequestError(404, "المسار غير موجود.");
+      requireAuth(req);
+      const store = await loadStore();
+      if (segments[3] === "chat") {
+        send(res, 200, await aiChat(req, store));
+        return;
+      }
+      if (segments[3] === "search") {
+        send(res, 200, await aiSearchEndpoint(req, store));
+        return;
+      }
+      if (segments[3] === "summarize") {
+        send(res, 200, await aiSummarizeEndpoint(req, store));
+        return;
+      }
+      if (segments[3] === "suggestions") {
+        send(res, 200, await aiSuggestionsEndpoint(req, store));
+        return;
+      }
+      throw new RequestError(404, "المسار غير موجود.");
     }
 
     if (segments[0] === "api" && segments[1] === "v1" && segments[2] === "comparisons") {

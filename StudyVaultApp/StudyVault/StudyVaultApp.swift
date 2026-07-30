@@ -32,10 +32,12 @@ private struct WeshRootExperience: View {
     private enum Phase {
         case splash
         case onboarding
+        case permissions
         case application
     }
 
     @AppStorage("wesh.onboarding.completed") private var completedOnboarding = false
+    @AppStorage("wesh.permissions.intro.completed") private var completedPermissionsIntro = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var phase: Phase = .splash
     let persistence: WeshPersistenceStore
@@ -56,6 +58,12 @@ private struct WeshRootExperience: View {
                 case .onboarding:
                     WeshOnboardingView {
                         completedOnboarding = true
+                        move(to: completedPermissionsIntro ? .application : .permissions)
+                    }
+                    .transition(.opacity)
+                case .permissions:
+                    WeshPermissionsOnboardingView {
+                        completedPermissionsIntro = true
                         move(to: .application)
                     }
                     .transition(.opacity)
@@ -72,7 +80,11 @@ private struct WeshRootExperience: View {
             guard !skipsLaunchExperience, phase == .splash else { return }
             try? await Task.sleep(for: .milliseconds(reduceMotion ? 450 : 1250))
             guard !Task.isCancelled else { return }
-            move(to: completedOnboarding ? .application : .onboarding)
+            if completedOnboarding {
+                move(to: completedPermissionsIntro ? .application : .permissions)
+            } else {
+                move(to: .onboarding)
+            }
         }
     }
 

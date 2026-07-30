@@ -171,6 +171,60 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertTrue(viewModel.validateOptions())
     }
 
+    func testCameraDecisionDraftPrefillsEditableComparison() {
+        let viewModel = CreateComparisonViewModel()
+        let draft = CameraDecisionDraft(
+            title: "آيفون 15 برو أم بديل أفضل؟",
+            details: "اقتراح من صورة المنتج.",
+            primaryOption: "آيفون 15 برو",
+            tags: ["ايفون", "كاميرا"],
+            category: .phones,
+            confidence: 0.82,
+            recognizedText: ["iPhone 15 Pro"]
+        )
+
+        viewModel.applyCameraDecisionDraft(draft)
+
+        XCTAssertEqual(viewModel.title, draft.title)
+        XCTAssertEqual(viewModel.category, .phones)
+        XCTAssertEqual(viewModel.completedOptions, ["آيفون 15 برو", "بديل مناسب"])
+        XCTAssertTrue(viewModel.tagsText.contains("ايفون"))
+        XCTAssertTrue(viewModel.tagsText.contains("كاميرا"))
+        XCTAssertEqual(viewModel.validationMessage, "حللنا الصورة محليًا وجهزنا مسودة قابلة للتعديل.")
+    }
+
+    func testAIAssistantSummarizesFromAllowedAppContext() {
+        let question = makeQuestion(
+            title: "آيفون أم سامسونج للتصوير؟",
+            category: .phones,
+            optionTitles: ["آيفون", "سامسونج"],
+            votes: [7, 3]
+        )
+
+        let response = AIDecisionAssistantEngine.answer(
+            prompt: "لخص مقارنة الآيفون للتصوير",
+            questions: [question],
+            knowledgeItems: []
+        )
+
+        XCTAssertTrue(response.answer.contains("إجابة ذكية إرشادية"))
+        XCTAssertTrue(response.answer.contains("آيفون أم سامسونج للتصوير؟"))
+        XCTAssertEqual(response.sources, [question.title])
+        XCTAssertEqual(response.matchedQuestionIDs, [question.id])
+    }
+
+    func testAIAssistantDoesNotInventWhenNoContextMatches() {
+        let response = AIDecisionAssistantEngine.answer(
+            prompt: "وش أفضل طائرة خاصة؟",
+            questions: [],
+            knowledgeItems: []
+        )
+
+        XCTAssertTrue(response.answer.contains("ما لقيت بيانات كافية"))
+        XCTAssertTrue(response.sources.isEmpty)
+        XCTAssertTrue(response.matchedQuestionIDs.isEmpty)
+    }
+
     func testSmartComparisonPriorityChangesTheLeadingCandidate() {
         let affordable = KnowledgeItem(
             id: "affordable",
@@ -477,6 +531,12 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertFalse(summary.compassSubtitle.isEmpty)
         XCTAssertFalse(summary.actionItems.isEmpty)
         XCTAssertTrue(summary.actionItems.contains { $0.title == "أهم محور في النقاش" })
+    }
+
+    func testReleasePrivacyDoesNotDeclareUnusedLocationOrTrackingPrompts() {
+        XCTAssertNil(Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription"))
+        XCTAssertNil(Bundle.main.object(forInfoDictionaryKey: "NSUserTrackingUsageDescription"))
+        XCTAssertNotNil(Bundle.main.object(forInfoDictionaryKey: "NSCameraUsageDescription"))
     }
 
     private func makeQuestion(

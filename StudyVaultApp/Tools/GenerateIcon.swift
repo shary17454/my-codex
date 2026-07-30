@@ -7,6 +7,7 @@ struct IconSlot {
 
 let appIconDirectory = CommandLine.arguments.dropFirst().first
     ?? "StudyVaultApp/StudyVault/Assets.xcassets/AppIcon.appiconset"
+let sourceImagePath = CommandLine.arguments.dropFirst(2).first
 
 let slots: [IconSlot] = [
     .init(filename: "AppIcon-20@2x.png", pixels: 40),
@@ -208,13 +209,44 @@ func renderPNG(pixels: Int) -> Data {
     bitmap.size = NSSize(width: pixels, height: pixels)
     NSGraphicsContext.saveGraphicsState()
     NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
-    drawIcon(size: CGFloat(pixels))
+    if let sourceImagePath,
+       let sourceImage = NSImage(contentsOfFile: sourceImagePath) {
+        drawSourceIcon(sourceImage, size: CGFloat(pixels))
+    } else {
+        drawIcon(size: CGFloat(pixels))
+    }
     NSGraphicsContext.restoreGraphicsState()
 
     guard let png = bitmap.representation(using: .png, properties: [.compressionFactor: 0.92]) else {
         fatalError("Could not encode \(pixels)x\(pixels)")
     }
     return png
+}
+
+func drawSourceIcon(_ image: NSImage, size: CGFloat) {
+    let rect = NSRect(x: 0, y: 0, width: size, height: size)
+    NSGraphicsContext.current?.imageInterpolation = .high
+
+    NSColor(calibratedRed: 0.02, green: 0.018, blue: 0.022, alpha: 1).setFill()
+    rect.fill()
+
+    let imageSize = image.size
+    let cropSide = min(imageSize.width, imageSize.height)
+    let cropRect = NSRect(
+        x: (imageSize.width - cropSide) / 2,
+        y: (imageSize.height - cropSide) / 2,
+        width: cropSide,
+        height: cropSide
+    )
+
+    image.draw(
+        in: rect,
+        from: cropRect,
+        operation: .sourceOver,
+        fraction: 1,
+        respectFlipped: true,
+        hints: [.interpolation: NSImageInterpolation.high]
+    )
 }
 
 let destination = URL(fileURLWithPath: appIconDirectory)

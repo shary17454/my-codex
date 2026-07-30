@@ -41,6 +41,7 @@ struct ContentView: View {
     @State private var selectedKnowledgeItem: KnowledgeItem?
     @State private var showingComposer = false
     @State private var showingResearchBrowser = false
+    @State private var showingAIAssistant = false
     @State private var composerTemplate: KnowledgeItem?
     @State private var pendingComposerTitle = ""
     let persistence: WeshPersistenceStore
@@ -140,6 +141,14 @@ struct ContentView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showingAIAssistant) {
+            AIDecisionAssistantView(
+                questions: homeViewModel.questions,
+                knowledgeItems: homeViewModel.knowledgeItems
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
         .task {
             homeViewModel.loadPersistentState()
             openPendingComparisonIntentIfNeeded()
@@ -178,6 +187,24 @@ struct ContentView: View {
     private var compactTabLayout: some View {
         ZStack {
             tabDestination(selectedTab)
+        }
+        .overlay(alignment: .topLeading) {
+            Button {
+                showingAIAssistant = true
+            } label: {
+                Label("المساعد الذكي", systemImage: "sparkles")
+                    .font(.caption.weight(.bold))
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 42)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .overlay { Capsule().stroke(WeshTheme.gold.opacity(0.35), lineWidth: 1) }
+                    .shadow(color: Color.black.opacity(0.16), radius: 10, y: 4)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(WeshTheme.goldBright)
+            .padding(.horizontal, WeshTheme.horizontalPadding)
+            .padding(.top, 10)
+            .accessibilityIdentifier("ai-assistant-entry")
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             WeshCompactTabBar(
@@ -237,6 +264,15 @@ struct ContentView: View {
                 }
                 .buttonStyle(WeshPrimaryButtonStyle())
                 .padding(16)
+
+                Button {
+                    showingAIAssistant = true
+                } label: {
+                    Label("المساعد الذكي", systemImage: "sparkles")
+                }
+                .buttonStyle(WeshSecondaryButtonStyle())
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
             .background(AppBackground())
             .navigationSplitViewColumnWidth(min: 230, ideal: 270, max: 320)
