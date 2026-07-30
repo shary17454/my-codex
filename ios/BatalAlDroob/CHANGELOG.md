@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2 (154) - 2026-07-31
+
+### Release
+
+- Moved the Batal Al-Droob App Store candidate to release train `2.2` after
+  App Store Connect completed review for `2.1` and Xcode Cloud build `152`
+  failed during "Prepare Build for App Store Connect" on the closed `2.1`
+  train.
+- Raised the local project build floor to `154` so Xcode Cloud cannot reuse
+  builds `152` or `153`.
+- Preserved the Y60 generation-card image replacement and kept the bundle
+  identifier, development team, signing style, entitlements, and capabilities
+  unchanged.
+
 ## 2.1 (149) - 2026-07-29
 
 ### Release

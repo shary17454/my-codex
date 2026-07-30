@@ -49,7 +49,10 @@ struct PartDetailView: View {
                     viewModel.text(ar: "القسم", en: "Category"),
                     value: part.categoryAr ?? part.categoryValue.title(viewModel.language)
                 )
-                LabeledContent(viewModel.text(ar: "السنوات", en: "Years"), value: short(part.years))
+                YearListDetailRow(
+                    title: viewModel.text(ar: "السنوات", en: "Years"),
+                    years: orderedModelYears(for: part.model, years: part.years)
+                )
                 LabeledContent(viewModel.text(ar: "المحركات", en: "Engines"), value: short(part.engines))
                 LabeledContent(viewModel.text(ar: "حالة التدقيق", en: "Audit"), value: part.auditStatus ?? "-")
                 LabeledContent(viewModel.text(ar: "الندرة", en: "Rarity"), value: part.rarity ?? "-")
@@ -133,6 +136,38 @@ struct PartDetailView: View {
                 en: viewModel.wishlist.contains(part.partNumber) ? "Remove from wishlist" : "Add to wishlist"
             ))
         }
+    }
+}
+
+private struct YearListDetailRow: View {
+    let title: String
+    let years: [String]
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 8) {
+            Text(title)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            if years.isEmpty {
+                Text("-")
+                    .foregroundStyle(.secondary)
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 68), spacing: 8)], alignment: .trailing, spacing: 8) {
+                    ForEach(years, id: \.self) { year in
+                        Text(year)
+                            .font(.callout.monospacedDigit().weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .frame(maxWidth: .infinity, minHeight: 34)
+                            .background(BatalDesign.brand.opacity(0.12), in: Capsule())
+                            .overlay(Capsule().stroke(BatalDesign.brand.opacity(0.25), lineWidth: 1))
+                    }
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(title): \(years.joined(separator: ", "))")
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 

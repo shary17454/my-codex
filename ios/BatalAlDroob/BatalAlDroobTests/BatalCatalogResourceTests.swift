@@ -88,7 +88,19 @@ final class BatalCatalogResourceTests: XCTestCase {
         }
 
         XCTAssertTrue(documentedSources.contains("Wikimedia Commons"))
+        XCTAssertTrue(documentedSources.contains("Owner-provided app asset"))
         XCTAssertTrue(documentedSources.contains("Public domain") || documentedSources.contains("CC0"))
+    }
+
+    func testY60DetailYearsDisplayFullModelRange() {
+        XCTAssertEqual(
+            orderedModelYears(for: "Y60", years: ["1988", "1989", "1990", "1991", "1992", "1993"]),
+            ["1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997"]
+        )
+        XCTAssertEqual(
+            fullYearListText(for: "Y60", years: ["1991"]),
+            "1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997"
+        )
     }
 
     func testPartNumberCandidatesRecognizePrintedOEMFormats() {

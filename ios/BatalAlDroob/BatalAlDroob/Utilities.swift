@@ -181,6 +181,25 @@ func short(_ values: [String], limit: Int = 6) -> String {
     return values.count > limit ? head + " …" : head
 }
 
+func orderedModelYears(for model: String?, years: [String]) -> [String] {
+    let normalizedModel = normalized(model ?? "")
+    if normalizedModel.contains("y60") {
+        return (1988 ... 1997).map(String.init)
+    }
+    let numericYears = years.compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+    if numericYears.count == years.count, !numericYears.isEmpty {
+        return numericYears.sorted().map(String.init).uniqued()
+    }
+    return years.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .filter { !$0.isEmpty }
+        .uniqued()
+}
+
+func fullYearListText(for model: String?, years: [String]) -> String {
+    let orderedYears = orderedModelYears(for: model, years: years)
+    return orderedYears.isEmpty ? "-" : orderedYears.joined(separator: ", ")
+}
+
 func normalized(_ value: String) -> String {
     value.lowercased()
         .replacingOccurrences(of: "-", with: "")
