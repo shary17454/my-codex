@@ -1229,8 +1229,25 @@ struct DecisionSummary: Codable {
     let reasonThemes: [ReasonThemeResult]
     let highlights: [DecisionHighlight]
     let optionInsights: [OptionDecisionInsight]
+    let compassTitle: String
+    let compassSubtitle: String
     let recommendationText: String
+    let actionItems: [DecisionActionItem]
     let warningText: String?
+}
+
+struct DecisionActionItem: Identifiable, Codable, Hashable {
+    let id: UUID
+    let title: String
+    let details: String
+    let systemImage: String
+
+    init(id: UUID = UUID(), title: String, details: String, systemImage: String) {
+        self.id = id
+        self.title = title
+        self.details = details
+        self.systemImage = systemImage
+    }
 }
 
 struct PreferenceCriterion: Identifiable, Codable, Hashable {
@@ -1532,12 +1549,20 @@ enum DecisionSummaryService {
             makeOptionInsight(for: option, in: question)
         }
 
+        let compass: (title: String, subtitle: String)
         let recommendation: String
         if let winner, totalVotes > 0 {
             let reasons = optionInsights.first { $0.optionID == winner.id }?.topReasons.prefix(2).joined(separator: " و") ?? ""
             let reasonSuffix = reasons.isEmpty ? "لكن الأسباب المكتوبة ما زالت محدودة." : "وأكثر ما يدعم هذا الاتجاه: \(reasons)."
+            compass = makeCompassTitle(
+                winnerTitle: winner.title,
+                clarity: clarity,
+                leadingPercentage: leadingPercentage,
+                evidenceQuality: evidenceQuality
+            )
             recommendation = "يميل المصوتون إلى \(winner.title) بنسبة \(leadingPercentage)%. \(reasonSuffix) لا تعتبرها حقيقة مطلقة؛ طابقها مع احتياجك قبل القرار."
         } else {
+            compass = ("نحتاج مشاركات أكثر", "لا توجد بيانات كافية لبناء اتجاه موثوق.")
             recommendation = "النتيجة غير حاسمة بعد. أضف تصويتات وأسبابًا حتى يظهر اتجاه أوضح."
         }
 
@@ -1569,7 +1594,15 @@ enum DecisionSummaryService {
             reasonThemes: reasonThemes,
             highlights: highlights,
             optionInsights: optionInsights,
+            compassTitle: compass.title,
+            compassSubtitle: compass.subtitle,
             recommendationText: recommendation,
+            actionItems: makeActionItems(
+                clarity: clarity,
+                evidenceQuality: evidenceQuality,
+                reasonThemes: reasonThemes,
+                optionInsights: optionInsights
+            ),
             warningText: warning
         )
     }
@@ -1608,6 +1641,92 @@ enum DecisionSummaryService {
             negatives: negatives,
             evidenceCount: relatedComments.count
         )
+    }
+
+    private static func makeCompassTitle(
+        winnerTitle: String,
+        clarity: DecisionClarity,
+        leadingPercentage: Int,
+        evidenceQuality: EvidenceQualityResult
+    ) -> (title: String, subtitle: String) {
+        switch clarity {
+        case .insufficientData:
+            return ("نحتاج مشاركات أكثر", "الأصوات الحالية لا تكفي لتوجيه القرار.")
+        case .close:
+            return ("الخيارات متقاربة", "راجع الأسباب قبل الحسم؛ الفارق الحالي بسيط.")
+        case .leaning:
+            return (
+                "\(winnerTitle) يميل للتقدم",
+                "يتقدم بنسبة \(leadingPercentage)%، وجودة الأدلة \(evidenceQuality.level.title)."
+            )
+        case .decisive:
+            return (
+                "\(winnerTitle) هو القرار الأقوى",
+                "النتيجة واضحة نسبيًا، مع ضرورة مطابقتها مع احتياجك الشخصي."
+            )
+        }
+    }
+
+    private static func makeActionItems(
+        clarity: DecisionClarity,
+        evidenceQuality: EvidenceQualityResult,
+        reasonThemes: [ReasonThemeResult],
+        optionInsights: [OptionDecisionInsight]
+    ) -> [DecisionActionItem] {
+        var items: [DecisionActionItem] = []
+
+        switch clarity {
+        case .insufficientData:
+            items.append(DecisionActionItem(
+                title: "اجمع أصواتًا أكثر",
+                details: "شارك المقارنة مع أشخاص جرّبوا الخيارات قبل الاعتماد على النتيجة.",
+                systemImage: "person.2.fill"
+            ))
+        case .close:
+            items.append(DecisionActionItem(
+                title: "لا تعتمد على النسبة وحدها",
+                details: "الفارق متقارب؛ اقرأ أسباب الاختيار والملاحظات قبل الحسم.",
+                systemImage: "equal.circle.fill"
+            ))
+        case .leaning:
+            items.append(DecisionActionItem(
+                title: "راجع سبب التقدم",
+                details: "يوجد ميل واضح، لكن الأفضل مطابقته مع أولويتك الشخصية.",
+                systemImage: "arrow.up.forward.circle.fill"
+            ))
+        case .decisive:
+            items.append(DecisionActionItem(
+                title: "تحقق من الملاءمة",
+                details: "النتيجة قوية، لكن القرار النهائي يعتمد على ميزانيتك واستخدامك.",
+                systemImage: "checkmark.seal.fill"
+            ))
+        }
+
+        if evidenceQuality.score < 60 {
+            items.append(DecisionActionItem(
+                title: "حسّن جودة الأدلة",
+                details: evidenceQuality.notes.first ?? "اطلب أسبابًا وتجارب مكتوبة أكثر من المشاركين.",
+                systemImage: "checkmark.shield.fill"
+            ))
+        }
+
+        if let theme = reasonThemes.first {
+            items.append(DecisionActionItem(
+                title: "أهم محور في النقاش",
+                details: "\(theme.title): \(theme.sentimentLabel) تكرر \(theme.mentionCount) مرة.",
+                systemImage: "text.magnifyingglass"
+            ))
+        }
+
+        if let winnerInsight = optionInsights.first, let firstNegative = winnerInsight.negatives.first {
+            items.append(DecisionActionItem(
+                title: "راجع الملاحظات المعاكسة",
+                details: "أبرز ملاحظة على المتصدر: \(firstNegative).",
+                systemImage: "exclamationmark.bubble.fill"
+            ))
+        }
+
+        return Array(items.prefix(4))
     }
 
     private static func votePercentage(option: PollOption, totalVotes: Int) -> Int {

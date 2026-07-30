@@ -804,6 +804,7 @@ struct DecisionSummaryScreen: View {
             .padding(.vertical, 18)
             .weshContentWidth()
         }
+        .accessibilityIdentifier("decision-summary-screen")
         .background(AppBackground())
         .navigationTitle("ملخص القرار")
         .navigationBarTitleDisplayMode(.inline)

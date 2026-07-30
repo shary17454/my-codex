@@ -5,13 +5,13 @@ const issuerId = process.env.ASC_ISSUER_ID;
 const keyId = process.env.ASC_KEY_ID;
 const keyPath = process.env.ASC_KEY_PATH;
 const bundleIdentifier = process.env.ASC_BUNDLE_ID || "com.shary17454.esal";
-const targetVersion = process.env.ASC_APP_VERSION || "1.10.0";
-const targetBuildNumber = process.env.ASC_BUILD_NUMBER || "52";
+const targetVersion = process.env.ASC_APP_VERSION || "2.0";
+const targetBuildNumber = process.env.ASC_BUILD_NUMBER || "79";
 const shouldSubmit = process.env.ASC_SUBMIT === "1";
 const shouldCreateVersion = process.env.ASC_CREATE_VERSION === "1";
 const shouldListBuilds = process.env.ASC_LIST_BUILDS === "1";
 const shouldUpdateMetadata = process.env.ASC_UPDATE_METADATA === "1";
-const appStoreName = process.env.ASC_APP_NAME || "وش الراي";
+const appStoreName = process.env.ASC_APP_NAME || "وش الرأي";
 const whatsNew =
   process.env.ASC_WHATS_NEW ||
   [

@@ -35,6 +35,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>نستخدم الكاميرا لالتقاط صورة منتج أو إعلان وتحليل النصوص الظاهرة محليًا لإنشاء مسودة مقارنة قابلة للتعديل. لا تُرسل الصورة إلى خادم.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -171,6 +171,60 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertTrue(viewModel.validateOptions())
     }
 
+    func testCameraDecisionDraftPrefillsEditableComparison() {
+        let viewModel = CreateComparisonViewModel()
+        let draft = CameraDecisionDraft(
+            title: "آيفون 15 برو أم بديل أفضل؟",
+            details: "اقتراح من صورة المنتج.",
+            primaryOption: "آيفون 15 برو",
+            tags: ["ايفون", "كاميرا"],
+            category: .phones,
+            confidence: 0.82,
+            recognizedText: ["iPhone 15 Pro"]
+        )
+
+        viewModel.applyCameraDecisionDraft(draft)
+
+        XCTAssertEqual(viewModel.title, draft.title)
+        XCTAssertEqual(viewModel.category, .phones)
+        XCTAssertEqual(viewModel.completedOptions, ["آيفون 15 برو", "بديل مناسب"])
+        XCTAssertTrue(viewModel.tagsText.contains("ايفون"))
+        XCTAssertTrue(viewModel.tagsText.contains("كاميرا"))
+        XCTAssertEqual(viewModel.validationMessage, "حللنا الصورة محليًا وجهزنا مسودة قابلة للتعديل.")
+    }
+
+    func testAIAssistantSummarizesFromAllowedAppContext() {
+        let question = makeQuestion(
+            title: "آيفون أم سامسونج للتصوير؟",
+            category: .phones,
+            optionTitles: ["آيفون", "سامسونج"],
+            votes: [7, 3]
+        )
+
+        let response = AIDecisionAssistantEngine.answer(
+            prompt: "لخص مقارنة الآيفون للتصوير",
+            questions: [question],
+            knowledgeItems: []
+        )
+
+        XCTAssertTrue(response.answer.contains("إجابة ذكية إرشادية"))
+        XCTAssertTrue(response.answer.contains("آيفون أم سامسونج للتصوير؟"))
+        XCTAssertEqual(response.sources, [question.title])
+        XCTAssertEqual(response.matchedQuestionIDs, [question.id])
+    }
+
+    func testAIAssistantDoesNotInventWhenNoContextMatches() {
+        let response = AIDecisionAssistantEngine.answer(
+            prompt: "وش أفضل طائرة خاصة؟",
+            questions: [],
+            knowledgeItems: []
+        )
+
+        XCTAssertTrue(response.answer.contains("ما لقيت بيانات كافية"))
+        XCTAssertTrue(response.sources.isEmpty)
+        XCTAssertTrue(response.matchedQuestionIDs.isEmpty)
+    }
+
     func testSmartComparisonPriorityChangesTheLeadingCandidate() {
         let affordable = KnowledgeItem(
             id: "affordable",
@@ -449,22 +503,72 @@ final class StudyVaultCoreTests: XCTestCase {
         }
     }
 
+    func testDecisionSummaryProducesCompassAndActionItems() {
+        let question = makeQuestion(
+            votes: [45, 15],
+            comments: [
+                AskComment(
+                    author: "مستخدم",
+                    text: "الكاميرا ممتازة وسهولة الاستخدام واضحة",
+                    likes: 3,
+                    optionTitle: "الخيار الأول",
+                    trustBadge: "مجرّب فعليًا",
+                    reasonCategory: "الكاميرا"
+                ),
+                AskComment(
+                    author: "مستخدم",
+                    text: "السعر غالي لكن الأداء قوي",
+                    likes: 1,
+                    optionTitle: "الخيار الأول",
+                    reasonCategory: "الأداء"
+                )
+            ]
+        )
+
+        let summary = DecisionSummaryService.makeSummary(for: question)
+
+        XCTAssertTrue(summary.compassTitle.contains("الخيار الأول"))
+        XCTAssertFalse(summary.compassSubtitle.isEmpty)
+        XCTAssertFalse(summary.actionItems.isEmpty)
+        XCTAssertTrue(summary.actionItems.contains { $0.title == "أهم محور في النقاش" })
+    }
+
+    func testReleasePrivacyDoesNotDeclareUnusedLocationOrTrackingPrompts() {
+        XCTAssertNil(Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription"))
+        XCTAssertNil(Bundle.main.object(forInfoDictionaryKey: "NSUserTrackingUsageDescription"))
+        XCTAssertNotNil(Bundle.main.object(forInfoDictionaryKey: "NSCameraUsageDescription"))
+    }
+
     private func makeQuestion(
         title: String = "أي خيار أفضل؟",
         category: AskCategory = .phones,
         optionTitles: [String] = ["الخيار الأول", "الخيار الثاني"],
-        votes: [Int]
+        votes: [Int],
+        comments: [AskComment] = []
     ) -> AskQuestion {
-        AskQuestion(
+        let options = zip(optionTitles, votes).map {
+            PollOption(title: $0.0, votes: $0.1)
+        }
+        let comments = comments.map { comment in
+            guard comment.optionID == nil,
+                  let optionTitle = comment.optionTitle,
+                  let optionID = options.first(where: { $0.title == optionTitle })?.id else {
+                return comment
+            }
+
+            var linkedComment = comment
+            linkedComment.optionID = optionID
+            return linkedComment
+        }
+
+        return AskQuestion(
             title: title,
             details: "تفاصيل المقارنة",
             category: category,
             author: "مختبر",
             timeAgo: "الآن",
-            options: zip(optionTitles, votes).map {
-                PollOption(title: $0.0, votes: $0.1)
-            },
-            comments: []
+            options: options,
+            comments: comments
         )
     }
 }
