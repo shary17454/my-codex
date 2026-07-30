@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-07-02",
+  "updated_at": "2026-07-30",
   "policy": {
     "show_only_verified_as_buying_option": true,
     "do_not_claim_partnership_without_written_approval": true,
@@ -79,6 +79,41 @@
       }
     },
     {
+      "id": "uae-oem-parts",
+      "name_ar": "UAE OEM Parts",
+      "name_en": "UAE OEM Parts",
+      "category": "gulf",
+      "secondary_categories": [
+        "nos"
+      ],
+      "website": "https://uaeoemparts.com/contact/",
+      "search_url_template": "https://uaeoemparts.com/contact/?part_number={part_number}",
+      "contact": {
+        "email": "supercarparts.contact@gmail.com",
+        "whatsapp": "+821089326932"
+      },
+      "verification": {
+        "status": "approved_by_written_email",
+        "source": "Gmail thread 19f8067318b9910c; reply message 19fb07dfd0c70b82",
+        "evidence_ar": "وافق James Kwon كتابيًا على إدراج UAE OEM Parts في دليل الموردين داخل بطل الدروب. المورد متخصص أساسًا في قطع OEM للسيارات الأوروبية الفاخرة ويقبل مراجعة طلبات قطع نيسان متى أمكن.",
+        "evidence_en": "James Kwon gave written permission to include UAE OEM Parts in the Batal Al-Droob supplier directory. The supplier primarily specializes in Genuine OEM parts for European premium brands and can review Nissan parts inquiries when possible."
+      },
+      "limitations": {
+        "ar": "ليس وكيل نيسان ولا موردًا متخصصًا حصريًا في الباترول؛ أرسل رقم القطعة أو VIN وانتظر تأكيد التوفر من المورد.",
+        "en": "Not a Nissan dealer and not a Patrol-only specialist; send the part number or VIN and wait for supplier availability confirmation."
+      },
+      "outreach": {
+        "status": "approved_written_permission",
+        "sent_at": "2026-07-20",
+        "reply_at": "2026-07-30",
+        "channel": "email",
+        "to": "supercarparts.contact@gmail.com",
+        "subject": "Permission request for OEM Nissan parts referrals from Batal Al-Droob",
+        "gmail_thread_id": "19f8067318b9910c",
+        "gmail_reply_message_id": "19fb07dfd0c70b82"
+      }
+    },
+    {
       "id": "partsouq",
       "name_en": "PartSouq",
       "category": "global",
@@ -115,8 +150,8 @@
   "candidate_categories_to_fill": [
     {
       "category": "gulf",
-      "status": "needs_verified_store_contact",
-      "notes_ar": "لم يتم تفعيل متجر خليجي كخيار موثق حتى يظهر رابط رسمي ووسيلة تواصل واضحة من المصدر."
+      "status": "partially_covered",
+      "notes_ar": "تم اعتماد UAE OEM Parts كمورد خليجي بعد موافقة مكتوبة، مع توضيح أنه يراجع طلبات نيسان عند الإمكان وليس مورد باترول حصريًا."
     },
     {
       "category": "salvage",

@@ -11,7 +11,8 @@ final class BatalAlDroobUITests: XCTestCase {
         app.launchArguments = [
             "-AppleLanguages", "(ar)",
             "-AppleLocale", "ar_SA",
-            "-batalLang", "ar"
+            "-batalLang", "ar",
+            "-skipPermissionOnboardingForUITests"
         ]
         app.launch()
 
@@ -20,11 +21,13 @@ final class BatalAlDroobUITests: XCTestCase {
         let quickCatalog = app.buttons["home.quick.catalog"]
         XCTAssertTrue(reveal(quickCatalog, in: app))
         quickCatalog.tap()
-        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 10))
+        let catalogSearch = app.textFields["catalog.search.inline"]
+        XCTAssertTrue(catalogSearch.waitForExistence(timeout: 10))
 
-        app.searchFields.firstMatch.tap()
-        app.searchFields.firstMatch.typeText("081210401F")
-        XCTAssertTrue(app.staticTexts["23378-M4901"].waitForExistence(timeout: 10))
+        catalogSearch.tap()
+        catalogSearch.typeText("081210401F")
+        XCTAssertTrue(app.staticTexts["النتائج"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["23378-M4901"].exists)
         dismissKeyboardIfVisible(in: app)
 
         let requestTab = navigationItem(named: "طلب قطعة", in: app)
@@ -74,7 +77,8 @@ final class BatalAlDroobUITests: XCTestCase {
         app.launchArguments = [
             "-AppleLanguages", "(en)",
             "-AppleLocale", "en_US",
-            "-batalLang", "en"
+            "-batalLang", "en",
+            "-skipPermissionOnboardingForUITests"
         ]
         app.launch()
 

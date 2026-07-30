@@ -8,8 +8,8 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
-- App Store version: `2.0`
-- Project build: `137`
+- App Store version: `2.1`
+- Project build: `149`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -84,37 +84,70 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
-- verifies `MARKETING_VERSION = 2.0`,
-- verifies `CURRENT_PROJECT_VERSION >= 135`,
+- verifies `MARKETING_VERSION = 2.1`,
+- verifies `CURRENT_PROJECT_VERSION >= 149`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-App Store Connect has closed the `1.2.1` train for new build uploads. Xcode
-Cloud uploads `131` and `132` failed with `ITMS-90062` and `ITMS-90186` because
-they reused `CFBundleShortVersionString = 1.2.1` after that version was already
-approved or closed. For the next candidate, create/open App Store version `2.0`
-and keep Xcode Cloud > Workflow > Next Build Number at `137` or higher. Do not
-reuse any uploaded build number.
+App Store Connect has closed the `2.0` train for new build uploads. Xcode Cloud
+build `148` failed with `ITMS-90062` and `ITMS-90186` because it reused
+`CFBundleShortVersionString = 2.0` after that version was already approved or
+closed. For the next candidate, create/open App Store version `2.1` and keep
+Xcode Cloud > Workflow > Next Build Number at `149` or higher. Do not reuse any
+uploaded build number.
 
 ## In-App Purchase
 
-Only one StoreKit product is referenced by the app:
+The app references these StoreKit products for protected catalog access:
 
-- `batal.catalog.permanent.unlock` (non-consumable permanent catalog unlock)
+- `batal.catalog.single.unlock` (consumable one-page catalog unlock, intended SAR 4 price tier)
+- `batal.catalog.full.unlock` (non-consumable full catalog unlock, intended SAR 100 price tier)
+- `batal.catalog.permanent.unlock` (legacy non-consumable permanent catalog unlock while active in App Store Connect)
 
 The legacy `batal.catalog.unlock` product was configured as a consumable and is
 not compatible with a permanent, restorable entitlement. Do not attach it to a
-corrected release. For the first review of the replacement product, add the
+corrected release. For first review of any new replacement product, add the
 In-App Purchase and the matching new app version to the same App Review
-submission. Apple requires an App Review screenshot for the product and a new
-binary when the product was omitted from an earlier submission.
+submission. Apple requires an App Review screenshot for each product and a new
+binary when the product was omitted from an earlier submission. The App Store
+Connect price configuration remains the source of truth for actual displayed
+prices.
 
 Part requests are prepared and saved inside the app without a separate purchase product.
 
 If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/data/` and run the regression tests before archiving.
+
+## AI Assistant
+
+The app includes a Batal Al-Droob assistant tab for catalog questions, fitment guidance, and next-step suggestions. The iOS app never stores an OpenAI API key. When `AIAssistantBaseURL` and `AIAssistantClientToken` are empty, the assistant runs in safe local fallback mode and uses only on-device catalog context.
+
+Optional backend setup:
+
+```sh
+cp .env.example .env.local
+# Fill OPENAI_API_KEY and BATAL_AI_CLIENT_TOKEN in .env.local.
+cd ai-backend
+npm test
+npm start
+```
+
+Configure the iOS `Info.plist` keys only for an environment that has a real backend:
+
+- `AIAssistantBaseURL`: HTTPS backend URL, or localhost for development.
+- `AIAssistantClientToken`: client token matching `BATAL_AI_CLIENT_TOKEN`.
+
+Data sent to the AI backend is deliberately minimized:
+
+- user question, app language, selected category, and current search text,
+- vehicle summary without VIN,
+- top protected catalog result summaries,
+- short maintenance previews,
+- saved request count.
+
+The app does not send VIN, passwords, payment data, StoreKit transactions, API keys, or full locked part numbers. The backend uses OpenAI Responses API with `store: false`, validates input, requires a client token, rate-limits requests, redacts common secrets, and returns structured errors. Production deployment should replace the simple client token with stronger user/session authorization and App Attest or equivalent request integrity checks.
 
 ## Supplier Partnerships
 
@@ -132,7 +165,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `137` or higher on release train `2.0`,
+a fresh signed Xcode Cloud build `149` or higher on release train `2.1`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 

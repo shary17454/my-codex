@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
-Updated: 2026-07-25
-Decision: `PREPARING_2.0_BUILD_137`
+Updated: 2026-07-29
+Decision: `PREPARING_2.1_BUILD_149`
 
 ## App And Apple Review State
 
@@ -10,23 +10,24 @@ Decision: `PREPARING_2.0_BUILD_137`
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| App Store version | `2.0` for the next code-carrying candidate |
-| Current project build | `137` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
+| App Store version | `2.1` for the next code-carrying candidate |
+| Current project build | `149` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
 | Latest App Store-ready version | `1.2.1` |
-| Latest failed Xcode Cloud build | `132` from commit `998fc21` |
-| Latest successful Xcode Cloud build | `132` compiled and archived, but the upload was rejected by App Store Connect |
-| Latest pushed source commit | pending build `135` commit |
-| Latest App Review submission | `1.2.1`/`1.2.0` trains are now closed for new uploads |
+| Latest failed Xcode Cloud build | `148` from commit `6dd51e94c33bbe697bcd9faa61368f1aa6b48ba2` |
+| Latest successful Xcode Cloud build | `148` compiled far enough to attempt App Store Connect preparation, but upload preparation was rejected |
+| Latest pushed source commit | `6dd51e94c33bbe697bcd9faa61368f1aa6b48ba2` |
+| Latest App Review submission | `2.0` train is now closed for new build uploads |
 | Required toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 | Latest detailed App Review issue | Guideline 2.1(b), App Completeness |
 | Latest historical rejected submission ID | `0fd0e8d0-ea44-4fe4-8fad-2ef8ea35eff6` |
 | Current submitted submission ID | `00e306d9-8983-4df8-b284-6cbc1fff2c04` |
 
 App Store Connect now reports `ITMS-90062` and `ITMS-90186` for new uploads on
-`1.2.1`: the `1.2.1` train is closed because it matches a previously approved
-or closed version. Builds `131` and `132` failed in Build Uploads for this
-reason. The next valid binary must use `MARKETING_VERSION = 2.0` and a build
-number above all prior uploads. The redesigned major candidate uses build `137`.
+`2.0`: the `2.0` train is closed for new build submissions and the uploaded
+binary reused `CFBundleShortVersionString = 2.0`, which is not higher than the
+previously approved version `2.0`. Build `148` failed in App Store Connect
+preparation for this reason. The next valid binary must use
+`MARKETING_VERSION = 2.1` and build `149` or higher.
 
 The latest Apple issue message says that the app references paid functionality,
 but the associated In-App Purchase was not included in the review submission.
@@ -63,7 +64,7 @@ that issue; the newest Batal-specific mail confirms cloud build `110` succeeded.
 | Fresh unsigned archive | PASS |
 | Actual archive metadata | PASS |
 
-Fresh local unsigned archive for the `2.0 (137)` candidate:
+Fresh local unsigned archive for the previous `2.0 (137)` candidate:
 `/tmp/BatalAlDroob-2.0-137.xcarchive`
 
 Verified app metadata inside that archive:
@@ -102,4 +103,4 @@ Store submission must still use a fresh signed Xcode Cloud archive on Xcode
    submissions; the shipping app uses the approved non-consumable
    `batal.catalog.permanent.unlock`.
 4. Before the next code-bearing release, verify Xcode Cloud Next Build Number is
-   `135` or higher.
+   `149` or higher.

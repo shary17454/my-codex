@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1 (149) - 2026-07-29
+
+### Release
+
+- Moved the Batal Al-Droob App Store candidate to release train `2.1` after
+  App Store Connect rejected `2.0 (148)` with `ITMS-90186` and `ITMS-90062`
+  because version `2.0` is closed for new build submissions.
+- Raised the local project build floor to `149` so Xcode Cloud cannot reuse
+  the failed build number `148`.
+- Kept the bundle identifier, development team, signing style, entitlements,
+  and capabilities unchanged.
+
 ## 2.0 (137) - 2026-07-26
 
 ### Release

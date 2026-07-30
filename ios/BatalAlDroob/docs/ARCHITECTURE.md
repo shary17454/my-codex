@@ -17,9 +17,12 @@ There are no widgets, app clips, watch targets, share extensions, notification e
 ## Application Structure
 
 - `AppDelegate.swift`: application entry point, dependency construction, lifecycle privacy shield.
+- `AIModels.swift`: AI request/response DTOs with Sendable models for app/backend communication.
+- `AIService.swift`: remote AI client plus local catalog fallback.
+- `AIAssistantView.swift`: assistant tab UI, loading/error states, and suggestion presentation.
 - `Models.swift`: catalog, store, vehicle, maintenance, request, and API data models.
 - `Services.swift`: bundled-resource loading and StoreKit purchase service protocols/implementations.
-- `CatalogViewModel.swift`: catalog/search/filter state, local persistence, request workflows, StoreKit state.
+- `CatalogViewModel.swift`: catalog/search/filter state, local persistence, request workflows, StoreKit state, and privacy-filtered AI context building.
 - The app intentionally has no map, compass, or location-tracking module. Parts lookup, fitment,
   maintenance, and supplier handoff are the supported product scope.
 - `Views.swift`: root tabs, dashboard, catalog, shared-fitment, and common state views.
@@ -41,7 +44,7 @@ Dependencies are injected at the application boundary through service protocols.
 
 ### StoreKit
 
-Product identifier: `batal.catalog.permanent.unlock`. It must be configured as a non-consumable because the entitlement is permanent and restorable. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement.
+Product identifiers: `batal.catalog.single.unlock` for a one-page consumable catalog unlock, `batal.catalog.full.unlock` for the current full-catalog non-consumable entitlement, and `batal.catalog.permanent.unlock` as the legacy permanent non-consumable entitlement while active in App Store Connect. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement and the portal price tier is the source of truth for actual charged prices.
 
 ### Location and compass
 
@@ -51,9 +54,22 @@ Location updates begin only after the user taps the tracking control and grants 
 
 Store links are opened only when the URL uses HTTPS and has a valid host. The app redirects users; it does not mirror vendor prices or inventory.
 
+### AI Assistant
+
+The AI boundary is optional and backend-mediated. The iOS app reads `AIAssistantBaseURL` and `AIAssistantClientToken` from `Info.plist`; when either value is absent, the assistant uses `LocalCatalogAssistantService` and sends no data off device. When enabled, `BatalRemoteAIService` posts only a minimized `AIAssistantRequest` to `/api/ai/chat`.
+
+The backend in `ai-backend/` is a minimal Node service for controlled OpenAI access. It stores no API key in the mobile app, reads secrets from `.env.local`, requires a client token, validates payloads, applies in-memory rate limiting, redacts common secrets, sets `store: false` on Responses API requests, and returns structured errors. It is intentionally small so it can be replaced by a production service with stronger identity, App Attest, central rate limits, and observability.
+
+The app must not send VIN, StoreKit transaction data, passwords, payment data, API keys, or full locked part numbers to the AI backend. AI answers must be treated as advisory: fitment and pricing remain subject to catalog evidence, unlock state, and App Store configuration.
+
 ## Permissions And Capabilities
 
-The only runtime permission requested is location while in use. It supports the on-screen map, tracking, and compass tools. No background location, camera, microphone, photos, contacts, tracking, notifications, Bluetooth, HealthKit, or other permission is requested.
+Runtime permissions are limited to current feature needs:
+
+- location while in use for on-screen map, tracking, and compass tools,
+- camera for on-device OCR of part labels or stamped part numbers.
+
+No background location, microphone, contacts, tracking, notifications, Bluetooth, HealthKit, or other permission is requested. Photo/camera recognition is local through Vision; it does not upload images to the AI backend.
 
 No custom entitlement file or optional Apple capability is enabled. Signing remains automatic with the existing bundle identifier and development team.
 

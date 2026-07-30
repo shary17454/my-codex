@@ -16,7 +16,7 @@ extension CatalogViewModel {
         }
         return [
             text(ar: "القطعة: \(title(for: match))", en: "Part: \(title(for: match))"),
-            text(ar: "الرقم الأساسي: \(match.partNumber)", en: "Primary number: \(match.partNumber)"),
+            text(ar: "الرقم الأساسي: \(protectedNumber(match))", en: "Primary number: \(protectedNumber(match))"),
             text(ar: "السنوات: \(short(match.years))", en: "Years: \(short(match.years))"),
             text(ar: "المحركات: \(short(match.engines))", en: "Engines: \(short(match.engines))"),
             text(

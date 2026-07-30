@@ -172,12 +172,12 @@
       "region": "Global / Asia",
       "official_website": "https://www.amayama.com/en",
       "contact_email": null,
-    "contact_form": "https://www.amayama.com/en/inquiry",
+      "contact_form": "https://www.amayama.com/en/inquiry",
       "contact_person": null,
       "phone": null,
       "linkedin": null,
       "x": null,
-    "facebook": "https://www.facebook.com/AmayamaTrading/",
+      "facebook": "https://www.facebook.com/AmayamaTrading/",
       "instagram": null,
       "parts_types": [
         "genuine Japanese vehicle parts",
@@ -207,19 +207,19 @@
       ],
       "verification_status": "public_source_and_project_record",
       "outreach": {
-      "status": "manual_business_contact_required",
+        "status": "manual_business_contact_required",
         "last_sent_at": null,
         "next_follow_up_at": null,
         "history": []
       },
-    "negotiation_status": "not_started_no_suitable_public_business_channel",
+      "negotiation_status": "not_started_no_suitable_public_business_channel",
       "last_updated": "2026-07-18",
       "review_flags": [
-      "The official /en/inquiry route is a parts inquiry that requires vehicle identification and is not suitable for a partnership request.",
-      "No verified public business outreach email was found; Gmail cannot be used safely for this supplier.",
-      "The official Facebook page requires account sign-in before a message can be sent."
+        "The official /en/inquiry route is a parts inquiry that requires vehicle identification and is not suitable for a partnership request.",
+        "No verified public business outreach email was found; Gmail cannot be used safely for this supplier.",
+        "The official Facebook page requires account sign-in before a message can be sent."
       ],
-    "recommended_next_action": "Use Amayama's authenticated account support or official Facebook page after a human signs in; do not enter a fictitious VIN or use the parts inquiry for a business request."
+      "recommended_next_action": "Use Amayama's authenticated account support or official Facebook page after a human signs in; do not enter a fictitious VIN or use the parts inquiry for a business request."
     },
     {
       "id": "megazip",
@@ -507,7 +507,7 @@
       "region": "GCC / Middle East",
       "official_website": "https://www.nissanspareparts.ae/",
       "contact_email": null,
-    "contact_form": "https://www.nissanspareparts.ae/contact",
+      "contact_form": "https://www.nissanspareparts.ae/contact",
       "contact_person": null,
       "phone": null,
       "linkedin": null,
@@ -546,17 +546,17 @@
       ],
       "verification_status": "public_source_reviewed",
       "outreach": {
-      "status": "sent_awaiting_reply",
-      "last_sent_at": "2026-07-18",
-      "next_follow_up_at": "2026-07-25",
-      "history": [
-        "Permission request submitted through the official contact form on 2026-07-18. The form accepted the submission and redirected to the official home page; no reference number was displayed."
-      ]
+        "status": "sent_awaiting_reply",
+        "last_sent_at": "2026-07-18",
+        "next_follow_up_at": "2026-07-25",
+        "history": [
+          "Permission request submitted through the official contact form on 2026-07-18. The form accepted the submission and redirected to the official home page; no reference number was displayed."
+        ]
       },
-    "negotiation_status": "awaiting_reply",
+      "negotiation_status": "awaiting_reply",
       "last_updated": "2026-07-18",
-    "review_flags": [],
-    "recommended_next_action": "Wait until 2026-07-25, then send one polite follow-up through the official contact form only if no reply is received."
+      "review_flags": [],
+      "recommended_next_action": "Wait until 2026-07-25, then send one polite follow-up through the official contact form only if no reply is received."
     },
     {
       "id": "proparts-ae",
@@ -845,8 +845,8 @@
       "country": "United States",
       "region": "North America",
       "official_website": "https://www.z1offroad.com/",
-    "contact_email": "info@z1offroad.com",
-    "contact_form": "https://www.z1offroad.com/contact_us.php",
+      "contact_email": "info@z1offroad.com",
+      "contact_form": "https://www.z1offroad.com/contact_us.php",
       "contact_person": null,
       "phone": "+1 678 839 8019",
       "linkedin": null,
@@ -883,19 +883,19 @@
       ],
       "verification_status": "public_source_reviewed",
       "outreach": {
-      "status": "sent_awaiting_reply",
-      "last_sent_at": "2026-07-18",
-      "next_follow_up_at": "2026-07-25",
-      "history": [
-        "Permission request sent via Gmail to the official address info@z1offroad.com on 2026-07-18. Subject: Partnership and External Linking Request for Batal Al-Droob. Gmail message ID: 19f738b32655e9db."
-      ]
+        "status": "sent_awaiting_reply",
+        "last_sent_at": "2026-07-18",
+        "next_follow_up_at": "2026-07-25",
+        "history": [
+          "Permission request sent via Gmail to the official address info@z1offroad.com on 2026-07-18. Subject: Partnership and External Linking Request for Batal Al-Droob. Gmail message ID: 19f738b32655e9db."
+        ]
       },
-    "negotiation_status": "awaiting_reply",
+      "negotiation_status": "awaiting_reply",
       "last_updated": "2026-07-18",
       "review_flags": [
-      "Patrol-specific relevance is indirect; verify Y60/Y61/Y62 coverage before high-priority integration."
+        "Patrol-specific relevance is indirect; verify Y60/Y61/Y62 coverage before high-priority integration."
       ],
-    "recommended_next_action": "Wait until 2026-07-25, then send one polite follow-up only if no reply or delivery error is received."
+      "recommended_next_action": "Wait until 2026-07-25, then send one polite follow-up only if no reply or delivery error is received."
     },
     {
       "id": "milner-off-road",
@@ -1018,8 +1018,8 @@
       "country": "New Zealand",
       "region": "Oceania / Global",
       "official_website": "https://www.nissinparts.co.nz/",
-    "contact_email": "sales@nissinparts.co.nz",
-    "contact_form": "https://www.nissinparts.co.nz/",
+      "contact_email": "sales@nissinparts.co.nz",
+      "contact_form": "https://www.nissinparts.co.nz/",
       "contact_person": null,
       "phone": "+64 3 377 8811",
       "linkedin": null,
@@ -1053,17 +1053,17 @@
       ],
       "verification_status": "public_source_reviewed",
       "outreach": {
-      "status": "sent_awaiting_reply",
-      "last_sent_at": "2026-07-18",
-      "next_follow_up_at": "2026-07-25",
-      "history": [
-        "Permission request sent via Gmail to the official address sales@nissinparts.co.nz on 2026-07-18. Subject: Partnership and External Linking Request for Batal Al-Droob. Gmail message ID: 19f738c40ca22df3."
-      ]
+        "status": "sent_awaiting_reply",
+        "last_sent_at": "2026-07-18",
+        "next_follow_up_at": "2026-07-25",
+        "history": [
+          "Permission request sent via Gmail to the official address sales@nissinparts.co.nz on 2026-07-18. Subject: Partnership and External Linking Request for Batal Al-Droob. Gmail message ID: 19f738c40ca22df3."
+        ]
       },
-    "negotiation_status": "awaiting_reply",
+      "negotiation_status": "awaiting_reply",
       "last_updated": "2026-07-18",
-    "review_flags": [],
-    "recommended_next_action": "Wait until 2026-07-25, then send one polite follow-up only if no reply or delivery error is received."
+      "review_flags": [],
+      "recommended_next_action": "Wait until 2026-07-25, then send one polite follow-up only if no reply or delivery error is received."
     },
     {
       "id": "nissan-new-zealand",
@@ -1072,9 +1072,9 @@
       "region": "Oceania",
       "official_website": "https://www.nissan.co.nz/",
       "contact_email": null,
-    "contact_form": "https://www.nissan.co.nz/about-nissan/contact-us.html",
+      "contact_form": "https://www.nissan.co.nz/about-nissan/contact-us.html",
       "contact_person": null,
-    "phone": "0800 464 7726",
+      "phone": "0800 464 7726",
       "linkedin": null,
       "x": null,
       "facebook": null,
@@ -1107,19 +1107,208 @@
       ],
       "verification_status": "public_source_reviewed",
       "outreach": {
-      "status": "manual_captcha_required",
+        "status": "manual_captcha_required",
         "last_sent_at": null,
         "next_follow_up_at": null,
         "history": []
       },
-    "negotiation_status": "not_started_manual_captcha_required",
+      "negotiation_status": "not_started_manual_captcha_required",
       "last_updated": "2026-07-18",
       "review_flags": [
-      "The official customer service form requires reCAPTCHA and directs parts enquiries to the nearest authorised dealer.",
-      "No suitable verified public business email was found; financial-services and privacy addresses must not be used for this request.",
-      "A human must complete reCAPTCHA before the official form can be submitted."
+        "The official customer service form requires reCAPTCHA and directs parts enquiries to the nearest authorised dealer.",
+        "No suitable verified public business email was found; financial-services and privacy addresses must not be used for this request.",
+        "A human must complete reCAPTCHA before the official form can be submitted."
       ],
-    "recommended_next_action": "Open the official customer service form, select Parts Enquiry, complete reCAPTCHA manually, and submit the reviewed partnership request; alternatively route it through an authorised Nissan New Zealand dealer."
+      "recommended_next_action": "Open the official customer service form, select Parts Enquiry, complete reCAPTCHA manually, and submit the reviewed partnership request; alternatively route it through an authorised Nissan New Zealand dealer."
+    },
+    {
+      "id": "fuso-auto-parts-trading",
+      "company_name": "Fuso Auto Parts Trading Co.",
+      "country": "Japan",
+      "region": "Asia / Japan",
+      "official_website": null,
+      "contact_email": "info@fuso-auto.co.jp",
+      "contact_form": null,
+      "contact_person": "Taka",
+      "phone": null,
+      "linkedin": null,
+      "x": null,
+      "facebook": null,
+      "instagram": null,
+      "parts_types": [
+        "genuine Japanese-origin auto parts",
+        "general auto parts"
+      ],
+      "sells_oem": "unknown_needs_confirmation",
+      "sells_aftermarket": "unknown_needs_confirmation",
+      "supports_international_shipping": "does_not_export_to_ksa",
+      "ships_to": [
+        "not Saudi Arabia under current SASO constraints"
+      ],
+      "site_languages": [
+        "en",
+        "ja"
+      ],
+      "affiliate_program": "unknown",
+      "api_available": "unknown",
+      "partnership_program": "declined_for_current_ksa_scope",
+      "link_terms": "Do not route Saudi/KSA users or present this supplier as available for Batal Al-Droob without a new written approval.",
+      "external_link_allowed": "declined_for_current_scope",
+      "developer_program": "unknown",
+      "legal_notes": "Fuso declined the proposal because they are not exporting to KSA due to SASO requirements.",
+      "importance_score": 60,
+      "importance_reason": "Japanese genuine-parts source, but not usable for the current Saudi/Gulf routing scope after written decline.",
+      "source_urls": [
+        "Gmail thread 19f8089f776819ef",
+        "Reply message 19f82249f45fb48b"
+      ],
+      "verification_status": "email_reply_verified",
+      "outreach": {
+        "status": "declined_no_ksa_export",
+        "last_sent_at": "2026-07-20",
+        "next_follow_up_at": null,
+        "history": [
+          "Permission request sent by Gmail on 2026-07-20 to info@fuso-auto.co.jp. Gmail message ID: 19f8089f776819ef.",
+          "Reply received on 2026-07-21 from Taka / Fuso Auto Parts Trading Co.: declined because they are not exporting to KSA due to SASO requirements. Gmail message ID: 19f82249f45fb48b."
+        ]
+      },
+      "negotiation_status": "declined_current_scope",
+      "last_updated": "2026-07-28",
+      "review_flags": [
+        "Written decline recorded; do not list as an approved partner.",
+        "Do not direct Saudi/KSA users to this supplier unless Fuso later gives new written approval and confirms export availability."
+      ],
+      "recommended_next_action": "No follow-up for the current Saudi/Gulf supplier-routing scope. Revisit only if the app expands to non-KSA markets or Fuso changes export policy in writing."
+    },
+    {
+      "id": "nissan-philippines",
+      "company_name": "Nissan Philippines Customer Assistance Center",
+      "country": "Philippines",
+      "region": "Asia / Philippines",
+      "official_website": null,
+      "contact_email": "customersupport@nissan.ph",
+      "contact_form": null,
+      "contact_person": null,
+      "phone": "09276009557; 09535786804; 09535786803",
+      "linkedin": null,
+      "x": null,
+      "facebook": null,
+      "instagram": null,
+      "parts_types": [
+        "official Nissan customer support",
+        "dealer guidance"
+      ],
+      "sells_oem": "unknown_needs_confirmation",
+      "sells_aftermarket": false,
+      "supports_international_shipping": false,
+      "ships_to": [
+        "Philippines only / regional support scope"
+      ],
+      "site_languages": [
+        "en"
+      ],
+      "affiliate_program": "unknown",
+      "api_available": "unknown",
+      "partnership_program": "not_available_from_this_contact",
+      "link_terms": "This contact cannot approve Saudi/Gulf linking or partnership requests; do not treat as authorization.",
+      "external_link_allowed": "not_authorized_by_this_contact",
+      "developer_program": "unknown",
+      "legal_notes": "Nissan Philippines stated they can only assist with Nissan vehicles and dealerships within the Philippines and recommended contacting Nissan support or regional office in the requester country.",
+      "importance_score": 45,
+      "importance_reason": "Official Nissan regional support contact, but out of scope for Saudi/Gulf Batal Al-Droob supplier routing.",
+      "source_urls": [
+        "Gmail thread 19f808895475cb83",
+        "Reply message 19f832f3076e6c97"
+      ],
+      "verification_status": "email_reply_verified",
+      "outreach": {
+        "status": "closed_wrong_region_referred_to_local_nissan",
+        "last_sent_at": "2026-07-20",
+        "next_follow_up_at": null,
+        "history": [
+          "Permission guidance request sent by Gmail on 2026-07-20 to customersupport@nissan.ph. Gmail message ID: 19f808895475cb83.",
+          "Reply received on 2026-07-21: Nissan Philippines cannot assist with Saudi/Gulf requests and recommends contacting Nissan customer support or regional office in the relevant country. Gmail message ID: 19f832f3076e6c97."
+        ]
+      },
+      "negotiation_status": "closed_no_permission_wrong_region",
+      "last_updated": "2026-07-28",
+      "review_flags": [
+        "No written approval granted.",
+        "Do not use Nissan Philippines as approval evidence for Batal Al-Droob links, OEM routing, or partner claims in Saudi/Gulf markets."
+      ],
+      "recommended_next_action": "Do not follow up with Nissan Philippines for this scope. Route any official Nissan approval request to Nissan Saudi Arabia/Gulf regional office or authorized local dealer channel."
+    },
+    {
+      "id": "uae-oem-parts",
+      "company_name": "UAE OEM Parts",
+      "country": "United Arab Emirates",
+      "region": "GCC / Middle East",
+      "official_website": "https://uaeoemparts.com/contact/",
+      "contact_email": "supercarparts.contact@gmail.com",
+      "contact_form": "https://uaeoemparts.com/contact/",
+      "contact_person": "James Kwon",
+      "phone": "+821089326932",
+      "linkedin": null,
+      "x": null,
+      "facebook": null,
+      "instagram": null,
+      "parts_types": [
+        "Genuine OEM European premium parts",
+        "OEM part-number inquiry review",
+        "Nissan parts inquiries reviewed when possible"
+      ],
+      "sells_oem": true,
+      "sells_aftermarket": "unknown",
+      "supports_international_shipping": "unknown_needs_confirmation_for_each_request",
+      "ships_to": [
+        "UAE",
+        "Middle East",
+        "unknown_needs_confirmation_for_Saudi_Arabia"
+      ],
+      "site_languages": [
+        "en"
+      ],
+      "affiliate_program": "unknown",
+      "api_available": "unknown",
+      "partnership_program": "supplier_directory_written_permission",
+      "link_terms": "Written permission received to include UAE OEM Parts in the Batal Al-Droob supplier directory and route user-initiated OEM/VIN inquiries. Do not copy prices, stock, product images, catalog content, or protected data. Do not imply Nissan authorization or exclusive Patrol specialization.",
+      "external_link_allowed": true,
+      "developer_program": "unknown",
+      "legal_notes": "Approved supplier-directory listing only. UAE OEM Parts primarily specializes in Genuine OEM parts for European premium brands and can review Nissan parts inquiries whenever possible. No official Nissan affiliation, endorsement, API access, affiliate program, inventory integration, or pricing permission is granted by this email.",
+      "importance_score": 86,
+      "importance_reason": "Written approval received for supplier-directory inclusion; useful as an OEM inquiry fallback for part-number/VIN review, but not a Patrol-only supplier.",
+      "source_urls": [
+        "https://uaeoemparts.com/contact/",
+        "https://supercarparts.asia/",
+        "Gmail thread 19f8067318b9910c; reply message 19fb07dfd0c70b82"
+      ],
+      "verification_status": "written_email_approval_verified",
+      "written_approval": {
+        "status": "verified",
+        "received_at": "2026-07-30T00:47:43Z",
+        "from": "Ohsung kwon <supercarparts.contact@gmail.com>",
+        "signer": "James Kwon",
+        "gmail_thread_id": "19f8067318b9910c",
+        "gmail_reply_message_id": "19fb07dfd0c70b82",
+        "approved_scope": "Supplier directory inclusion and review of Nissan parts inquiries when possible."
+      },
+      "outreach": {
+        "status": "approved_written_permission",
+        "last_sent_at": "2026-07-20",
+        "next_follow_up_at": null,
+        "history": [
+          "Permission request sent via Gmail on 2026-07-20. Subject: Permission request for OEM Nissan parts referrals from Batal Al-Droob. Gmail thread ID: 19f8067318b9910c.",
+          "Written approval received on 2026-07-30 from Ohsung kwon / James Kwon at supercarparts.contact@gmail.com: \"We would be happy to be included in the Batal Al-Droob supplier directory.\" Reply message ID: 19fb07dfd0c70b82."
+        ]
+      },
+      "negotiation_status": "approved",
+      "last_updated": "2026-07-30",
+      "review_flags": [
+        "Do not present UAE OEM Parts as an official Nissan dealer or endorsed Nissan partner.",
+        "Do not present UAE OEM Parts as a Patrol-only specialist; they primarily specialize in European premium OEM parts.",
+        "Confirm availability, shipping, final price, and compatibility directly with the supplier for every user inquiry."
+      ],
+      "recommended_next_action": "Keep the in-app listing as a permission-approved external inquiry option. Ask a follow-up only if stronger Nissan/Patrol coverage, API access, affiliate terms, logo use, or partner wording is needed."
     }
   ]
 }

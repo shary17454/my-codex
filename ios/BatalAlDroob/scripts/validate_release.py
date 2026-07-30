@@ -16,8 +16,8 @@ APPLE_ENGINEERING_STANDARD = APP_ROOT / "docs" / "APPLE_ENGINEERING_STANDARD.md"
 SWIFT_ROOT = APP_ROOT / "BatalAlDroob"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 
-EXPECTED_MARKETING_VERSION = "2.0"
-MIN_EXPECTED_BUILD = 135
+EXPECTED_MARKETING_VERSION = "2.1"
+MIN_EXPECTED_BUILD = 149
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts",
@@ -25,7 +25,11 @@ EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts.uitests",
 }
 EXPECTED_DEPLOYMENT_TARGET = "17.0"
-ALLOWED_STOREKIT_PRODUCTS = {"batal.catalog.permanent.unlock"}
+ALLOWED_STOREKIT_PRODUCTS = {
+    "batal.catalog.single.unlock",
+    "batal.catalog.full.unlock",
+    "batal.catalog.permanent.unlock",
+}
 
 
 def fail(message: str) -> None:

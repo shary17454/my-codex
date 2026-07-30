@@ -1,5 +1,6 @@
 import PhotosUI
 import SwiftUI
+import UIKit
 
 enum MoreToolDestination: Hashable {
     case smartSearch
@@ -20,9 +21,11 @@ struct MoreView: View {
     @State private var maintenanceTitle = ""
     @State private var maintenanceOdometer = ""
     @State private var maintenanceNotes = ""
+    @State private var isCameraPresented = false
 
     var body: some View {
         let photoPickerTitle = viewModel.text(ar: "اختيار صورة كمرجع", en: "Choose reference photo")
+        let cameraAvailable = UIImagePickerController.isSourceTypeAvailable(.camera)
         return NavigationStack(path: $toolPath) {
             List {
                 Section {
@@ -45,6 +48,7 @@ struct MoreView: View {
                     )
                     .lineLimit(2 ... 4)
                     Button {
+                        AppHaptics.lightImpact()
                         viewModel.applyDescriptionSearch(descriptionQuery)
                         descriptionMatches = viewModel.filteredParts
                         descriptionStatus = descriptionSearchStatus
@@ -65,6 +69,24 @@ struct MoreView: View {
                             PartRow(part: part, viewModel: viewModel)
                         }
                     }
+                    Button {
+                        AppHaptics.lightImpact()
+                        isCameraPresented = true
+                    } label: {
+                        Label(
+                            viewModel.text(ar: "تصوير القطعة أو رقمها", en: "Capture part or number"),
+                            systemImage: "camera.viewfinder"
+                        )
+                    }
+                    .disabled(!cameraAvailable)
+                    if !cameraAvailable {
+                        Text(viewModel.text(
+                            ar: "الكاميرا غير متاحة على هذا الجهاز أو المحاكي.",
+                            en: "Camera is not available on this device or simulator."
+                        ))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
                     PhotosPicker(selection: $viewModel.selectedPhoto, matching: .images) {
                         Label(photoPickerTitle, systemImage: "photo")
                     }
@@ -83,6 +105,7 @@ struct MoreView: View {
                     TextField(viewModel.text(ar: "المقاس القديم", en: "Old size"), text: $oldTireSize)
                     TextField(viewModel.text(ar: "المقاس الجديد", en: "New size"), text: $newTireSize)
                     Button {
+                        AppHaptics.lightImpact()
                         tireResult = viewModel.tireDifference(oldSize: oldTireSize, newSize: newTireSize)
                     } label: {
                         Label(
@@ -138,7 +161,10 @@ struct MoreView: View {
                 }
                 Section(viewModel.text(ar: "المتاجر الموثقة", en: "Verified stores")) {
                     ForEach(viewModel.stores) { store in
-                        Button { viewModel.openStore(store, part: nil) } label: { Label(
+                        Button {
+                            AppHaptics.lightImpact()
+                            viewModel.openStore(store, part: nil)
+                        } label: { Label(
                             store.name(language: viewModel.language),
                             systemImage: "link"
                         ) }
@@ -157,6 +183,12 @@ struct MoreView: View {
                             "to a developer-operated server."
                     ))
                 }
+            }
+            .fullScreenCover(isPresented: $isCameraPresented) {
+                CameraCaptureView { image in
+                    Task { await viewModel.analyzeCapturedPartImage(image) }
+                }
+                .ignoresSafeArea()
             }
             .navigationTitle(viewModel.text(ar: "المزيد", en: "More"))
             .scrollContentBackground(.hidden)
@@ -265,6 +297,7 @@ struct ToolsActionGrid: View {
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
                 Button {
+                    AppHaptics.lightImpact()
                     openTool(.smartSearch)
                 } label: {
                     ToolsActionCard(
@@ -277,6 +310,7 @@ struct ToolsActionGrid: View {
                 .accessibilityIdentifier("tools.action.smart-search")
 
                 Button {
+                    AppHaptics.lightImpact()
                     openTool(.fitment)
                 } label: {
                     ToolsActionCard(
@@ -292,6 +326,7 @@ struct ToolsActionGrid: View {
                 .accessibilityIdentifier("tools.action.fitment")
 
                 Button {
+                    AppHaptics.lightImpact()
                     openTool(.request)
                 } label: {
                     ToolsActionCard(
@@ -307,6 +342,7 @@ struct ToolsActionGrid: View {
                 .accessibilityIdentifier("tools.action.request")
 
                 Button {
+                    AppHaptics.lightImpact()
                     openTool(.maintenance)
                 } label: {
                     ToolsActionCard(

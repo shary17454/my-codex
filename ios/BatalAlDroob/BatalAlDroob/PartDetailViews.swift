@@ -28,27 +28,17 @@ struct PartDetailView: View {
                         Text(viewModel.purchaseSetupMessage)
                             .font(.caption)
                             .foregroundStyle(viewModel.availableProductIDs.isEmpty ? .orange : .secondary)
-                        Button { Task { await viewModel.unlock(part) } } label: {
-                            Label(
-                                viewModel
-                                    .text(
-                                        ar: "فتح الأرقام البديلة والأدلة المتقدمة",
-                                        en: "Unlock alternate numbers and advanced evidence"
-                                    ),
-                                systemImage: "lock.open"
-                            )
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(
-                            !viewModel.isProductAvailable(StoreProductID.catalogPermanentUnlock)
-                                || viewModel.isLoadingPurchases
-                        )
-                        Button { Task { await viewModel.restorePurchases() } } label: {
+                        CatalogAccessOfferView(part: part, viewModel: viewModel)
+                        Button {
+                            AppHaptics.lightImpact()
+                            Task { await viewModel.restorePurchases() }
+                        } label: {
                             Label(
                                 viewModel.text(ar: "استعادة المشتريات", en: "Restore Purchases"),
                                 systemImage: "arrow.clockwise"
                             )
                         }
+                        .buttonStyle(.batalSecondary)
                     }
                 }
                 .padding(.vertical, 4)
@@ -70,12 +60,17 @@ struct PartDetailView: View {
                 }
             }
             Section(viewModel.text(ar: "مؤشر موضع توضيحي", en: "Illustrative part locator")) {
-                NativeDiagramView(part: part)
-                    .frame(height: 220)
-                    .accessibilityLabel(viewModel.text(
-                        ar: "مؤشر توضيحي يعرض رقم القطعة وليس رسماً رسمياً من الكتالوج",
-                        en: "Illustrative locator showing the part number, not an official catalog diagram"
-                    ))
+                if viewModel.isUnlocked(part) {
+                    NativeDiagramView(part: part, displayNumber: viewModel.protectedNumber(part))
+                        .frame(height: 220)
+                        .accessibilityLabel(viewModel.text(
+                            ar: "مؤشر توضيحي يعرض رقم القطعة وليس رسماً رسمياً من الكتالوج",
+                            en: "Illustrative locator showing the part number, not an official catalog diagram"
+                        ))
+                } else {
+                    LockedPartImagePlaceholder(viewModel: viewModel)
+                        .frame(height: 220)
+                }
             }
             Section(viewModel.text(ar: "الأدلة", en: "Evidence")) {
                 if part.evidence.isEmpty {
@@ -112,19 +107,25 @@ struct PartDetailView: View {
                     )
                 } else {
                     ForEach(viewModel.stores.prefix(8)) { store in
-                        Button { viewModel.openStore(store, part: part) } label: {
+                        Button {
+                            AppHaptics.lightImpact()
+                            viewModel.openStore(store, part: part)
+                        } label: {
                             Label(store.name(language: viewModel.language), systemImage: "safari")
                         }
                     }
                 }
             }
         }
-        .navigationTitle(part.partNumber)
+        .navigationTitle(viewModel.protectedNumber(part))
         .scrollContentBackground(.hidden)
         .background(BatalDesign.canvas)
         .listStyle(.insetGrouped)
         .toolbar {
-            Button { viewModel.toggleWishlist(part) } label: {
+            Button {
+                AppHaptics.lightImpact()
+                viewModel.toggleWishlist(part)
+            } label: {
                 Image(systemName: viewModel.wishlist.contains(part.partNumber) ? "heart.fill" : "heart")
             }
             .accessibilityLabel(viewModel.text(
@@ -135,8 +136,87 @@ struct PartDetailView: View {
     }
 }
 
+private struct LockedPartImagePlaceholder: View {
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "photo.badge.lock")
+                .font(.system(size: 40, weight: .semibold))
+                .foregroundStyle(BatalDesign.accent)
+            Text(viewModel.text(ar: "صورة القطعة والرقم الكامل مقفلة", en: "Part image and full number are locked"))
+                .font(.headline)
+                .multilineTextAlignment(.center)
+            Text(viewModel.text(
+                ar: "افتح صفحة الكتالوج هذه بـ 4 ر.س لعرض الرقم الكامل ومؤشر صورة القطعة.",
+                en: "Unlock this catalog page for SAR 4 to show the full number and part image locator."
+            ))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+    }
+}
+
+private struct CatalogAccessOfferView: View {
+    let part: Part
+    @Bindable var viewModel: CatalogViewModel
+
+    var body: some View {
+        VStack(spacing: 8) {
+            accessButton(level: .singleUnlock, style: .secondary)
+            accessButton(level: .fullCatalog, style: .primary)
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    @ViewBuilder
+    private func accessButton(level: CatalogAccessLevel, style: AccessButtonStyle) -> some View {
+        if style == .primary {
+            accessButtonContent(level: level)
+                .buttonStyle(.batalPrimary)
+        } else {
+            accessButtonContent(level: level)
+                .buttonStyle(.batalSecondary)
+        }
+    }
+
+    private func accessButtonContent(level: CatalogAccessLevel) -> some View {
+        Button {
+            AppHaptics.lightImpact()
+            Task { await viewModel.unlock(part, level: level) }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: level == .singleUnlock ? "doc.viewfinder" : "shippingbox.and.arrow.backward.fill")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(level.title(viewModel.language))
+                        .font(.subheadline.weight(.semibold))
+                    Text(level.description(viewModel.language))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+                Spacer(minLength: 8)
+                Text(level.priceText(viewModel.language))
+                    .font(.subheadline.monospacedDigit().bold())
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .disabled(!viewModel.isProductAvailable(level.productID) || viewModel.isLoadingPurchases)
+    }
+
+    private enum AccessButtonStyle {
+        case primary, secondary
+    }
+}
+
 struct NativeDiagramView: View {
     let part: Part
+    let displayNumber: String
+
     var body: some View {
         Canvas { context, size in
             let box = CGRect(x: 30, y: 42, width: size.width - 60, height: 104)
@@ -144,7 +224,7 @@ struct NativeDiagramView: View {
             let callout = CGRect(x: size.width * 0.52, y: 82, width: 82, height: 42)
             context.fill(Path(roundedRect: callout, cornerRadius: 10), with: .color(.red.opacity(0.22)))
             context.stroke(Path(roundedRect: callout, cornerRadius: 10), with: .color(.red), lineWidth: 3)
-            let text = Text(part.partNumber).font(.caption.monospaced().bold()).foregroundStyle(.primary)
+            let text = Text(displayNumber).font(.caption.monospaced().bold()).foregroundStyle(.primary)
             context.draw(text, at: CGPoint(x: callout.midX, y: callout.midY), anchor: .center)
         }
         .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))

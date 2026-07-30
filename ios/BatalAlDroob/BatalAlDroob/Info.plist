@@ -19,6 +19,10 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>BatalAlDroob</string>
+	<key>AIAssistantBaseURL</key>
+	<string></string>
+	<key>AIAssistantClientToken</key>
+	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -29,6 +33,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>يستخدم بطل الدروب الكاميرا لتصوير رقم القطعة أو الملصق وقراءة النص محليًا للبحث في الكتالوج.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>
