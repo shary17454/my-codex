@@ -415,7 +415,7 @@ extension CatalogViewModel {
         switch productID {
         case StoreProductID.singleCatalogUnlock:
             paidUnlocks.insert(part.partNumber)
-        case StoreProductID.catalogFullUnlock, StoreProductID.catalogPermanentUnlock:
+        case StoreProductID.catalogFullUnlock, StoreProductID.legacyCatalogFullUnlock:
             applyEntitlements([productID])
         default:
             break
@@ -424,12 +424,24 @@ extension CatalogViewModel {
 
     private func containsFullCatalogEntitlement(_ productIDs: Set<String>) -> Bool {
         productIDs.contains(StoreProductID.catalogFullUnlock)
-            || productIDs.contains(StoreProductID.catalogPermanentUnlock)
+            || productIDs.contains(StoreProductID.legacyCatalogFullUnlock)
     }
 
     private func purchaseErrorMessage(_ error: Error) -> String {
         if case AppError.productUnavailable = error {
             return purchaseSetupMessage
+        }
+        if case AppError.invalidProductType = error {
+            return text(
+                ar: "منتج الشراء مضبوط بنوع غير صحيح في App Store Connect. لا تستخدم الدفع حتى يتم تصحيح إعداد المنتج.",
+                en: "The App Store product has the wrong type. Do not purchase until the product setup is corrected."
+            )
+        }
+        if case AppError.unverifiedTransaction = error {
+            return text(
+                ar: "لم تتمكن Apple من توثيق عملية الشراء. حاول مرة أخرى بعد قليل.",
+                en: "Apple could not verify the purchase. Try again shortly."
+            )
         }
         return text(
             ar: "تعذر إكمال عملية الشراء. حاول مرة أخرى أو استخدم الاستعادة إذا كنت اشتريت سابقًا.",

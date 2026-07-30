@@ -44,7 +44,7 @@ Dependencies are injected at the application boundary through service protocols.
 
 ### StoreKit
 
-Product identifiers: `batal.catalog.single.unlock` for a one-page consumable catalog unlock, `batal.catalog.full.unlock` for the current full-catalog non-consumable entitlement, and `batal.catalog.permanent.unlock` as the legacy permanent non-consumable entitlement while active in App Store Connect. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement and the portal price tier is the source of truth for actual charged prices.
+Product identifiers: `batal.catalog.single.unlock` for a one-page consumable catalog unlock, `batal.catalog.permanent.unlock` for the current full-catalog non-consumable entitlement, and `batal.catalog.full.unlock` as a legacy full-catalog non-consumable entitlement while active in App Store Connect. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement and the portal price tier is the source of truth for actual charged prices.
 
 ### Location and compass
 

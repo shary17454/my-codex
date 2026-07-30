@@ -264,13 +264,15 @@ final class BatalCatalogResourceTests: XCTestCase {
             viewModel.purchaseProductIDs,
             [
                 "batal.catalog.single.unlock",
-                "batal.catalog.full.unlock",
-                "batal.catalog.permanent.unlock"
+                "batal.catalog.permanent.unlock",
+                "batal.catalog.full.unlock"
             ]
         )
         XCTAssertEqual(StoreProductID.singleCatalogUnlock, "batal.catalog.single.unlock")
-        XCTAssertEqual(StoreProductID.catalogFullUnlock, "batal.catalog.full.unlock")
+        XCTAssertEqual(StoreProductID.catalogFullUnlock, "batal.catalog.permanent.unlock")
         XCTAssertEqual(StoreProductID.catalogPermanentUnlock, "batal.catalog.permanent.unlock")
+        XCTAssertEqual(StoreProductID.legacyCatalogFullUnlock, "batal.catalog.full.unlock")
+        XCTAssertEqual(CatalogAccessLevel.fullCatalog.productID, "batal.catalog.permanent.unlock")
     }
 
     @MainActor
@@ -369,6 +371,22 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertEqual(CatalogAccessLevel.fullCatalog.title(.arabic), "فتح الكتالوج الكامل")
         XCTAssertEqual(CatalogAccessLevel.fullCatalog.title(.english), "Unlock full catalog")
         XCTAssertEqual(CatalogAccessLevel.fullCatalog.priceText(.arabic), "100 ر.س")
+    }
+
+    @MainActor
+    func testLegacyFullCatalogEntitlementStillRestoresAccess() async throws {
+        let defaultsKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: TestPurchaseService(entitlements: [StoreProductID.legacyCatalogFullUnlock])
+        )
+        await viewModel.load()
+
+        XCTAssertTrue(viewModel.isFullCatalogUnlocked())
+        XCTAssertTrue(viewModel.parts.allSatisfy { viewModel.isUnlocked($0) })
     }
 
     @MainActor

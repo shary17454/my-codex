@@ -35,9 +35,9 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 ## Archive
 
-- [ ] A fresh unsigned local archive for build `154` succeeds with the selected production Xcode as an engineering validation fallback.
-- [ ] Local archive metadata confirms bundle `com.batalaldroob.parts`, version `2.2 (154+)`, accepted Xcode build, accepted SDK, and iOS 17.0 minimum.
-- [ ] New signed Xcode Cloud `2.2 (154+)` archive metadata is verified before selecting a new App Store build.
+- [ ] A fresh unsigned local archive for build `155` succeeds with the selected production Xcode as an engineering validation fallback.
+- [ ] Local archive metadata confirms bundle `com.batalaldroob.parts`, version `2.2 (155+)`, accepted Xcode build, accepted SDK, and iOS 17.0 minimum.
+- [ ] New signed Xcode Cloud `2.2 (155+)` archive metadata is verified before selecting a new App Store build.
 - [ ] A fresh signed Xcode Cloud archive is created from the intended commit.
 - [x] `ci_post_xcodebuild.sh` passes against Xcode Cloud build `122`.
 - [ ] Archive metadata confirms bundle `com.batalaldroob.parts`, expected version/build, production Xcode, accepted SDK, and iOS 17.0 minimum.
@@ -49,7 +49,7 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [ ] App Store privacy labels are human-confirmed against the final app, which no longer requests location access.
 - [ ] No Open-Meteo endpoint or other external weather integration remains in source or the submitted binary.
 - [ ] No location usage description is present unless location features are deliberately reintroduced later.
-- [ ] StoreKit products `batal.catalog.single.unlock`, `batal.catalog.full.unlock`, and any still-active `batal.catalog.permanent.unlock` legacy entitlement are complete, cleared for sale where appropriate, and attached to the same first-review submission as the binary.
+- [ ] StoreKit products `batal.catalog.single.unlock`, `batal.catalog.permanent.unlock`, and any still-active `batal.catalog.full.unlock` legacy entitlement are complete, cleared for sale where appropriate, and attached to the same first-review submission as the binary.
 - [ ] Product types match the app: single unlock is Consumable; full and legacy unlocks are Non-consumable.
 - [ ] The legacy consumable `batal.catalog.unlock` is not attached to the corrected permanent-unlock submission.
 - [ ] The IAP review screenshot demonstrates the purchase surface.
@@ -62,6 +62,6 @@ Use this list for every App Store candidate. A checked item must have current ev
 
 - [ ] No unresolved App Review item remains in the selected submission.
 - [ ] Only the newly validated build is selected.
-- [ ] Build `154` or higher is selected for iOS App Version `2.2`.
+- [ ] Build `155` or higher is selected for iOS App Version `2.2`.
 - [ ] Release notes match implemented behavior.
 - [x] Submitted after explicit approval: App Review submission `00e306d9-8983-4df8-b284-6cbc1fff2c04` is `Waiting for Review`.

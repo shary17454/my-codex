@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `2.2`
-- Project build: `154`
+- Project build: `155`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -85,7 +85,7 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
 - verifies `MARKETING_VERSION = 2.2`,
-- verifies `CURRENT_PROJECT_VERSION >= 154`,
+- verifies `CURRENT_PROJECT_VERSION >= 155`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
@@ -97,15 +97,15 @@ code-carrying uploads must use a higher marketing version. Xcode Cloud build
 `152` failed during "Prepare Build for App Store Connect" after the Y60 image
 replacement because it still targeted `2.1`. For the next candidate,
 create/open App Store version `2.2` and keep Xcode Cloud > Workflow > Next
-Build Number at `154` or higher. Do not reuse any uploaded build number.
+Build Number at `155` or higher. Do not reuse any uploaded build number.
 
 ## In-App Purchase
 
 The app references these StoreKit products for protected catalog access:
 
 - `batal.catalog.single.unlock` (consumable one-page catalog unlock, intended SAR 4 price tier)
-- `batal.catalog.full.unlock` (non-consumable full catalog unlock, intended SAR 100 price tier)
-- `batal.catalog.permanent.unlock` (legacy non-consumable permanent catalog unlock while active in App Store Connect)
+- `batal.catalog.permanent.unlock` (primary non-consumable full catalog unlock, intended SAR 100 price tier)
+- `batal.catalog.full.unlock` (legacy non-consumable full catalog entitlement while active in App Store Connect)
 
 The legacy `batal.catalog.unlock` product was configured as a consumable and is
 not compatible with a permanent, restorable entitlement. Do not attach it to a
@@ -165,7 +165,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `154` or higher on release train `2.2`,
+a fresh signed Xcode Cloud build `155` or higher on release train `2.2`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 

@@ -37,7 +37,7 @@
 
 - كل الشاشات الأساسية تمت مراجعتها: الرئيسية، الكتالوج، طلب قطعة، المزيد، تفاصيل القطعة، الصيانة، القطع المشتركة.
 - كل أزرار المسارات الحرجة تمت تغطيتها يدويًا بالكود أو عبر UI smoke tests.
-- StoreKit يستخدم `batal.catalog.single.unlock` للفتح الجزئي، و`batal.catalog.full.unlock` للفتح الكامل، مع إبقاء `batal.catalog.permanent.unlock` كاستحقاق دائم قديم عند وجوده في App Store Connect.
+- StoreKit يستخدم `batal.catalog.single.unlock` للفتح الجزئي، و`batal.catalog.permanent.unlock` للفتح الكامل، مع إبقاء `batal.catalog.full.unlock` كاستحقاق كامل قديم عند وجوده في App Store Connect.
 - لا توجد خريطة أو بوصلة أو تتبع موقع في التطبيق، ولا توجد صلاحية موقع مطلوبة.
 - OCR يتم محليًا عبر Vision ولا يرسل الصورة لخادم.
 - الروابط الخارجية لا تفتح إلا عبر HTTPS وضمن نطاق المتجر الموثق.

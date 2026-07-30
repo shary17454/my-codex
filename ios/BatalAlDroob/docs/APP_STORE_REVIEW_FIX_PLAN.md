@@ -36,7 +36,7 @@ Connect.
 - [ ] Uploaded build is created from the current source commit.
 - [ ] App Store version is exactly `1.1.0`.
 - [ ] Selected build number is `111` or higher and has not been reused.
-- [ ] In-App Purchases `batal.catalog.single.unlock`, `batal.catalog.full.unlock`, and any still-active `batal.catalog.permanent.unlock` legacy entitlement are complete.
+- [ ] In-App Purchases `batal.catalog.single.unlock`, `batal.catalog.permanent.unlock`, and any still-active `batal.catalog.full.unlock` legacy entitlement are complete.
 - [ ] IAP product types match the app: single unlock is Consumable; full/legacy catalog unlocks are Non-consumable.
 - [ ] IAP price, availability, localization, and review notes are complete.
 - [ ] IAP App Review screenshot shows the current native purchase surface.
@@ -59,8 +59,8 @@ store prices or inventory.
 
 Paid access is handled only through Apple In-App Purchase. The consumable
 `batal.catalog.single.unlock` unlocks one selected part record, while
-`batal.catalog.full.unlock` unlocks the protected catalog permanently. The
-legacy non-consumable `batal.catalog.permanent.unlock` remains supported only
-for existing App Store Connect entitlement continuity. Part request preparation,
+`batal.catalog.permanent.unlock` unlocks the protected catalog permanently. The
+legacy non-consumable `batal.catalog.full.unlock` remains supported only
+for App Store Connect entitlement continuity. Part request preparation,
 catalog search, maintenance, and tools remain usable without payment. No
 external payment method is used.

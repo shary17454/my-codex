@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2 (154) - 2026-07-31
+## 2.2 (155) - 2026-07-31
 
 ### Release
 
@@ -13,6 +13,11 @@
 - Preserved the Y60 generation-card image replacement and kept the bundle
   identifier, development team, signing style, entitlements, and capabilities
   unchanged.
+- Corrected the full-catalog purchase button to request the active
+  `batal.catalog.permanent.unlock` non-consumable product while preserving
+  `batal.catalog.full.unlock` as a legacy entitlement for restore continuity.
+- Raised the corrected purchase build floor to `155` so App Store Connect can
+  receive a fresh binary after build `154` was submitted.
 
 ## 2.1 (149) - 2026-07-29
 

@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-07-31
-Decision: `PREPARING_2.2_BUILD_154`
+Decision: `PREPARING_2.2_BUILD_155`
 
 ## App And Apple Review State
 
@@ -11,7 +11,7 @@ Decision: `PREPARING_2.2_BUILD_154`
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
 | App Store version | `2.2` for the next code-carrying candidate |
-| Current project build | `154` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
+| Current project build | `155` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
 | Latest App Store-ready version | `2.1` |
 | Latest failed Xcode Cloud build | `153` from commit `7cdb573c61ef7740af6762aa4eea24835577dc0d` |
 | Latest successful Xcode Cloud build | `151` |
@@ -26,7 +26,7 @@ App Store Connect completed review for `2.1`. Xcode Cloud build `152` then
 failed during "Prepare Build for App Store Connect" after the Y60 image change
 because new code-carrying uploads can no longer target the completed `2.1`
 train. The next valid binary must use `MARKETING_VERSION = 2.2` and build
-`154` or higher.
+`155` or higher.
 
 The latest Apple issue message says that the app references paid functionality,
 but the associated In-App Purchase was not included in the review submission.
@@ -102,4 +102,4 @@ Store submission must still use a fresh signed Xcode Cloud archive on Xcode
    submissions; the shipping app uses the approved non-consumable
    `batal.catalog.permanent.unlock`.
 4. Before the next code-bearing release, verify Xcode Cloud Next Build Number is
-   `154` or higher.
+   `155` or higher.

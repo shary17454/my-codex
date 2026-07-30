@@ -78,20 +78,21 @@ enum PurchaseOutcome: Equatable { case success, cancelled, pending }
 
 enum StoreProductID {
     static let singleCatalogUnlock = "batal.catalog.single.unlock"
-    static let catalogFullUnlock = "batal.catalog.full.unlock"
-    static let catalogPermanentUnlock = "batal.catalog.permanent.unlock"
+    static let catalogFullUnlock = "batal.catalog.permanent.unlock"
+    static let legacyCatalogFullUnlock = "batal.catalog.full.unlock"
+    static let catalogPermanentUnlock = catalogFullUnlock
 
     static let allCatalogProducts = [
         singleCatalogUnlock,
         catalogFullUnlock,
-        catalogPermanentUnlock
+        legacyCatalogFullUnlock
     ]
 
     static func expectedType(for productID: String) -> Product.ProductType? {
         switch productID {
         case singleCatalogUnlock:
             return .consumable
-        case catalogFullUnlock, catalogPermanentUnlock:
+        case catalogFullUnlock, legacyCatalogFullUnlock:
             return .nonConsumable
         default:
             return nil
