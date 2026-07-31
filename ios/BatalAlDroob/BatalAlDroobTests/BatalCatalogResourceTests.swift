@@ -127,6 +127,26 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertTrue(matches.contains { $0.partNumber == "23378-M4901" || $0.partNumber == "23378-03J00" })
     }
 
+    @MainActor
+    func testNaturalArabicSteeringArmSearchFindsCatalogParts() async throws {
+        let viewModel = CatalogViewModel(
+            repository: BundledCatalogRepository(),
+            store: TestPurchaseService()
+        )
+        await viewModel.load()
+
+        viewModel.searchText = "ذراع دركسون"
+        let results = viewModel.filteredParts
+
+        XCTAssertFalse(results.isEmpty)
+        XCTAssertTrue(results.contains { part in
+            let text = viewModel.searchableText(for: part)
+            return text.contains(normalized("arm pitman"))
+                || text.contains(normalized("drag link"))
+                || text.contains(normalized("pwr strg"))
+        })
+    }
+
     func testDiagnosticKeywordsMapArabicAndEnglishDescriptions() {
         XCTAssertEqual(diagnosticKeywords("مشكلة في الفرامل"), ["brake"])
         XCTAssertEqual(diagnosticKeywords("radiator heat issue"), ["cooling", "fan", "radiator"])

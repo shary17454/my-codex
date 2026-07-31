@@ -172,7 +172,7 @@ extension CatalogViewModel {
             guard categoryMatch || (isPartNumberLookup && numberMatch) else { return false }
             guard !query.isEmpty else { return true }
             let indexedText = self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)
-            return numberMatch || indexedText.contains(query)
+            return numberMatch || self.searchTextMatches(indexedText, rawQuery: rawQuery, normalizedQuery: query)
         }.prefix(250))
 
         guard exactResults.isEmpty, isPartNumberLookup else { return applyVehicleFilter(to: exactResults) }

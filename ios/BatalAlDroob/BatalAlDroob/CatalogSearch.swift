@@ -55,6 +55,7 @@ extension CatalogViewModel {
 
     private func rankedFitmentMatches(for query: String, limit: Int) -> [Part] {
         let normalizedQuery = normalized(query)
+        let expandedTerms = expandedSearchTerms(for: query)
         return parts.compactMap { part -> (Part, Int)? in
             let normalizedPrimary = normalized(part.partNumber)
             let normalizedNumbers = part.allNumbers.map(normalized)
@@ -74,6 +75,8 @@ extension CatalogViewModel {
                 score = 180 - distance
             } else if searchText.contains(normalizedQuery) {
                 score = 100 + (part.confidence ?? 0)
+            } else if let expandedScore = expandedSearchScore(in: searchText, terms: expandedTerms) {
+                score = expandedScore + (part.confidence ?? 0)
             } else {
                 return nil
             }
@@ -96,7 +99,54 @@ extension CatalogViewModel {
             part.category,
             part.categoryAr,
             part.model
-        ] + part.partNumbers + part.years + part.engines).compactMap(\.self).joined(separator: " "))
+        ] + part.partNumbers + part.years + part.engines + part.evidence.prefix(4).flatMap {
+            [$0.sourceID, $0.year, $0.reference, $0.quantity, $0.context.map { String($0.prefix(240)) }]
+        }).compactMap(\.self).joined(separator: " "))
+    }
+
+    func searchTextMatches(_ searchText: String, rawQuery: String, normalizedQuery query: String) -> Bool {
+        guard !query.isEmpty else { return true }
+        return searchText.contains(query) || expandedSearchScore(in: searchText, terms: expandedSearchTerms(for: rawQuery)) != nil
+    }
+
+    func expandedSearchTerms(for query: String) -> [String] {
+        let normalizedQuery = normalized(query)
+        guard !normalizedQuery.isEmpty else { return [] }
+        var terms = [normalizedQuery]
+
+        let groups: [(triggers: [String], expansions: [String])] = [
+            (
+                ["دركسون", "دريكسون", "دركسيون", "ستيرنج", "توجيه", "مقود", "steering", "strg"],
+                ["steering", "power steering", "pwr strg", "strg", "pitman", "arm pitman", "link assy drag link", "drag link"]
+            ),
+            (
+                ["ذراع", "اذرع", "أذرع", "عمود", "arm", "rod", "link"],
+                ["arm", "rod", "link", "arm pitman", "pitman", "link assy drag link", "drag link"]
+            ),
+            (
+                ["تي رود", "تيرود", "تايرود", "tie rod", "tierod"],
+                ["tie rod", "tierod", "rod assy", "socket kit"]
+            )
+        ]
+
+        for group in groups where group.triggers.map(normalized).contains(where: normalizedQuery.contains) {
+            terms.append(contentsOf: group.expansions.map(normalized))
+        }
+
+        if ["دركسون", "دريكسون", "دركسيون", "توجيه"].map(normalized).contains(where: normalizedQuery.contains),
+           ["ذراع", "اذرع", "أذرع", "arm", "rod", "link"].map(normalized).contains(where: normalizedQuery.contains) {
+            terms.append(contentsOf: ["arm pitman", "pitman", "drag link", "link assy drag link"].map(normalized))
+        }
+
+        return terms.filter { !$0.isEmpty }.uniqued()
+    }
+
+    private func expandedSearchScore(in searchText: String, terms: [String]) -> Int? {
+        let hits = terms.filter { term in
+            term.count >= 3 && searchText.contains(term)
+        }
+        guard !hits.isEmpty else { return nil }
+        return 80 + min(hits.count, 4) * 15
     }
 
     func isLikelyPartNumberLookup(_ rawQuery: String, normalizedQuery: String) -> Bool {
