@@ -1,5 +1,21 @@
 # سجل إصدار الدروب
 
+## 2.3 (157) - 2026-07-31
+
+### العربية - What's New
+
+- أصبحت بطاقات تنبيهات الطقس وجودة الهواء والرياح والحرارة تفتح تفاصيل وإرشادات مباشرة.
+- أصبحت إحصاءات المجتمع تفتح معلومات عن المشاركين والمواقع والرحلات والنقاط.
+- تحسين أزرار ملاحة الإحداثيات وGPX والمشاركة لتظهر بتنسيق أوضح وتعمل كإجراءات مستقلة.
+- تحسينات استقرار وتجربة استخدام عامة.
+
+### English - What's New
+
+- Weather, air quality, wind, and temperature alert cards now open detailed guidance.
+- Community stats now open participant, place, trip, and point details.
+- Coordinate navigation actions for GPX, maps, sharing, and deletion are clearer and easier to use.
+- General stability and usability improvements.
+
 ## 2.2 (128) - 2026-07-30
 
 ### العربية - What's New

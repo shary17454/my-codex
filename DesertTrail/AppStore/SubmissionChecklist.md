@@ -11,12 +11,12 @@
 ## Current Prepared Release
 
 - Display name: `الدروب`
-- Marketing version: `2.2`
-- Build number: `128`
+- Marketing version: `2.3`
+- Build number: `157`
 - Bundle ID: `com.codex.DesertTrail`
 - Release action in Codex task: `PREPARE_ONLY` - do not submit automatically.
 - Xcode Cloud environment: use production `Xcode 26.6 (17F113)` or a newer production Xcode explicitly accepted by Apple. Do not use `Latest Beta`.
-- App Store Connect must use a new iOS version record matching `2.2`; do not attach this build to the closed `2.1` pre-release train.
+- App Store Connect must use a new iOS version record matching `2.3`; do not attach this build to the published or closed `2.2` pre-release train.
 
 ## Local Commands
 
