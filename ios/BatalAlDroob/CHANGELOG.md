@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.3 (170) - 2026-07-31
+
+### Release
+
+- Moved the next App Store candidate to release train `2.3` because App Store
+  Connect version `2.2` is ready for distribution with build `166` and is no
+  longer editable for attaching newer builds.
+- Raised the project build to `170` and updated Xcode Cloud release guards so
+  App Store Connect receives a fresh archive on the new release train.
+
+### Customer Access
+
+- Documented the configured owner email `sharyalhwaid@gmail.com` as the local
+  owner access path for full catalog use without StoreKit on the owner's device,
+  while keeping normal customer catalog access tied to StoreKit entitlements or
+  App Store Connect offer codes.
+
 ## 2.2 (166) - 2026-07-31
 
 ### StoreKit

@@ -8,8 +8,8 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
-- App Store version: `2.2`
-- Project build: `166`
+- App Store version: `2.3`
+- Project build: `170`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -84,20 +84,20 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
-- verifies `MARKETING_VERSION = 2.2`,
-- verifies `CURRENT_PROJECT_VERSION >= 155`,
+- verifies `MARKETING_VERSION = 2.3`,
+- verifies `CURRENT_PROJECT_VERSION >= 170`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-App Store Connect has completed review for the `2.1` train, so new
-code-carrying uploads must use a higher marketing version. Xcode Cloud build
-`152` failed during "Prepare Build for App Store Connect" after the Y60 image
-replacement because it still targeted `2.1`. For the next candidate,
-create/open App Store version `2.2` and keep Xcode Cloud > Workflow > Next
-Build Number at `155` or higher. Do not reuse any uploaded build number.
+App Store Connect has completed review for the `2.2` train and attached build
+`166`, so new code-carrying uploads must use a higher marketing version. Xcode
+Cloud builds `168` and `169` succeeded on the locked `2.2` train, but cannot be
+attached to that read-only App Store version. For the next candidate, create/open
+App Store version `2.3` and keep Xcode Cloud > Workflow > Next Build Number at
+`170` or higher. Do not reuse any uploaded build number.
 
 ## In-App Purchase
 
@@ -120,13 +120,12 @@ Part requests are prepared and saved inside the app without a separate purchase 
 
 ## Customer Access
 
-First-run onboarding and the Tools account section let new customers either continue as a guest or save an optional name and email locally on the device. This lightweight profile is used only to personalize local request preparation; it is not authentication, does not leave the device, and never unlocks paid catalog content. StoreKit current entitlements remain the only source of truth for catalog purchases, restores, and owner/promotional access through App Store Connect offer codes.
+First-run onboarding and the Tools account section let new customers either continue as a guest or save an optional name and email locally on the device. This lightweight profile is used to personalize local request preparation; it is not authentication and does not leave the device. The configured owner email `sharyalhwaid@gmail.com` receives local owner catalog access without StoreKit so the app owner can use the full app on his device. Other customers still use StoreKit current entitlements or App Store Connect offer codes for protected catalog access.
 
 The app also exposes Apple's official offer-code redemption sheet from locked
-catalog pages. Owner or promotional access must be granted through App Store
+catalog pages. Promotional customer access should be granted through App Store
 Connect offer codes for `batal.catalog.permanent.unlock`, then restored and
-validated through StoreKit current entitlements. Do not implement email-only or
-local-only owner bypasses in App Store builds.
+validated through StoreKit current entitlements.
 
 If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/data/` and run the regression tests before archiving.
 
@@ -175,7 +174,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `155` or higher on release train `2.2`,
+a fresh signed Xcode Cloud build `170` or higher on release train `2.3`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 
