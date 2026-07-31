@@ -108,6 +108,11 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertEqual(LocalDraftStore.shared.load(), draft)
     }
 
+    func testOwnerEmailUnlocksFullFeatureAccess() {
+        XCTAssertTrue(UserSession.isOwnerEmail("  SHARYALHWAID@gmail.com "))
+        XCTAssertFalse(UserSession.isOwnerEmail("other@example.com"))
+    }
+
     func testLocalVotingRepositoryPreventsDuplicateVote() async throws {
         let repository = LocalVotingRepository.shared
         let comparisonID = UUID()

@@ -132,7 +132,7 @@ BASE_URL=http://localhost:8787 npm run smoke
 - Xcode: `26.6 (17F113)` الإنتاجي، وليس Latest Beta.
 - Actions: Build ثم Archive مع App Store Connect distribution.
 - Build Number: تديره Xcode Cloud؛ لا تستخدم `agvtool` أو `PlistBuddy` أو سكربتًا محليًا لزيادته.
-- آخر رفض موثق من App Store Connect بتاريخ 31 يوليو 2026 كان للإصدار `2.0` والبناء `98` بسبب `ITMS-90186` و`ITMS-90062`: مسار `2.0` مغلق لأنه يساوي آخر إصدار معتمد. إصدار الإرسال التالي في المشروع هو `2.1` مع Build أساسه `99` أو أعلى من كل Builds الظاهرة في App Store Connect.
+- آخر رفض موثق من App Store Connect بتاريخ 31 يوليو 2026 كان للإصدار `2.0` والبناء `98` بسبب `ITMS-90186` و`ITMS-90062`: مسار `2.0` مغلق لأنه يساوي آخر إصدار معتمد. إصدار الإرسال التالي في المشروع هو `2.1` مع Build أساسه `102` أو أعلى من كل Builds الظاهرة في App Store Connect.
 
 راجع [XCODE_CLOUD_RELEASE.md](docs/XCODE_CLOUD_RELEASE.md) قبل أي إصدار.
 

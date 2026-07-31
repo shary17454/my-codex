@@ -1,5 +1,6 @@
 import AuthenticationServices
 import Combine
+import CryptoKit
 import Foundation
 import Security
 
@@ -12,6 +13,7 @@ final class UserSession: ObservableObject {
 
     private let defaults: UserDefaults
     private let secureStore: UserSessionSecureStore
+    nonisolated private static let ownerEmailDigest = "036a6f30eceeeeac0d800e80c2e824b3686decfe06d353a246ba282ce39cb36e"
 
     init(
         defaults: UserDefaults = .standard,
@@ -29,6 +31,18 @@ final class UserSession: ObservableObject {
     var publicName: String {
         let cleanName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
         return cleanName.isEmpty ? "ضيف" : cleanName
+    }
+
+    var hasOwnerAccess: Bool {
+        Self.isOwnerEmail(email)
+    }
+
+    var hasFullFeatureAccess: Bool {
+        hasOwnerAccess
+    }
+
+    nonisolated static func isOwnerEmail(_ email: String) -> Bool {
+        sha256Digest(for: normalizedEmail(email)) == ownerEmailDigest
     }
 
     func completeSignIn(with credential: ASAuthorizationAppleIDCredential) {
@@ -82,6 +96,15 @@ final class UserSession: ObservableObject {
     private func persistPublicState() {
         defaults.set(isSignedIn, forKey: "user.isSignedIn")
         defaults.set(displayName, forKey: "user.displayName")
+    }
+
+    nonisolated private static func normalizedEmail(_ email: String) -> String {
+        email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+
+    nonisolated private static func sha256Digest(for value: String) -> String {
+        let digest = SHA256.hash(data: Data(value.utf8))
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 }
 

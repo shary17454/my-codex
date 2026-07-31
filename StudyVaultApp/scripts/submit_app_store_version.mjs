@@ -6,7 +6,7 @@ const keyId = process.env.ASC_KEY_ID;
 const keyPath = process.env.ASC_KEY_PATH;
 const bundleIdentifier = process.env.ASC_BUNDLE_ID || "com.shary17454.esal";
 const targetVersion = process.env.ASC_APP_VERSION || "2.1";
-const targetBuildNumber = process.env.ASC_BUILD_NUMBER || "99";
+const targetBuildNumber = process.env.ASC_BUILD_NUMBER || "102";
 const shouldSubmit = process.env.ASC_SUBMIT === "1";
 const shouldCreateVersion = process.env.ASC_CREATE_VERSION === "1";
 const shouldListBuilds = process.env.ASC_LIST_BUILDS === "1";

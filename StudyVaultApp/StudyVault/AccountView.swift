@@ -74,6 +74,13 @@ struct AccountView: View {
                     Label("تم تسجيل الدخول باستخدام Apple", systemImage: "apple.logo")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(WeshTheme.accent)
+                    if userSession.hasOwnerAccess {
+                        Label("حساب المالك: كل الوظائف مفعّلة بدون اشتراك", systemImage: "crown.fill")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(WeshTheme.gold)
+                            .multilineTextAlignment(.center)
+                            .accessibilityLabel("حساب المالك، كل الوظائف مفعلة بدون اشتراك")
+                    }
                 }
             } else {
                 WeshBrandMark(size: 72)
