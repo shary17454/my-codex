@@ -2,7 +2,7 @@
 set -euo pipefail
 
 expected_bundle_id="com.shary17454.esal"
-expected_marketing_version="${EXPECTED_MARKETING_VERSION:-2.0}"
+expected_marketing_version="${EXPECTED_MARKETING_VERSION:-2.1}"
 required_xcode_build="17F113"
 required_sdk_prefix="iphoneos26.5"
 

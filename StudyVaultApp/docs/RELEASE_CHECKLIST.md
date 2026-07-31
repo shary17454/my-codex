@@ -8,8 +8,8 @@
 - [x] Swift: 6.0.
 - [x] Deployment target: iOS 17.0.
 - [x] الأجهزة: iPhone وiPad.
-- [x] Marketing Version في المشروع: `1.11.0`.
-- [x] Build Number في المشروع: `70`.
+- [x] Marketing Version في المشروع: `2.1`.
+- [x] Build Number في المشروع: `98`.
 - [x] لم يتغير Team أو Signing أو Entitlements.
 
 ## البناء والاختبارات المحلية
@@ -51,11 +51,11 @@
 - [x] اعتماد Xcode Cloud وحده لبناء Release وArchive والرفع إلى App Store Connect.
 - [x] تثبيت Workflow على Xcode 26.6 الإنتاجي `17F113` وSDK iPhoneOS 26.5.
 - [x] إضافة `ci_post_xcodebuild.sh` للتحقق من Bundle ID والإصدار وXcode/SDK داخل الأرشيف، ومن رقم Cloud داخل IPA الموقّع النهائي.
-- [x] نجاح Build وArchive رقم 58 من commit `dda2ea7` وظهور `1.10.0 (58)` بحالة `Complete`.
+- [ ] إنشاء Archive جديد من Commit النهائي لإصدار `2.1` عبر Xcode Cloud.
 - [x] فحص Shell syntax ومسار الرفض المحلي عند استخدام Xcode أقدم من 26.6.
 - [x] تأكيد أن Workflow يبني `StudyVaultApp/StudyVault.xcodeproj` والـScheme `StudyVault`.
 - [x] اختيار Xcode Stable إنتاجي: Latest Release، حاليًا Xcode 26.6 (`17F113`).
-- [x] يجب ضبط Next Build Number على `70` أو أعلى، أعلى من Build المرفوض `69`.
+- [ ] يجب ضبط Next Build Number على `98` أو أعلى، أعلى من Build المرفوض `97`.
 - [ ] تشغيل Unit وUI tests قبل Archive.
 - [ ] إنشاء Archive من Commit النهائي.
 - [ ] التأكد أن الإصدار والبناء داخل Artifact يطابقان App Store Connect.
@@ -64,8 +64,8 @@
 
 ## App Store Connect
 
-- [x] التأكد أن `1.11.0` أعلى من الإصدار المغلق `1.10.0`.
-- [x] التأكد أن Build `70` أعلى من آخر Build مرفوض `69`.
+- [x] التأكد أن `2.1` أعلى من الإصدار المغلق `2.0`.
+- [x] التأكد أن Build `98` أعلى من آخر Build مرفوض `97`.
 - [ ] مراجعة App Privacy Labels يدويًا.
 - [ ] مراجعة Export Compliance.
 - [x] تحديث What’s New بالعربية والإنجليزية بما يطابق الوظائف المنفذة.

@@ -1,3 +1,17 @@
+# ملاحظات الإصدار 2.1
+
+- رفع مسار الإصدار بعد إغلاق App Store Connect لمسار 2.0.
+- تحسينات إصدار واستقرار تمنع إعادة استخدام مسار إصدار مغلق أو Build مرفوض.
+- الحفاظ على تجربة بوصلة القرار والتصميم الجديد مع نفس Bundle ID وإعدادات التوقيع.
+- إصلاحات عامة وتجهيزات رفع أكثر وضوحًا عبر Xcode Cloud.
+
+## English Release Notes 2.1
+
+- Increased the release train after App Store Connect closed version 2.0.
+- Improved release safeguards to avoid reusing a closed version train or rejected build number.
+- Preserved the Decision Compass experience and refreshed design with the same bundle identifier and signing setup.
+- General fixes and clearer Xcode Cloud release preparation.
+
 # ملاحظات الإصدار 2.0
 
 - تصميم جديد بالكامل لهوية «بوصلة القرار» مع واجهة فحمية فاخرة، زمرد للأفعال، وذهب للخلاصة.
