@@ -26,19 +26,24 @@ struct RootView: View {
                         viewModel.text(ar: "الرئيسية", en: "Home"),
                         systemImage: "gauge.with.dots.needle.bottom.50percent"
                     ) }
+                    .accessibilityIdentifier("tab.home")
                     .tag(AppTab.dashboard)
                 CatalogView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الكتالوج", en: "Catalog"), systemImage: "magnifyingglass") }
+                    .accessibilityIdentifier("tab.catalog")
                     .tag(AppTab.catalog)
                 AIAssistantView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "المساعد", en: "Assistant"), systemImage: "sparkles") }
+                    .accessibilityIdentifier("tab.assistant")
                     .tag(AppTab.assistant)
                 RequestView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "طلب قطعة", en: "Request"), systemImage: "cart.badge.plus") }
+                    .accessibilityIdentifier("tab.request")
                     .tag(AppTab.request)
                 MoreView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الأدوات", en: "Tools"), systemImage: "wrench.and.screwdriver")
                     }
+                    .accessibilityIdentifier("tab.tools")
                     .tag(AppTab.tools)
             }
             .overlay(alignment: .top) {

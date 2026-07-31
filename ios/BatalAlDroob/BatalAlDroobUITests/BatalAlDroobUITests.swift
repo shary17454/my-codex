@@ -25,7 +25,7 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertTrue(focusedCatalogSearch.waitForExistence(timeout: 10))
         XCTAssertEqual(focusedCatalogSearch.value as? String, "Y60")
 
-        let homeTab = navigationItem(named: "الرئيسية", in: app)
+        let homeTab = tabItem(identifier: "tab.home", fallbackName: "الرئيسية", in: app)
         XCTAssertTrue(homeTab.waitForExistence(timeout: 10))
         homeTab.tap()
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 10))
@@ -42,7 +42,7 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["23378-M4901"].exists)
         dismissKeyboardIfVisible(in: app)
 
-        let requestTab = navigationItem(named: "طلب قطعة", in: app)
+        let requestTab = tabItem(identifier: "tab.request", fallbackName: "طلب قطعة", in: app)
         XCTAssertTrue(requestTab.waitForExistence(timeout: 10))
         requestTab.tap()
         XCTAssertTrue(app.navigationBars["طلب قطعة"].waitForExistence(timeout: 10))
@@ -61,7 +61,7 @@ final class BatalAlDroobUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
 
-        let toolsTab = navigationItem(named: "الأدوات", in: app)
+        let toolsTab = tabItem(identifier: "tab.tools", fallbackName: "الأدوات", in: app)
         XCTAssertTrue(toolsTab.waitForExistence(timeout: 10))
         toolsTab.tap()
 
@@ -97,8 +97,8 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Home"].waitForExistence(timeout: 20))
         XCTAssertTrue(reveal(app.staticTexts["Start quickly"], in: app, requireHittable: false))
         XCTAssertFalse(app.staticTexts["ylkciuq tratS"].exists)
-        XCTAssertTrue(navigationItem(named: "Catalog", in: app).waitForExistence(timeout: 10))
-        XCTAssertTrue(navigationItem(named: "Request", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.catalog", fallbackName: "Catalog", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.request", fallbackName: "Request", in: app).waitForExistence(timeout: 10))
 
         let languageMenu = app.buttons["language.menu"]
         XCTAssertTrue(languageMenu.waitForExistence(timeout: 10))
@@ -109,8 +109,18 @@ final class BatalAlDroobUITests: XCTestCase {
         arabicOption.tap()
 
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 10))
-        XCTAssertTrue(navigationItem(named: "الكتالوج", in: app).waitForExistence(timeout: 10))
-        XCTAssertTrue(navigationItem(named: "طلب قطعة", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.catalog", fallbackName: "الكتالوج", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.request", fallbackName: "طلب قطعة", in: app).waitForExistence(timeout: 10))
+    }
+
+    @MainActor
+    private func tabItem(identifier: String, fallbackName: String, in app: XCUIApplication) -> XCUIElement {
+        let identifiedTab = app.tabBars.buttons[identifier]
+        if identifiedTab.exists {
+            return identifiedTab
+        }
+
+        return navigationItem(named: fallbackName, in: app)
     }
 
     @MainActor
