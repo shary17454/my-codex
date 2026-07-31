@@ -75,6 +75,10 @@ final class CatalogViewModel {
         didSet { UserDefaults.standard.set(Array(paidUnlocks), forKey: "batalPaidUnlocks") }
     }
 
+    var customerProfile = UserDefaults.standard.codable(CustomerProfile.self, forKey: "batalCustomerProfile") ?? CustomerProfile() {
+        didSet { UserDefaults.standard.setCodable(customerProfile, forKey: "batalCustomerProfile") }
+    }
+
     let plans: [PartRequestPlan] = [
         .init(
             id: "basic",
@@ -299,6 +303,54 @@ extension CatalogViewModel {
 
     func isPurchaseActionDisabled(for _: CatalogAccessLevel) -> Bool {
         isLoadingPurchases
+    }
+
+    var customerAccessTitle: String {
+        switch customerProfile.accessMode {
+        case .guest:
+            return text(ar: "ضيف", en: "Guest")
+        case .localEmail:
+            return customerProfile.displayName.isEmpty ? customerProfile.email : customerProfile.displayName
+        }
+    }
+
+    var customerAccessSummary: String {
+        switch customerProfile.accessMode {
+        case .guest:
+            return text(ar: "تستخدم التطبيق كضيف. لا يلزم تسجيل دخول للبحث والطلبات.", en: "Using the app as a guest. No sign-in is required for search and requests.")
+        case .localEmail:
+            return text(
+                ar: "البريد محفوظ على هذا الجهاز فقط ولا يفتح مشتريات الكتالوج.",
+                en: "Email is saved on this device only and does not unlock catalog purchases."
+            )
+        }
+    }
+
+    func continueAsGuest() {
+        customerProfile = CustomerProfile(accessMode: .guest, displayName: "", email: "", hasCompletedSignInChoice: true)
+    }
+
+    func saveLocalCustomer(name: String, email: String) -> Bool {
+        let normalizedEmail = normalizedCustomerEmail(email)
+        guard isValidCustomerEmail(normalizedEmail) else { return false }
+        customerProfile = CustomerProfile(
+            accessMode: .localEmail,
+            displayName: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            email: normalizedEmail,
+            hasCompletedSignInChoice: true
+        )
+        return true
+    }
+
+    func isValidCustomerEmail(_ email: String) -> Bool {
+        let normalizedEmail = normalizedCustomerEmail(email)
+        let parts = normalizedEmail.split(separator: "@", omittingEmptySubsequences: false)
+        guard parts.count == 2, parts[0].count >= 1 else { return false }
+        return parts[1].contains(".") && !parts[1].hasSuffix(".")
+    }
+
+    func normalizedCustomerEmail(_ email: String) -> String {
+        email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
     var purchaseSetupMessage: String {

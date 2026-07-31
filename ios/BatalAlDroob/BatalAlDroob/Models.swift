@@ -326,6 +326,18 @@ struct VehicleProfile: Codable, Hashable {
     var transmission = ""
 }
 
+enum CustomerAccessMode: String, Codable, Hashable {
+    case guest
+    case localEmail
+}
+
+struct CustomerProfile: Codable, Hashable {
+    var accessMode: CustomerAccessMode = .guest
+    var displayName = ""
+    var email = ""
+    var hasCompletedSignInChoice = false
+}
+
 private extension String {
     func trimmedForStorage(defaultValue: String = "") -> String {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)

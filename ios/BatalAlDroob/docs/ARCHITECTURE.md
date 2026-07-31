@@ -36,8 +36,9 @@ Dependencies are injected at the application boundary through service protocols.
 ## Data And Persistence
 
 - Catalog and support data are read-only bundled JSON under `BatalAlDroob/Web/data/`.
-- Language, vehicle profile, maintenance entries, saved requests, wishlist, and entitlement cache use `UserDefaults` with stable keys.
+- Language, vehicle profile, maintenance entries, saved requests, wishlist, optional local customer profile, and entitlement cache use `UserDefaults` with stable keys.
 - StoreKit current entitlements are the authority for paid access; cached values do not independently grant an entitlement.
+- The optional customer name/email profile is device-local only, used for request personalization, and never treated as authentication or an owner unlock.
 - No Core Data, SwiftData, SQLite, Realm, CloudKit, Firebase, or Supabase database is present.
 
 ## External Boundaries

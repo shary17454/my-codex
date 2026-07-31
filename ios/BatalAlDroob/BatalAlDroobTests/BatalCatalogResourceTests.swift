@@ -510,6 +510,62 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
+    func testLocalCustomerEmailSavesNormalizedDeviceOnlyProfile() {
+        let defaultsKey = "batalCustomerProfile"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        XCTAssertTrue(viewModel.saveLocalCustomer(name: "  مالك التطبيق  ", email: "  OWNER@Example.COM  "))
+        XCTAssertEqual(viewModel.customerProfile.accessMode, .localEmail)
+        XCTAssertEqual(viewModel.customerProfile.displayName, "مالك التطبيق")
+        XCTAssertEqual(viewModel.customerProfile.email, "owner@example.com")
+        XCTAssertTrue(viewModel.customerProfile.hasCompletedSignInChoice)
+        XCTAssertFalse(viewModel.isFullCatalogUnlocked(), "Local customer email must not bypass StoreKit catalog access.")
+    }
+
+    @MainActor
+    func testInvalidLocalCustomerEmailIsRejectedWithoutChangingProfile() {
+        let defaultsKey = "batalCustomerProfile"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        XCTAssertFalse(viewModel.saveLocalCustomer(name: "Bad", email: "not-an-email"))
+        XCTAssertEqual(viewModel.customerProfile.accessMode, .guest)
+        XCTAssertEqual(viewModel.customerProfile.email, "")
+        XCTAssertFalse(viewModel.customerProfile.hasCompletedSignInChoice)
+    }
+
+    @MainActor
+    func testContinueAsGuestClearsLocalCustomerEmail() {
+        let defaultsKey = "batalCustomerProfile"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        XCTAssertTrue(viewModel.saveLocalCustomer(name: "Owner", email: "owner@example.com"))
+        viewModel.continueAsGuest()
+
+        XCTAssertEqual(viewModel.customerProfile.accessMode, .guest)
+        XCTAssertEqual(viewModel.customerProfile.displayName, "")
+        XCTAssertEqual(viewModel.customerProfile.email, "")
+        XCTAssertTrue(viewModel.customerProfile.hasCompletedSignInChoice)
+    }
+
+    @MainActor
     func testLegacyFullCatalogEntitlementStillRestoresAccess() async throws {
         let defaultsKey = "batalPaidUnlocks"
         UserDefaults.standard.removeObject(forKey: defaultsKey)

@@ -42,15 +42,19 @@ final class AppPermissionCoordinator: ObservableObject {
 }
 
 struct PermissionOnboardingView: View {
-    let language: AppLanguage
+    @Bindable var viewModel: CatalogViewModel
     let complete: () -> Void
     @StateObject private var coordinator = AppPermissionCoordinator()
+    @State private var customerName = ""
+    @State private var customerEmail = ""
+    @State private var accountMessage: String?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     header
+                    customerAccess
                     permissionCards
                     footer
                 }
@@ -62,7 +66,7 @@ struct PermissionOnboardingView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(text(ar: "ليس الآن", en: "Not now")) {
-                        complete()
+                        completeOnboarding()
                     }
                     .disabled(coordinator.isRequesting)
                 }
@@ -92,6 +96,70 @@ struct PermissionOnboardingView: View {
             .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private var customerAccess: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label(text(ar: "خيارات الدخول", en: "Sign-in options"), systemImage: "person.crop.circle.badge.checkmark")
+                .font(.headline)
+
+            Text(text(
+                ar: "يمكنك البدء كضيف، أو حفظ بريدك محليًا على هذا الجهاز لتخصيص الطلبات لاحقًا. هذا ليس اشتراكًا ولا يفتح مشتريات الكتالوج.",
+                en: "Start as a guest, or save your email locally on this device for later request personalization. This is not a subscription and does not unlock catalog purchases."
+            ))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+
+            TextField(text(ar: "الاسم اختياري", en: "Name optional"), text: $customerName)
+                .textInputAutocapitalization(.words)
+                .textFieldStyle(.roundedBorder)
+                .accessibilityIdentifier("onboarding.customer.name")
+
+            TextField(text(ar: "البريد الإلكتروني اختياري", en: "Email optional"), text: $customerEmail)
+                .keyboardType(.emailAddress)
+                .textContentType(.emailAddress)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .textFieldStyle(.roundedBorder)
+                .accessibilityIdentifier("onboarding.customer.email")
+
+            if let accountMessage {
+                Text(accountMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    viewModel.continueAsGuest()
+                    accountMessage = text(ar: "تم اختيار الدخول كضيف.", en: "Guest access selected.")
+                } label: {
+                    Label(text(ar: "متابعة كضيف", en: "Continue as guest"), systemImage: "person")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.batalSecondary)
+                .accessibilityIdentifier("onboarding.customer.guest")
+
+                Button {
+                    if viewModel.saveLocalCustomer(name: customerName, email: customerEmail) {
+                        accountMessage = text(ar: "تم حفظ البريد على هذا الجهاز.", en: "Email saved on this device.")
+                    } else {
+                        accountMessage = text(ar: "اكتب بريدًا صحيحًا أو تابع كضيف.", en: "Enter a valid email or continue as guest.")
+                    }
+                } label: {
+                    Label(text(ar: "حفظ البريد", en: "Save email"), systemImage: "envelope")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.batalSecondary)
+                .accessibilityIdentifier("onboarding.customer.email.save")
+            }
+        }
+        .padding(14)
+        .background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: BatalDesign.cardRadius)
+                .stroke(BatalDesign.border)
+        )
     }
 
     private var permissionCards: some View {
@@ -132,8 +200,11 @@ struct PermissionOnboardingView: View {
         VStack(spacing: 10) {
             Button {
                 Task {
+                    if !viewModel.customerProfile.hasCompletedSignInChoice {
+                        viewModel.continueAsGuest()
+                    }
                     await coordinator.requestRecommendedPermissions()
-                    complete()
+                    completeOnboarding()
                 }
             } label: {
                 if coordinator.isRequesting {
@@ -149,7 +220,7 @@ struct PermissionOnboardingView: View {
             .accessibilityIdentifier("permissions.allow.continue")
 
             Button(text(ar: "المتابعة بدون تفعيل", en: "Continue without enabling")) {
-                complete()
+                completeOnboarding()
             }
             .buttonStyle(.batalSecondary)
             .disabled(coordinator.isRequesting)
@@ -176,7 +247,14 @@ struct PermissionOnboardingView: View {
     }
 
     private func text(ar: String, en: String) -> String {
-        language == .arabic ? ar : en
+        viewModel.language == .arabic ? ar : en
+    }
+
+    private func completeOnboarding() {
+        if !viewModel.customerProfile.hasCompletedSignInChoice {
+            viewModel.continueAsGuest()
+        }
+        complete()
     }
 }
 

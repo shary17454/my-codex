@@ -63,7 +63,7 @@ struct RootView: View {
             isPermissionOnboardingPresented = true
         }
         .fullScreenCover(isPresented: $isPermissionOnboardingPresented) {
-            PermissionOnboardingView(language: viewModel.language) {
+            PermissionOnboardingView(viewModel: viewModel) {
                 hasCompletedInitialPermissionOnboarding = true
                 isPermissionOnboardingPresented = false
             }

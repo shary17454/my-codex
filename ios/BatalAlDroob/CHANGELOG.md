@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2 (165) - 2026-07-31
+## 2.2 (166) - 2026-07-31
 
 ### StoreKit
 
@@ -11,6 +11,15 @@
   locally unless StoreKit current entitlements include the full-catalog product.
 - Kept the bundle identifier, development team, signing style, entitlements,
   and capabilities unchanged.
+
+### Customer Access
+
+- Added first-run customer access choices so new users can continue as guests or
+  save an optional local name/email for request personalization.
+- Added the same local account controls to Tools without adding backend auth,
+  secrets, Sign in with Apple capability, or any paid-access bypass.
+- Added regression tests proving local email storage does not unlock StoreKit
+  protected catalog content.
 
 ## 2.2 (155) - 2026-07-31
 

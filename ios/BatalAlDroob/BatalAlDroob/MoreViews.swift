@@ -31,6 +31,7 @@ struct MoreView: View {
                 Section {
                     ToolsHeroView(viewModel: viewModel)
                 }
+                CustomerAccountSection(viewModel: viewModel)
                 Section(viewModel.text(ar: "مركز العمل", en: "Action center")) {
                     ToolsActionGrid(
                         viewModel: viewModel,
@@ -232,6 +233,76 @@ struct MoreView: View {
             ar: "تم العثور على \(count) نتيجة. افتح أي قطعة للاطلاع على التفاصيل.",
             en: "Found \(count) results. Open any part to review details."
         )
+    }
+}
+
+private struct CustomerAccountSection: View {
+    @Bindable var viewModel: CatalogViewModel
+    @State private var name = ""
+    @State private var email = ""
+    @State private var statusMessage: String?
+
+    var body: some View {
+        Section(viewModel.text(ar: "الحساب", en: "Account")) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: viewModel.customerProfile.accessMode == .guest ? "person" : "person.crop.circle.badge.checkmark")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(BatalDesign.brand)
+                    .frame(width: 40, height: 40)
+                    .background(BatalDesign.brand.opacity(0.12), in: RoundedRectangle(cornerRadius: AppRadius.control))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.customerAccessTitle)
+                        .font(.headline)
+                    Text(viewModel.customerAccessSummary)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            TextField(viewModel.text(ar: "الاسم اختياري", en: "Name optional"), text: $name)
+                .textInputAutocapitalization(.words)
+                .accessibilityIdentifier("account.name")
+            TextField(viewModel.text(ar: "البريد الإلكتروني", en: "Email"), text: $email)
+                .keyboardType(.emailAddress)
+                .textContentType(.emailAddress)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .accessibilityIdentifier("account.email")
+
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Button {
+                AppHaptics.lightImpact()
+                if viewModel.saveLocalCustomer(name: name, email: email) {
+                    statusMessage = viewModel.text(ar: "تم حفظ الحساب المحلي.", en: "Local account saved.")
+                } else {
+                    statusMessage = viewModel.text(ar: "اكتب بريدًا صحيحًا.", en: "Enter a valid email.")
+                }
+            } label: {
+                Label(viewModel.text(ar: "حفظ البريد على الجهاز", en: "Save email on device"), systemImage: "envelope.badge")
+            }
+            .accessibilityIdentifier("account.saveEmail")
+
+            Button(role: .destructive) {
+                AppHaptics.lightImpact()
+                viewModel.continueAsGuest()
+                name = ""
+                email = ""
+                statusMessage = viewModel.text(ar: "تم الرجوع لوضع الضيف.", en: "Returned to guest mode.")
+            } label: {
+                Label(viewModel.text(ar: "استخدام كضيف", en: "Use as guest"), systemImage: "person")
+            }
+            .accessibilityIdentifier("account.useGuest")
+        }
+        .onAppear {
+            name = viewModel.customerProfile.displayName
+            email = viewModel.customerProfile.email
+        }
     }
 }
 
