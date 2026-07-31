@@ -42,16 +42,19 @@ final class HomeViewModel {
     var isBackendEnabled: Bool
     var backendBaseURLText: String
     var backendAPITokenText: String
+    private let allowLocalPublicPublishing: Bool
     private let persistence: WeshPersistenceStore?
 
     init(
         questions: [AskQuestion] = AskDemoStore.questions,
         knowledgeItems: [KnowledgeItem] = AskDemoStore.knowledgeItems,
-        persistence: WeshPersistenceStore? = nil
+        persistence: WeshPersistenceStore? = nil,
+        allowLocalPublicPublishing: Bool = BackendSettingsStore.shared.allowsLocalPublicPublishing
     ) {
         self.questions = questions
         self.knowledgeItems = knowledgeItems
         self.persistence = persistence
+        self.allowLocalPublicPublishing = allowLocalPublicPublishing
         self.isBackendEnabled = BackendSettingsStore.shared.isEnabled
         self.backendBaseURLText = BackendSettingsStore.shared.baseURLText
         self.backendAPITokenText = BackendSettingsStore.shared.apiTokenText
@@ -281,6 +284,10 @@ final class HomeViewModel {
 
     func publishQuestion(_ question: AskQuestion) async -> AskQuestion? {
         guard isBackendEnabled else {
+            if question.visibility == .publicRoom && !allowLocalPublicPublishing {
+                appErrorMessage = "النشر العام يتطلب اتصالًا بخادم وش الرأي حتى تظهر المقارنة للمستخدمين الآخرين."
+                return nil
+            }
             do {
                 try persistence?.upsert(question: question)
             } catch {
@@ -586,11 +593,14 @@ final class BackendSettingsStore: @unchecked Sendable {
     private init() {}
 
     var isEnabled: Bool {
-        UserDefaults.standard.bool(forKey: enabledKey)
+        if UserDefaults.standard.object(forKey: enabledKey) != nil {
+            return UserDefaults.standard.bool(forKey: enabledKey)
+        }
+        return ProductionBackendConfiguration.isConfigured
     }
 
     var baseURLText: String {
-        UserDefaults.standard.string(forKey: baseURLKey) ?? "http://localhost:8787"
+        UserDefaults.standard.string(forKey: baseURLKey) ?? ProductionBackendConfiguration.baseURLString ?? "http://localhost:8787"
     }
 
     var apiTokenText: String {
@@ -601,6 +611,37 @@ final class BackendSettingsStore: @unchecked Sendable {
         UserDefaults.standard.set(isEnabled, forKey: enabledKey)
         UserDefaults.standard.set(baseURLText.trimmingCharacters(in: .whitespacesAndNewlines), forKey: baseURLKey)
         BackendAPITokenStore.save(apiTokenText.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+
+    var allowsLocalPublicPublishing: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
+    }
+}
+
+enum ProductionBackendConfiguration {
+    private static let baseURLKey = "WeshAlrayBackendBaseURL"
+
+    static var baseURLString: String? {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: baseURLKey) as? String else {
+            return nil
+        }
+        let cleanValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanValue.isEmpty,
+              !cleanValue.contains("$("),
+              let url = URL(string: cleanValue),
+              url.scheme == "https",
+              url.host?.isEmpty == false else {
+            return nil
+        }
+        return cleanValue
+    }
+
+    static var isConfigured: Bool {
+        baseURLString != nil
     }
 }
 

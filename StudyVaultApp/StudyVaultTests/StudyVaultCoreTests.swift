@@ -153,6 +153,29 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertNil(LocalDraftStore.shared.load())
     }
 
+    func testPublicPublishingRequiresBackendWhenLocalPublicPublishingIsDisabled() async {
+        UserDefaults.standard.set(false, forKey: "wash_alray_backend_enabled")
+        defer {
+            UserDefaults.standard.removeObject(forKey: "wash_alray_backend_enabled")
+        }
+
+        let viewModel = HomeViewModel(
+            questions: [],
+            knowledgeItems: [],
+            allowLocalPublicPublishing: false
+        )
+        let question = makeQuestion(title: "تلفلكس وشاهد", votes: [0, 0])
+
+        let published = await viewModel.publishQuestion(question)
+
+        XCTAssertNil(published)
+        XCTAssertTrue(viewModel.questions.isEmpty)
+        XCTAssertEqual(
+            viewModel.appErrorMessage,
+            "النشر العام يتطلب اتصالًا بخادم وش الرأي حتى تظهر المقارنة للمستخدمين الآخرين."
+        )
+    }
+
     func testCreateComparisonViewModelManagesOptionsAndRejectsDuplicates() {
         let viewModel = CreateComparisonViewModel()
         viewModel.optionTitles[0] = "آيفون"

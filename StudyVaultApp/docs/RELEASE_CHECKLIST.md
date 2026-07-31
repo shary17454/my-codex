@@ -78,6 +78,7 @@
 ## Backend والإنتاج
 
 - [ ] توفير خدمة HTTPS إنتاجية.
+- [ ] ضبط `WESH_ALRAY_BACKEND_BASE_URL`/`WeshAlrayBackendBaseURL` على رابط HTTPS الإنتاجي حتى تظهر المقارنات العامة في «اكتشف» لكل المستخدمين.
 - [ ] استبدال تخزين JSON بقاعدة بيانات دائمة.
 - [ ] تطبيق مصادقة مستخدمين وسياسة تصويت على الخادم.
 - [ ] ضبط Rate Limiting وMonitoring وBackups.

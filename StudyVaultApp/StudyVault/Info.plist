@@ -55,5 +55,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>WeshAlrayBackendBaseURL</key>
+	<string>$(WESH_ALRAY_BACKEND_BASE_URL)</string>
 </dict>
 </plist>
