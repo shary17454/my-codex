@@ -147,6 +147,34 @@ final class BatalCatalogResourceTests: XCTestCase {
         })
     }
 
+    @MainActor
+    func testDialectSynonymsExpandCommonPartSearchTerms() {
+        let viewModel = CatalogViewModel(
+            repository: BundledCatalogRepository(),
+            store: TestPurchaseService()
+        )
+
+        XCTAssertTrue(viewModel.expandedSearchTerms(for: "اديتر ماء").contains(normalized("radiator")))
+        XCTAssertTrue(viewModel.expandedSearchTerms(for: "طرمبة بنزين").contains(normalized("fuel pump")))
+        XCTAssertTrue(viewModel.expandedSearchTerms(for: "فحمات فرامل").contains(normalized("brake")))
+        XCTAssertTrue(viewModel.expandedSearchTerms(for: "سلف").contains(normalized("starter")))
+        XCTAssertTrue(viewModel.expandedSearchTerms(for: "كمبروسر مكيف").contains(normalized("compressor")))
+    }
+
+    @MainActor
+    func testDialectPartSearchFindsBundledCatalogResults() async throws {
+        let viewModel = CatalogViewModel(
+            repository: BundledCatalogRepository(),
+            store: TestPurchaseService()
+        )
+        await viewModel.load()
+
+        for query in ["رديتر ماء", "فحمات فرامل", "سير دينمو", "سلف", "مساعدات"] {
+            viewModel.searchText = query
+            XCTAssertFalse(viewModel.filteredParts.isEmpty, "Expected catalog results for dialect query: \(query)")
+        }
+    }
+
     func testDiagnosticKeywordsMapArabicAndEnglishDescriptions() {
         XCTAssertEqual(diagnosticKeywords("مشكلة في الفرامل"), ["brake"])
         XCTAssertEqual(diagnosticKeywords("radiator heat issue"), ["cooling", "fan", "radiator"])

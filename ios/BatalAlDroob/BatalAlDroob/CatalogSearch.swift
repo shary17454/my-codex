@@ -55,7 +55,8 @@ extension CatalogViewModel {
 
     private func rankedFitmentMatches(for query: String, limit: Int) -> [Part] {
         let normalizedQuery = normalized(query)
-        let expandedTerms = expandedSearchTerms(for: query)
+        let shouldUseExpandedTerms = !isLikelyPartNumberLookup(query, normalizedQuery: normalizedQuery)
+        let expandedTerms = shouldUseExpandedTerms ? expandedSearchTerms(for: query) : []
         return parts.compactMap { part -> (Part, Int)? in
             let normalizedPrimary = normalized(part.partNumber)
             let normalizedNumbers = part.allNumbers.map(normalized)
@@ -106,6 +107,9 @@ extension CatalogViewModel {
 
     func searchTextMatches(_ searchText: String, rawQuery: String, normalizedQuery query: String) -> Bool {
         guard !query.isEmpty else { return true }
+        guard !isLikelyPartNumberLookup(rawQuery, normalizedQuery: query) else {
+            return searchText.contains(query)
+        }
         return searchText.contains(query) || expandedSearchScore(in: searchText, terms: expandedSearchTerms(for: rawQuery)) != nil
     }
 
@@ -116,16 +120,168 @@ extension CatalogViewModel {
 
         let groups: [(triggers: [String], expansions: [String])] = [
             (
-                ["دركسون", "دريكسون", "دركسيون", "ستيرنج", "توجيه", "مقود", "steering", "strg"],
-                ["steering", "power steering", "pwr strg", "strg", "pitman", "arm pitman", "link assy drag link", "drag link"]
+                ["دركسون", "دريكسون", "دركسيون", "ستيرنج", "طاره", "طارة", "مقود", "توجيه", "دوده", "دودة", "علبة دركسون", "علبة دريكسون", "steering", "strg"],
+                ["steering", "power steering", "pwr strg", "strg", "steering wheel", "steering column", "gear steering", "gear assy steering", "pitman", "arm pitman", "link assy drag link", "drag link"]
             ),
             (
-                ["ذراع", "اذرع", "أذرع", "عمود", "arm", "rod", "link"],
-                ["arm", "rod", "link", "arm pitman", "pitman", "link assy drag link", "drag link"]
+                ["ذراع", "اذرع", "أذرع", "عمود", "عمود توازن", "عامود", "عمودان", "مقص", "مقصات", "وصلة", "وصله", "بيضة", "بيض", "جلدة", "جلد", "ربلة", "ربلات", "arm", "rod", "link"],
+                ["arm", "rod", "link", "control arm", "arm assy", "bushing", "bush", "rubber", "ball joint", "socket", "stabilizer", "stabilizer bar", "arm pitman", "pitman", "link assy drag link", "drag link"]
             ),
             (
-                ["تي رود", "تيرود", "تايرود", "tie rod", "tierod"],
-                ["tie rod", "tierod", "rod assy", "socket kit"]
+                ["تي رود", "تيرود", "تايرود", "تيرودات", "تايرودات", "طرف دركسون", "طرف دريكسون", "tie rod", "tierod"],
+                ["tie rod", "tierod", "rod assy", "socket kit", "socket steering", "end assy tie rod"]
+            ),
+            (
+                ["رديتر", "راديتر", "رديتر ماء", "راديتر ماء", "راديتور", "اديتر", "مبرد", "cooler", "radiator"],
+                ["radiator", "rad", "cooling", "cooler", "water", "reservoir", "tank", "fan", "shroud", "hose radiator", "cap radiator"]
+            ),
+            (
+                ["مروحة", "مراوح", "كلتش مروحة", "كلج مروحة", "fan"],
+                ["fan", "fan clutch", "clutch fan", "cooling fan", "shroud", "blade fan"]
+            ),
+            (
+                ["طرمبة ماء", "طمبة ماء", "مضخة ماء", "واتر بمب", "water pump"],
+                ["water pump", "pump water", "cooling", "gasket water pump", "pulley water pump"]
+            ),
+            (
+                ["طرمبة بنزين", "طمبة بنزين", "مضخة بنزين", "مضخة وقود", "طرمبه وقود", "بمبة بنزين", "fuel pump"],
+                ["fuel pump", "pump fuel", "pump assy fuel", "filter fuel", "strainer fuel", "tank fuel"]
+            ),
+            (
+                ["بخاخ", "بخاخات", "انجكتر", "انجكترات", "رشاش", "رشاشات", "injector"],
+                ["injector", "nozzle", "fuel injection", "injection", "rail fuel"]
+            ),
+            (
+                ["فرامل", "بريك", "بريكات", "فحمات", "اقمشة", "أقمشة", "هوبات", "هوب", "ديسك فرامل", "brake"],
+                ["brake", "pad", "shoe", "disc", "rotor", "drum", "caliper", "cylinder brake", "master cylinder", "booster brake"]
+            ),
+            (
+                ["كلتش", "كلج", "دبرياج", "صحن كلتش", "دسك كلتش", "clutch"],
+                ["clutch", "disc clutch", "cover clutch", "release bearing", "master cylinder clutch", "operating cylinder clutch"]
+            ),
+            (
+                ["قير", "جير", "فتيس", "جربكس", "جيربوكس", "ناقل حركة", "transmission", "gearbox"],
+                ["transmission", "gearbox", "gear", "shaft", "synchro", "shift", "transfer", "case transfer", "oil seal transmission"]
+            ),
+            (
+                ["دبل", "دفلوك", "دف لوك", "دفرنس", "دفرنش", "كرونة", "كارونه", "diff", "differential"],
+                ["differential", "final drive", "carrier", "gear ring", "pinion", "transfer", "axle", "lock differential"]
+            ),
+            (
+                ["عمود كردان", "كردان", "عامود كردان", "دراب شفت", "درايف شفت", "drive shaft", "propeller shaft"],
+                ["propeller shaft", "drive shaft", "shaft propeller", "universal joint", "u joint", "yoke", "flange"]
+            ),
+            (
+                ["عكس", "عكوس", "اكسل", "اكسلات", "axle", "cv"],
+                ["axle", "shaft axle", "cv joint", "joint", "hub", "knuckle", "bearing wheel"]
+            ),
+            (
+                ["مساعد", "مساعدات", "ممتص", "ممتص صدمات", "shock", "absorber"],
+                ["shock absorber", "absorber", "strut", "suspension", "spring", "coil spring"]
+            ),
+            (
+                ["ياي", "يايات", "سست", "سسته", "سبرنق", "سبرنج", "spring"],
+                ["spring", "coil spring", "leaf spring", "suspension", "seat spring", "shackle"]
+            ),
+            (
+                ["صوفة", "صوف", "جلدة زيت", "تهريب زيت", "سيل", "seal"],
+                ["seal", "oil seal", "packing", "gasket", "o ring", "rubber", "retainer"]
+            ),
+            (
+                ["وجه", "وجيه", "قازقيت", "جازكيت", "جوان", "gasket"],
+                ["gasket", "packing", "seal", "o ring", "cylinder head gasket", "manifold gasket"]
+            ),
+            (
+                ["رمان", "رمانة", "بلي", "بليه", "بيرنق", "bearing"],
+                ["bearing", "ball bearing", "roller bearing", "needle bearing", "hub bearing", "pilot bearing"]
+            ),
+            (
+                ["فلتر", "فلاتر", "صفاية", "سيفون", "filter"],
+                ["filter", "element", "strainer", "cleaner", "air cleaner", "oil filter", "fuel filter"]
+            ),
+            (
+                ["بواجي", "بوجي", "شمعة", "شمعات", "spark plug", "plug"],
+                ["spark plug", "plug", "ignition", "coil", "distributor", "cap distributor", "rotor"]
+            ),
+            (
+                ["كويل", "كويلات", "ملف", "ملفات", "coil"],
+                ["coil", "ignition coil", "ignition", "distributor", "spark plug"]
+            ),
+            (
+                ["دينمو", "دنمو", "الترنيتر", "الترناتور", "مولد", "alternator"],
+                ["alternator", "generator", "dynamo", "regulator", "pulley alternator", "belt alternator"]
+            ),
+            (
+                ["سلف", "سلفه", "مارش", "ستارتر", "starter"],
+                ["starter", "motor starter", "switch starter", "relay starter", "pinion starter"]
+            ),
+            (
+                ["سير", "سيور", "قشاط", "قشاطات", "belt"],
+                ["belt", "fan belt", "alternator belt", "power steering belt", "compressor belt", "v belt"]
+            ),
+            (
+                ["بطارية", "اصبع بطارية", "قطب بطارية", "battery"],
+                ["battery", "terminal", "cable battery", "holder battery", "relay", "fusible link"]
+            ),
+            (
+                ["حساس", "حساسات", "سنسر", "سينسور", "sensor"],
+                ["sensor", "switch", "sender", "temperature sensor", "speed sensor", "oxygen sensor", "pressure sensor"]
+            ),
+            (
+                ["كمبيوتر", "مخ", "اي سي يو", "ecu", "ecm"],
+                ["control unit", "ecu", "ecm", "module", "controller", "relay", "unit assy"]
+            ),
+            (
+                ["مكيف", "مكييف", "ثلاجة", "كمبروسر", "كومبروسر", "رديتر مكيف", "كوندنسر", "ac", "air conditioner"],
+                ["air conditioner", "a/c", "compressor", "condenser", "evaporator", "cooler", "receiver drier", "hose air conditioner"]
+            ),
+            (
+                ["نور", "انوار", "أنوار", "شمعة امامية", "شمعة خلفية", "كشاف", "اسطب", "اصطب", "فانوس", "headlight", "lamp"],
+                ["lamp", "headlamp", "head light", "tail lamp", "combination lamp", "fog lamp", "lens", "bulb"]
+            ),
+            (
+                ["صدام", "دعامة", "دعامية", "نسافة", "نسافات", "bumper"],
+                ["bumper", "fascia", "guard", "protector", "reinforcement", "bracket bumper", "mud guard"]
+            ),
+            (
+                ["رفرف", "رفارف", "جناح", "fender"],
+                ["fender", "mudguard", "protector fender", "guard chipping", "flare", "apron"]
+            ),
+            (
+                ["كبوت", "غطاء مكينة", "غطا مكينه", "hood", "bonnet"],
+                ["hood", "bonnet", "hinge hood", "lock hood", "support hood", "insulator hood"]
+            ),
+            (
+                ["باب", "بيبان", "قفل باب", "مسكة باب", "يد باب", "door"],
+                ["door", "lock door", "handle door", "hinge door", "weatherstrip", "regulator window"]
+            ),
+            (
+                ["مراية", "مرايا", "منظرة", "مناظر", "mirror"],
+                ["mirror", "outside mirror", "rear view mirror", "mirror assy"]
+            ),
+            (
+                ["قزاز", "زجاج", "جام", "دريشة", "قزازة", "glass", "window"],
+                ["glass", "window", "windshield", "back door glass", "quarter glass", "regulator window"]
+            ),
+            (
+                ["مساحات", "مساحة", "مسااحات", "wiper"],
+                ["wiper", "blade wiper", "arm wiper", "motor wiper", "washer", "nozzle washer"]
+            ),
+            (
+                ["طرمبة زيت", "مضخة زيت", "طمبة زيت", "oil pump"],
+                ["oil pump", "pump oil", "strainer oil", "pan oil", "filter oil"]
+            ),
+            (
+                ["ثروتل", "بوابة", "بوابة الهواء", "دعسة", "throttle"],
+                ["throttle", "throttle chamber", "accelerator", "pedal accelerator", "cable accelerator"]
+            ),
+            (
+                ["شكمان", "اكزوز", "دبة", "دبات", "exhaust"],
+                ["exhaust", "muffler", "pipe exhaust", "catalyst", "hanger exhaust", "gasket exhaust"]
+            ),
+            (
+                ["تانكي", "تنده", "خزان", "خزان بنزين", "fuel tank"],
+                ["fuel tank", "tank fuel", "cap fuel", "hose fuel", "pipe fuel", "sender fuel"]
             )
         ]
 
@@ -142,11 +298,13 @@ extension CatalogViewModel {
     }
 
     private func expandedSearchScore(in searchText: String, terms: [String]) -> Int? {
-        let hits = terms.filter { term in
-            term.count >= 3 && searchText.contains(term)
+        var hitCount = 0
+        for term in terms where term.count >= 3 && searchText.contains(term) {
+            hitCount += 1
+            if hitCount >= 4 { break }
         }
-        guard !hits.isEmpty else { return nil }
-        return 80 + min(hits.count, 4) * 15
+        guard hitCount > 0 else { return nil }
+        return 80 + hitCount * 15
     }
 
     func isLikelyPartNumberLookup(_ rawQuery: String, normalizedQuery: String) -> Bool {
