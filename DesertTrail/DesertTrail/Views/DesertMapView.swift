@@ -191,6 +191,21 @@ struct DesertMapView: View {
 
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 88), spacing: 8)], spacing: 8) {
                     compactMapActionButton(
+                        title: appState.selectedTrip.status == .active ? "إنهاء الرحلة" : "بدء الرحلة",
+                        icon: appState.selectedTrip.status == .active ? "stop.circle.fill" : "play.circle.fill",
+                        isPrimary: appState.selectedTrip.status != .active
+                    ) {
+                        if !appState.hasSelectedTrip {
+                            showMapStatus("أنشئ رحلة أولًا من تبويب الرحلات")
+                        } else if appState.selectedTrip.status == .active {
+                            appState.endSelectedTrip()
+                            showMapStatus("تم إنهاء الرحلة")
+                        } else {
+                            appState.startSelectedTrip()
+                            showMapStatus("بدأت الرحلة وتم تشغيل GPS")
+                        }
+                    }
+                    compactMapActionButton(
                         title: appState.locationManager.isTracking ? appState.text(.stopNavigation) : appState.text(.startNavigation),
                         icon: "location.north.line",
                         isPrimary: true
@@ -308,12 +323,42 @@ struct DesertMapView: View {
                     .background(Color.oasisTeal.opacity(0.12), in: Capsule())
             }
 
+            routeColorLegend
+
             ForEach(visibleDirtRoadRoutes) { route in
                 dirtRoadRouteRow(route)
             }
         }
         .padding(10)
         .background(Color(.systemBackground).opacity(0.86), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var routeColorLegend: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("معنى الألوان")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 118), spacing: 6)], spacing: 6) {
+                ForEach(DirtRoadDifficulty.allCases) { difficulty in
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(difficulty.color)
+                            .frame(width: 9, height: 9)
+                        Text(difficulty.legendTitle)
+                            .font(.caption2.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(difficulty.color.opacity(0.10), in: Capsule())
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("معنى ألوان الطرق: أخضر سهل، برتقالي متوسط، نحاسي يتطلب دفع رباعي، أحمر تجنب")
     }
 
     private func dirtRoadRouteRow(_ route: DirtRoadRoute) -> some View {

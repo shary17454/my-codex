@@ -326,12 +326,19 @@ struct HomeDashboardView: View {
         DashboardCard {
             if appState.hasSelectedTrip {
                 VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text("رحلاتي القادمة")
-                        .font(.headline)
-                    Image(systemName: "map")
-                        .foregroundStyle(Color.desertCopper)
-                }
+                    HStack {
+                        Text(appState.selectedTrip.status == .active ? "رحلة جارية" : "رحلاتي")
+                            .font(.headline)
+                        Image(systemName: "map")
+                            .foregroundStyle(Color.desertCopper)
+                        Spacer()
+                        Label(appState.selectedTrip.status.title, systemImage: appState.selectedTrip.status.icon)
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(appState.selectedTrip.status.tint)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .background(appState.selectedTrip.status.tint.opacity(0.14), in: Capsule())
+                    }
 
                 HStack(spacing: 10) {
                     RoundedRectangle(cornerRadius: 8)
@@ -363,22 +370,34 @@ struct HomeDashboardView: View {
                 ProgressView(value: tripProgress)
                     .tint(Color.desertCopper)
 
-                    Button {
-                        interactionFeedback()
-                        openActiveTrip()
-                } label: {
-                    HStack {
-                        Text("متابعة الرحلة")
-                        Spacer()
-                        Image(systemName: "arrow.left")
+                    HStack(spacing: 8) {
+                        Button {
+                            interactionFeedback()
+                            if appState.selectedTrip.status == .active {
+                                appState.endSelectedTrip()
+                                showStatus("تم إنهاء الرحلة")
+                            } else {
+                                appState.startSelectedTrip()
+                                showStatus("بدأت الرحلة وتم تشغيل GPS")
+                            }
+                        } label: {
+                            Label(appState.selectedTrip.status == .active ? "إنهاء الرحلة" : "بدء الرحلة", systemImage: appState.selectedTrip.status == .active ? "stop.circle.fill" : "play.circle.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(appState.selectedTrip.status == .active ? .red : Color.oasisTeal)
+
+                        Button {
+                            interactionFeedback()
+                            openActiveTrip()
+                        } label: {
+                            Label("متابعة", systemImage: "arrow.left")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(Color.desertCopper)
                     }
                     .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .foregroundStyle(.white)
-                    .background(Color.desertCopper, in: RoundedRectangle(cornerRadius: 8))
-                }
-                    .buttonStyle(.plain)
                 }
             } else {
                 ContentUnavailableView {
@@ -587,6 +606,8 @@ struct HomeDashboardView: View {
     }
 
     private var tripProgress: Double {
+        if appState.selectedTrip.status == .completed { return 1 }
+        if appState.selectedTrip.status == .planned { return 0 }
         let total = max(appState.selectedTrip.endDate.timeIntervalSince(appState.selectedTrip.startDate), 1)
         let elapsed = Date().timeIntervalSince(appState.selectedTrip.startDate)
         return min(max(elapsed / total, 0), 1)

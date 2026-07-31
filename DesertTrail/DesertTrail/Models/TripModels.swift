@@ -11,6 +11,8 @@ struct TripPlan: Identifiable, Hashable {
     var routeName: String
     var notes: String
     var participants: [String]
+    var status: TripLifecycleStatus = .planned
+    var updatedAt: Date = .now
 
     var shareURL: URL {
         var components = URLComponents(string: "https://maps.apple.com/")
@@ -67,6 +69,36 @@ struct TripPlan: Identifiable, Hashable {
             participants: ["نورة", "سارة", "فهد"]
         )
     ]
+}
+
+enum TripLifecycleStatus: String, Codable, CaseIterable, Hashable {
+    case planned
+    case active
+    case completed
+
+    var title: String {
+        switch self {
+        case .planned: return "مخططة"
+        case .active: return "جارية"
+        case .completed: return "منتهية"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .planned: return "calendar"
+        case .active: return "location.north.line.fill"
+        case .completed: return "checkmark.seal.fill"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .planned: return .desertCopper
+        case .active: return .oasisTeal
+        case .completed: return .green
+        }
+    }
 }
 
 struct HiddenPlace: Identifiable, Hashable {

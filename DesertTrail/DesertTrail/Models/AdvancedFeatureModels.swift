@@ -131,6 +131,24 @@ enum DirtRoadDifficulty: String, CaseIterable, Identifiable {
         case .avoid: return 8
         }
     }
+
+    var legendTitle: String {
+        switch self {
+        case .easy: return "أخضر: سهل"
+        case .moderate: return "برتقالي: متوسط"
+        case .technical: return "نحاسي: دفع رباعي"
+        case .avoid: return "أحمر: تجنب"
+        }
+    }
+
+    var legendDescription: String {
+        switch self {
+        case .easy: return "مناسب غالبًا عند جفاف الطريق."
+        case .moderate: return "يحتاج انتباه وفحص الإطارات."
+        case .technical: return "يفضل دفع رباعي وخبرة."
+        case .avoid: return "غير مناسب حاليًا أو يحتاج تحققًا ميدانيًا."
+        }
+    }
 }
 
 struct DirtRoadRoute: Identifiable {

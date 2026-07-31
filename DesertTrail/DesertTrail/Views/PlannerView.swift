@@ -38,6 +38,41 @@ struct PlannerView: View {
                 }
 
                 if appState.hasSelectedTrip {
+                    Section("حالة الرحلة") {
+                        HStack(spacing: 10) {
+                            Label(appState.selectedTrip.status.title, systemImage: appState.selectedTrip.status.icon)
+                                .font(.headline)
+                                .foregroundStyle(appState.selectedTrip.status.tint)
+                            Spacer()
+                            Text("آخر تحديث \(appState.selectedTrip.updatedAt.formatted(date: .omitted, time: .shortened))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        HStack(spacing: 10) {
+                            Button {
+                                appState.startSelectedTrip()
+                            } label: {
+                                Label("بدء الرحلة", systemImage: "play.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color.oasisTeal)
+                            .disabled(appState.selectedTrip.status == .active)
+
+                            Button {
+                                appState.endSelectedTrip()
+                            } label: {
+                                Label("إنهاء الرحلة", systemImage: "stop.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.red)
+                            .disabled(appState.selectedTrip.status != .active)
+                        }
+                        .font(.subheadline.weight(.bold))
+                    }
+
                     Section(appState.text(.tripDetails)) {
                         TextField(appState.text(.tripTitle), text: $appState.selectedTrip.title)
                             .textInputAutocapitalization(.words)
@@ -165,11 +200,19 @@ private struct TripListRow: View {
                     .lineLimit(2)
             }
             Spacer()
-            Text("\(trip.participants.count)")
-                .font(.caption.bold())
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .background(Color.desertCopper.opacity(0.14), in: Capsule())
+            VStack(alignment: .trailing, spacing: 6) {
+                Label(trip.status.title, systemImage: trip.status.icon)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(trip.status.tint)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                Text("\(trip.participants.count)")
+                    .font(.caption.bold())
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color.desertCopper.opacity(0.14), in: Capsule())
+            }
         }
         .contentShape(Rectangle())
     }

@@ -53,6 +53,7 @@ final class AppState {
         }
 
         trips = AppStateStorage.loadTrips() ?? []
+        sortTripsByRecentActivity()
         if let storedHiddenPlaces = AppStateStorage.loadHiddenPlaces() {
             hiddenPlaces = Self.mergedHiddenPlaces(storedHiddenPlaces, with: HiddenPlace.samples)
             if hiddenPlaces.count != storedHiddenPlaces.count {
@@ -122,9 +123,11 @@ final class AppState {
 
     func saveSelectedTrip() {
         guard trips.contains(where: { $0.id == selectedTrip.id }) else { return }
+        selectedTrip.updatedAt = .now
         if let index = trips.firstIndex(where: { $0.id == selectedTrip.id }) {
             trips[index] = selectedTrip
         }
+        sortTripsByRecentActivity()
         persistTrips()
         persistSelectedTripID()
     }
@@ -141,7 +144,9 @@ final class AppState {
             meetingPoint: coordinate,
             routeName: "مسار مخصص",
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
-            participants: []
+            participants: [],
+            status: .planned,
+            updatedAt: .now
         )
         trips.insert(trip, at: 0)
         selectedTrip = trip
@@ -194,7 +199,9 @@ final class AppState {
                 meetingPoint: place.coordinate,
                 routeName: "مسار مباشر",
                 notes: place.notes,
-                participants: []
+                participants: [],
+                status: .planned,
+                updatedAt: .now
             )
             trips.insert(trip, at: 0)
             selectedTrip = trip
@@ -205,6 +212,7 @@ final class AppState {
         }
         selectedTrip.meetingPoint = place.coordinate
         selectedTrip.title = selectedTrip.title.isEmpty ? place.name : selectedTrip.title
+        selectedTrip.updatedAt = .now
         saveSelectedTrip()
         statusMessage = "تم تحديد الوجهة: \(place.name)"
     }
@@ -226,8 +234,42 @@ final class AppState {
         preferredDirtRoadRouteID = route.id
         selectedTrip.meetingPoint = route.endCoordinate
         selectedTrip.routeName = route.name
+        selectedTrip.updatedAt = .now
         saveSelectedTrip()
         statusMessage = "تم تفعيل \(route.name) كمسار بري مفضل"
+    }
+
+    func startSelectedTrip() {
+        guard hasSelectedTrip else {
+            statusMessage = "أنشئ رحلة أولًا قبل بدء الرحلة"
+            return
+        }
+        selectedTrip.status = .active
+        selectedTrip.startDate = .now
+        if selectedTrip.endDate <= selectedTrip.startDate {
+            selectedTrip.endDate = Calendar.current.date(byAdding: .hour, value: 8, to: selectedTrip.startDate) ?? selectedTrip.startDate
+        }
+        selectedTrip.updatedAt = .now
+        saveSelectedTrip()
+        locationManager.requestNavigationAccessAndStart(userInitiated: true)
+        statusMessage = "بدأت الرحلة: \(selectedTrip.title)"
+    }
+
+    func endSelectedTrip() {
+        guard hasSelectedTrip else {
+            statusMessage = "لا توجد رحلة محفوظة لإنهائها"
+            return
+        }
+        guard selectedTrip.status == .active else {
+            statusMessage = "ابدأ الرحلة أولًا قبل إنهائها"
+            return
+        }
+        selectedTrip.status = .completed
+        selectedTrip.endDate = .now
+        selectedTrip.updatedAt = .now
+        saveSelectedTrip()
+        locationManager.stopNavigation()
+        statusMessage = "تم إنهاء الرحلة: \(selectedTrip.title)"
     }
 
     func toggleFavoriteDirtRoadRoute(_ route: DirtRoadRoute) {
@@ -254,6 +296,14 @@ final class AppState {
 
     private func persistTrips() {
         AppStateStorage.saveTrips(trips)
+    }
+
+    private func sortTripsByRecentActivity() {
+        trips.sort {
+            if $0.status == .active && $1.status != .active { return true }
+            if $1.status == .active && $0.status != .active { return false }
+            return $0.updatedAt > $1.updatedAt
+        }
     }
 
     private func persistHiddenPlaces() {
@@ -367,6 +417,8 @@ private struct StoredTripPlan: Codable {
     let routeName: String
     let notes: String
     let participants: [String]
+    let status: String?
+    let updatedAt: Date?
 
     init(_ trip: TripPlan) {
         id = trip.id
@@ -377,6 +429,8 @@ private struct StoredTripPlan: Codable {
         routeName = trip.routeName
         notes = trip.notes
         participants = trip.participants
+        status = trip.status.rawValue
+        updatedAt = trip.updatedAt
     }
 
     var trip: TripPlan {
@@ -388,7 +442,9 @@ private struct StoredTripPlan: Codable {
             meetingPoint: meetingPoint.coordinate,
             routeName: routeName,
             notes: notes,
-            participants: participants
+            participants: participants,
+            status: TripLifecycleStatus(rawValue: status ?? "") ?? .planned,
+            updatedAt: updatedAt ?? max(startDate, endDate)
         )
     }
 }
