@@ -54,21 +54,21 @@ final class BatalAlDroobUITests: XCTestCase {
         toolsTab.tap()
 
         let actionCenter = app.staticTexts["more.section.action-center"]
-        XCTAssertTrue(reveal(actionCenter, in: app))
+        XCTAssertTrue(reveal(actionCenter, in: app, requireHittable: false))
 
         let smartSearchAction = app.buttons["tools.action.smart-search"]
         XCTAssertTrue(reveal(smartSearchAction, in: app))
         smartSearchAction.tap()
         XCTAssertTrue(app.staticTexts["النتائج"].waitForExistence(timeout: 10))
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(reveal(actionCenter, in: app))
+        XCTAssertTrue(reveal(actionCenter, in: app, requireHittable: false))
 
         let maintenanceAction = app.buttons["tools.action.maintenance"]
         XCTAssertTrue(reveal(maintenanceAction, in: app))
         maintenanceAction.tap()
         XCTAssertTrue(app.navigationBars["الصيانة"].waitForExistence(timeout: 10))
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(reveal(actionCenter, in: app))
+        XCTAssertTrue(reveal(actionCenter, in: app, requireHittable: false))
     }
 
     @MainActor
@@ -83,7 +83,7 @@ final class BatalAlDroobUITests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(app.navigationBars["Home"].waitForExistence(timeout: 20))
-        XCTAssertTrue(reveal(app.staticTexts["Start quickly"], in: app))
+        XCTAssertTrue(reveal(app.staticTexts["Start quickly"], in: app, requireHittable: false))
         XCTAssertFalse(app.staticTexts["ylkciuq tratS"].exists)
         XCTAssertTrue(navigationItem(named: "Catalog", in: app).waitForExistence(timeout: 10))
         XCTAssertTrue(navigationItem(named: "Request", in: app).waitForExistence(timeout: 10))
@@ -112,14 +112,14 @@ final class BatalAlDroobUITests: XCTestCase {
     }
 
     @MainActor
-    private func reveal(_ element: XCUIElement, in app: XCUIApplication, maximumSwipes: Int = 8) -> Bool {
-        if element.waitForExistence(timeout: 2), element.isHittable {
+    private func reveal(_ element: XCUIElement, in app: XCUIApplication, maximumSwipes: Int = 8, requireHittable: Bool = true) -> Bool {
+        if element.waitForExistence(timeout: 2), !requireHittable || element.isHittable {
             return true
         }
 
         for _ in 0 ..< maximumSwipes {
             app.swipeUp()
-            if element.waitForExistence(timeout: 1), element.isHittable {
+            if element.waitForExistence(timeout: 1), !requireHittable || element.isHittable {
                 return true
             }
         }

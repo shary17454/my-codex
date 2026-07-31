@@ -304,6 +304,24 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
+    func testPurchaseActionStaysEnabledWhenProductsNeedRefresh() async throws {
+        let defaultsKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: ProductRefreshPurchaseService(availabilityResponses: [[], []])
+        )
+        await viewModel.load()
+        viewModel.availableProductIDs = []
+
+        XCTAssertFalse(viewModel.isPurchaseActionDisabled(for: .singleUnlock))
+        viewModel.isLoadingPurchases = true
+        XCTAssertTrue(viewModel.isPurchaseActionDisabled(for: .singleUnlock))
+    }
+
+    @MainActor
     func testSingleCatalogUnlockOpensOnlySelectedPart() async throws {
         let defaultsKey = "batalPaidUnlocks"
         UserDefaults.standard.removeObject(forKey: defaultsKey)

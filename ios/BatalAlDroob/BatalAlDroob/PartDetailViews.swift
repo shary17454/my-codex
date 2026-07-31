@@ -240,7 +240,7 @@ private struct CatalogAccessOfferView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .disabled(!viewModel.isProductAvailable(level.productID) || viewModel.isLoadingPurchases)
+        .disabled(viewModel.isPurchaseActionDisabled(for: level))
     }
 
     private enum AccessButtonStyle {

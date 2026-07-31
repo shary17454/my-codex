@@ -297,6 +297,10 @@ extension CatalogViewModel {
         availableProductIDs.contains(productID)
     }
 
+    func isPurchaseActionDisabled(for _: CatalogAccessLevel) -> Bool {
+        isLoadingPurchases
+    }
+
     var purchaseSetupMessage: String {
         if isLoadingPurchases {
             return text(ar: "جاري التحقق من منتجات الشراء داخل التطبيق...", en: "Checking in-app purchase products...")
