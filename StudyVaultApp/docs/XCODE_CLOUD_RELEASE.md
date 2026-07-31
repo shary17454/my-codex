@@ -44,7 +44,7 @@ Xcode Cloud هو المصدر الوحيد لبناء Release وإنشاء Archi
 - `ITMS-90186`: مسار `1.10.0` مغلق للإرسالات الجديدة.
 - `ITMS-90062`: `CFBundleShortVersionString` يجب أن يكون أعلى من آخر إصدار معتمد `1.10.0`.
 
-الإصدار المطلوب الآن هو `2.1`، ورقم البناء الأدنى هو `102`. تم إغلاق مسار `2.0` في App Store Connect بعد اعتماده سابقًا، لذلك يجب ألا يرفع Xcode Cloud أي Build جديد على `2.0`. يجب ضبط Xcode Cloud Next Build Number على `102` أو رقم أعلى من كل Builds الظاهرة في App Store Connect قبل أي Archive جديد.
+الإصدار المطلوب الآن هو `2.2`، ورقم البناء الأدنى هو `116`. تم إغلاق مسار `2.1` في App Store Connect بعد اعتماده، ورفضت Apple الأبنية `113` إلى `115` عليه. يجب ضبط Xcode Cloud Next Build Number على `116` أو رقم أعلى من كل Builds الظاهرة في App Store Connect قبل أي Archive جديد.
 
 ## خطوات الإصدار
 
