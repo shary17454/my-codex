@@ -67,6 +67,28 @@ struct VisionPhotoTextRecognizer: PhotoTextRecognizing {
     }
 }
 
+
+protocol OwnerAccessAuthorizing: Sendable {
+    func grantsOwnerAccess(to profile: CustomerProfile) -> Bool
+}
+
+struct DefaultOwnerAccessAuthorizer: OwnerAccessAuthorizing {
+    private let ownerEmails: Set<String>
+
+    init(ownerEmails: Set<String> = ["sharyalhwaid@gmail.com"]) {
+        self.ownerEmails = Set(ownerEmails.map { Self.normalizedEmail($0) })
+    }
+
+    func grantsOwnerAccess(to profile: CustomerProfile) -> Bool {
+        guard profile.accessMode == .localEmail else { return false }
+        return ownerEmails.contains(Self.normalizedEmail(profile.email))
+    }
+
+    private static func normalizedEmail(_ email: String) -> String {
+        email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+}
+
 protocol PurchaseService: Sendable {
     func availableProductIDs(for productIDs: [String]) async throws -> Set<String>
     func currentEntitledProductIDs() async -> Set<String>

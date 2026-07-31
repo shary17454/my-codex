@@ -525,7 +525,41 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertEqual(viewModel.customerProfile.displayName, "مالك التطبيق")
         XCTAssertEqual(viewModel.customerProfile.email, "owner@example.com")
         XCTAssertTrue(viewModel.customerProfile.hasCompletedSignInChoice)
-        XCTAssertFalse(viewModel.isFullCatalogUnlocked(), "Local customer email must not bypass StoreKit catalog access.")
+        XCTAssertFalse(viewModel.isFullCatalogUnlocked(), "Regular local customer email must not bypass StoreKit catalog access.")
+    }
+
+    @MainActor
+    func testConfiguredOwnerEmailUnlocksCatalogWithoutStoreKitPurchase() async throws {
+        let profileKey = "batalCustomerProfile"
+        let unlocksKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: profileKey)
+        UserDefaults.standard.removeObject(forKey: unlocksKey)
+        defer {
+            UserDefaults.standard.removeObject(forKey: profileKey)
+            UserDefaults.standard.removeObject(forKey: unlocksKey)
+        }
+
+        let store = ProductRefreshPurchaseService(availabilityResponses: [[]])
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: store,
+            ownerAccess: DefaultOwnerAccessAuthorizer(ownerEmails: ["owner@example.com"])
+        )
+
+        await viewModel.load()
+        XCTAssertTrue(viewModel.saveLocalCustomer(name: "Owner", email: " OWNER@example.com "))
+
+        let part = try XCTUnwrap(viewModel.parts.first { part in part.partNumber == "21082-4W000" })
+        XCTAssertTrue(viewModel.hasOwnerAccess)
+        XCTAssertTrue(viewModel.isFullCatalogUnlocked())
+        XCTAssertTrue(viewModel.parts.allSatisfy { part in viewModel.isUnlocked(part) })
+        XCTAssertEqual(viewModel.protectedNumber(part), "21082-4W000")
+
+        await viewModel.unlock(part, level: .fullCatalog)
+
+        XCTAssertEqual(store.purchasedProductIDs(), [])
+        XCTAssertEqual(store.availableProductLookupCount(), 1)
+        XCTAssertTrue(viewModel.paymentMessage?.contains("وضع المالك مفعل") == true)
     }
 
     @MainActor

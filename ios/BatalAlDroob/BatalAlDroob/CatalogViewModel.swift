@@ -11,6 +11,7 @@ import UIKit
 final class CatalogViewModel {
     private let repository: CatalogRepository
     private let store: PurchaseService
+    private let ownerAccess: OwnerAccessAuthorizing
     private let photoTextRecognizer: any PhotoTextRecognizing
     private let aiService: AIAssistantServicing
     private let catalogUnlockToken = "__catalog_unlock__"
@@ -109,11 +110,13 @@ final class CatalogViewModel {
     init(
         repository: CatalogRepository,
         store: PurchaseService,
+        ownerAccess: OwnerAccessAuthorizing = DefaultOwnerAccessAuthorizer(),
         photoTextRecognizer: any PhotoTextRecognizing = VisionPhotoTextRecognizer(),
         aiService: AIAssistantServicing = CompositeAIAssistantService(remote: BatalRemoteAIService())
     ) {
         self.repository = repository
         self.store = store
+        self.ownerAccess = ownerAccess
         self.photoTextRecognizer = photoTextRecognizer
         self.aiService = aiService
     }
@@ -289,12 +292,16 @@ extension CatalogViewModel {
         part.title(language: language)
     }
 
+    var hasOwnerAccess: Bool {
+        ownerAccess.grantsOwnerAccess(to: customerProfile)
+    }
+
     func isUnlocked(_ part: Part) -> Bool {
-        paidUnlocks.contains(catalogUnlockToken) || paidUnlocks.contains(part.partNumber)
+        hasOwnerAccess || paidUnlocks.contains(catalogUnlockToken) || paidUnlocks.contains(part.partNumber)
     }
 
     func isFullCatalogUnlocked() -> Bool {
-        paidUnlocks.contains(catalogUnlockToken)
+        hasOwnerAccess || paidUnlocks.contains(catalogUnlockToken)
     }
 
     func isProductAvailable(_ productID: String) -> Bool {
@@ -306,6 +313,9 @@ extension CatalogViewModel {
     }
 
     var customerAccessTitle: String {
+        if hasOwnerAccess {
+            return text(ar: "المالك", en: "Owner")
+        }
         switch customerProfile.accessMode {
         case .guest:
             return text(ar: "ضيف", en: "Guest")
@@ -315,6 +325,12 @@ extension CatalogViewModel {
     }
 
     var customerAccessSummary: String {
+        if hasOwnerAccess {
+            return text(
+                ar: "وضع المالك مفعل على هذا الجهاز. جميع وظائف الكتالوج مفتوحة بدون اشتراك.",
+                en: "Owner mode is active on this device. Catalog features are unlocked without a subscription."
+            )
+        }
         switch customerProfile.accessMode {
         case .guest:
             return text(ar: "تستخدم التطبيق كضيف. لا يلزم تسجيل دخول للبحث والطلبات.", en: "Using the app as a guest. No sign-in is required for search and requests.")
@@ -354,6 +370,12 @@ extension CatalogViewModel {
     }
 
     var purchaseSetupMessage: String {
+        if hasOwnerAccess {
+            return text(
+                ar: "وضع المالك مفعل. لا تحتاج إلى شراء أو اشتراك لفتح الكتالوج.",
+                en: "Owner mode is active. No purchase or subscription is required to unlock the catalog."
+            )
+        }
         if isLoadingPurchases {
             return text(ar: "جاري التحقق من منتجات الشراء داخل التطبيق...", en: "Checking in-app purchase products...")
         }
@@ -385,6 +407,13 @@ extension CatalogViewModel {
     }
 
     func unlock(_ part: Part, level: CatalogAccessLevel = .fullCatalog) async {
+        if hasOwnerAccess {
+            paymentMessage = text(
+                ar: "وضع المالك مفعل. تم فتح المحتوى بدون اشتراك.",
+                en: "Owner mode is active. Content is unlocked without a subscription."
+            )
+            return
+        }
         let productID = level.productID
         if !isProductAvailable(productID) {
             await refreshPurchaseProducts()
