@@ -362,7 +362,6 @@ struct DashboardHero: View {
             RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
                 .stroke(BatalDesign.border)
         )
-        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder

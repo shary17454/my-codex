@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.4 (171) - 2026-07-31
+
+### Release
+
+- Moved the App Store candidate to release train `2.4` because App Store
+  Connect rejected creating version `2.3` with the message: "The version number
+  has been previously used."
+- Raised the project build to `171` and updated local/Xcode Cloud release guards
+  so the next archive can be selected for App Review.
+
 ## 2.3 (170) - 2026-07-31
 
 ### Release
