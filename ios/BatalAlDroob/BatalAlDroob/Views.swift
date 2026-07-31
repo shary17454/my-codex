@@ -119,7 +119,10 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: BatalDesign.roomySpacing) {
-                    DashboardHero(viewModel: viewModel)
+                    DashboardHero(viewModel: viewModel) { generationID in
+                        viewModel.focusCatalog(onGeneration: generationID)
+                        openTab(.catalog)
+                    }
 
                     PatrolGenerationsSection(viewModel: viewModel) {
                         openTab(.catalog)
@@ -269,6 +272,7 @@ struct FeatureRow: View {
 
 struct DashboardHero: View {
     @Bindable var viewModel: CatalogViewModel
+    let openGeneration: (String) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -322,14 +326,22 @@ struct DashboardHero: View {
             }
 
             HStack(spacing: 8) {
-                HeroGenerationPill(title: "Y60", subtitle: "1988-1997", isActive: true)
-                HeroGenerationPill(title: "Y61", subtitle: "1997-2010", isActive: false)
-                HeroGenerationPill(title: "Y62", subtitle: "2010-2024", isActive: false)
+                HeroGenerationPill(title: "Y60", subtitle: "1988-1997", isActive: true) {
+                    openGeneration("Y60")
+                }
+                HeroGenerationPill(title: "Y61", subtitle: "1997-2010", isActive: false) {
+                    openGeneration("Y61")
+                }
+                HeroGenerationPill(title: "Y62", subtitle: "2010-2024", isActive: false) {
+                    openGeneration("Y62")
+                }
                 HeroGenerationPill(
                     title: "Y63",
                     subtitle: viewModel.text(ar: "الأحدث", en: "Newest"),
                     isActive: false
-                )
+                ) {
+                    openGeneration("Y63")
+                }
             }
         }
         .padding(12)
@@ -395,20 +407,28 @@ struct HeroGenerationPill: View {
     let title: String
     let subtitle: String
     let isActive: Bool
+    let action: () -> Void
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text(title)
-                .font(.caption.weight(.heavy))
-                .lineLimit(1)
-            Text(subtitle)
-                .font(.caption2.monospacedDigit())
-                .foregroundStyle(isActive ? BatalDesign.brand : .secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+        Button {
+            AppHaptics.lightImpact()
+            action()
+        } label: {
+            VStack(spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.heavy))
+                    .lineLimit(1)
+                Text(subtitle)
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(isActive ? BatalDesign.brand : .secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .padding(.horizontal, 6)
+            .contentShape(RoundedRectangle(cornerRadius: AppRadius.control, style: .continuous))
         }
-        .frame(maxWidth: .infinity, minHeight: 44)
-        .padding(.horizontal, 6)
+        .buttonStyle(.plain)
         .background(
             isActive ? BatalDesign.brand.opacity(0.14) : Color.secondary.opacity(0.10),
             in: RoundedRectangle(cornerRadius: AppRadius.control, style: .continuous)
@@ -417,6 +437,9 @@ struct HeroGenerationPill: View {
             RoundedRectangle(cornerRadius: AppRadius.control, style: .continuous)
                 .stroke(isActive ? BatalDesign.brand.opacity(0.24) : BatalDesign.border)
         )
+        .accessibilityIdentifier("home.hero.generation.\(title)")
+        .accessibilityLabel(title)
+        .accessibilityHint("يفتح الكتالوج على جيل \(title)")
     }
 }
 

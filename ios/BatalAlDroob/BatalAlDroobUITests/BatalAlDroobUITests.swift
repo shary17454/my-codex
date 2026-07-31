@@ -18,6 +18,18 @@ final class BatalAlDroobUITests: XCTestCase {
 
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
 
+        let heroY60 = app.buttons["home.hero.generation.Y60"]
+        XCTAssertTrue(heroY60.waitForExistence(timeout: 10))
+        heroY60.tap()
+        let focusedCatalogSearch = app.textFields["catalog.search.inline"]
+        XCTAssertTrue(focusedCatalogSearch.waitForExistence(timeout: 10))
+        XCTAssertEqual(focusedCatalogSearch.value as? String, "Y60")
+
+        let homeTab = navigationItem(named: "الرئيسية", in: app)
+        XCTAssertTrue(homeTab.waitForExistence(timeout: 10))
+        homeTab.tap()
+        XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 10))
+
         let quickCatalog = app.buttons["home.quick.catalog"]
         XCTAssertTrue(reveal(quickCatalog, in: app))
         quickCatalog.tap()
