@@ -40,6 +40,11 @@ struct CoordinateNavigationView: View {
         return CoordinateMath.bearing(from: current, to: destination)
     }
 
+    private let pointActionColumns = [
+        GridItem(.flexible(minimum: 118), spacing: 8),
+        GridItem(.flexible(minimum: 118), spacing: 8)
+    ]
+
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
@@ -338,12 +343,11 @@ struct CoordinateNavigationView: View {
             }
             .buttonStyle(.plain)
 
-            HStack(spacing: 8) {
+            LazyVGrid(columns: pointActionColumns, alignment: .center, spacing: 8) {
                 ShareLink(item: point.shareText) {
-                    Label("مشاركة", systemImage: "square.and.arrow.up")
+                    coordinateActionLabel("مشاركة", systemImage: "square.and.arrow.up")
                 }
-                .font(.caption.weight(.semibold))
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
 
                 Button {
                     if let url = point.appleMapsURL {
@@ -352,10 +356,9 @@ struct CoordinateNavigationView: View {
                         showStatus("تعذر إنشاء رابط خرائط Apple")
                     }
                 } label: {
-                    Label("Apple", systemImage: "map")
+                    coordinateActionLabel("Apple", systemImage: "map")
                 }
-                .font(.caption.weight(.semibold))
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
 
                 Button {
                     if let url = point.googleMapsURL {
@@ -364,24 +367,41 @@ struct CoordinateNavigationView: View {
                         showStatus("تعذر إنشاء رابط خرائط Google")
                     }
                 } label: {
-                    Label("Google", systemImage: "link")
+                    coordinateActionLabel("Google", systemImage: "link")
                 }
-                .font(.caption.weight(.semibold))
-                .buttonStyle(.bordered)
-
-                Spacer()
+                .buttonStyle(.plain)
 
                 Button(role: .destructive) {
                     store.delete(point)
                     showStatus("تم حذف النقطة")
                 } label: {
-                    Image(systemName: "trash")
+                    coordinateActionLabel("حذف", systemImage: "trash")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
             }
         }
         .padding(10)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func coordinateActionLabel(_ title: String, systemImage: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.body.weight(.semibold))
+                .frame(width: 18)
+            Text(title)
+                .font(.caption.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+                .allowsTightening(true)
+        }
+        .environment(\.layoutDirection, .rightToLeft)
+        .foregroundStyle(Color.oasisTeal)
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .padding(.horizontal, 10)
+        .background(Color.oasisTeal.opacity(0.18), in: Capsule())
+        .contentShape(Capsule())
+        .accessibilityElement(children: .combine)
     }
 
     private func navMetric(_ title: String, _ value: String, _ icon: String) -> some View {

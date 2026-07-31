@@ -13,6 +13,8 @@ struct HomeDashboardView: View {
     @State private var showingCreateTrip = false
     @State private var showingGeospatialCatalog = false
     @State private var showingEnvironmentDetails = false
+    @State private var selectedAlertDetail: DashboardAlertDetail?
+    @State private var selectedCommunityDetail: DashboardCommunityDetail?
     @State private var statusMessage: String?
     @State private var dashboardRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
@@ -71,6 +73,12 @@ struct HomeDashboardView: View {
         }
         .sheet(isPresented: $showingEnvironmentDetails) {
             EnvironmentDetailsView()
+        }
+        .sheet(item: $selectedAlertDetail) { detail in
+            DashboardAlertDetailSheet(detail: detail)
+        }
+        .sheet(item: $selectedCommunityDetail) { detail in
+            DashboardCommunityDetailSheet(detail: detail)
         }
         .navigationDestination(isPresented: $showingActiveTrip) {
             ActiveTripDriveView()
@@ -527,10 +535,10 @@ struct HomeDashboardView: View {
                 }
 
                 HStack(spacing: 8) {
-                    communityStat("المشاركون", "\(localParticipantCount)", "person")
-                    communityStat("المواقع", "\(appState.hiddenPlaces.count)", "mappin")
-                    communityStat("الرحلات", "\(appState.trips.count)", "figure.hiking")
-                    communityStat("النقاط", "\(localPoints)", "trophy")
+                    communityStat("المشاركون", "\(localParticipantCount)", "person", detail: .participants)
+                    communityStat("المواقع", "\(appState.hiddenPlaces.count)", "mappin", detail: .places)
+                    communityStat("الرحلات", "\(appState.trips.count)", "figure.hiking", detail: .trips)
+                    communityStat("النقاط", "\(localPoints)", "trophy", detail: .points)
                 }
             }
         }
@@ -544,10 +552,30 @@ struct HomeDashboardView: View {
 
             if appState.environmentalReport.isLiveData {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                    alertChip("AQI \(appState.environmentalReport.airQualityDisplayText)", "leaf.fill", appState.environmentalReport.airQualityIndex > 150 ? .red : .green)
-                    alertChip("\(Int(appState.environmentalReport.windSpeedKPH.rounded())) كم/س", "wind", appState.environmentalReport.windSpeedKPH > 35 ? .orange : .green)
-                    alertChip("\(Int(appState.environmentalReport.temperatureCelsius.rounded()))°C", "thermometer.sun", appState.environmentalReport.temperatureCelsius > 42 ? .red : .yellow)
-                    alertChip(appState.environmentalReport.weatherSummary, "cloud.sun", .blue)
+                    alertChip(
+                        "AQI \(appState.environmentalReport.airQualityDisplayText)",
+                        "leaf.fill",
+                        appState.environmentalReport.airQualityIndex > 150 ? .red : .green,
+                        detail: .airQuality
+                    )
+                    alertChip(
+                        "\(Int(appState.environmentalReport.windSpeedKPH.rounded())) كم/س",
+                        "wind",
+                        appState.environmentalReport.windSpeedKPH > 35 ? .orange : .green,
+                        detail: .wind
+                    )
+                    alertChip(
+                        "\(Int(appState.environmentalReport.temperatureCelsius.rounded()))°C",
+                        "thermometer.sun",
+                        appState.environmentalReport.temperatureCelsius > 42 ? .red : .yellow,
+                        detail: .temperature
+                    )
+                    alertChip(
+                        appState.environmentalReport.weatherSummary,
+                        "cloud.sun",
+                        .blue,
+                        detail: .weather
+                    )
                 }
             } else {
                 Button {
@@ -817,32 +845,64 @@ struct HomeDashboardView: View {
         .buttonStyle(.plain)
     }
 
-    private func communityStat(_ title: String, _ value: String, _ icon: String) -> some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            HStack(spacing: 4) {
-                Text(value)
-                    .font(.subheadline.weight(.bold).monospacedDigit())
-                Image(systemName: icon)
-                    .font(.caption)
-                    .foregroundStyle(Color.desertCopper)
+    private func communityStat(_ title: String, _ value: String, _ icon: String, detail: DashboardCommunityDetail) -> some View {
+        Button {
+            interactionFeedback()
+            selectedCommunityDetail = detail
+        } label: {
+            VStack(spacing: 4) {
+                Text(title)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                HStack(spacing: 4) {
+                    Text(value)
+                        .font(.subheadline.weight(.bold).monospacedDigit())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Image(systemName: icon)
+                        .font(.caption)
+                        .foregroundStyle(Color.desertCopper)
+                }
             }
+            .frame(maxWidth: .infinity, minHeight: 54)
+            .background(Color.desertBackground, in: RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.desertCopper.opacity(0.16), lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: 8))
         }
-        .frame(maxWidth: .infinity, minHeight: 54)
-        .background(Color.desertBackground, in: RoundedRectangle(cornerRadius: 8))
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title): \(value)")
+        .accessibilityHint("يفتح تفاصيل \(title)")
     }
 
-    private func alertChip(_ title: String, _ icon: String, _ color: Color) -> some View {
-        Label(title, systemImage: icon)
+    private func alertChip(_ title: String, _ icon: String, _ color: Color, detail: DashboardAlertDetail) -> some View {
+        Button {
+            interactionFeedback()
+            selectedAlertDetail = detail
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                Text(title)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.left")
+                    .font(.caption2.weight(.bold))
+                    .opacity(0.72)
+                    .flipsForRightToLeftLayoutDirection(true)
+            }
             .font(.caption2.weight(.semibold))
-            .lineLimit(2)
-            .minimumScaleFactor(0.72)
             .foregroundStyle(color)
             .frame(maxWidth: .infinity, minHeight: 44)
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 8)
             .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(color.opacity(0.22), lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(detail.title): \(title)")
+        .accessibilityHint("يفتح معلومات وإرشادات \(detail.title)")
     }
 
     private func refreshWeather() {
@@ -899,6 +959,421 @@ struct HomeDashboardView: View {
 
     private func interactionFeedback() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+}
+
+private enum DashboardAlertDetail: String, Identifiable {
+    case airQuality
+    case wind
+    case temperature
+    case weather
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .airQuality: return "جودة الهواء"
+        case .wind: return "الرياح"
+        case .temperature: return "الحرارة"
+        case .weather: return "حالة الطقس"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .airQuality: return "leaf.fill"
+        case .wind: return "wind"
+        case .temperature: return "thermometer.sun.fill"
+        case .weather: return "cloud.sun.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .airQuality: return .green
+        case .wind: return .orange
+        case .temperature: return .yellow
+        case .weather: return .blue
+        }
+    }
+
+    func value(from report: EnvironmentalReport) -> String {
+        switch self {
+        case .airQuality:
+            return "AQI \(report.airQualityDisplayText)"
+        case .wind:
+            return "\(Int(report.windSpeedKPH.rounded())) كم/س"
+        case .temperature:
+            return "\(Int(report.temperatureCelsius.rounded()))°C"
+        case .weather:
+            return report.weatherSummary
+        }
+    }
+
+    func status(from report: EnvironmentalReport) -> String {
+        switch self {
+        case .airQuality:
+            if report.airQualityIndex >= 151 { return "غير مناسب للرحلات الطويلة" }
+            if report.airQualityIndex >= 101 { return "يحتاج انتباه" }
+            return "مناسب غالبًا"
+        case .wind:
+            if report.windSpeedKPH >= 45 { return "رياح قوية" }
+            if report.windSpeedKPH >= 28 { return "رياح متوسطة" }
+            return "رياح خفيفة"
+        case .temperature:
+            if report.temperatureCelsius >= 43 { return "حرارة عالية جدًا" }
+            if report.temperatureCelsius >= 36 { return "حرارة تحتاج احتياط" }
+            return "مناسبة غالبًا"
+        case .weather:
+            return report.weatherSummary
+        }
+    }
+
+    func guidance(from report: EnvironmentalReport) -> [String] {
+        switch self {
+        case .airQuality:
+            if report.airQualityIndex >= 151 {
+                return [
+                    "قلّل المشي الطويل والتعرض للغبار.",
+                    "يفضل تأجيل الرحلة الحساسة للأطفال أو مرضى الربو.",
+                    "تابع الجهات الرسمية إذا ظهرت عاصفة ترابية أو انخفاض رؤية."
+                ]
+            }
+            return [
+                "مؤشر جودة الهواء ضمن نطاق قابل للرحلة غالبًا.",
+                "راقب التغيرات عند الاقتراب من طرق ترابية أو مناطق غبار.",
+                "حدّث البيانات قبل الانطلاق وأثناء التوقفات الطويلة."
+            ]
+        case .wind:
+            if report.windSpeedKPH >= 35 {
+                return [
+                    "تجنب الحواف المكشوفة وبطون الأودية وقت الغبار.",
+                    "ثبّت المظلات والخيام وتحقق من اتجاه الريح قبل التخييم.",
+                    "خفف السرعة على الطرق الترابية لأن الغبار قد يخفض الرؤية."
+                ]
+            }
+            return [
+                "سرعة الرياح لا تظهر خطرًا واضحًا الآن.",
+                "استخدم سهم الرياح في البوصلة لمعرفة اتجاه حركة الهواء.",
+                "حدّث الطقس إذا تغيّر الموقع أو بدأت الرحلة."
+            ]
+        case .temperature:
+            if report.temperatureCelsius >= 40 {
+                return [
+                    "زد كمية الماء وخطط للتوقف في الظل.",
+                    "تجنب المشي أو تغيير الإطارات تحت الشمس وقت الظهيرة.",
+                    "راقب حرارة الأطفال وكبار السن والحيوانات المرافقة."
+                ]
+            }
+            return [
+                "درجة الحرارة مناسبة غالبًا للرحلة مع الاحتياطات المعتادة.",
+                "احمل ماءً كافيًا حتى لو كانت القراءة معتدلة.",
+                "راجع الحرارة مجددًا قبل المسارات الطويلة."
+            ]
+        case .weather:
+            return [
+                "هذه خلاصة سريعة من بيانات الطقس الحالية.",
+                "افتح التفاصيل لتأكيد الحرارة والرياح وجودة الهواء قبل الانطلاق.",
+                "لا تعتمد عليها بديلًا عن تنبيهات الجهات الرسمية عند الظروف الشديدة."
+            ]
+        }
+    }
+}
+
+private enum DashboardCommunityDetail: String, Identifiable {
+    case participants
+    case places
+    case trips
+    case points
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .participants: return "المشاركون"
+        case .places: return "المواقع"
+        case .trips: return "الرحلات"
+        case .points: return "النقاط"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .participants: return "person.2.fill"
+        case .places: return "mappin.and.ellipse"
+        case .trips: return "figure.hiking"
+        case .points: return "trophy.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .participants: return .orange
+        case .places: return .blue
+        case .trips: return .green
+        case .points: return .yellow
+        }
+    }
+
+    @MainActor
+    func value(from appState: AppState) -> String {
+        switch self {
+        case .participants:
+            return "\(Set(appState.trips.flatMap(\.participants)).count)"
+        case .places:
+            return "\(appState.hiddenPlaces.count)"
+        case .trips:
+            return "\(appState.trips.count)"
+        case .points:
+            let points = appState.hiddenPlaces.reduce(into: 0) { total, place in
+                total += max(place.points, 0)
+            }
+            return "\(points)"
+        }
+    }
+
+    @MainActor
+    func summary(from appState: AppState) -> String {
+        switch self {
+        case .participants:
+            let count = Set(appState.trips.flatMap(\.participants)).count
+            return count == 0 ? "لا يوجد مشاركون محفوظون بعد." : "لديك \(count) مشاركين محفوظين في رحلات الدروب."
+        case .places:
+            return "عدد المواقع البرية والمخفية المحفوظة في التطبيق."
+        case .trips:
+            return "عدد الرحلات الموجودة حاليًا، وتشمل المخططة والجارية والمكتملة."
+        case .points:
+            return "مجموع نقاط المجتمع المحسوبة من المواقع والمساهمات المحفوظة."
+        }
+    }
+
+    @MainActor
+    func details(from appState: AppState) -> [String] {
+        switch self {
+        case .participants:
+            let names = Array(Set(appState.trips.flatMap(\.participants))).sorted()
+            if names.isEmpty {
+                return [
+                    "أضف مشاركين عند إنشاء الرحلة أو تعديلها.",
+                    "تظهر هنا الأسماء المحفوظة في الرحلات المحلية.",
+                    "لا تتم مشاركة الأسماء إلا عند استخدام خيار مشاركة الرحلة."
+                ]
+            }
+            return names.prefix(6).map { "مشارك محفوظ: \($0)" } + [
+                "يمكن استخدام هذه القائمة لمراجعة من شارك في الرحلات السابقة."
+            ]
+        case .places:
+            let approved = appState.hiddenPlaces.filter { $0.status == .approved }.count
+            let pending = appState.hiddenPlaces.count - approved
+            return [
+                "المواقع المعتمدة: \(approved)",
+                "المواقع غير المعتمدة أو قيد المراجعة: \(pending)",
+                "اضغط على الخريطة أو إضافة موقع لحفظ مكان جديد مع ملاحظاتك."
+            ]
+        case .trips:
+            let active = appState.trips.filter { $0.status == .active }.count
+            let planned = appState.trips.filter { $0.status == .planned }.count
+            let completed = appState.trips.filter { $0.status == .completed }.count
+            return [
+                "رحلات جارية: \(active)",
+                "رحلات مخططة: \(planned)",
+                "رحلات مكتملة: \(completed)",
+                "يفترض ترتيب الرحلات حسب الأحدث في شاشة الرحلات."
+            ]
+        case .points:
+            return [
+                "النقاط تزيد من المواقع ذات التقييم والمساهمات المفيدة.",
+                "تستخدم النقاط كمؤشر نشاط محلي داخل التطبيق.",
+                "لا تمثل النقاط مكافآت مالية أو ترتيبًا رسميًا خارج التطبيق."
+            ]
+        }
+    }
+}
+
+private struct DashboardCommunityDetailSheet: View {
+    @Environment(AppState.self) private var appState: AppState
+    @Environment(\.dismiss) private var dismiss
+    let detail: DashboardCommunityDetail
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    header
+                    detailList
+                    actions
+                }
+                .padding()
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle(detail.title)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("تم") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private var header: some View {
+        HStack(spacing: 14) {
+            Image(systemName: detail.icon)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(detail.color)
+                .frame(width: 52, height: 52)
+                .background(detail.color.opacity(0.14), in: Circle())
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(detail.value(from: appState))
+                    .font(.title.weight(.black).monospacedDigit())
+                Text(detail.summary(from: appState))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var detailList: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("التفاصيل", systemImage: "list.bullet.rectangle")
+                .font(.headline)
+
+            ForEach(detail.details(from: appState), id: \.self) { row in
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(detail.color)
+                        .padding(.top, 2)
+                    Text(row)
+                        .font(.subheadline)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var actions: some View {
+        VStack(spacing: 10) {
+            Button {
+                dismiss()
+            } label: {
+                Label("العودة للرئيسية", systemImage: "house.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(detail.color)
+        }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+private struct DashboardAlertDetailSheet: View {
+    @Environment(AppState.self) private var appState: AppState
+    @Environment(\.dismiss) private var dismiss
+    let detail: DashboardAlertDetail
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    header
+                    guidanceCard
+                    sourceCard
+                }
+                .padding()
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle(detail.title)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("تم") { dismiss() }
+                }
+            }
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: detail.icon)
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(detail.color)
+                    .frame(width: 50, height: 50)
+                    .background(detail.color.opacity(0.14), in: Circle())
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(detail.value(from: appState.environmentalReport))
+                        .font(.title2.weight(.black))
+                        .monospacedDigit()
+                    Text(detail.status(from: appState.environmentalReport))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Text("آخر تحديث: \(appState.environmentalReport.updatedAt.formatted(date: .abbreviated, time: .shortened))")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var guidanceCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("ماذا يعني هذا؟", systemImage: "info.circle.fill")
+                .font(.headline)
+
+            ForEach(detail.guidance(from: appState.environmentalReport), id: \.self) { item in
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(detail.color)
+                        .padding(.top, 2)
+                    Text(item)
+                        .font(.subheadline)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var sourceCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("ملاحظة ميدانية", systemImage: "exclamationmark.shield.fill")
+                .font(.headline)
+                .foregroundStyle(.orange)
+            Text("القراءات تعتمد على موقع الجهاز والاتصال بخدمات الطقس وجودة الهواء. استخدمها كمؤشر مساعد، وراجع التحذيرات الرسمية عند الظروف القاسية.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                appState.locationManager.requestNavigationAccessAndStart(userInitiated: true)
+                Task { await appState.refreshEnvironmentReport() }
+            } label: {
+                Label("تحديث البيانات", systemImage: "arrow.clockwise")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(detail.color)
+            .disabled(appState.isEnvironmentRefreshing)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
