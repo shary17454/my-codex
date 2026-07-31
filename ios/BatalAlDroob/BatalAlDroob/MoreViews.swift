@@ -472,8 +472,8 @@ struct PrivacyShieldView: View {
         VStack(spacing: 12) {
             Image(systemName: "eye.slash.fill").font(.largeTitle)
             Text(language == .arabic ? "المحتوى محمي" : "Content protected").font(.title.bold())
-            Text(language == .arabic ? "تم حجب الكتالوج عندما لا يكون التطبيق نشطًا." :
-                "The catalog is hidden while the app is inactive.")
+            Text(language == .arabic ? "يظهر هذا الغطاء فقط عند مغادرة التطبيق أو فتح مبدل التطبيقات لحماية بيانات الكتالوج." :
+                "This shield appears only when you leave the app or open the app switcher to protect catalog data.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

@@ -330,9 +330,12 @@ extension CatalogViewModel {
 
     func unlock(_ part: Part, level: CatalogAccessLevel = .fullCatalog) async {
         let productID = level.productID
-        guard isProductAvailable(productID) else {
-            paymentMessage = purchaseSetupMessage
-            return
+        if !isProductAvailable(productID) {
+            await refreshPurchaseProducts()
+            guard isProductAvailable(productID) else {
+                paymentMessage = purchaseSetupMessage
+                return
+            }
         }
         paymentMessage = text(
             ar: "جاري طلب الدفع: \(level.title(language))...",

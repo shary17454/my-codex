@@ -276,6 +276,34 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
+    func testPurchaseRefreshesProductsBeforeFailingUnavailableUnlock() async throws {
+        let defaultsKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let store = ProductRefreshPurchaseService(
+            availabilityResponses: [
+                [],
+                [StoreProductID.singleCatalogUnlock, StoreProductID.catalogFullUnlock]
+            ]
+        )
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: store
+        )
+        await viewModel.load()
+        viewModel.availableProductIDs = []
+        let part = try XCTUnwrap(viewModel.parts.first { $0.partNumber == "21082-4W000" })
+
+        await viewModel.unlock(part, level: .singleUnlock)
+
+        XCTAssertEqual(store.availableProductLookupCount(), 2)
+        XCTAssertEqual(store.purchasedProductIDs(), [StoreProductID.singleCatalogUnlock])
+        XCTAssertTrue(viewModel.isUnlocked(part))
+        XCTAssertTrue(viewModel.paymentMessage?.contains("تم الدفع") == true)
+    }
+
+    @MainActor
     func testSingleCatalogUnlockOpensOnlySelectedPart() async throws {
         let defaultsKey = "batalPaidUnlocks"
         UserDefaults.standard.removeObject(forKey: defaultsKey)
@@ -639,6 +667,47 @@ private struct TestPurchaseService: PurchaseService {
 
     func restorePurchasedProductIDs() async throws -> Set<String> {
         entitlements
+    }
+}
+
+private final class ProductRefreshPurchaseService: PurchaseService, @unchecked Sendable {
+    private var availabilityResponses: [Set<String>]
+    private var lookupCount = 0
+    private var purchasedIDs: [String] = []
+
+    init(availabilityResponses: [Set<String>]) {
+        self.availabilityResponses = availabilityResponses
+    }
+
+    func availableProductIDs(for productIDs: [String]) async throws -> Set<String> {
+        lookupCount += 1
+        guard !availabilityResponses.isEmpty else { return Set(productIDs) }
+        return availabilityResponses.removeFirst()
+    }
+
+    func currentEntitledProductIDs() async -> Set<String> {
+        []
+    }
+
+    func entitlementUpdates() -> AsyncStream<Set<String>> {
+        AsyncStream { continuation in continuation.finish() }
+    }
+
+    func purchase(productID: String) async throws -> PurchaseOutcome {
+        purchasedIDs.append(productID)
+        return .success
+    }
+
+    func restorePurchasedProductIDs() async throws -> Set<String> {
+        []
+    }
+
+    func availableProductLookupCount() -> Int {
+        lookupCount
+    }
+
+    func purchasedProductIDs() -> [String] {
+        purchasedIDs
     }
 }
 
