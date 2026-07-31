@@ -403,6 +403,24 @@ extension CatalogViewModel {
         }
     }
 
+    func redeemOfferCode() async {
+        paymentMessage = text(ar: "افتح ورقة استرداد كود Apple وأدخل الكود.", en: "Open Apple's offer code sheet and enter the code.")
+        do {
+            try await store.presentOfferCodeRedemption()
+            await synchronizeCurrentEntitlements()
+            if isFullCatalogUnlocked() {
+                paymentMessage = text(ar: "تم استرداد الكود وفتح الكتالوج.", en: "Offer code redeemed. Catalog unlocked.")
+            } else {
+                paymentMessage = text(
+                    ar: "إذا أكملت الاسترداد، استخدم استعادة المشتريات أو أعد فتح القطعة بعد لحظات.",
+                    en: "If redemption completed, use Restore Purchases or reopen the part shortly."
+                )
+            }
+        } catch {
+            paymentMessage = purchaseErrorMessage(error)
+        }
+    }
+
     func observePurchaseUpdates() async {
         for await entitlements in store.entitlementUpdates() {
             guard !Task.isCancelled else { break }
@@ -448,6 +466,12 @@ extension CatalogViewModel {
             return text(
                 ar: "لم تتمكن Apple من توثيق عملية الشراء. حاول مرة أخرى بعد قليل.",
                 en: "Apple could not verify the purchase. Try again shortly."
+            )
+        }
+        if case AppError.offerCodeRedemptionUnavailable = error {
+            return text(
+                ar: "تعذر فتح ورقة استرداد الكود الآن. جرّب من جهاز فعلي أو افتح App Store لاسترداد الكود.",
+                en: "The offer code sheet could not open now. Try on a physical device or redeem the code in the App Store."
             )
         }
         return text(

@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `2.2`
-- Project build: `155`
+- Project build: `165`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -117,6 +117,12 @@ Connect price configuration remains the source of truth for actual displayed
 prices.
 
 Part requests are prepared and saved inside the app without a separate purchase product.
+
+The app also exposes Apple's official offer-code redemption sheet from locked
+catalog pages. Owner or promotional access must be granted through App Store
+Connect offer codes for `batal.catalog.permanent.unlock`, then restored and
+validated through StoreKit current entitlements. Do not implement email-only or
+local-only owner bypasses in App Store builds.
 
 If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/data/` and run the regression tests before archiving.
 

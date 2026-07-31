@@ -468,6 +468,48 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
+    func testOfferCodeRedemptionUsesStoreKitWithoutLocalBypass() async {
+        let defaultsKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let store = OfferCodeTrackingPurchaseService(entitlementsAfterRedemption: [])
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: store
+        )
+        await viewModel.load()
+
+        await viewModel.redeemOfferCode()
+
+        XCTAssertEqual(store.redemptionPresentationCount(), 1)
+        XCTAssertFalse(viewModel.isFullCatalogUnlocked())
+        XCTAssertTrue(viewModel.paymentMessage?.contains("استعادة المشتريات") == true)
+    }
+
+    @MainActor
+    func testOfferCodeRedemptionUnlocksWhenAppleEntitlementExists() async {
+        let defaultsKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let store = OfferCodeTrackingPurchaseService(
+            entitlementsAfterRedemption: [StoreProductID.catalogPermanentUnlock]
+        )
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: store
+        )
+        await viewModel.load()
+
+        await viewModel.redeemOfferCode()
+
+        XCTAssertEqual(store.redemptionPresentationCount(), 1)
+        XCTAssertTrue(viewModel.isFullCatalogUnlocked())
+        XCTAssertTrue(viewModel.paymentMessage?.contains("تم استرداد الكود") == true)
+    }
+
+    @MainActor
     func testLegacyFullCatalogEntitlementStillRestoresAccess() async throws {
         let defaultsKey = "batalPaidUnlocks"
         UserDefaults.standard.removeObject(forKey: defaultsKey)
@@ -734,6 +776,8 @@ private struct TestPurchaseService: PurchaseService {
     func restorePurchasedProductIDs() async throws -> Set<String> {
         entitlements
     }
+
+    func presentOfferCodeRedemption() async throws {}
 }
 
 private final class ProductRefreshPurchaseService: PurchaseService, @unchecked Sendable {
@@ -768,12 +812,53 @@ private final class ProductRefreshPurchaseService: PurchaseService, @unchecked S
         []
     }
 
+    func presentOfferCodeRedemption() async throws {}
+
     func availableProductLookupCount() -> Int {
         lookupCount
     }
 
     func purchasedProductIDs() -> [String] {
         purchasedIDs
+    }
+}
+
+private final class OfferCodeTrackingPurchaseService: PurchaseService, @unchecked Sendable {
+    private let entitlementsAfterRedemption: Set<String>
+    private var presentationCount = 0
+    private var hasPresentedRedemption = false
+
+    init(entitlementsAfterRedemption: Set<String>) {
+        self.entitlementsAfterRedemption = entitlementsAfterRedemption
+    }
+
+    func availableProductIDs(for productIDs: [String]) async throws -> Set<String> {
+        Set(productIDs)
+    }
+
+    func currentEntitledProductIDs() async -> Set<String> {
+        hasPresentedRedemption ? entitlementsAfterRedemption : []
+    }
+
+    func entitlementUpdates() -> AsyncStream<Set<String>> {
+        AsyncStream { continuation in continuation.finish() }
+    }
+
+    func purchase(productID _: String) async throws -> PurchaseOutcome {
+        .success
+    }
+
+    func restorePurchasedProductIDs() async throws -> Set<String> {
+        await currentEntitledProductIDs()
+    }
+
+    func presentOfferCodeRedemption() async throws {
+        presentationCount += 1
+        hasPresentedRedemption = true
+    }
+
+    func redemptionPresentationCount() -> Int {
+        presentationCount
     }
 }
 

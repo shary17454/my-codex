@@ -46,6 +46,12 @@ Dependencies are injected at the application boundary through service protocols.
 
 Product identifiers: `batal.catalog.single.unlock` for a one-page consumable catalog unlock, `batal.catalog.permanent.unlock` for the current full-catalog non-consumable entitlement, and `batal.catalog.full.unlock` as a legacy full-catalog non-consumable entitlement while active in App Store Connect. Product lookup, purchase, current-entitlement refresh, transaction updates, and restore are implemented with StoreKit 2. App Store Connect product state remains an external release requirement and the portal price tier is the source of truth for actual charged prices.
 
+Locked catalog pages include Apple's official offer-code redemption sheet. Owner
+access and promotional access must arrive as verified StoreKit transactions for
+the approved non-consumable product, so the same entitlement path unlocks the
+catalog whether the user purchased normally, restored a prior purchase, or
+redeemed a free App Store Connect offer code.
+
 ### Location and compass
 
 Location updates begin only after the user taps the tracking control and grants when-in-use permission. Updates stop when the user stops tracking or leaves the screen. The application has no developer-operated location backend and does not send coordinates to Open-Meteo or another weather provider.

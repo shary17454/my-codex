@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2 (165) - 2026-07-31
+
+### StoreKit
+
+- Added Apple's official offer-code redemption flow to locked catalog pages so
+  owner/promotional access can unlock `batal.catalog.permanent.unlock` through a
+  verified StoreKit transaction instead of an unsafe local email bypass.
+- Added regression coverage proving redemption presentation does not unlock
+  locally unless StoreKit current entitlements include the full-catalog product.
+- Kept the bundle identifier, development team, signing style, entitlements,
+  and capabilities unchanged.
+
 ## 2.2 (155) - 2026-07-31
 
 ### Release

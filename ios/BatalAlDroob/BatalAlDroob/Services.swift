@@ -1,5 +1,6 @@
 import Foundation
 import StoreKit
+import UIKit
 import Vision
 
 // MARK: - Services
@@ -72,6 +73,7 @@ protocol PurchaseService: Sendable {
     func entitlementUpdates() -> AsyncStream<Set<String>>
     func purchase(productID: String) async throws -> PurchaseOutcome
     func restorePurchasedProductIDs() async throws -> Set<String>
+    func presentOfferCodeRedemption() async throws
 }
 
 enum PurchaseOutcome: Equatable { case success, cancelled, pending }
@@ -161,11 +163,19 @@ struct StoreKitPurchaseService: PurchaseService {
         try await AppStore.sync()
         return await currentEntitledProductIDs()
     }
+
+    @MainActor
+    func presentOfferCodeRedemption() async throws {
+        guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
+            throw AppError.offerCodeRedemptionUnavailable
+        }
+        try await AppStore.presentOfferCodeRedeemSheet(in: scene)
+    }
 }
 
 enum AppError: LocalizedError {
     case missingResource(String), productUnavailable, invalidProductType, unverifiedTransaction, unknownPurchaseResult
-    case unreadablePhoto
+    case unreadablePhoto, offerCodeRedemptionUnavailable
     var errorDescription: String? {
         switch self {
         case let .missingResource(name): "Missing bundled resource: \(name)"
@@ -174,6 +184,7 @@ enum AppError: LocalizedError {
         case .unverifiedTransaction: "Transaction verification failed."
         case .unknownPurchaseResult: "Unknown purchase result."
         case .unreadablePhoto: "The selected photo could not be read."
+        case .offerCodeRedemptionUnavailable: "The offer code redemption sheet is unavailable."
         }
     }
 }

@@ -39,6 +39,17 @@ struct PartDetailView: View {
                             )
                         }
                         .buttonStyle(.batalSecondary)
+                        Button {
+                            AppHaptics.lightImpact()
+                            Task { await viewModel.redeemOfferCode() }
+                        } label: {
+                            Label(
+                                viewModel.text(ar: "استرداد كود العرض أو المالك", en: "Redeem offer or owner code"),
+                                systemImage: "ticket"
+                            )
+                        }
+                        .buttonStyle(.batalSecondary)
+                        .accessibilityIdentifier("purchase.redeemOfferCode")
                     }
                 }
                 .padding(.vertical, 4)
