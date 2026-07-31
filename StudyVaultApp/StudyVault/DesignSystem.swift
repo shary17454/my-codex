@@ -342,8 +342,10 @@ struct WeshPrimaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.headline)
             .foregroundStyle(isEnabled ? .white : WeshTheme.secondaryText)
-            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
             .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
             .background(
                 LinearGradient(
                     colors: isEnabled
@@ -369,8 +371,10 @@ struct WeshGoldButtonStyle: ButtonStyle {
         configuration.label
             .font(.headline)
             .foregroundStyle(isEnabled ? Color.black.opacity(0.82) : WeshTheme.secondaryText)
-            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
             .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
             .background(
                 LinearGradient(
                     colors: isEnabled ? [WeshTheme.goldBright, WeshTheme.gold] : [WeshTheme.hairline],
@@ -393,8 +397,10 @@ struct WeshSecondaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.headline)
             .foregroundStyle(isEnabled ? WeshTheme.primaryText : WeshTheme.secondaryText)
-            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
             .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity, minHeight: WeshTheme.touchTarget)
             .background(
                 WeshTheme.surface.opacity(configuration.isPressed ? 0.72 : 1),
                 in: RoundedRectangle(cornerRadius: 18, style: .continuous)
