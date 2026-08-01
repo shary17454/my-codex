@@ -2,10 +2,12 @@ import SwiftUI
 
 struct AIAssistantView: View {
     @Bindable var viewModel: CatalogViewModel
+    let exitAssistant: () -> Void
     @FocusState private var isInputFocused: Bool
+    @State private var navigationPath: [Part] = []
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -53,7 +55,9 @@ struct AIAssistantView: View {
                             }
 
                             if !viewModel.aiSuggestions.isEmpty {
-                                AIAssistantSuggestions(viewModel: viewModel)
+                                AIAssistantSuggestions(viewModel: viewModel) { part in
+                                    navigationPath.append(part)
+                                }
                             }
                         }
                         .padding(BatalDesign.screenPadding)
@@ -70,7 +74,34 @@ struct AIAssistantView: View {
             }
             .background(BatalDesign.canvas)
             .navigationTitle(viewModel.text(ar: "مساعد بطل الدروب", en: "Batal Assistant"))
-            .toolbar { LanguageMenu(viewModel: viewModel) }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        AppHaptics.lightImpact()
+                        isInputFocused = false
+                        if navigationPath.isEmpty {
+                            exitAssistant()
+                        } else {
+                            navigationPath.removeLast()
+                        }
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                            .font(.headline.weight(.bold))
+                            .frame(width: 42, height: 42)
+                            .background(BatalDesign.surface, in: Circle())
+                            .overlay(Circle().stroke(BatalDesign.border))
+                    }
+                    .accessibilityIdentifier("assistant.back")
+                    .accessibilityLabel(viewModel.text(ar: "رجوع للرئيسية", en: "Back to Home"))
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    LanguageMenu(viewModel: viewModel)
+                }
+            }
+            .navigationDestination(for: Part.self) { part in
+                PartDetailView(part: part, viewModel: viewModel)
+            }
         }
     }
 }
@@ -196,27 +227,74 @@ private struct AIAssistantBubble: View {
 
 private struct AIAssistantSuggestions: View {
     @Bindable var viewModel: CatalogViewModel
+    let openPart: (Part) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(viewModel.text(ar: "خطوات مقترحة", en: "Suggested next steps"))
                 .font(.headline)
             ForEach(viewModel.aiSuggestions) { suggestion in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(suggestion.title)
-                        .font(.callout.bold())
-                    Text(suggestion.reason)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                Button {
+                    AppHaptics.lightImpact()
+                    perform(suggestion)
+                } label: {
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(suggestion.title)
+                                .font(.callout.bold())
+                            Text(suggestion.reason)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 8)
+                        Image(systemName: icon(for: suggestion.id))
+                            .font(.headline)
+                            .foregroundStyle(BatalDesign.brand)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(.tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                    .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(.tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("assistant.suggestion.\(suggestion.id)")
             }
         }
         .padding(14)
         .premiumPanel()
+    }
+
+    private func icon(for id: String) -> String {
+        switch id {
+        case "review-top-result":
+            "arrow.up.forward.square"
+        case "prepare-request":
+            "cart.badge.plus"
+        case "complete-vehicle":
+            "car"
+        default:
+            "arrow.up.left"
+        }
+    }
+
+    private func perform(_ suggestion: AISuggestion) {
+        switch suggestion.id {
+        case "review-top-result":
+            if let part = viewModel.assistantTopResult {
+                openPart(part)
+            } else {
+                viewModel.aiErrorMessage = viewModel.text(
+                    ar: "لا توجد نتيجة حالية لفتحها. ابدأ ببحث في الكتالوج أولًا.",
+                    en: "There is no current result to open. Start with a catalog search first."
+                )
+            }
+        case "prepare-request":
+            viewModel.prepareAssistantPartRequest()
+        case "complete-vehicle":
+            viewModel.explainVehicleProfileCompletion()
+        default:
+            viewModel.aiQuestion = suggestion.title
+        }
     }
 }
 

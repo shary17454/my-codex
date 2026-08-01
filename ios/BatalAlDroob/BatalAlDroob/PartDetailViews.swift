@@ -82,7 +82,7 @@ struct PartDetailView: View {
                             en: "Illustrative locator showing the part number, not an official catalog diagram"
                         ))
                 } else {
-                    LockedPartImagePlaceholder(viewModel: viewModel)
+                    LockedPartImagePlaceholder(part: part, viewModel: viewModel)
                         .frame(height: 220)
                 }
             }
@@ -183,27 +183,52 @@ private struct YearListDetailRow: View {
 }
 
 private struct LockedPartImagePlaceholder: View {
+    let part: Part
     @Bindable var viewModel: CatalogViewModel
 
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "photo.badge.lock")
-                .font(.system(size: 40, weight: .semibold))
-                .foregroundStyle(BatalDesign.accent)
-            Text(viewModel.text(ar: "صورة القطعة والرقم الكامل مقفلة", en: "Part image and full number are locked"))
-                .font(.headline)
+        Button {
+            AppHaptics.lightImpact()
+            Task { await viewModel.unlock(part, level: .singleUnlock) }
+        } label: {
+            VStack(spacing: 12) {
+                if viewModel.isPurchaseActionDisabled(for: .singleUnlock) {
+                    ProgressView()
+                        .controlSize(.large)
+                } else {
+                    Image(systemName: "photo.badge.lock")
+                        .font(.system(size: 40, weight: .semibold))
+                        .foregroundStyle(BatalDesign.accent)
+                }
+                Text(viewModel.text(ar: "صورة القطعة والرقم الكامل مقفلة", en: "Part image and full number are locked"))
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.center)
+                Text(viewModel.text(
+                    ar: "اضغط هنا لفتح صفحة الكتالوج هذه بـ 4 ر.س وعرض الرقم الكامل ومؤشر صورة القطعة.",
+                    en: "Tap here to unlock this catalog page for SAR 4 and show the full number and part image locator."
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            Text(viewModel.text(
-                ar: "افتح صفحة الكتالوج هذه بـ 4 ر.س لعرض الرقم الكامل ومؤشر صورة القطعة.",
-                en: "Unlock this catalog page for SAR 4 to show the full number and part image locator."
-            ))
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
+                Text(CatalogAccessLevel.singleUnlock.priceText(viewModel.language))
+                    .font(.headline.monospacedDigit().bold())
+                    .foregroundStyle(BatalDesign.brand)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 7)
+                    .background(BatalDesign.brand.opacity(0.12), in: Capsule())
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
+            .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-        .background(.quaternary.opacity(0.3), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+        .buttonStyle(.plain)
+        .disabled(viewModel.isPurchaseActionDisabled(for: .singleUnlock))
+        .accessibilityIdentifier("part.lockedImage.unlockSinglePage")
+        .accessibilityLabel(viewModel.text(
+            ar: "فتح صورة القطعة والرقم الكامل بأربعة ريالات",
+            en: "Unlock part image and full number for four Saudi Riyals"
+        ))
     }
 }
 

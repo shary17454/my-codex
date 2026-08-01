@@ -127,6 +127,26 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertTrue(matches.contains { $0.partNumber == "23378-M4901" || $0.partNumber == "23378-03J00" })
     }
 
+    func testBundledCatalogContainsMergedY61IABParts() throws {
+        let catalogURL = try XCTUnwrap(bundle.url(
+            forResource: "y60_app_catalog",
+            withExtension: "json",
+            subdirectory: "data"
+        ))
+        let catalogData = try Data(contentsOf: catalogURL)
+        let catalog = try JSONDecoder().decode(CatalogPayload.self, from: catalogData)
+        let y61Parts = catalog.parts.filter { ($0.model ?? "").uppercased() == "Y61" }
+
+        XCTAssertGreaterThan(y61Parts.count, 5_000)
+
+        let engineAssembly = try XCTUnwrap(y61Parts.first { $0.partNumber == "10102VB050" })
+        XCTAssertEqual(engineAssembly.nameEn, "ENGINE ASSY-BARE")
+        XCTAssertTrue(engineAssembly.years.contains("1997"))
+        XCTAssertTrue(engineAssembly.engines.contains("TB45E"))
+        XCTAssertEqual(engineAssembly.category, "engine")
+        XCTAssertTrue(engineAssembly.evidence.contains { $0.sourceID?.hasPrefix("y61_partsouq_iab_1997") == true })
+    }
+
     @MainActor
     func testNaturalArabicSteeringArmSearchFindsCatalogParts() async throws {
         let viewModel = CatalogViewModel(
@@ -397,6 +417,54 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
+    func testCancelledSinglePagePurchaseKeepsUnlockActionRetryable() async throws {
+        let defaultsKey = "batalPaidUnlocks"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let store = FixedOutcomePurchaseService(outcome: .cancelled)
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: store
+        )
+        await viewModel.load()
+        let part = try XCTUnwrap(viewModel.parts.first { $0.partNumber == "21082-4W000" })
+
+        await viewModel.unlock(part, level: .singleUnlock)
+
+        XCTAssertFalse(viewModel.isUnlocked(part))
+        XCTAssertFalse(viewModel.isPurchaseActionDisabled(for: .singleUnlock))
+        XCTAssertEqual(store.purchasedProductIDs(), [StoreProductID.singleCatalogUnlock])
+        XCTAssertTrue(viewModel.paymentMessage?.contains("تم إلغاء عملية الدفع") == true)
+    }
+
+    @MainActor
+    func testAssistantPrepareRequestSavesClosestCatalogResult() async throws {
+        let defaultsKey = "batalPartRequests"
+        UserDefaults.standard.removeObject(forKey: defaultsKey)
+        defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
+
+        let viewModel = CatalogViewModel(
+            repository: RankedCatalogRepository(),
+            store: TestPurchaseService()
+        )
+        await viewModel.load()
+        viewModel.isVehicleFilterEnabled = false
+        viewModel.selectedCategory = .all
+        viewModel.searchText = "21082-4W000"
+        let topResult = try XCTUnwrap(viewModel.assistantTopResult)
+
+        viewModel.prepareAssistantPartRequest()
+
+        let saved = try XCTUnwrap(viewModel.savedRequests.first)
+        XCTAssertEqual(saved.partNumber, viewModel.protectedNumber(topResult))
+        XCTAssertEqual(saved.partName, viewModel.title(for: topResult))
+        XCTAssertEqual(saved.planID, "basic")
+        XCTAssertTrue(saved.draft.contains(saved.partName))
+        XCTAssertTrue(viewModel.aiMessages.last?.text.contains("تم حفظ طلب قطعة") == true)
+    }
+
+    @MainActor
     func testPhotoAndFitmentResultsMaskPartNumberUntilSingleUnlock() async throws {
         let defaultsKey = "batalPaidUnlocks"
         UserDefaults.standard.removeObject(forKey: defaultsKey)
@@ -443,6 +511,25 @@ final class BatalCatalogResourceTests: XCTestCase {
 
         XCTAssertEqual(viewModel.filteredParts.map(\.partNumber), ["21082-4W000"])
         XCTAssertEqual(viewModel.vehicleMatchSummary(for: viewModel.filteredParts[0]), "متوافق مع ملف سيارتك")
+    }
+
+    @MainActor
+    func testInteriorGearTrimSearchDoesNotRankHardwareAsTopResult() async throws {
+        let viewModel = CatalogViewModel(
+            repository: InteriorTrimCatalogRepository(),
+            store: TestPurchaseService()
+        )
+        await viewModel.load()
+        viewModel.isVehicleFilterEnabled = false
+        viewModel.selectedCategory = .all
+        viewModel.searchText = "رقم ديكور القير العنابي لنيسان 1992"
+
+        let results = viewModel.filteredParts
+        let debugResults = results.map { "\($0.partNumber): \(viewModel.title(for: $0))" }.joined(separator: " | ")
+
+        XCTAssertEqual(results.first?.partNumber, "96935-TRIM", debugResults)
+        XCTAssertFalse(viewModel.title(for: try XCTUnwrap(results.first)).contains("صامولة"), debugResults)
+        XCTAssertFalse(results.prefix(2).contains { viewModel.title(for: $0).contains("صامولة") }, debugResults)
     }
 
     @MainActor
@@ -788,6 +875,72 @@ private struct RankedCatalogRepository: CatalogRepository {
     }
 }
 
+private struct InteriorTrimCatalogRepository: CatalogRepository {
+    func loadCatalog() async throws -> CatalogPayload {
+        let parts = try [
+            Self.part("""
+            {
+              "part_number": "01225-00371",
+              "name_ar": "صامولة",
+              "name_en": "Grommet-Screw",
+              "confidence": 98,
+              "category": "body",
+              "model": "Y60",
+              "years": ["1988", "1989", "1990", "1991", "1992", "1993"],
+              "engines": ["TB42"],
+              "evidence": [
+                {
+                  "source_id": "01_combined_catalog_1988_1997",
+                  "year": "1992",
+                  "reference": "680A",
+                  "context": "Y60 | لوحة العدادات، بطانة وغطاء مجموعة العدادات | Grommet-Screw | صامولة | gear trim nearby"
+                }
+              ]
+            }
+            """),
+            Self.part("""
+            {
+              "part_number": "96935-TRIM",
+              "name_ar": "ديكور القير العنابي",
+              "name_en": "Burgundy Gear Shift Console Finisher",
+              "confidence": 70,
+              "category": "body",
+              "model": "Y60",
+              "years": ["1992"],
+              "engines": ["TB42"],
+              "evidence": [
+                {
+                  "source_id": "01_combined_catalog_1988_1997",
+                  "year": "1992",
+                  "reference": "969A",
+                  "context": "Y60 | Console box and shift lever finisher | ديكور القير | burgundy interior trim | cover shift selector"
+                }
+              ]
+            }
+            """)
+        ]
+
+        return CatalogPayload(
+            generatedAt: nil,
+            appName: "بطل الدروب",
+            model: "Y60",
+            sourceCount: 1,
+            recordCount: 2,
+            partCount: 2,
+            sources: [],
+            parts: parts
+        )
+    }
+
+    func loadStores() async throws -> [VerifiedStore] {
+        []
+    }
+
+    private static func part(_ json: String) throws -> Part {
+        try JSONDecoder().decode(Part.self, from: Data(json.utf8))
+    }
+}
+
 private struct AlternatePartNumberRepository: CatalogRepository {
     func loadCatalog() async throws -> CatalogPayload {
         let part = try JSONDecoder().decode(Part.self, from: Data("""
@@ -907,6 +1060,42 @@ private final class ProductRefreshPurchaseService: PurchaseService, @unchecked S
     func availableProductLookupCount() -> Int {
         lookupCount
     }
+
+    func purchasedProductIDs() -> [String] {
+        purchasedIDs
+    }
+}
+
+private final class FixedOutcomePurchaseService: PurchaseService, @unchecked Sendable {
+    private let outcome: PurchaseOutcome
+    private var purchasedIDs: [String] = []
+
+    init(outcome: PurchaseOutcome) {
+        self.outcome = outcome
+    }
+
+    func availableProductIDs(for productIDs: [String]) async throws -> Set<String> {
+        Set(productIDs)
+    }
+
+    func currentEntitledProductIDs() async -> Set<String> {
+        []
+    }
+
+    func entitlementUpdates() -> AsyncStream<Set<String>> {
+        AsyncStream { continuation in continuation.finish() }
+    }
+
+    func purchase(productID: String) async throws -> PurchaseOutcome {
+        purchasedIDs.append(productID)
+        return outcome
+    }
+
+    func restorePurchasedProductIDs() async throws -> Set<String> {
+        []
+    }
+
+    func presentOfferCodeRedemption() async throws {}
 
     func purchasedProductIDs() -> [String] {
         purchasedIDs

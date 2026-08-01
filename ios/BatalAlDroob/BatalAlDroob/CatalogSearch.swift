@@ -1,13 +1,105 @@
 import Foundation
 import UIKit
 
+private struct CatalogSearchIntent {
+    private let normalizedQuery: String
+    private let wantsInteriorTrim: Bool
+    private let wantsGearArea: Bool
+    private let yearTokens: [String]
+
+    init(query: String) {
+        normalizedQuery = normalized(query)
+        wantsInteriorTrim = Self.containsAny(
+            normalized(query),
+            [
+                "ديكور", "دكور", "زينة", "زينه", "تلبيس", "تلبيسة", "تلبيسه", "تلبيسات",
+                "غطاء", "غطا", "كسوة", "حلية", "خشب", "خشبي", "عنابي", "خمري", "ماروني",
+                "بيج", "ذهبي", "داخلية", "داخلي", "كونسول", "درجالقير", "trim", "finisher",
+                "finish", "garnish", "bezel", "console", "interior", "wood", "maroon", "burgundy"
+            ]
+        )
+        wantsGearArea = Self.containsAny(
+            normalized(query),
+            ["قير", "جير", "فتيس", "جربكس", "جيربوكس", "ناقلحركة", "transmission", "gearbox", "shift", "selector"]
+        )
+        yearTokens = partNumberCandidates(in: query).isEmpty
+            ? query.split(whereSeparator: { !$0.isNumber }).map(String.init).filter { $0.count == 4 }
+            : []
+    }
+
+    func adjustedScore(_ baseScore: Int, for part: Part, searchText: String) -> Int? {
+        var score = baseScore
+
+        if wantsInteriorTrim {
+            if isClearlyHardware(part) {
+                return nil
+            }
+
+            let preferredHits = interiorTrimPreferredTerms.filter { searchText.contains(normalized($0)) }.count
+            if preferredHits > 0 { score += min(220, preferredHits * 45) }
+
+            if wantsGearArea, Self.containsAny(searchText, gearAreaPreferredTerms.map(normalized)) {
+                score += 120
+            }
+
+            if Self.containsAny(searchText, ["لوحةالعدادات", "طبلون", "تابلوه", "داخلي", "كونسول", "كسوة", "ديكور"]) {
+                score += 80
+            }
+        }
+
+        for year in yearTokens where part.years.contains(year) || part.dateRanges.contains(where: { $0.contains(year) }) {
+            score += 60
+            break
+        }
+
+        if normalizedQuery.contains("y60"), normalized(part.model ?? "").contains("y60") {
+            score += 80
+        }
+
+        return score
+    }
+
+    private func isClearlyHardware(_ part: Part) -> Bool {
+        let title = normalized([part.nameAr, part.nameEn].compactMap(\.self).joined(separator: " "))
+        let hardwareNames = [
+            "صامولة", "مسمار", "برغي", "وردة", "واشر", "كلبسة", "مشبك", "جلدة", "ربلة",
+            "nut", "screw", "bolt", "washer", "grommet", "clip", "retainer"
+        ].map(normalized)
+        return hardwareNames.contains { title.contains($0) }
+    }
+
+    private var interiorTrimPreferredTerms: [String] {
+        [
+            "trim", "finisher", "finish", "garnish", "bezel", "cover", "lid", "console",
+            "center console", "instrument panel", "dashboard", "cluster lid", "cluster",
+            "shift", "selector", "knob", "boot", "interior", "wood", "maroon", "burgundy",
+            "ديكور", "زينة", "زينه", "تلبيس", "غطاء", "كسوة", "حلية", "كونسول", "طبلون", "تابلوه", "عنابي"
+        ]
+    }
+
+    private var gearAreaPreferredTerms: [String] {
+        [
+            "shift", "selector", "gear shift", "gear selector", "transmission control",
+            "console", "knob", "boot", "lever", "finisher shift", "cover shift",
+            "قير", "عصا القير", "ديكور القير", "كونسول"
+        ]
+    }
+
+    private static func containsAny(_ text: String, _ terms: [String]) -> Bool {
+        terms.contains { term in
+            let normalizedTerm = normalized(term)
+            return !normalizedTerm.isEmpty && text.contains(normalizedTerm)
+        }
+    }
+}
+
 extension CatalogViewModel {
     func fitmentSummary(for query: String) -> String {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             return text(ar: "أدخل رقم قطعة أو وصفًا مختصرًا.", en: "Enter a part number or short description.")
         }
-        let match = rankedFitmentMatches(for: trimmed, limit: 1).first
+        let match = rankedCatalogMatches(for: trimmed, limit: 1).first
         guard let match else {
             return text(
                 ar: "لم أجد تطابقًا مباشرًا. جرّب رقم قطعة مثل 21082-4W000 أو اسم القسم.",
@@ -29,7 +121,7 @@ extension CatalogViewModel {
     func fitmentMatches(for query: String) -> [Part] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
-        return rankedFitmentMatches(for: trimmed, limit: 8)
+        return rankedCatalogMatches(for: trimmed, limit: 8)
     }
 
     func categoryCount(_ category: CatalogCategory) -> Int {
@@ -53,15 +145,16 @@ extension CatalogViewModel {
         #endif
     }
 
-    private func rankedFitmentMatches(for query: String, limit: Int) -> [Part] {
+    func rankedCatalogMatches(for query: String, limit: Int) -> [Part] {
         let normalizedQuery = normalized(query)
         let shouldUseExpandedTerms = !isLikelyPartNumberLookup(query, normalizedQuery: normalizedQuery)
         let expandedTerms = shouldUseExpandedTerms ? expandedSearchTerms(for: query) : []
+        let intent = CatalogSearchIntent(query: query)
         return parts.compactMap { part -> (Part, Int)? in
             let normalizedPrimary = normalized(part.partNumber)
             let normalizedNumbers = part.allNumbers.map(normalized)
             let searchText = self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)
-            let score: Int
+            var score: Int
             if normalizedPrimary == normalizedQuery {
                 score = 400
             } else if normalizedNumbers.contains(normalizedQuery) {
@@ -81,6 +174,10 @@ extension CatalogViewModel {
             } else {
                 return nil
             }
+            guard let adjustedScore = intent.adjustedScore(score, for: part, searchText: searchText) else {
+                return nil
+            }
+            score = adjustedScore
             return (part, score)
         }
         .sorted { lhs, rhs in
@@ -89,6 +186,12 @@ extension CatalogViewModel {
         }
         .prefix(limit)
         .map(\.0)
+    }
+
+    func rankingDebugSummary(for query: String, limit: Int = 5) -> [String] {
+        rankedCatalogMatches(for: query, limit: limit).map { part in
+            "\(part.partNumber) | \(title(for: part)) | \(part.model ?? "-") | \(short(orderedModelYears(for: part.model, years: part.years), limit: 4))"
+        }
     }
 
     func searchableText(for part: Part) -> String {
@@ -161,7 +264,11 @@ extension CatalogViewModel {
             ),
             (
                 ["قير", "جير", "فتيس", "جربكس", "جيربوكس", "ناقل حركة", "transmission", "gearbox"],
-                ["transmission", "gearbox", "gear", "shaft", "synchro", "shift", "transfer", "case transfer", "oil seal transmission"]
+                ["transmission", "gearbox", "manual transmission", "automatic transmission", "shift", "shift lever", "gear shift", "selector", "gear selector", "knob", "boot", "console", "finisher", "cover shift", "case transfer", "oil seal transmission"]
+            ),
+            (
+                ["ديكور", "دكور", "زينة", "زينه", "تلبيس", "تلبيسة", "تلبيسه", "غطاء", "غطا", "كسوة", "تلبيسات", "عنابي", "خمري", "ماروني", "خشب", "خشبي", "بيج", "ذهبي", "داخلية", "داخلي", "كونسول", "درج القير", "حلية", "trim", "finisher", "garnish", "bezel", "console"],
+                ["trim", "finisher", "finish", "garnish", "bezel", "cover", "lid", "console", "center console", "instrument panel", "dashboard", "cluster", "cluster lid", "shift", "selector", "knob", "boot", "interior", "wood", "maroon", "burgundy"]
             ),
             (
                 ["دبل", "دفلوك", "دف لوك", "دفرنس", "دفرنش", "كرونة", "كارونه", "diff", "differential"],
@@ -310,8 +417,22 @@ extension CatalogViewModel {
     func isLikelyPartNumberLookup(_ rawQuery: String, normalizedQuery: String) -> Bool {
         guard normalizedQuery.count >= 5 else { return false }
         if !partNumberCandidates(in: rawQuery).isEmpty { return true }
-        return normalizedQuery.contains(where: \.isNumber)
-            && normalizedQuery.contains(where: \.isLetter)
+        let latinTokens = rawQuery
+            .uppercased()
+            .split { !$0.isLetter && !$0.isNumber }
+            .map(String.init)
+            .filter { token in
+                token.range(of: #"^[A-Z0-9]{5,14}$"#, options: .regularExpression) != nil
+            }
+
+        return latinTokens.contains { token in
+            let hasDigit = token.contains(where: \.isNumber)
+            let hasLatinLetter = token.contains { character in
+                character >= "A" && character <= "Z"
+            }
+            guard hasDigit else { return false }
+            return hasLatinLetter || token.count >= 7
+        }
     }
 
     func partNumberMatches(

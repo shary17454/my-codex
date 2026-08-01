@@ -32,7 +32,9 @@ struct RootView: View {
                     .tabItem { Label(viewModel.text(ar: "الكتالوج", en: "Catalog"), systemImage: "magnifyingglass") }
                     .accessibilityIdentifier("tab.catalog")
                     .tag(AppTab.catalog)
-                AIAssistantView(viewModel: viewModel)
+                AIAssistantView(viewModel: viewModel) {
+                    selectedTab = .dashboard
+                }
                     .tabItem { Label(viewModel.text(ar: "المساعد", en: "Assistant"), systemImage: "sparkles") }
                     .accessibilityIdentifier("tab.assistant")
                     .tag(AppTab.assistant)
@@ -458,6 +460,7 @@ private struct PatrolGeneration: Identifiable {
     let summaryEn: String
     let badgeAr: String
     let badgeEn: String
+    let catalogFileCount: Int?
     let isActive: Bool
 }
 
@@ -473,10 +476,11 @@ struct PatrolGenerationsSection: View {
             titleEn: "Classic generation",
             yearsAr: "1988-1997",
             yearsEn: "1988-1997",
-            summaryAr: "الفئة الكلاسيكية التي طلبت إرجاع صورها، وهي مرتبطة الآن ببحث الكتالوج النشط.",
-            summaryEn: "The restored classic generation visuals linked to the active catalog search.",
+            summaryAr: "صور وبيانات الجيل الكلاسيكي مرتبطة ببحث الكتالوج لتسهيل الوصول إلى القطع المناسبة.",
+            summaryEn: "Classic generation visuals and data are linked to catalog search for faster part discovery.",
             badgeAr: "نشط",
             badgeEn: "Active",
+            catalogFileCount: 47,
             isActive: true
         ),
         PatrolGeneration(
@@ -486,10 +490,11 @@ struct PatrolGenerationsSection: View {
             titleEn: "Safari generation",
             yearsAr: "1997-2010",
             yearsEn: "1997-2010",
-            summaryAr: "جيل السفاري ضمن بطاقات الأجيال، جاهز للتوسعة عند إدخال قاعدة بياناته.",
-            summaryEn: "The Safari generation card, ready for expansion when its catalog is indexed.",
-            badgeAr: "قادم",
-            badgeEn: "Next",
+            summaryAr: "كتالوجات السفاري محفوظة كملفات مرجعية، وتحتاج فهرسة تفصيلية لتحويل صفحاتها إلى أرقام قطع قابلة للبحث.",
+            summaryEn: "Safari catalogs are stored as reference files and need detailed indexing before their pages become searchable part records.",
+            badgeAr: "ملفات",
+            badgeEn: "Files",
+            catalogFileCount: 19,
             isActive: false
         ),
         PatrolGeneration(
@@ -503,6 +508,7 @@ struct PatrolGenerationsSection: View {
             summaryEn: "A modern-platform generation with its own visual card on the home screen.",
             badgeAr: "قادم",
             badgeEn: "Next",
+            catalogFileCount: 30,
             isActive: false
         ),
         PatrolGeneration(
@@ -516,6 +522,7 @@ struct PatrolGenerationsSection: View {
             summaryEn: "The newest generation card is kept in the generation framework for future support.",
             badgeAr: "مستقبلي",
             badgeEn: "Future",
+            catalogFileCount: nil,
             isActive: false
         )
     ]
@@ -592,13 +599,8 @@ private struct PatrolGenerationCard: View {
                         .lineLimit(3)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Label(
-                        viewModel.text(
-                            ar: "\(viewModel.generationRecordCount(for: generation.id).formatted()) سجل مرتبط",
-                            en: "\(viewModel.generationRecordCount(for: generation.id).formatted()) linked records"
-                        ),
-                        systemImage: "externaldrive.badge.checkmark"
-                    )
+                    let recordCount = viewModel.generationRecordCount(for: generation.id)
+                    Label(generationCoverageLabel(recordCount: recordCount), systemImage: "externaldrive.badge.checkmark")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(BatalDesign.brand)
 
@@ -621,6 +623,24 @@ private struct PatrolGenerationCard: View {
         )
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("home.generation.\(generation.id)")
+    }
+
+    private func generationCoverageLabel(recordCount: Int) -> String {
+        if recordCount > 0 {
+            return viewModel.text(
+                ar: "\(recordCount.formatted()) سجل مرتبط",
+                en: "\(recordCount.formatted()) linked records"
+            )
+        }
+
+        if let fileCount = generation.catalogFileCount {
+            return viewModel.text(
+                ar: "\(fileCount.formatted()) ملف كتالوج محفوظ",
+                en: "\(fileCount.formatted()) saved catalog files"
+            )
+        }
+
+        return viewModel.text(ar: "بانتظار الفهرسة", en: "Awaiting indexing")
     }
 
     @ViewBuilder

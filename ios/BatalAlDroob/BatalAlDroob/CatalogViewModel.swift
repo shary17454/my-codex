@@ -168,7 +168,21 @@ extension CatalogViewModel {
     var filteredParts: [Part] {
         let rawQuery = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         let query = normalized(searchText)
+        guard !query.isEmpty else {
+            let categoryResults = Array(parts.lazy.filter { part in
+                self.selectedCategory == .all || part.categoryValue == self.selectedCategory
+            }.prefix(250))
+            return applyVehicleFilter(to: categoryResults)
+        }
+
         let isPartNumberLookup = isLikelyPartNumberLookup(rawQuery, normalizedQuery: query)
+        if !isPartNumberLookup {
+            let rankedTextResults = rankedCatalogMatches(for: rawQuery, limit: 250).filter { part in
+                self.selectedCategory == .all || part.categoryValue == self.selectedCategory
+            }
+            return applyVehicleFilter(to: rankedTextResults)
+        }
+
         let exactResults = Array(parts.lazy.filter { part in
             let categoryMatch = self.selectedCategory == .all || part.categoryValue == self.selectedCategory
             let numberMatch = self.partNumberMatches(
@@ -177,7 +191,6 @@ extension CatalogViewModel {
                 allowingCloseMatches: false
             )
             guard categoryMatch || (isPartNumberLookup && numberMatch) else { return false }
-            guard !query.isEmpty else { return true }
             let indexedText = self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)
             return numberMatch || self.searchTextMatches(indexedText, rawQuery: rawQuery, normalizedQuery: query)
         }.prefix(250))
@@ -607,6 +620,50 @@ extension CatalogViewModel {
     func retryLastAssistantQuestion() async {
         guard let lastQuestion = aiMessages.last(where: { $0.role == .user })?.text else { return }
         await askAssistant(lastQuestion)
+    }
+
+    var assistantTopResult: Part? {
+        filteredParts.first
+    }
+
+    func prepareAssistantPartRequest() {
+        guard let part = assistantTopResult else {
+            appendLocalAssistantActionMessage(text(
+                ar: "لا توجد نتيجة حالية لتجهيز طلب قطعة. اكتب وصف القطعة أو رقمها في البحث أولًا.",
+                en: "There is no current result to prepare a part request. Search by part description or number first."
+            ))
+            return
+        }
+
+        let request = SavedPartRequest(
+            generation: part.model ?? vehicleProfile.generation,
+            year: orderedModelYears(for: part.model, years: part.years).first ?? vehicleProfile.year,
+            vin: vehicleProfile.vin,
+            engine: part.engines.first ?? vehicleProfile.engine,
+            transmission: vehicleProfile.transmission,
+            partNumber: protectedNumber(part),
+            partName: title(for: part),
+            notes: text(
+                ar: "تم تجهيز هذا الطلب من مساعد بطل الدروب. تحقق من التوافق قبل الإرسال للمورد.",
+                en: "Prepared from Batal Assistant. Verify fitment before sending to a supplier."
+            )
+        )
+        saveRequestPlan(plans[0], request: request)
+        appendLocalAssistantActionMessage(text(
+            ar: "تم حفظ طلب قطعة للنتيجة الأقرب: \(title(for: part)). افتح تبويب طلب قطعة لمراجعة النص وإرساله للمورد.",
+            en: "Saved a part request for the closest result: \(title(for: part)). Open the Part Request tab to review and send it to a supplier."
+        ))
+    }
+
+    func explainVehicleProfileCompletion() {
+        appendLocalAssistantActionMessage(text(
+            ar: "لتحسين الدقة: افتح الرئيسية ثم عدّل بيانات سيارتي وأدخل الجيل، السنة، المحرك، وVIN إن توفر. بعدها أعد البحث وسأرتب النتائج حسب التوافق.",
+            en: "To improve accuracy: open Home, edit My Vehicle, then enter generation, year, engine, and VIN if available. Search again and I will rank results by fitment."
+        ))
+    }
+
+    private func appendLocalAssistantActionMessage(_ message: String) {
+        aiMessages.append(.init(role: .assistant, text: message, generatedByAI: false, createdAt: Date()))
     }
 
     func assistantContextRequest(message: String) -> AIAssistantRequest {
