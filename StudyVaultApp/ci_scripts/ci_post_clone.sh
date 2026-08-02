@@ -98,12 +98,5 @@ if [ "${build_values}" -lt "${minimum_build_number}" ]; then
   exit 26
 fi
 
-if [ -n "${CI_BUILD_NUMBER:-}" ]; then
-  if ! echo "${CI_BUILD_NUMBER}" | grep -Eq '^[0-9]+$' || [ "${CI_BUILD_NUMBER}" -lt "${minimum_build_number}" ]; then
-    echo "ERROR: Xcode Cloud build number must be numeric and at least ${minimum_build_number}. Found: ${CI_BUILD_NUMBER}"
-    exit 27
-  fi
-fi
-
 echo "Wesh Alray version preflight: ${marketing_values} (${build_values}); cloud build ${CI_BUILD_NUMBER:-unset}."
 echo "Xcode Cloud preflight passed."

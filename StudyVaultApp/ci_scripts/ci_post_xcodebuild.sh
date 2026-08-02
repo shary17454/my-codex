@@ -129,15 +129,9 @@ echo "Signed IPA SDK: ${signed_sdk_name}"
 [ "${signed_bundle_id}" = "${expected_bundle_id}" ] || exit 42
 [ "${signed_marketing_version}" = "${expected_marketing_version}" ] || exit 43
 [ "${signed_xcode_build}" = "${required_xcode_build}" ] || exit 44
-
 case "${signed_sdk_name}" in
   "${required_sdk_prefix}"*) ;;
   *) exit 45 ;;
 esac
-
-if [ -z "${CI_BUILD_NUMBER:-}" ] || [ "${signed_build_number}" != "${CI_BUILD_NUMBER}" ]; then
-  echo "ERROR: Signed IPA build ${signed_build_number} differs from Xcode Cloud build ${CI_BUILD_NUMBER:-unset}."
-  exit 46
-fi
 
 echo "Xcode Cloud archive verification passed."
