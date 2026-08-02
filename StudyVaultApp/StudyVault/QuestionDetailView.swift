@@ -27,6 +27,9 @@ struct QuestionDetail: View {
     let saveAction: (AskQuestion.ID) -> Void
     let saveOutcomeAction: (DecisionOutcomeSnapshot) -> Void
     let savePersonalEvaluationAction: (PersonalDecisionEvaluation) -> Void
+    let reportAction: (UUID, ReportableContentType, ReportReason, String?) async -> Bool
+    let followNotificationsAction: (UUID) async -> Void
+    let hasPremiumAccess: Bool
     let openRelatedQuestion: (AskQuestion) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -137,6 +140,13 @@ struct QuestionDetail: View {
                     share: { showingShareActions = true },
                     report: { showingReportSheet = true },
                     scheduleReminder: { showingReminderPicker = true },
+                    followNotifications: {
+                        Task {
+                            await followNotificationsAction(question.id)
+                            localMessage = "تم تفعيل متابعة تنبيهات هذه المقارنة."
+                            localMessageKind = .success
+                        }
+                    },
                     personalDecision: { showingPersonalDecision = true },
                     recordOutcome: { showingOutcomeEntry = true }
                 )
@@ -205,9 +215,15 @@ struct QuestionDetail: View {
         }
         .sheet(isPresented: $showingReportSheet) {
             NavigationStack {
-                ReportContentView(contentID: question.id, contentType: .comparison) {
-                    localMessage = "تم حفظ البلاغ محليًا. يتطلب إرساله للمراجعة Backend في النسخة الإنتاجية."
-                    localMessageKind = .information
+                ReportContentView(
+                    contentID: question.id,
+                    contentType: .comparison,
+                    submit: reportAction
+                ) { wasSentToReview in
+                    localMessage = wasSentToReview
+                        ? "تم إرسال البلاغ لفريق المراجعة."
+                        : "حفظنا البلاغ محليًا، وسيحتاج اتصال Backend لإرساله للمراجعة."
+                    localMessageKind = wasSentToReview ? .success : .information
                     showingReportSheet = false
                 }
             }
@@ -222,6 +238,7 @@ struct QuestionDetail: View {
                 localMessage = "تصدير PDF غير متاح في النسخة الحالية."
                 localMessageKind = .information
             }
+            .environment(\.weshPremiumAccess, hasPremiumAccess)
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
         }
@@ -653,6 +670,8 @@ struct DecisionSummaryCard: View {
             .padding(13)
             .background(WeshTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: WeshTheme.compactRadius))
 
+            CommunityNeedMatchView(match: summary.communityNeedMatch)
+
             if !summary.reasonThemes.isEmpty {
                 VStack(alignment: .leading, spacing: 9) {
                     Label("الموضوعات الأكثر تكرارًا", systemImage: "text.magnifyingglass")
@@ -693,6 +712,10 @@ struct DecisionSummaryCard: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
+            }
+
+            if let balance = summary.leaderReasonBalance {
+                LeaderReasonBalanceView(balance: balance)
             }
 
             if let warning = summary.warningText {
@@ -776,6 +799,172 @@ struct DecisionSummaryCard: View {
             RoundedRectangle(cornerRadius: WeshTheme.controlRadius, style: .continuous)
                 .stroke(WeshTheme.gold.opacity(0.38), lineWidth: 1)
         }
+    }
+}
+
+private struct CommunityNeedMatchView: View {
+    let match: CommunityNeedMatch
+
+    private var color: Color {
+        switch match.matchLevel {
+        case .low: WeshTheme.secondaryText
+        case .medium: WeshTheme.gold
+        case .high: WeshTheme.accent
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("رأي المجتمع مقابل احتياجي", systemImage: "person.text.rectangle")
+                    .font(.headline)
+                Spacer()
+                Text(match.matchLevel.arabicTitle)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(color)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(color.opacity(0.12), in: Capsule())
+            }
+
+            HStack(alignment: .top, spacing: 10) {
+                NeedMatchColumn(
+                    title: "اختيار المجتمع",
+                    value: match.communityChoice ?? "غير واضح بعد",
+                    icon: "person.2.fill",
+                    color: WeshTheme.accent
+                )
+                NeedMatchColumn(
+                    title: "الأقرب لاحتياجك",
+                    value: match.personalFitChoice ?? "حدد معاييرك",
+                    icon: "slider.horizontal.3",
+                    color: WeshTheme.gold
+                )
+            }
+
+            Text(match.explanation)
+                .font(.caption)
+                .foregroundStyle(WeshTheme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if !match.topCriteria.isEmpty {
+                FlowTags(values: match.topCriteria, color: color)
+            }
+        }
+        .padding(13)
+        .background(WeshTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: WeshTheme.compactRadius))
+        .overlay {
+            RoundedRectangle(cornerRadius: WeshTheme.compactRadius)
+                .stroke(color.opacity(0.22), lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private struct NeedMatchColumn: View {
+    let title: String
+    let value: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(WeshTheme.secondaryText)
+            Text(value)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(WeshTheme.primaryText)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(color.opacity(0.08), in: RoundedRectangle(cornerRadius: WeshTheme.compactRadius))
+    }
+}
+
+private struct LeaderReasonBalanceView: View {
+    let balance: LeaderReasonBalance
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("أسباب المتصدر وما يعاكسه", systemImage: "scale.3d")
+                    .font(.headline)
+                Spacer()
+                Text(balance.leaderTitle)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(WeshTheme.gold)
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 8)], spacing: 8) {
+                ReasonBalanceColumn(
+                    title: "لماذا اختاروه؟",
+                    values: balance.supportReasons,
+                    emptyText: "لا توجد أسباب دعم كافية.",
+                    icon: "checkmark.circle.fill",
+                    color: WeshTheme.accent
+                )
+                ReasonBalanceColumn(
+                    title: "ليش ما يختارونه؟",
+                    values: balance.cautionReasons,
+                    emptyText: "لا توجد ملاحظات واضحة.",
+                    icon: "exclamationmark.circle.fill",
+                    color: WeshTheme.gold
+                )
+            }
+
+            if !balance.alternativeReasons.isEmpty {
+                VStack(alignment: .leading, spacing: 7) {
+                    Text("أسباب اختيار البدائل")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(WeshTheme.secondaryText)
+                    FlowTags(values: balance.alternativeReasons, color: WeshTheme.secondaryAccent)
+                }
+            }
+        }
+        .padding(13)
+        .background(WeshTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: WeshTheme.compactRadius))
+        .overlay {
+            RoundedRectangle(cornerRadius: WeshTheme.compactRadius)
+                .stroke(WeshTheme.hairline, lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private struct ReasonBalanceColumn: View {
+    let title: String
+    let values: [String]
+    let emptyText: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(color)
+
+            let visibleValues = Array(values.prefix(4))
+            if visibleValues.isEmpty {
+                Text(emptyText)
+                    .font(.caption)
+                    .foregroundStyle(WeshTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                ForEach(visibleValues, id: \.self) { value in
+                    Text(value)
+                        .font(.caption)
+                        .foregroundStyle(WeshTheme.primaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(color.opacity(0.08), in: RoundedRectangle(cornerRadius: WeshTheme.compactRadius))
     }
 }
 
@@ -1106,6 +1295,7 @@ struct DecisionActionCard: View {
     let share: () -> Void
     let report: () -> Void
     let scheduleReminder: () -> Void
+    let followNotifications: () -> Void
     let personalDecision: () -> Void
     let recordOutcome: () -> Void
 
@@ -1127,6 +1317,10 @@ struct DecisionActionCard: View {
                 }
                 Button(action: scheduleReminder) {
                     DecisionToolButton(title: "إضافة تذكير", icon: "bell.badge", color: WeshTheme.gold)
+                }
+                .buttonStyle(.plain)
+                Button(action: followNotifications) {
+                    DecisionToolButton(title: "متابعة التنبيهات", icon: "bell.and.waves.left.and.right", color: WeshTheme.accentBright)
                 }
                 .buttonStyle(.plain)
                 Button(action: personalDecision) {
@@ -1167,12 +1361,16 @@ struct DecisionToolButton: View {
 
 private struct ComparisonShareSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @Environment(\.weshPremiumAccess) private var hasPremiumAccess
     let question: AskQuestion
     let showQRCode: () -> Void
     let unavailablePDF: () -> Void
+    @State private var pdfURL: URL?
+    @State private var pdfError: String?
 
     private var shareText: String { ComparisonShareService.shareText(for: question) }
-    private var link: String { ComparisonShareService.deepLink(for: question).absoluteString }
+    private var link: String { ComparisonShareService.publicURL(for: question).absoluteString }
 
     var body: some View {
         NavigationStack {
@@ -1180,6 +1378,20 @@ private struct ComparisonShareSheet: View {
                 VStack(spacing: 10) {
                     ShareLink(item: shareText) {
                         ShareActionRow(title: "مشاركة المقارنة", icon: "square.and.arrow.up", color: WeshTheme.accent)
+                    }
+                    Button {
+                        if let url = ComparisonShareService.whatsappURL(for: question) {
+                            openURL(url)
+                        }
+                    } label: {
+                        ShareActionRow(title: "مشاركة عبر WhatsApp", icon: "message.fill", color: WeshTheme.accentBright)
+                    }
+                    Button {
+                        if let url = ComparisonShareService.xShareURL(for: question) {
+                            openURL(url)
+                        }
+                    } label: {
+                        ShareActionRow(title: "مشاركة عبر X", icon: "xmark", color: WeshTheme.primaryText)
                     }
                     ShareLink(item: question.smartSummary) {
                         ShareActionRow(title: "مشاركة ملخص النتيجة", icon: "doc.text", color: WeshTheme.gold)
@@ -1190,6 +1402,9 @@ private struct ComparisonShareSheet: View {
                         ShareActionRow(title: "بطاقة نتيجة كصورة", icon: "photo.on.rectangle.angled", color: WeshTheme.gold)
                     }
                     .buttonStyle(.plain)
+                    ShareLink(item: shareText) {
+                        ShareActionRow(title: "مشاركة في Instagram", icon: "camera", color: WeshTheme.goldBright)
+                    }
                     Button {
                         UIPasteboard.general.string = shareText
                         dismiss()
@@ -1202,8 +1417,17 @@ private struct ComparisonShareSheet: View {
                     ShareLink(item: ComparisonShareService.csvText(for: question)) {
                         ShareActionRow(title: "تصدير CSV", icon: "tablecells", color: WeshTheme.secondaryAccent)
                     }
-                    Button(action: unavailablePDF) {
-                        ShareActionRow(title: "تصدير PDF", icon: "doc.richtext", color: WeshTheme.secondaryText)
+                    if let pdfURL {
+                        ShareLink(item: pdfURL, preview: SharePreview("تقرير \(question.title)")) {
+                            ShareActionRow(title: "مشاركة PDF", icon: "doc.richtext.fill", color: WeshTheme.gold)
+                        }
+                    } else {
+                        Button(action: generatePDF) {
+                            ShareActionRow(title: "تجهيز PDF", icon: "doc.richtext", color: WeshTheme.gold)
+                        }
+                    }
+                    if let pdfError {
+                        WeshStatusBanner(text: pdfError, kind: .warning)
                     }
 
                     VStack(alignment: .leading, spacing: 5) {
@@ -1219,7 +1443,7 @@ private struct ComparisonShareSheet: View {
                             .font(.caption.monospaced())
                             .foregroundStyle(WeshTheme.secondaryText)
                             .textSelection(.enabled)
-                        Text("يحتاج المستلم إلى تطبيق «وش الرأي» لفتح هذا الرابط.")
+                        Text("الرابط العام يفتح صفحة المقارنة في المتصفح، ويفتح التطبيق مباشرة عند تفعيل Universal Links للنطاق.")
                             .font(.caption)
                             .foregroundStyle(WeshTheme.secondaryText)
                     }
@@ -1237,6 +1461,28 @@ private struct ComparisonShareSheet: View {
                 }
             }
         }
+    }
+
+    @MainActor
+    private func generatePDF() {
+        do {
+            pdfURL = try DecisionPDFExporter.createPDF(question: question, watermark: !hasPremiumAccess)
+            pdfError = nil
+        } catch {
+            pdfError = "تعذر إنشاء ملف PDF. حاول مرة أخرى."
+            unavailablePDF()
+        }
+    }
+}
+
+private struct WeshPremiumAccessKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var weshPremiumAccess: Bool {
+        get { self[WeshPremiumAccessKey.self] }
+        set { self[WeshPremiumAccessKey.self] = newValue }
     }
 }
 
@@ -1292,6 +1538,12 @@ private struct ReminderPickerView: View {
                     ReminderChoiceButton(title: "بعد ساعة", icon: "clock") { schedule(3_600) }
                     ReminderChoiceButton(title: "مساء اليوم", icon: "moon.stars") { schedule(eveningInterval) }
                     ReminderChoiceButton(title: "غدًا", icon: "sunrise") { schedule(tomorrowInterval) }
+                    if let closesAt = question.closesAt {
+                        ReminderChoiceButton(title: "قبل انتهاء التصويت", icon: "timer") {
+                            let target = closesAt.addingTimeInterval(-3_600)
+                            schedule(target.timeIntervalSinceNow)
+                        }
+                    }
 
                     VStack(alignment: .leading, spacing: 10) {
                         Label("اختيار وقت", systemImage: "calendar")
@@ -1309,10 +1561,12 @@ private struct ReminderPickerView: View {
                     }
                     .weshSurface()
 
-                    Text("خيار «قبل انتهاء التصويت» يحتاج تاريخ انتهاء محفوظًا مع المقارنة، وهو غير متوفر في هذه المقارنة الحالية.")
-                        .font(.caption)
-                        .foregroundStyle(WeshTheme.secondaryText)
-                        .fixedSize(horizontal: false, vertical: true)
+                    if question.closesAt == nil {
+                        Text("خيار «قبل انتهاء التصويت» يظهر عندما يكون للمقارنة وقت انتهاء محفوظ.")
+                            .font(.caption)
+                            .foregroundStyle(WeshTheme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 .padding(18)
             }
@@ -1346,7 +1600,7 @@ struct QRCodeShareView: View {
     @Environment(\.dismiss) private var dismiss
 
     private var link: String {
-        ComparisonShareService.deepLink(for: question).absoluteString
+        ComparisonShareService.publicURL(for: question).absoluteString
     }
 
     var body: some View {
@@ -1378,7 +1632,7 @@ struct QRCodeShareView: View {
             }
             .buttonStyle(WeshPrimaryButtonStyle())
 
-            Text("الرابط العميق يفتح المقارنة داخل التطبيق عندما تكون المقارنة موجودة على نفس الجهاز. المشاركة العامة بين المستخدمين تحتاج Backend وروابط Universal Links.")
+            Text("يمثل QR رابطًا عامًا للمقارنة. عند تفعيل Universal Links للنطاق سيفتح الرابط التطبيق مباشرة، وإلا يفتح صفحة الويب العامة.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1414,11 +1668,14 @@ enum QRCodeGenerator {
 struct ReportContentView: View {
     let contentID: UUID
     let contentType: ReportableContentType
-    let didSubmit: () -> Void
+    let submit: (UUID, ReportableContentType, ReportReason, String?) async -> Bool
+    let didSubmit: (Bool) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var reason: ReportReason = .misleading
     @State private var details = ""
+    @State private var isSubmitting = false
+    @State private var validationMessage: String?
 
     var body: some View {
         Form {
@@ -1433,34 +1690,57 @@ struct ReportContentView: View {
             Section("تفاصيل اختيارية") {
                 TextField("اكتب ما يساعد فريق المراجعة", text: $details, axis: .vertical)
                     .lineLimit(3...6)
+                    .onChange(of: details) { _, newValue in
+                        if newValue.count > 1000 {
+                            details = String(newValue.prefix(1000))
+                        }
+                    }
+
+                Text("\(details.count) من 1000")
+                    .font(.caption)
+                    .foregroundStyle(details.count > 900 ? WeshTheme.gold : .secondary)
             }
 
             Section {
-                Text("البلاغات تحفظ محليًا الآن. إرسالها لفريق إشراف فعلي يتطلب Backend مخصصًا.")
+                Text("تُرسل البلاغات لفريق المراجعة عند توفر Backend، وتُحفظ محليًا عند تعذر الاتصال.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+            }
+
+            if let validationMessage {
+                Section {
+                    Text(validationMessage)
+                        .font(.footnote)
+                        .foregroundStyle(WeshTheme.destructive)
+                }
             }
         }
         .navigationTitle("إبلاغ")
         .navigationBarTitleDisplayMode(.inline)
+        .disabled(isSubmitting)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("إلغاء") {
                     dismiss()
                 }
+                .disabled(isSubmitting)
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button("حفظ البلاغ") {
-                    LocalReportStore.shared.save(
-                        ContentReport(
-                            contentID: contentID,
-                            contentType: contentType,
-                            reason: reason,
-                            details: details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : details
+                Button(isSubmitting ? "جار الإرسال..." : "إرسال") {
+                    Task {
+                        let cleanDetails = details.trimmingCharacters(in: .whitespacesAndNewlines)
+                        isSubmitting = true
+                        let sent = await submit(
+                            contentID,
+                            contentType,
+                            reason,
+                            cleanDetails.isEmpty ? nil : cleanDetails
                         )
-                    )
-                    didSubmit()
+                        isSubmitting = false
+                        didSubmit(sent)
+                    }
                 }
+                .disabled(isSubmitting)
             }
         }
     }

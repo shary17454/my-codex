@@ -8,14 +8,20 @@ struct DashboardView: View {
     let questions: [AskQuestion]
     let knowledgeItems: [KnowledgeItem]
     let statistics: DashboardStatistics
+    @ObservedObject var notificationStore: WeshNotificationCenterStore
     let userName: String
     let isSignedIn: Bool
     let hasDraft: Bool
     let isRefreshing: Bool
     let isOffline: Bool
     let refresh: () async -> Void
+    let refreshNotifications: () async -> Void
+    let enablePushNotifications: () async -> Bool
+    let followForNotifications: (UUID) async -> Void
     let openQuestion: (AskQuestion) -> Void
+    let openQuestionByID: (UUID) -> Void
     let openDecisionSummary: (AskQuestion) -> Void
+    let openAIAssistant: () -> Void
     let openDiscover: () -> Void
     let openSmartCompare: () -> Void
     let startQuestion: (KnowledgeItem?) -> Void
@@ -36,6 +42,7 @@ struct DashboardView: View {
                 DashboardBrandHeader(
                     userName: userName,
                     isSignedIn: isSignedIn,
+                    unreadNotificationCount: notificationStore.unreadCount,
                     showMenu: { showingHeaderMenu = true },
                     showNotifications: { showingNotifications = true }
                 )
@@ -43,7 +50,7 @@ struct DashboardView: View {
                 connectionStatus
 
                 WeshStatusBanner(
-                    text: "نسخة 2 تقدم تجربة قرار جديدة: أوضح، أهدأ، وأكثر تركيزًا على الأسباب وجودة الأدلة.",
+                    text: "نسخة 2 تقدم تنبيهات للمتابعة: تصويت جديد، تغير المتصدر، قرب الانتهاء، وسؤال الرضا بعد التجربة.",
                     kind: .information
                 )
 
@@ -75,24 +82,18 @@ struct DashboardView: View {
         .confirmationDialog("اختصارات", isPresented: $showingHeaderMenu, titleVisibility: .visible) {
             Button("مقارنة جديدة") { startQuestion(nil) }
             Button("مقارنة ذكية") { openSmartCompare() }
+            Button("مساعد القرار") { openAIAssistant() }
             if hasDraft {
                 Button("استعادة المسودة") { restoreDraft() }
             }
             Button("إلغاء", role: .cancel) {}
         }
         .sheet(isPresented: $showingNotifications) {
-            NavigationStack {
-                WeshEmptyState(
-                    title: "لا توجد إشعارات جديدة",
-                    message: "ستظهر هنا تحديثات التصويت والتعليقات والتنبيهات المجدولة.",
-                    systemImage: "bell"
-                )
-                .padding(24)
-                .navigationTitle("الإشعارات")
-                .navigationBarTitleDisplayMode(.inline)
-            }
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
+            WeshNotificationsView(
+                store: notificationStore,
+                openQuestion: openQuestionByID,
+                refresh: refreshNotifications
+            )
         }
     }
 
@@ -148,6 +149,13 @@ struct DashboardView: View {
                 ForEach(questions.prefix(3)) { question in
                     ReferenceComparisonRow(question: question) {
                         openQuestion(question)
+                    }
+                    .contextMenu {
+                        Button {
+                            Task { await followForNotifications(question.id) }
+                        } label: {
+                            Label("متابعة التنبيهات", systemImage: "bell.badge")
+                        }
                     }
                 }
             }

@@ -228,11 +228,26 @@ enum EvidenceQualityEngine {
         }
 
         var notes: [String] = []
-        if participantCount < 10 { notes.append("عدد المشاركين ما زال منخفضًا.") }
-        if reasonCoverage < 0.20 { notes.append("نسبة الأسباب المكتوبة منخفضة.") }
-        if triedCoverage < 0.20 { notes.append("عدد المشاركين الذين جرّبوا الخيارات محدود.") }
-        if daysSinceLastActivity > 30 { notes.append("بعض البيانات قديمة نسبيًا.") }
-        if notes.isEmpty { notes.append("المقارنة تحتوي على مستوى جيد من المشاركة والأسباب.") }
+        if participantCount < 10 {
+            notes.append("عدد المشاركين ما زال منخفضًا.")
+        } else {
+            notes.append("حجم المشاركة مناسب مبدئيًا: \(participantCount) مشاركًا.")
+        }
+        if reasonCoverage < 0.20 {
+            notes.append("نسبة الأسباب المكتوبة منخفضة: \(Int((reasonCoverage * 100).rounded()))%.")
+        } else {
+            notes.append("\(Int((reasonCoverage * 100).rounded()))% من المشاركين أضافوا أسبابًا.")
+        }
+        if triedCoverage < 0.20 {
+            notes.append("عدد المشاركين الذين جرّبوا الخيارات محدود.")
+        } else {
+            notes.append("\(Int((triedCoverage * 100).rounded()))% من أصحاب الأسباب أشاروا إلى تجربة.")
+        }
+        if daysSinceLastActivity > 30 {
+            notes.append("بعض البيانات قديمة نسبيًا.")
+        } else if participantCount >= 10 {
+            notes.append("النشاط حديث ويعزز قراءة الاتجاه الحالي.")
+        }
 
         return EvidenceQualityResult(
             score: finalScore,
@@ -293,17 +308,27 @@ struct ReasonThemeResult: Identifiable, Codable, Hashable, Sendable {
 
 enum ArabicReasonAnalyzer {
     private static let themes = [
-        ReasonThemeDefinition(key: "camera", title: "الكاميرا والتصوير", keywords: ["كاميرا", "تصوير", "صور", "فيديو", "عدسه"]),
-        ReasonThemeDefinition(key: "battery", title: "البطارية", keywords: ["بطاريه", "شحن", "يصمد", "استهلاك"]),
-        ReasonThemeDefinition(key: "price", title: "السعر والقيمة", keywords: ["سعر", "غالي", "رخيص", "قيمه", "ميزانيه", "تكلفه"]),
-        ReasonThemeDefinition(key: "usability", title: "سهولة الاستخدام", keywords: ["سهل", "سهوله", "استخدام", "واجهه", "بسيط"]),
-        ReasonThemeDefinition(key: "reliability", title: "الاعتمادية", keywords: ["اعتماديه", "يتحمل", "ثابت", "مشاكل", "خراب", "صيانه"]),
-        ReasonThemeDefinition(key: "screen", title: "الشاشة والتصميم", keywords: ["شاشه", "تصميم", "سطوع", "الوان", "حجم"]),
-        ReasonThemeDefinition(key: "performance", title: "الأداء", keywords: ["اداء", "سرعه", "سريع", "تعليق", "معالج", "قوي"]),
-        ReasonThemeDefinition(key: "service", title: "الخدمة والدعم", keywords: ["خدمه", "دعم", "ضمان", "فروع", "موظفين"])
+        ReasonThemeDefinition(key: "camera", title: "الكاميرا والتصوير", keywords: ["كاميرا", "تصوير", "صور", "فيديو", "عدسه", "سناب", "زووم"]),
+        ReasonThemeDefinition(key: "battery", title: "البطارية", keywords: ["بطاريه", "شحن", "يصمد", "استهلاك", "عمر", "سريع الشحن"]),
+        ReasonThemeDefinition(key: "price", title: "السعر والقيمة", keywords: ["سعر", "غالي", "رخيص", "قيمه", "ميزانيه", "تكلفه", "وفر", "توفير"]),
+        ReasonThemeDefinition(key: "usability", title: "سهولة الاستخدام", keywords: ["سهل", "سهوله", "استخدام", "واجهه", "بسيط", "مريح", "واضح"]),
+        ReasonThemeDefinition(key: "reliability", title: "الاعتمادية", keywords: ["اعتماديه", "يتحمل", "ثابت", "مشاكل", "خراب", "يعمر", "اعطال"]),
+        ReasonThemeDefinition(key: "screen", title: "الشاشة والتصميم", keywords: ["شاشه", "تصميم", "سطوع", "الوان", "حجم", "وزن", "خامه"]),
+        ReasonThemeDefinition(key: "performance", title: "الأداء", keywords: ["اداء", "سرعه", "سريع", "تعليق", "معالج", "قوي", "سلاسه", "حراره"]),
+        ReasonThemeDefinition(key: "service", title: "الخدمة والدعم", keywords: ["خدمه", "دعم", "ضمان", "فروع", "موظفين", "وكيل", "استبدال"]),
+        ReasonThemeDefinition(key: "maintenance", title: "الصيانة والتكاليف", keywords: ["صيانه", "قطع", "قطع غيار", "تكاليف", "اصلاح", "ورشه"]),
+        ReasonThemeDefinition(key: "availability", title: "التوفر وسهولة الشراء", keywords: ["متوفر", "توفر", "شحن", "طلب", "مخزون", "انتظار"]),
+        ReasonThemeDefinition(key: "experience", title: "التجربة الشخصية", keywords: ["جربت", "تجربتي", "استخدمته", "عندي", "امتلك", "اشتريت"])
     ]
-    private static let positiveWords = ["ممتاز", "افضل", "رايع", "قوي", "سريع", "مريح", "واضح", "عملي", "موثوق", "مناسب", "جيد", "جميل"]
-    private static let negativeWords = ["سيء", "ضعيف", "غالي", "بطيء", "مزعج", "مشاكل", "تعليق", "خراب", "صعب", "ثقيل", "رديء"]
+    private static let positiveWords = [
+        "ممتاز", "افضل", "رايع", "رائع", "قوي", "سريع", "مريح", "واضح",
+        "عملي", "موثوق", "مناسب", "جيد", "جميل", "اقتصادي", "اوفر",
+        "ارخص", "متوفر", "ثابت", "يعمر", "مضمون", "مرن"
+    ]
+    private static let negativeWords = [
+        "سيء", "ضعيف", "غالي", "بطيء", "مزعج", "مشاكل", "تعليق", "خراب",
+        "صعب", "ثقيل", "رديء", "مكلف", "نادر", "حراره", "محدود", "يتاخر"
+    ]
 
     static func analyze(reasons: [String]) -> [ReasonThemeResult] {
         themes.compactMap { theme in

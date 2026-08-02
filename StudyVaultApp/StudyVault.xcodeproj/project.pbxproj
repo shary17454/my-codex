@@ -25,6 +25,10 @@
 		EE0000000000000000000002 /* PersistenceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000012 /* PersistenceModels.swift */; };
 		EE0000000000000000000003 /* DecisionFeaturesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000013 /* DecisionFeaturesView.swift */; };
 		EE0000000000000000000004 /* PlatformIntegrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000014 /* PlatformIntegrations.swift */; };
+		FF0000000000000000000002 /* CameraDecisionAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000012 /* CameraDecisionAssistant.swift */; };
+		FF0000000000000000000003 /* AIDecisionAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000013 /* AIDecisionAssistant.swift */; };
+		FF0000000000000000000004 /* WeshNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000014 /* WeshNotifications.swift */; };
+		FF0000000000000000000005 /* WeshApplePlusOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000015 /* WeshApplePlusOperations.swift */; };
 		AA0000000000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000017 /* Assets.xcassets */; };
 		AA0000000000000000000007 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000018 /* PrivacyInfo.xcprivacy */; };
 		AA0000000000000000000008 /* SeedQuestions.json in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000019 /* SeedQuestions.json */; };
@@ -76,6 +80,10 @@
 		EE0000000000000000000012 /* PersistenceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceModels.swift; sourceTree = "<group>"; };
 		EE0000000000000000000013 /* DecisionFeaturesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionFeaturesView.swift; sourceTree = "<group>"; };
 		EE0000000000000000000014 /* PlatformIntegrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformIntegrations.swift; sourceTree = "<group>"; };
+		FF0000000000000000000012 /* CameraDecisionAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraDecisionAssistant.swift; sourceTree = "<group>"; };
+		FF0000000000000000000013 /* AIDecisionAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDecisionAssistant.swift; sourceTree = "<group>"; };
+		FF0000000000000000000014 /* WeshNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeshNotifications.swift; sourceTree = "<group>"; };
+		FF0000000000000000000015 /* WeshApplePlusOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeshApplePlusOperations.swift; sourceTree = "<group>"; };
 		BB0000000000000000000010 /* StudyVaultTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyVaultTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000000000000000000011 /* StudyVaultCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyVaultCoreTests.swift; sourceTree = "<group>"; };
 		DD0000000000000000000010 /* StudyVaultUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudyVaultUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,6 +141,10 @@
 				EE0000000000000000000012 /* PersistenceModels.swift */,
 				EE0000000000000000000013 /* DecisionFeaturesView.swift */,
 				EE0000000000000000000014 /* PlatformIntegrations.swift */,
+				FF0000000000000000000012 /* CameraDecisionAssistant.swift */,
+				FF0000000000000000000013 /* AIDecisionAssistant.swift */,
+				FF0000000000000000000014 /* WeshNotifications.swift */,
+				FF0000000000000000000015 /* WeshApplePlusOperations.swift */,
 				AA0000000000000000000013 /* AskModels.swift */,
 				AA0000000000000000000014 /* ViewModels.swift */,
 				AA0000000000000000000016 /* DesignSystem.swift */,
@@ -343,6 +355,10 @@
 				EE0000000000000000000002 /* PersistenceModels.swift in Sources */,
 				EE0000000000000000000003 /* DecisionFeaturesView.swift in Sources */,
 				EE0000000000000000000004 /* PlatformIntegrations.swift in Sources */,
+				FF0000000000000000000002 /* CameraDecisionAssistant.swift in Sources */,
+				FF0000000000000000000003 /* AIDecisionAssistant.swift in Sources */,
+				FF0000000000000000000004 /* WeshNotifications.swift in Sources */,
+				FF0000000000000000000005 /* WeshApplePlusOperations.swift in Sources */,
 				AA0000000000000000000003 /* AskModels.swift in Sources */,
 				AA0000000000000000000004 /* ViewModels.swift in Sources */,
 				AA0000000000000000000005 /* DesignSystem.swift in Sources */,

@@ -412,7 +412,7 @@ struct DecisionShareCard: View {
                         .foregroundStyle(Color.white.opacity(0.62))
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer()
-                    if let image = QRCodeImageGenerator.image(for: ComparisonShareService.deepLink(for: question).absoluteString) {
+                    if let image = QRCodeImageGenerator.image(for: ComparisonShareService.publicURL(for: question).absoluteString) {
                         Image(uiImage: image)
                             .interpolation(.none)
                             .resizable()

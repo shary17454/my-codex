@@ -6,8 +6,10 @@ struct NewQuestionView: View {
     @State private var viewModel: CreateComparisonViewModel
     @State private var currentStep = 0
     @State private var showingPreview = false
+    @State private var showingCamera = false
     @State private var isPublishing = false
     @State private var publishedQuestion: AskQuestion?
+    @StateObject private var cameraAssistant: CameraDecisionAssistant
 
     let authorName: String
     let saveAction: (AskQuestion) async -> AskQuestion?
@@ -18,6 +20,7 @@ struct NewQuestionView: View {
         template: KnowledgeItem? = nil,
         initialTitle: String = "",
         persistence: WeshPersistenceStore? = nil,
+        backendClient: WeshAlrayAPIClient? = nil,
         authorName: String,
         saveAction: @escaping (AskQuestion) async -> AskQuestion?
     ) {
@@ -28,6 +31,7 @@ struct NewQuestionView: View {
                 persistence: persistence
             )
         )
+        _cameraAssistant = StateObject(wrappedValue: CameraDecisionAssistant(backendClient: backendClient))
         self.authorName = authorName
         self.saveAction = saveAction
     }
@@ -80,6 +84,20 @@ struct NewQuestionView: View {
                 .presentationDragIndicator(.visible)
             }
         }
+        .fullScreenCover(isPresented: $showingCamera) {
+            WeshCameraCaptureView(
+                onCapture: { image in
+                    showingCamera = false
+                    Task {
+                        if let draft = await cameraAssistant.analyze(image) {
+                            viewModel.applyCameraDecisionDraft(draft)
+                        }
+                    }
+                },
+                onCancel: { showingCamera = false }
+            )
+            .ignoresSafeArea()
+        }
         .sensoryFeedback(.success, trigger: publishedQuestion?.id)
     }
 
@@ -92,7 +110,11 @@ struct NewQuestionView: View {
                 Group {
                     switch currentStep {
                     case 0:
-                        ComparisonBasicsStep(viewModel: viewModel)
+                        ComparisonBasicsStep(
+                            viewModel: viewModel,
+                            cameraAssistant: cameraAssistant,
+                            openCamera: { showingCamera = true }
+                        )
                     case 1:
                         ComparisonOptionsStep(viewModel: viewModel)
                     default:
@@ -196,6 +218,8 @@ struct NewQuestionView: View {
 
 private struct ComparisonBasicsStep: View {
     @Bindable var viewModel: CreateComparisonViewModel
+    @ObservedObject var cameraAssistant: CameraDecisionAssistant
+    let openCamera: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -240,6 +264,14 @@ private struct ComparisonBasicsStep: View {
                 }
             }
             .weshSurface()
+
+            CameraDecisionAssistantCard(
+                isAnalyzing: cameraAssistant.isAnalyzing,
+                errorMessage: cameraAssistant.errorMessage,
+                usedBackend: cameraAssistant.usedBackend,
+                lastDraft: viewModel.lastCameraDraft,
+                openCamera: openCamera
+            )
 
             VStack(alignment: .leading, spacing: 12) {
                 WeshSectionHeader("قوالب جاهزة", subtitle: "اختر مثالًا وعدّله بما يناسب قرارك")

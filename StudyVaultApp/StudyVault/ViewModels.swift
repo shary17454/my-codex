@@ -39,6 +39,7 @@ final class HomeViewModel {
     private(set) var outcomesByComparisonID: [UUID: DecisionOutcomeSnapshot] = [:]
     private(set) var voteTrendsByComparisonID: [UUID: [VoteTrendPoint]] = [:]
     private(set) var personalEvaluationsByComparisonID: [UUID: PersonalDecisionEvaluation] = [:]
+    private(set) var adminOverview: AdminOverview?
     var isBackendEnabled: Bool
     var backendBaseURLText: String
     var backendAPITokenText: String
@@ -152,21 +153,33 @@ final class HomeViewModel {
     }
 
     func question(fromDeepLink url: URL) -> AskQuestion? {
-        guard url.scheme == "weshalray",
-              url.host == "comparison",
-              let idString = url.pathComponents.dropFirst().first,
-              let questionID = UUID(uuidString: idString) else {
+        guard let questionID = ComparisonShareService.comparisonID(fromSharedURL: url) else {
             return nil
         }
         return questions.first { $0.id == questionID }
     }
 
     func inviteCode(fromDeepLink url: URL) -> String? {
-        guard url.scheme == "weshalray", url.host == "comparison" else { return nil }
-        return URLComponents(url: url, resolvingAgainstBaseURL: false)?
-            .queryItems?
-            .first(where: { $0.name == "invite" })?
-            .value
+        ComparisonShareService.inviteCode(fromSharedURL: url)
+    }
+
+    func comparisonID(fromSharedURL url: URL) -> UUID? {
+        ComparisonShareService.comparisonID(fromSharedURL: url)
+    }
+
+    func fetchSharedQuestion(id: UUID, inviteCode: String?) async -> AskQuestion? {
+        guard let backendClient = makeBackendClient() else {
+            appErrorMessage = "الرابط يحتاج اتصال Backend حتى تظهر المقارنة على هذا الجهاز."
+            return nil
+        }
+        do {
+            let question = try await backendClient.fetchComparison(id: id, inviteCode: inviteCode)
+            upsertQuestion(question)
+            return question
+        } catch {
+            appErrorMessage = error.localizedDescription
+            return nil
+        }
     }
 
     private func sortedQuestions(_ questions: [AskQuestion]) -> [AskQuestion] {
@@ -224,6 +237,11 @@ final class HomeViewModel {
         )
     }
 
+    func optionalAIBackendClient() -> WeshAlrayAPIClient? {
+        guard isBackendEnabled else { return nil }
+        return makeBackendClient()
+    }
+
     func refreshFromBackend() async {
         guard isBackendEnabled, let client = makeBackendClient() else { return }
         guard !isRefreshing else { return }
@@ -243,12 +261,75 @@ final class HomeViewModel {
                     questions = remoteQuestions
                 }
             }
+            await refreshNotifications()
             appErrorMessage = nil
             isOffline = false
             lastUpdatedAt = Date()
         } catch {
             appErrorMessage = userFacingMessage(for: error)
             isOffline = (error as? URLError)?.code == .notConnectedToInternet
+        }
+    }
+
+    func refreshNotifications() async {
+        guard isBackendEnabled, let client = makeBackendClient() else { return }
+        do {
+            let notifications = try await client.fetchNotifications()
+            WeshNotificationCenterStore.shared.setRemoteNotifications(notifications)
+        } catch {
+            appErrorMessage = userFacingMessage(for: error)
+        }
+    }
+
+    func enablePushNotifications() async -> Bool {
+        let granted = await WeshNotificationCenterStore.shared.requestAuthorizationAndRegister()
+        guard granted, isBackendEnabled, let client = makeBackendClient() else {
+            if granted {
+                appErrorMessage = "تم تفعيل الإذن محليًا. اربط Backend إنتاجي حتى تصلك تنبيهات Push خارج التطبيق."
+            }
+            return granted
+        }
+        do {
+            try await client.registerDevice(pushToken: nil)
+            appErrorMessage = nil
+            return true
+        } catch {
+            appErrorMessage = userFacingMessage(for: error)
+            return false
+        }
+    }
+
+    func followForNotifications(questionID: UUID) async {
+        guard isBackendEnabled, let client = makeBackendClient() else {
+            appErrorMessage = "فعّل Backend حتى تتابع تنبيهات هذه المقارنة على كل أجهزتك."
+            return
+        }
+        do {
+            try await client.followComparison(id: questionID)
+            WeshNotificationCenterStore.shared.addLocal(
+                WeshNotificationItem(
+                    kind: .system,
+                    comparisonID: questionID,
+                    title: "تمت متابعة المقارنة",
+                    body: "سننبّهك عند التصويت الجديد، تغير المتصدر، وقرب انتهاء المقارنة."
+                )
+            )
+            appErrorMessage = nil
+        } catch {
+            appErrorMessage = userFacingMessage(for: error)
+        }
+    }
+
+    func refreshAdminOverview() async {
+        guard isBackendEnabled, let client = makeBackendClient() else {
+            appErrorMessage = "فعّل Backend حتى تظهر لوحة الإدارة."
+            return
+        }
+        do {
+            adminOverview = try await client.fetchAdminOverview()
+            appErrorMessage = nil
+        } catch {
+            appErrorMessage = userFacingMessage(for: error)
         }
     }
 
@@ -312,7 +393,15 @@ final class HomeViewModel {
     }
 
     func insertPublishedQuestion(_ question: AskQuestion) {
-        questions.insert(question, at: 0)
+        upsertQuestion(question)
+    }
+
+    private func upsertQuestion(_ question: AskQuestion) {
+        if let index = questions.firstIndex(where: { $0.id == question.id }) {
+            questions[index] = question
+        } else {
+            questions.insert(question, at: 0)
+        }
     }
 
     func vote(questionID: AskQuestion.ID, optionID: PollOption.ID) async -> AskQuestion? {
@@ -392,6 +481,7 @@ final class HomeViewModel {
                     )
                 }
                 votedQuestionIDs.insert(questionID)
+                await schedulePostVoteReminders(for: remoteQuestion)
                 appErrorMessage = nil
                 return remoteQuestion
             } catch {
@@ -420,6 +510,9 @@ final class HomeViewModel {
                     reason: cleanReason?.isEmpty == true ? nil : cleanReason,
                     isAnonymous: authorName == "مجهول"
                 )
+            }
+            if let localQuestion = questions.first(where: { $0.id == questionID }) {
+                await schedulePostVoteReminders(for: localQuestion)
             }
             appErrorMessage = nil
             return applyLocalVote(
@@ -532,6 +625,36 @@ final class HomeViewModel {
         }
     }
 
+    func submitContentReport(
+        contentID: UUID,
+        contentType: ReportableContentType,
+        reason: ReportReason,
+        details: String?
+    ) async -> Bool {
+        let cleanDetails = details?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let report = ContentReport(
+            contentID: contentID,
+            contentType: contentType,
+            reason: reason,
+            details: cleanDetails?.isEmpty == true ? nil : cleanDetails
+        )
+
+        guard isBackendEnabled, let client = makeBackendClient() else {
+            LocalReportStore.shared.save(report)
+            return false
+        }
+
+        do {
+            try await client.submitReport(report)
+            appErrorMessage = nil
+            return true
+        } catch {
+            LocalReportStore.shared.save(report)
+            appErrorMessage = userFacingMessage(for: error)
+            return false
+        }
+    }
+
     private func makeBackendClient() -> WeshAlrayAPIClient? {
         guard let url = URL(string: backendBaseURLText.trimmingCharacters(in: .whitespacesAndNewlines)) else {
             appErrorMessage = "عنوان Backend غير صحيح."
@@ -539,6 +662,17 @@ final class HomeViewModel {
         }
         let cleanToken = backendAPITokenText.trimmingCharacters(in: .whitespacesAndNewlines)
         return WeshAlrayAPIClient(baseURL: url, apiToken: cleanToken.isEmpty ? nil : cleanToken)
+    }
+
+    private func schedulePostVoteReminders(for question: AskQuestion) async {
+        do {
+            try await LocalNotificationScheduler.scheduleOutcomeFollowUp(for: question)
+            if question.closesAt != nil {
+                try? await LocalNotificationScheduler.scheduleClosingReminderIfPossible(for: question)
+            }
+        } catch {
+            // The app can still complete voting when notification permission is denied.
+        }
     }
 
     private func cacheRemoteTrends(_ remoteQuestions: [AskQuestion]) {
@@ -732,6 +866,18 @@ struct WeshAlrayAPIClient: Sendable {
         return response.askQuestion
     }
 
+    func fetchComparison(id: UUID, inviteCode: String?) async throws -> AskQuestion {
+        let response: RemoteComparison = try await get(
+            baseURL
+                .appendingPathComponent("api")
+                .appendingPathComponent("v1")
+                .appendingPathComponent("comparisons")
+                .appendingPathComponent(id.uuidString),
+            inviteCode: inviteCode
+        )
+        return response.askQuestion
+    }
+
     func createComparison(question: AskQuestion) async throws -> AskQuestion {
         let request = CreateComparisonRequest(
             title: question.title,
@@ -789,10 +935,103 @@ struct WeshAlrayAPIClient: Sendable {
         )
     }
 
-    private func get<T: Decodable>(_ url: URL) async throws -> T {
+    func aiChat(prompt: String) async throws -> AIAssistantResponse {
+        let response: AIChatResponse = try await post(
+            path: "/api/v1/ai/chat",
+            body: AIChatRequest(prompt: prompt)
+        )
+        return AIAssistantResponse(
+            answer: response.answer,
+            sources: response.sources.map(\.title),
+            matchedQuestionIDs: response.sources.map(\.id)
+        )
+    }
+
+    func createCameraDecisionDraft(
+        recognizedText: [String],
+        fallbackDraft: CameraDecisionDraft
+    ) async throws -> CameraDecisionDraft {
+        let response: AICameraDraftResponse = try await post(
+            path: "/api/v1/ai/camera-draft",
+            body: AICameraDraftRequest(
+                recognizedText: Array(recognizedText.prefix(12)),
+                fallbackTitle: fallbackDraft.title,
+                fallbackCategory: fallbackDraft.category.rawValue
+            )
+        )
+        let category = AskCategory(rawValue: response.category) ?? fallbackDraft.category
+        let cleanOptions = response.options
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return CameraDecisionDraft(
+            title: response.title,
+            details: response.details,
+            primaryOption: cleanOptions.first ?? response.primaryOption ?? fallbackDraft.primaryOption,
+            optionSuggestions: cleanOptions.isEmpty ? fallbackDraft.optionSuggestions : cleanOptions,
+            suggestedCriteria: response.criteria.isEmpty ? fallbackDraft.suggestedCriteria : response.criteria,
+            tags: response.tags.isEmpty ? fallbackDraft.tags : response.tags,
+            category: category,
+            confidence: response.confidence ?? fallbackDraft.confidence,
+            recognizedText: fallbackDraft.recognizedText
+        )
+    }
+
+    func submitReport(_ report: ContentReport) async throws {
+        _ = try await post(
+            path: "/api/v1/reports",
+            body: ReportRequest(report: report)
+        ) as RemoteReport
+    }
+
+    func registerDevice(pushToken: String?) async throws {
+        _ = try await post(
+            path: "/api/v1/devices",
+            body: DeviceRegistrationRequest(
+                platform: "ios",
+                pushToken: pushToken,
+                clientID: DeviceClientID.value,
+                notificationsEnabled: true
+            )
+        ) as DeviceRegistrationResponse
+    }
+
+    func fetchNotifications() async throws -> [WeshNotificationItem] {
+        let response: NotificationListResponse = try await get(
+            baseURL
+                .appendingPathComponent("api")
+                .appendingPathComponent("v1")
+                .appendingPathComponent("notifications")
+        )
+        return response.notifications.map(\.item)
+    }
+
+    func followComparison(id: UUID) async throws {
+        _ = try await post(
+            path: "/api/v1/comparisons/\(id.uuidString)/follow",
+            body: FollowComparisonRequest()
+        ) as FollowComparisonResponse
+    }
+
+    func fetchAdminOverview() async throws -> AdminOverview {
+        try await get(
+            baseURL
+                .appendingPathComponent("api")
+                .appendingPathComponent("v1")
+                .appendingPathComponent("admin")
+                .appendingPathComponent("overview")
+        )
+    }
+
+    private func get<T: Decodable>(_ url: URL, inviteCode: String? = nil) async throws -> T {
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "accept")
         request.setValue(DeviceClientID.value, forHTTPHeaderField: "x-client-id")
+        if let inviteCode, !inviteCode.isEmpty {
+            request.setValue(inviteCode, forHTTPHeaderField: "x-invite-code")
+        }
+        if let apiToken, !apiToken.isEmpty {
+            request.setValue("Bearer \(apiToken)", forHTTPHeaderField: "authorization")
+        }
         let (data, response) = try await session.data(for: request)
         try validate(response: response, data: data)
         return try decoder.decode(T.self, from: data)
@@ -984,6 +1223,106 @@ private struct CommentRequest: Encodable {
     let text: String
 }
 
+private struct AIChatRequest: Encodable {
+    let prompt: String
+}
+
+private struct AIChatResponse: Decodable {
+    let answer: String
+    let sources: [AISourceResponse]
+}
+
+private struct AISourceResponse: Decodable {
+    let id: UUID
+    let title: String
+}
+
+private struct AICameraDraftRequest: Encodable {
+    let recognizedText: [String]
+    let fallbackTitle: String
+    let fallbackCategory: String
+}
+
+private struct AICameraDraftResponse: Decodable {
+    let title: String
+    let details: String
+    let primaryOption: String?
+    let options: [String]
+    let tags: [String]
+    let criteria: [String]
+    let category: String
+    let confidence: Double?
+}
+
+private struct ReportRequest: Encodable {
+    let contentID: String
+    let contentType: String
+    let reason: String
+    let details: String?
+
+    init(report: ContentReport) {
+        contentID = report.contentID.uuidString
+        contentType = report.contentType.rawValue
+        reason = report.reason.rawValue
+        details = report.details
+    }
+}
+
+private struct RemoteReport: Decodable {
+    let id: UUID
+    let contentID: String
+    let contentType: String
+    let reason: String
+    let details: String?
+    let createdAt: String
+    let status: String
+}
+
+private struct DeviceRegistrationRequest: Encodable {
+    let platform: String
+    let pushToken: String?
+    let clientID: String
+    let notificationsEnabled: Bool
+}
+
+private struct DeviceRegistrationResponse: Decodable {
+    let ok: Bool
+}
+
+private struct FollowComparisonRequest: Encodable {}
+
+private struct FollowComparisonResponse: Decodable {
+    let ok: Bool
+}
+
+private struct NotificationListResponse: Decodable {
+    let notifications: [RemoteNotification]
+}
+
+private struct RemoteNotification: Decodable {
+    let id: UUID
+    let type: String
+    let comparisonID: UUID?
+    let title: String
+    let body: String
+    let createdAt: String
+    let deliverAt: String?
+    let readAt: String?
+
+    var item: WeshNotificationItem {
+        WeshNotificationItem(
+            id: id,
+            kind: WeshNotificationKind(rawValue: type) ?? .system,
+            comparisonID: comparisonID,
+            title: title,
+            body: body,
+            createdAt: ISO8601DateFormatter().date(from: createdAt) ?? Date(),
+            deliverAt: deliverAt.flatMap { ISO8601DateFormatter().date(from: $0) },
+            isRead: readAt != nil
+        )
+    }
+}
+
 final class LocalReportStore: @unchecked Sendable {
     static let shared = LocalReportStore()
     private let key = "wash_alray_content_reports"
@@ -1006,6 +1345,10 @@ final class LocalReportStore: @unchecked Sendable {
         }
         return reports
     }
+
+    func clear() {
+        UserDefaults.standard.removeObject(forKey: key)
+    }
 }
 
 @MainActor
@@ -1025,6 +1368,7 @@ final class CreateComparisonViewModel {
     var hideResultsUntilVote = false
     var validationMessage: String?
     var didPublish = false
+    var lastCameraDraft: CameraDecisionDraft?
     private let persistence: WeshPersistenceStore?
 
     init(
@@ -1184,6 +1528,56 @@ final class CreateComparisonViewModel {
         if details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             details = "ساعدني أقرر بناءً على التجربة والسعر والجودة والقيمة."
         }
+    }
+
+    func applyCameraDecisionDraft(_ draft: CameraDecisionDraft) {
+        lastCameraDraft = draft
+
+        if title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            title = draft.title
+        }
+
+        if details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            details = draft.details
+        } else if !details.contains("تم إنشاء هذه المسودة من صورة") {
+            details += "\n\nاقتراح الكاميرا: \(draft.details)"
+        }
+
+        category = draft.category
+
+        if optionTitles[0].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            optionTitles[0] = draft.primaryOption
+        }
+        if optionTitles[1].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            optionTitles[1] = "بديل مناسب"
+        }
+        optionCount = max(optionCount, 2)
+
+        let existingTags = tagsText
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        let mergedTags = Array(Set(existingTags + draft.tags)).sorted()
+        if !mergedTags.isEmpty {
+            tagsText = mergedTags.joined(separator: ", ")
+        }
+
+        let suggestedOptions = draft.optionSuggestions
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        if suggestedOptions.count >= 2 {
+            optionCount = min(max(suggestedOptions.count, 2), 10)
+            for index in 0..<optionTitles.count {
+                if index < suggestedOptions.count {
+                    optionTitles[index] = suggestedOptions[index]
+                }
+            }
+        }
+
+        validationMessage = draft.suggestedCriteria.isEmpty
+            ? "حللنا الصورة وجهزنا مسودة قابلة للتعديل."
+            : "حللنا الصورة واقترحنا خيارات ومعايير قابلة للتعديل."
+        saveDraftSilently()
     }
 
     func saveDraftOnDismissIfNeeded() {

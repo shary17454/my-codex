@@ -34,6 +34,7 @@ struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var userSession = UserSession()
+    @StateObject private var notificationStore = WeshNotificationCenterStore.shared
     @State private var homeViewModel: HomeViewModel
     @State private var selectedTab: AppTab = .home
     @State private var selectedQuestion: AskQuestion?
@@ -41,6 +42,7 @@ struct ContentView: View {
     @State private var selectedKnowledgeItem: KnowledgeItem?
     @State private var showingComposer = false
     @State private var showingResearchBrowser = false
+    @State private var showingAIAssistant = false
     @State private var composerTemplate: KnowledgeItem?
     @State private var pendingComposerTitle = ""
     let persistence: WeshPersistenceStore
@@ -73,6 +75,7 @@ struct ContentView: View {
                 template: composerTemplate,
                 initialTitle: pendingComposerTitle,
                 persistence: persistence,
+                backendClient: homeViewModel.optionalAIBackendClient(),
                 authorName: userSession.publicName
             ) { question in
                 let published = await homeViewModel.publishQuestion(question)
@@ -105,6 +108,9 @@ struct ContentView: View {
                     savePersonalEvaluationAction: { evaluation in
                         homeViewModel.savePersonalEvaluation(evaluation, comparisonID: question.id)
                     },
+                    reportAction: homeViewModel.submitContentReport,
+                    followNotificationsAction: homeViewModel.followForNotifications,
+                    hasPremiumAccess: userSession.hasOwnerAccess,
                     openRelatedQuestion: { related in
                         selectedQuestion = related
                     }
@@ -140,7 +146,18 @@ struct ContentView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showingAIAssistant) {
+            AIDecisionAssistantView(
+                questions: homeViewModel.questions,
+                knowledgeItems: homeViewModel.knowledgeItems,
+                backendClient: homeViewModel.optionalAIBackendClient()
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
         .task {
+            WeshNotificationBackendBridge.shared.clientProvider = { homeViewModel.optionalAIBackendClient() }
+            await notificationStore.refreshAuthorizationStatus()
             homeViewModel.loadPersistentState()
             openPendingComparisonIntentIfNeeded()
             await homeViewModel.refreshFromBackend()
@@ -159,7 +176,15 @@ struct ContentView: View {
                 selectedQuestion = question
             } else if let inviteCode = homeViewModel.inviteCode(fromDeepLink: url) {
                 Task {
-                    selectedQuestion = await homeViewModel.joinPrivateRoom(inviteCode: inviteCode)
+                    if let questionID = homeViewModel.comparisonID(fromSharedURL: url) {
+                        selectedQuestion = await homeViewModel.fetchSharedQuestion(id: questionID, inviteCode: inviteCode)
+                    } else {
+                        selectedQuestion = await homeViewModel.joinPrivateRoom(inviteCode: inviteCode)
+                    }
+                }
+            } else if let questionID = homeViewModel.comparisonID(fromSharedURL: url) {
+                Task {
+                    selectedQuestion = await homeViewModel.fetchSharedQuestion(id: questionID, inviteCode: nil)
                 }
             }
         }
@@ -255,16 +280,24 @@ struct ContentView: View {
                     questions: homeViewModel.questions,
                     knowledgeItems: homeViewModel.knowledgeItems,
                     statistics: homeViewModel.dashboardStatistics,
+                    notificationStore: notificationStore,
                     userName: userSession.publicName,
                     isSignedIn: userSession.isSignedIn,
                     hasDraft: hasSavedDraft,
                     isRefreshing: homeViewModel.isRefreshing,
                     isOffline: homeViewModel.isOffline,
                     refresh: { await homeViewModel.refreshFromBackend() },
+                    refreshNotifications: { await homeViewModel.refreshNotifications() },
+                    enablePushNotifications: { await homeViewModel.enablePushNotifications() },
+                    followForNotifications: { await homeViewModel.followForNotifications(questionID: $0) },
                     openQuestion: {
                         selectedQuestion = $0
                     },
+                    openQuestionByID: { id in
+                        selectedQuestion = homeViewModel.questions.first { $0.id == id }
+                    },
                     openDecisionSummary: { summaryQuestion = $0 },
+                    openAIAssistant: { showingAIAssistant = true },
                     openDiscover: { selectedTab = .questions },
                     openSmartCompare: { selectedTab = .compare },
                     startQuestion: { item in
@@ -319,9 +352,13 @@ struct ContentView: View {
                     isBackendEnabled: $homeViewModel.isBackendEnabled,
                     backendBaseURLText: $homeViewModel.backendBaseURLText,
                     backendAPITokenText: $homeViewModel.backendAPITokenText,
+                    adminOverview: homeViewModel.adminOverview,
                     saveBackendSettings: { homeViewModel.saveBackendSettings() },
                     refreshBackend: {
                         Task { await homeViewModel.refreshFromBackend() }
+                    },
+                    refreshAdminOverview: {
+                        Task { await homeViewModel.refreshAdminOverview() }
                     }
                 )
             }
@@ -378,10 +415,21 @@ struct ContentView: View {
     }
 
     private func openPendingComparisonIntentIfNeeded() {
-        guard let title = PendingComparisonIntentStore.consumeTitle() else { return }
-        composerTemplate = nil
-        pendingComposerTitle = title
-        showingComposer = true
+        if let title = PendingComparisonIntentStore.consumeTitle() {
+            composerTemplate = nil
+            pendingComposerTitle = title
+            showingComposer = true
+            return
+        }
+        guard let action = PendingComparisonIntentStore.consumeAction() else { return }
+        switch action {
+        case .openDiscover:
+            selectedTab = .questions
+        case .openLibrary:
+            selectedTab = .account
+        case .openLatestResult:
+            selectedQuestion = homeViewModel.questions.first
+        }
     }
 }
 

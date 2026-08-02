@@ -6,10 +6,16 @@ import TipKit
 
 enum PendingComparisonIntentStore {
     static let titleKey = "wesh.pendingComparison.title"
+    static let actionKey = "wesh.pendingAction"
     private static let createdAtKey = "wesh.pendingComparison.createdAt"
 
     static func save(title: String) {
         UserDefaults.standard.set(title, forKey: titleKey)
+        UserDefaults.standard.set(Date(), forKey: createdAtKey)
+    }
+
+    static func save(action: PendingAppAction) {
+        UserDefaults.standard.set(action.rawValue, forKey: actionKey)
         UserDefaults.standard.set(Date(), forKey: createdAtKey)
     }
 
@@ -23,6 +29,22 @@ enum PendingComparisonIntentStore {
         UserDefaults.standard.removeObject(forKey: createdAtKey)
         return title
     }
+
+    static func consumeAction() -> PendingAppAction? {
+        guard let rawValue = UserDefaults.standard.string(forKey: actionKey),
+              let action = PendingAppAction(rawValue: rawValue) else {
+            return nil
+        }
+        UserDefaults.standard.removeObject(forKey: actionKey)
+        UserDefaults.standard.removeObject(forKey: createdAtKey)
+        return action
+    }
+}
+
+enum PendingAppAction: String {
+    case openDiscover
+    case openLibrary
+    case openLatestResult
 }
 
 struct CreateComparisonIntent: AppIntent {
@@ -65,9 +87,69 @@ struct WeshAlRayShortcuts: AppShortcutsProvider {
             shortTitle: "مقارنة جديدة",
             systemImageName: "plus.bubble.fill"
         )
+        AppShortcut(
+            intent: OpenDiscoverIntent(),
+            phrases: [
+                "افتح اكتشف في \(.applicationName)",
+                "اعرض المقارنات في \(.applicationName)"
+            ],
+            shortTitle: "اكتشف",
+            systemImageName: "safari.fill"
+        )
+        AppShortcut(
+            intent: OpenMyLibraryIntent(),
+            phrases: [
+                "افتح مكتبتي في \(.applicationName)",
+                "اعرض محفوظاتي في \(.applicationName)"
+            ],
+            shortTitle: "مكتبتي",
+            systemImageName: "tray.full.fill"
+        )
+        AppShortcut(
+            intent: OpenLatestResultIntent(),
+            phrases: [
+                "افتح آخر نتيجة في \(.applicationName)",
+                "اعرض آخر قرار في \(.applicationName)"
+            ],
+            shortTitle: "آخر نتيجة",
+            systemImageName: "chart.bar.fill"
+        )
     }
 
     static var shortcutTileColor: ShortcutTileColor { .teal }
+}
+
+struct OpenDiscoverIntent: AppIntent {
+    static let title: LocalizedStringResource = "فتح اكتشف"
+    static let description = IntentDescription("يفتح تبويب اكتشف في وش الرأي.")
+    static var openAppWhenRun: Bool { true }
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        PendingComparisonIntentStore.save(action: .openDiscover)
+        return .result(dialog: "سأفتح اكتشف في وش الرأي.")
+    }
+}
+
+struct OpenMyLibraryIntent: AppIntent {
+    static let title: LocalizedStringResource = "فتح مكتبتي"
+    static let description = IntentDescription("يفتح الحساب ومكتبتك الخاصة.")
+    static var openAppWhenRun: Bool { true }
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        PendingComparisonIntentStore.save(action: .openLibrary)
+        return .result(dialog: "سأفتح مكتبتك الخاصة.")
+    }
+}
+
+struct OpenLatestResultIntent: AppIntent {
+    static let title: LocalizedStringResource = "فتح آخر نتيجة"
+    static let description = IntentDescription("يفتح آخر نتيجة أو مقارنة متاحة داخل وش الرأي.")
+    static var openAppWhenRun: Bool { true }
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        PendingComparisonIntentStore.save(action: .openLatestResult)
+        return .result(dialog: "سأفتح آخر نتيجة في وش الرأي.")
+    }
 }
 
 struct DecisionSummaryTip: Tip {

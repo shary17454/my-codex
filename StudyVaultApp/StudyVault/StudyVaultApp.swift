@@ -4,6 +4,7 @@ import SwiftUI
 
 @main
 struct StudyVaultApp: App {
+    @UIApplicationDelegateAdaptor(WeshNotificationAppDelegate.self) private var notificationDelegate
     private let persistence: WeshPersistenceStore?
 
     init() {

@@ -405,7 +405,167 @@ struct ContentReport: Identifiable, Codable, Hashable {
     }
 }
 
+enum WeshNotificationKind: String, Codable, CaseIterable, Identifiable {
+    case voteReceived
+    case leaderChanged
+    case closingSoon
+    case outcomeFollowUp
+    case system
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .voteReceived: "تصويت جديد"
+        case .leaderChanged: "تغير المتصدر"
+        case .closingSoon: "اقترب الانتهاء"
+        case .outcomeFollowUp: "متابعة التجربة"
+        case .system: "تنبيه"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .voteReceived: "checkmark.message.fill"
+        case .leaderChanged: "crown.fill"
+        case .closingSoon: "timer"
+        case .outcomeFollowUp: "star.bubble.fill"
+        case .system: "bell.badge.fill"
+        }
+    }
+}
+
+struct WeshNotificationItem: Identifiable, Codable, Hashable {
+    let id: UUID
+    var kind: WeshNotificationKind
+    var comparisonID: UUID?
+    var title: String
+    var body: String
+    var createdAt: Date
+    var deliverAt: Date?
+    var isRead: Bool
+
+    init(
+        id: UUID = UUID(),
+        kind: WeshNotificationKind,
+        comparisonID: UUID? = nil,
+        title: String,
+        body: String,
+        createdAt: Date = Date(),
+        deliverAt: Date? = nil,
+        isRead: Bool = false
+    ) {
+        self.id = id
+        self.kind = kind
+        self.comparisonID = comparisonID
+        self.title = title
+        self.body = body
+        self.createdAt = createdAt
+        self.deliverAt = deliverAt
+        self.isRead = isRead
+    }
+}
+
+struct AdminOverview: Codable, Hashable {
+    let comparisons: Int
+    let publicComparisons: Int
+    let privateComparisons: Int
+    let votes: Int
+    let comments: Int
+    let reports: Int
+    let openReports: Int
+    let devices: Int
+    let notificationSubscriptions: Int
+    let queuedNotifications: Int
+    let blockedClients: Int
+    let generatedAt: Date?
+
+    enum CodingKeys: String, CodingKey {
+        case comparisons
+        case publicComparisons
+        case privateComparisons
+        case votes
+        case comments
+        case reports
+        case openReports
+        case devices
+        case notificationSubscriptions
+        case queuedNotifications
+        case blockedClients
+        case generatedAt
+    }
+
+    init(
+        comparisons: Int,
+        publicComparisons: Int,
+        privateComparisons: Int,
+        votes: Int,
+        comments: Int,
+        reports: Int,
+        openReports: Int,
+        devices: Int,
+        notificationSubscriptions: Int,
+        queuedNotifications: Int,
+        blockedClients: Int,
+        generatedAt: Date? = nil
+    ) {
+        self.comparisons = comparisons
+        self.publicComparisons = publicComparisons
+        self.privateComparisons = privateComparisons
+        self.votes = votes
+        self.comments = comments
+        self.reports = reports
+        self.openReports = openReports
+        self.devices = devices
+        self.notificationSubscriptions = notificationSubscriptions
+        self.queuedNotifications = queuedNotifications
+        self.blockedClients = blockedClients
+        self.generatedAt = generatedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        comparisons = try container.decode(Int.self, forKey: .comparisons)
+        publicComparisons = try container.decode(Int.self, forKey: .publicComparisons)
+        privateComparisons = try container.decode(Int.self, forKey: .privateComparisons)
+        votes = try container.decode(Int.self, forKey: .votes)
+        comments = try container.decode(Int.self, forKey: .comments)
+        reports = try container.decode(Int.self, forKey: .reports)
+        openReports = try container.decode(Int.self, forKey: .openReports)
+        devices = try container.decode(Int.self, forKey: .devices)
+        notificationSubscriptions = try container.decode(Int.self, forKey: .notificationSubscriptions)
+        queuedNotifications = try container.decode(Int.self, forKey: .queuedNotifications)
+        blockedClients = try container.decode(Int.self, forKey: .blockedClients)
+        if let rawDate = try container.decodeIfPresent(String.self, forKey: .generatedAt) {
+            generatedAt = ISO8601DateFormatter().date(from: rawDate)
+        } else {
+            generatedAt = nil
+        }
+    }
+}
+
 enum ComparisonShareService {
+    static func publicURL(for question: AskQuestion, baseURLText: String? = nil) -> URL {
+        let configuredBase = (baseURLText ?? BackendSettingsStore.shared.baseURLText)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let baseURL = URL(string: configuredBase),
+              ["http", "https"].contains(baseURL.scheme?.lowercased()),
+              let host = baseURL.host,
+              !host.isEmpty else {
+            return deepLink(for: question)
+        }
+        if baseURLText == nil && ["localhost", "127.0.0.1"].contains(host.lowercased()) {
+            return deepLink(for: question)
+        }
+
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
+        components?.path = "/c/\(question.id.uuidString)"
+        if let inviteCode = question.inviteCode, question.visibility != .publicRoom {
+            components?.queryItems = [URLQueryItem(name: "invite", value: inviteCode)]
+        }
+        return components?.url ?? deepLink(for: question)
+    }
+
     static func deepLink(for question: AskQuestion) -> URL {
         var components = URLComponents()
         components.scheme = "weshalray"
@@ -428,8 +588,43 @@ enum ComparisonShareService {
         \(question.smartSummary)
 
         افتح المقارنة:
-        \(deepLink(for: question).absoluteString)
+        \(publicURL(for: question).absoluteString)
         """
+    }
+
+    static func whatsappURL(for question: AskQuestion) -> URL? {
+        let encoded = shareText(for: question).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return URL(string: "https://wa.me/?text=\(encoded)")
+    }
+
+    static func xShareURL(for question: AskQuestion) -> URL? {
+        let text = "وش الرأي؟ \(question.title)"
+        var components = URLComponents(string: "https://twitter.com/intent/tweet")
+        components?.queryItems = [
+            URLQueryItem(name: "text", value: text),
+            URLQueryItem(name: "url", value: publicURL(for: question).absoluteString)
+        ]
+        return components?.url
+    }
+
+    static func comparisonID(fromSharedURL url: URL) -> UUID? {
+        if url.scheme == "weshalray", url.host == "comparison" {
+            return url.pathComponents.dropFirst().first.flatMap(UUID.init(uuidString:))
+        }
+        guard ["http", "https"].contains(url.scheme?.lowercased()) else { return nil }
+        let parts = url.pathComponents.dropFirst()
+        guard let marker = parts.first, ["c", "comparisons"].contains(marker),
+              let idString = parts.dropFirst().first else {
+            return nil
+        }
+        return UUID(uuidString: idString)
+    }
+
+    static func inviteCode(fromSharedURL url: URL) -> String? {
+        URLComponents(url: url, resolvingAgainstBaseURL: false)?
+            .queryItems?
+            .first(where: { $0.name == "invite" })?
+            .value
     }
 
     static func csvText(for question: AskQuestion) -> String {
@@ -1217,6 +1412,25 @@ struct OptionDecisionInsight: Identifiable, Codable, Hashable {
     let evidenceCount: Int
 }
 
+struct LeaderReasonBalance: Codable, Hashable {
+    let leaderTitle: String
+    let supportReasons: [String]
+    let cautionReasons: [String]
+    let alternativeReasons: [String]
+
+    var hasContent: Bool {
+        !supportReasons.isEmpty || !cautionReasons.isEmpty || !alternativeReasons.isEmpty
+    }
+}
+
+struct CommunityNeedMatch: Codable, Hashable {
+    let communityChoice: String?
+    let personalFitChoice: String?
+    let matchLevel: DecisionConfidenceLevel
+    let explanation: String
+    let topCriteria: [String]
+}
+
 struct DecisionSummary: Codable {
     let winningOptionID: UUID?
     let confidenceLevel: DecisionConfidenceLevel
@@ -1229,6 +1443,8 @@ struct DecisionSummary: Codable {
     let reasonThemes: [ReasonThemeResult]
     let highlights: [DecisionHighlight]
     let optionInsights: [OptionDecisionInsight]
+    let leaderReasonBalance: LeaderReasonBalance?
+    let communityNeedMatch: CommunityNeedMatch
     let compassTitle: String
     let compassSubtitle: String
     let recommendationText: String
@@ -1548,6 +1764,8 @@ enum DecisionSummaryService {
         let optionInsights = sorted.map { option in
             makeOptionInsight(for: option, in: question)
         }
+        let leaderReasonBalance = makeLeaderReasonBalance(winner: winner, question: question, optionInsights: optionInsights)
+        let communityNeedMatch = makeCommunityNeedMatch(for: question, winner: winner, optionInsights: optionInsights)
 
         let compass: (title: String, subtitle: String)
         let recommendation: String
@@ -1594,6 +1812,8 @@ enum DecisionSummaryService {
             reasonThemes: reasonThemes,
             highlights: highlights,
             optionInsights: optionInsights,
+            leaderReasonBalance: leaderReasonBalance?.hasContent == true ? leaderReasonBalance : nil,
+            communityNeedMatch: communityNeedMatch,
             compassTitle: compass.title,
             compassSubtitle: compass.subtitle,
             recommendationText: recommendation,
@@ -1622,14 +1842,17 @@ enum DecisionSummaryService {
         )
         let keywordPositives = rankedKeywords(
             from: relatedComments,
-            keywords: ["جودة", "سعر", "ضمان", "بطارية", "كاميرا", "راحة", "اعتمادية", "خدمة", "عملي", "قيمة", "أداء", "توفير"]
+            keywords: [
+                "جودة", "سعر", "ضمان", "بطارية", "كاميرا", "راحة", "اعتمادية",
+                "خدمة", "عملي", "قيمة", "أداء", "توفير", "صيانة", "توفر", "مرونة"
+            ]
         )
         let keywordNegatives = rankedKeywords(
             from: relatedComments,
-            keywords: ["غالي", "صيانة", "استهلاك", "ضعيف", "بطء", "حرارة", "قطع", "زحمة", "عيب", "تأخير", "وزن", "محدود"]
+            keywords: ["غالي", "استهلاك", "ضعيف", "بطء", "حرارة", "زحمة", "عيب", "تأخير", "وزن", "محدود", "مكلف", "نادر"]
         )
-        let positives = Array((analyzedThemes.filter { $0.positiveCount > $0.negativeCount }.map(\.title) + keywordPositives).prefix(4))
-        let negatives = Array((analyzedThemes.filter { $0.negativeCount > $0.positiveCount }.map(\.title) + keywordNegatives).prefix(4))
+        let positives = Array(uniqueValues(analyzedThemes.filter { $0.positiveCount > $0.negativeCount }.map(\.title) + keywordPositives).prefix(4))
+        let negatives = Array(uniqueValues(analyzedThemes.filter { $0.negativeCount > $0.positiveCount }.map(\.title) + keywordNegatives).prefix(4))
 
         return OptionDecisionInsight(
             id: UUID(),
@@ -1729,6 +1952,100 @@ enum DecisionSummaryService {
         return Array(items.prefix(4))
     }
 
+    private static func makeLeaderReasonBalance(
+        winner: PollOption?,
+        question: AskQuestion,
+        optionInsights: [OptionDecisionInsight]
+    ) -> LeaderReasonBalance? {
+        guard let winner,
+              let leaderInsight = optionInsights.first(where: { $0.optionID == winner.id }) else {
+            return nil
+        }
+
+        var supportReasons = uniqueValues(leaderInsight.topReasons + leaderInsight.positives)
+        if supportReasons.isEmpty {
+            let relatedComments = question.comments.filter { comment in
+                comment.optionID == winner.id || comment.optionTitle == winner.title
+            }
+            supportReasons = uniqueValues(
+                rankedReasons(from: relatedComments, category: question.category) +
+                ArabicReasonAnalyzer.analyze(reasons: relatedComments.map(\.text)).map(\.title)
+            )
+        }
+        let cautionReasons = uniqueValues(leaderInsight.negatives)
+        let alternativeReasons = uniqueValues(
+            optionInsights
+                .filter { $0.optionID != winner.id }
+                .flatMap { $0.topReasons + $0.positives }
+        )
+
+        return LeaderReasonBalance(
+            leaderTitle: leaderInsight.optionTitle,
+            supportReasons: Array(supportReasons.prefix(5)),
+            cautionReasons: Array(cautionReasons.prefix(5)),
+            alternativeReasons: Array(alternativeReasons.prefix(5))
+        )
+    }
+
+    private static func makeCommunityNeedMatch(
+        for question: AskQuestion,
+        winner: PollOption?,
+        optionInsights: [OptionDecisionInsight]
+    ) -> CommunityNeedMatch {
+        let criteria = DecisionFeatureCatalog.criteria(for: question.category)
+            .prefix(4)
+            .map { PreferenceCriterion(name: $0, weight: 3) }
+        let personalResults = ComparisonScoringService.score(question: question, criteria: criteria)
+        let personalWinner = personalResults.first.flatMap { result in
+            question.options.first { $0.id == result.optionID }
+        }
+        let topCriteria = uniqueValues(
+            optionInsights
+                .prefix(3)
+                .flatMap(\.topReasons)
+                .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        )
+        let visibleCriteria = Array((topCriteria.isEmpty ? criteria.map(\.name) : topCriteria).prefix(3))
+
+        guard let winner else {
+            return CommunityNeedMatch(
+                communityChoice: nil,
+                personalFitChoice: personalWinner?.title,
+                matchLevel: .low,
+                explanation: "لا يوجد رأي مجتمع كافٍ بعد، لذلك يعتمد تقدير الاحتياج على المعايير العامة للتصنيف.",
+                topCriteria: visibleCriteria
+            )
+        }
+
+        guard let personalWinner else {
+            return CommunityNeedMatch(
+                communityChoice: winner.title,
+                personalFitChoice: nil,
+                matchLevel: .medium,
+                explanation: "رأي المجتمع واضح نسبيًا، لكن لا توجد معايير شخصية كافية للمقارنة مع احتياجك.",
+                topCriteria: visibleCriteria
+            )
+        }
+
+        if winner.id == personalWinner.id {
+            return CommunityNeedMatch(
+                communityChoice: winner.title,
+                personalFitChoice: personalWinner.title,
+                matchLevel: .high,
+                explanation: "رأي المجتمع والمعايير الأساسية لهذا التصنيف يشيران إلى الخيار نفسه.",
+                topCriteria: visibleCriteria
+            )
+        }
+
+        return CommunityNeedMatch(
+            communityChoice: winner.title,
+            personalFitChoice: personalWinner.title,
+            matchLevel: .medium,
+            explanation: "رأي المجتمع يميل إلى \(winner.title)، بينما تقدير الاحتياج يميل إلى \(personalWinner.title). راجع المعايير قبل الحسم.",
+            topCriteria: visibleCriteria
+        )
+    }
+
     private static func votePercentage(option: PollOption, totalVotes: Int) -> Int {
         guard totalVotes > 0 else { return 0 }
         return Int((Double(option.votes) / Double(totalVotes)) * 100)
@@ -1754,11 +2071,24 @@ enum DecisionSummaryService {
     }
 
     private static func rankedKeywords(from comments: [AskComment], keywords: [String]) -> [String] {
-        let blob = comments.map { [$0.text, $0.reasonCategory ?? ""].joined(separator: " ") }.joined(separator: " ")
+        let blob = ArabicTextNormalizer.normalize(
+            comments.map { [$0.text, $0.reasonCategory ?? ""].joined(separator: " ") }.joined(separator: " ")
+        )
         return keywords
-            .filter { blob.localizedCaseInsensitiveContains($0) }
+            .filter { blob.contains(ArabicTextNormalizer.normalize($0)) }
             .prefix(4)
             .map { $0 }
+    }
+
+    private static func uniqueValues(_ values: [String]) -> [String] {
+        values.reduce(into: [String]()) { result, value in
+            let clean = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !clean.isEmpty else { return }
+            let normalized = ArabicTextNormalizer.normalize(clean)
+            if !result.contains(where: { ArabicTextNormalizer.normalize($0) == normalized }) {
+                result.append(clean)
+            }
+        }
     }
 }
 

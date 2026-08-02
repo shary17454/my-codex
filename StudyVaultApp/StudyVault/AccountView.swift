@@ -8,8 +8,10 @@ struct AccountView: View {
     @Binding var isBackendEnabled: Bool
     @Binding var backendBaseURLText: String
     @Binding var backendAPITokenText: String
+    let adminOverview: AdminOverview?
     let saveBackendSettings: () -> Void
     let refreshBackend: () -> Void
+    let refreshAdminOverview: () -> Void
 
     @State private var alias = ""
     @State private var selectedInterests: Set<AskCategory> = []
@@ -26,6 +28,11 @@ struct AccountView: View {
             VStack(alignment: .leading, spacing: 20) {
                 accountHero
                 AccountStatisticsCard(statistics: statistics)
+                WeshAppleFeaturesCard()
+                WeshPlusCard(hasOwnerAccess: userSession.hasOwnerAccess)
+                if userSession.hasOwnerAccess {
+                    AdminOperationsCard(overview: adminOverview, refresh: refreshAdminOverview)
+                }
                 publicIdentityCard
                 interestsCard
                 privacyCard
@@ -266,6 +273,45 @@ private struct AccountPrivacyRow: View {
             }
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct AdminOperationsCard: View {
+    let overview: AdminOverview?
+    let refresh: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            WeshSectionHeader(
+                "لوحة الإدارة",
+                subtitle: "مراقبة البلاغات والنشاط والتشغيل لحساب المالك.",
+                systemImage: "wrench.and.screwdriver.fill"
+            )
+
+            if let overview {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 10)], spacing: 10) {
+                    WeshMetricTile(title: "مقارنات", value: "\(overview.comparisons)", systemImage: "bubble.left.and.bubble.right.fill", color: WeshTheme.accent)
+                    WeshMetricTile(title: "أصوات", value: "\(overview.votes)", systemImage: "chart.bar.fill", color: WeshTheme.secondaryAccent)
+                    WeshMetricTile(title: "بلاغات مفتوحة", value: "\(overview.openReports)", systemImage: "exclamationmark.bubble.fill", color: WeshTheme.destructive)
+                    WeshMetricTile(title: "أجهزة", value: "\(overview.devices)", systemImage: "iphone", color: WeshTheme.gold)
+                    WeshMetricTile(title: "تنبيهات", value: "\(overview.queuedNotifications)", systemImage: "bell.badge.fill", color: WeshTheme.accentBright)
+                    WeshMetricTile(title: "محظورون", value: "\(overview.blockedClients)", systemImage: "hand.raised.fill", color: WeshTheme.destructive)
+                }
+            } else {
+                WeshStatusBanner(
+                    text: "اربط Backend ثم حدّث لوحة الإدارة لقراءة مؤشرات التشغيل.",
+                    kind: .information
+                )
+            }
+
+            Button {
+                refresh()
+            } label: {
+                Label("تحديث لوحة الإدارة", systemImage: "arrow.clockwise")
+            }
+            .buttonStyle(WeshSecondaryButtonStyle())
+        }
+        .weshSurface(goldAccent: true)
     }
 }
 

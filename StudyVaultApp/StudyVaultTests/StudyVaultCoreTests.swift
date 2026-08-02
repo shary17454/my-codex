@@ -5,6 +5,7 @@ import XCTest
 final class StudyVaultCoreTests: XCTestCase {
     override func tearDown() {
         LocalDraftStore.shared.clear()
+        LocalReportStore.shared.clear()
         super.tearDown()
     }
 
@@ -19,6 +20,22 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertEqual(summary.leadingVotePercentage, 0)
         XCTAssertEqual(summary.voteGapPercentage, 0)
         XCTAssertEqual(summary.clarity, .insufficientData)
+    }
+
+    func testPremiumPolicyUnlocksPlusForOwnerOnly() {
+        XCTAssertTrue(PremiumAccessPolicy.hasPlus(ownerAccess: true))
+        XCTAssertFalse(PremiumAccessPolicy.hasPlus(ownerAccess: false))
+        XCTAssertFalse(WeshPlusCatalog.productIdentifiers.isEmpty)
+    }
+
+    func testDecisionPDFExporterCreatesReadableFile() throws {
+        let question = makeQuestion(title: "آيفون أم سامسونج؟", votes: [8, 4])
+
+        let url = try DecisionPDFExporter.createPDF(question: question, watermark: true)
+        let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+
+        XCTAssertEqual(url.pathExtension, "pdf")
+        XCTAssertGreaterThan(attributes[.size] as? Int ?? 0, 500)
     }
 
     func testDashboardDoesNotClaimAMostVotedQuestionWithoutVotes() {
@@ -199,6 +216,78 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertTrue(viewModel.validateOptions())
     }
 
+    func testCameraDecisionDraftPrefillsEditableComparison() {
+        let viewModel = CreateComparisonViewModel()
+        let draft = CameraDecisionDraft(
+            title: "آيفون 15 برو أم بديل أفضل؟",
+            details: "اقتراح من صورة المنتج.",
+            primaryOption: "آيفون 15 برو",
+            optionSuggestions: ["آيفون 15 برو", "جوال بديل"],
+            suggestedCriteria: ["الكاميرا", "البطارية"],
+            tags: ["ايفون", "كاميرا"],
+            category: .phones,
+            confidence: 0.82,
+            recognizedText: ["iPhone 15 Pro"]
+        )
+
+        viewModel.applyCameraDecisionDraft(draft)
+
+        XCTAssertEqual(viewModel.title, draft.title)
+        XCTAssertEqual(viewModel.category, .phones)
+        XCTAssertEqual(viewModel.completedOptions, ["آيفون 15 برو", "جوال بديل"])
+        XCTAssertTrue(viewModel.tagsText.contains("ايفون"))
+        XCTAssertTrue(viewModel.tagsText.contains("كاميرا"))
+        XCTAssertEqual(viewModel.validationMessage, "حللنا الصورة واقترحنا خيارات ومعايير قابلة للتعديل.")
+    }
+
+    func testCameraDecisionAnalyzerSuggestsEditableOptionsAndCriteriaFromRecognizedText() {
+        let draft = CameraDecisionAnalyzer.makeDraft(
+            fromRecognizedText: [
+                "iPhone 15 Pro",
+                "Camera battery price",
+                "Apple"
+            ]
+        )
+
+        XCTAssertEqual(draft.category, .phones)
+        XCTAssertGreaterThanOrEqual(draft.optionSuggestions.count, 2)
+        XCTAssertEqual(draft.optionSuggestions.first, draft.primaryOption)
+        XCTAssertTrue(draft.suggestedCriteria.contains("الكاميرا"))
+        XCTAssertTrue(draft.suggestedCriteria.contains("البطارية"))
+    }
+
+    func testAIAssistantSummarizesFromAllowedAppContext() {
+        let question = makeQuestion(
+            title: "آيفون أم سامسونج للتصوير؟",
+            category: .phones,
+            optionTitles: ["آيفون", "سامسونج"],
+            votes: [7, 3]
+        )
+
+        let response = AIDecisionAssistantEngine.answer(
+            prompt: "لخص مقارنة الآيفون للتصوير",
+            questions: [question],
+            knowledgeItems: []
+        )
+
+        XCTAssertTrue(response.answer.contains("إجابة ذكية إرشادية"))
+        XCTAssertTrue(response.answer.contains("آيفون أم سامسونج للتصوير؟"))
+        XCTAssertEqual(response.sources, [question.title])
+        XCTAssertEqual(response.matchedQuestionIDs, [question.id])
+    }
+
+    func testAIAssistantDoesNotInventWhenNoContextMatches() {
+        let response = AIDecisionAssistantEngine.answer(
+            prompt: "وش أفضل طائرة خاصة؟",
+            questions: [],
+            knowledgeItems: []
+        )
+
+        XCTAssertTrue(response.answer.contains("ما لقيت بيانات كافية"))
+        XCTAssertTrue(response.sources.isEmpty)
+        XCTAssertTrue(response.matchedQuestionIDs.isEmpty)
+    }
+
     func testSmartComparisonPriorityChangesTheLeadingCandidate() {
         let affordable = KnowledgeItem(
             id: "affordable",
@@ -299,12 +388,15 @@ final class StudyVaultCoreTests: XCTestCase {
         let insights = ArabicReasonAnalyzer.analyze(reasons: [
             "الكاميرا ممتازة والتصوير واضح",
             "البطارية جيدة لكن السعر غالي",
-            "السعر مناسب وقيمة ممتازة"
+            "السعر مناسب وقيمة ممتازة",
+            "الصيانة أرخص وقطع الغيار متوفرة"
         ])
 
-        XCTAssertEqual(insights.first(where: { $0.id == "price" })?.mentionCount, 2)
+        XCTAssertEqual(insights.first(where: { $0.id == "price" })?.mentionCount, 3)
         XCTAssertEqual(insights.first(where: { $0.id == "camera" })?.sentimentLabel, "نقطة قوة")
         XCTAssertEqual(insights.first(where: { $0.id == "battery" })?.mentionCount, 1)
+        XCTAssertEqual(insights.first(where: { $0.id == "maintenance" })?.sentimentLabel, "نقطة قوة")
+        XCTAssertEqual(insights.first(where: { $0.id == "availability" })?.mentionCount, 1)
     }
 
     func testRankedVotingAwardsThreeTwoOnePoints() {
@@ -449,6 +541,55 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertEqual(viewModel.inviteCode(fromDeepLink: link), "A1B2C3D4E5")
     }
 
+    func testPublicShareURLUsesWebPathAndParsesAsUniversalLink() throws {
+        let question = makeQuestion(title: "آيفون أم جالكسي؟", votes: [3, 2])
+        let link = ComparisonShareService.publicURL(
+            for: question,
+            baseURLText: "https://share.weshalray.example"
+        )
+        let viewModel = HomeViewModel(questions: [question], knowledgeItems: [])
+
+        XCTAssertEqual(link.absoluteString, "https://share.weshalray.example/c/\(question.id.uuidString)")
+        XCTAssertEqual(viewModel.question(fromDeepLink: link)?.id, question.id)
+        XCTAssertNil(viewModel.inviteCode(fromDeepLink: link))
+    }
+
+    func testPrivatePublicShareURLCarriesInviteCode() throws {
+        var question = makeQuestion(votes: [0, 0])
+        question.visibility = .inviteCode
+        question.inviteCode = "JOIN123"
+        let link = ComparisonShareService.publicURL(
+            for: question,
+            baseURLText: "https://share.weshalray.example"
+        )
+
+        XCTAssertTrue(link.absoluteString.contains("/c/\(question.id.uuidString)"))
+        XCTAssertEqual(ComparisonShareService.comparisonID(fromSharedURL: link), question.id)
+        XCTAssertEqual(ComparisonShareService.inviteCode(fromSharedURL: link), "JOIN123")
+    }
+
+    func testContentReportFallsBackToLocalQueueWhenBackendIsDisabled() async {
+        LocalReportStore.shared.clear()
+        let question = makeQuestion(votes: [0, 0])
+        let viewModel = HomeViewModel(questions: [question], knowledgeItems: [])
+        viewModel.isBackendEnabled = false
+
+        let sent = await viewModel.submitContentReport(
+            contentID: question.id,
+            contentType: .comparison,
+            reason: .misleading,
+            details: "تفاصيل بلاغ"
+        )
+
+        let reports = LocalReportStore.shared.load()
+        XCTAssertFalse(sent)
+        XCTAssertEqual(reports.count, 1)
+        XCTAssertEqual(reports.first?.contentID, question.id)
+        XCTAssertEqual(reports.first?.contentType, .comparison)
+        XCTAssertEqual(reports.first?.reason, .misleading)
+        XCTAssertEqual(reports.first?.details, "تفاصيل بلاغ")
+    }
+
     func testSwiftDataSurvivesRecreatedModelContainer() throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("wesh-persistence-\(UUID().uuidString)", isDirectory: true)
@@ -495,6 +636,13 @@ final class StudyVaultCoreTests: XCTestCase {
                     likes: 1,
                     optionTitle: "الخيار الأول",
                     reasonCategory: "الأداء"
+                ),
+                AskComment(
+                    author: "مستخدم",
+                    text: "الخيار الثاني أوفر وقطع الغيار متوفرة والصيانة أرخص",
+                    likes: 2,
+                    optionTitle: "الخيار الثاني",
+                    reasonCategory: "الصيانة"
                 )
             ]
         )
@@ -505,6 +653,10 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertFalse(summary.compassSubtitle.isEmpty)
         XCTAssertFalse(summary.actionItems.isEmpty)
         XCTAssertTrue(summary.actionItems.contains { $0.title == "أهم محور في النقاش" })
+        XCTAssertEqual(summary.leaderReasonBalance?.leaderTitle, "الخيار الأول")
+        XCTAssertNotNil(summary.leaderReasonBalance)
+        XCTAssertEqual(summary.communityNeedMatch.communityChoice, "الخيار الأول")
+        XCTAssertFalse(summary.communityNeedMatch.explanation.isEmpty)
     }
 
     private func makeQuestion(

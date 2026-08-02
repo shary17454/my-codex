@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardBrandHeader: View {
     let userName: String
     let isSignedIn: Bool
+    let unreadNotificationCount: Int
     let showMenu: () -> Void
     let showNotifications: () -> Void
 
@@ -31,9 +32,20 @@ struct DashboardBrandHeader: View {
             }
 
             Button(action: showNotifications) {
-                Image(systemName: "bell")
-                    .frame(width: 44, height: 44)
-                    .background(WeshTheme.surface.opacity(0.82), in: Circle())
+                ZStack(alignment: .topTrailing) {
+                    Image(systemName: "bell")
+                        .frame(width: 44, height: 44)
+                        .background(WeshTheme.surface.opacity(0.82), in: Circle())
+                    if unreadNotificationCount > 0 {
+                        Text("\(min(unreadNotificationCount, 9))")
+                            .font(.caption2.weight(.heavy))
+                            .foregroundStyle(.white)
+                            .frame(width: 18, height: 18)
+                            .background(WeshTheme.destructive, in: Circle())
+                            .offset(x: 3, y: -3)
+                            .accessibilityLabel("\(unreadNotificationCount) إشعارات غير مقروءة")
+                    }
+                }
             }
             .accessibilityLabel("الإشعارات")
         }
