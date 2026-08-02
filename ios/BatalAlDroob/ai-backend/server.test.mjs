@@ -44,6 +44,29 @@ function post(url, body, token = "test-token") {
   });
 }
 
+function postRaw(url, body, token = "test-token") {
+  return new Promise((resolve, reject) => {
+    const request = http.request(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Batal-AI-Client-Token": token
+      }
+    }, (response) => {
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.on("end", () => {
+        resolve({
+          statusCode: response.statusCode,
+          json: JSON.parse(Buffer.concat(chunks).toString("utf8"))
+        });
+      });
+    });
+    request.on("error", reject);
+    request.end(body);
+  });
+}
+
 const basePayload = {
   message: "وش أقرب قطعة؟",
   language: "ar",
@@ -102,6 +125,30 @@ test("requires client token", async () => {
   }
 });
 
+test("rejects invalid json as a client error", async () => {
+  const server = createServer({ env: { OPENAI_API_KEY: "test", BATAL_AI_CLIENT_TOKEN: "test-token" } });
+  const baseURL = await listen(server);
+  try {
+    const response = await postRaw(`${baseURL}/api/ai/chat`, "{bad-json");
+    assert.equal(response.statusCode, 400);
+    assert.equal(response.json.error, "invalid_json");
+  } finally {
+    await close(server);
+  }
+});
+
+test("returns a safe unavailable error when the provider key is missing", async () => {
+  const server = createServer({ env: { BATAL_AI_CLIENT_TOKEN: "test-token" } });
+  const baseURL = await listen(server);
+  try {
+    const response = await post(`${baseURL}/api/ai/chat`, basePayload);
+    assert.equal(response.statusCode, 503);
+    assert.equal(response.json.error, "missing_openai_api_key");
+  } finally {
+    await close(server);
+  }
+});
+
 test("calls OpenAI with store false and returns structured answer", async () => {
   let outboundBody;
   const fetchImpl = async (_url, options) => {
@@ -124,6 +171,31 @@ test("calls OpenAI with store false and returns structured answer", async () => 
     assert.equal(response.json.generatedByAI, true);
     assert.equal(outboundBody.store, false);
     assert.equal(outboundBody.model, "test-model");
+  } finally {
+    await close(server);
+  }
+});
+
+test("uses the production-safe default model when no override is configured", async () => {
+  let outboundBody;
+  const fetchImpl = async (_url, options) => {
+    outboundBody = JSON.parse(options.body);
+    return {
+      ok: true,
+      async json() {
+        return { output_text: "تمت المعالجة." };
+      }
+    };
+  };
+  const server = createServer({
+    fetchImpl,
+    env: { OPENAI_API_KEY: "test", BATAL_AI_CLIENT_TOKEN: "test-token" }
+  });
+  const baseURL = await listen(server);
+  try {
+    const response = await post(`${baseURL}/api/ai/chat`, basePayload);
+    assert.equal(response.statusCode, 200);
+    assert.equal(outboundBody.model, "gpt-4.1-mini");
   } finally {
     await close(server);
   }

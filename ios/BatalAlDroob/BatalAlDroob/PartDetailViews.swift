@@ -3,6 +3,7 @@ import SwiftUI
 struct PartDetailView: View {
     let part: Part
     @Bindable var viewModel: CatalogViewModel
+    @State private var selectedSmartIndicator: SmartPartIndicator?
 
     var body: some View {
         List {
@@ -68,6 +69,11 @@ struct PartDetailView: View {
                 LabeledContent(viewModel.text(ar: "حالة التدقيق", en: "Audit"), value: part.auditStatus ?? "-")
                 LabeledContent(viewModel.text(ar: "الندرة", en: "Rarity"), value: part.rarity ?? "-")
             }
+            SmartPartIndicatorsSection(
+                part: part,
+                viewModel: viewModel,
+                selectedIndicator: $selectedSmartIndicator
+            )
             Section(viewModel.text(ar: "أرقام القطعة", en: "Part numbers")) {
                 ForEach(part.allNumbers, id: \.self) { number in
                     Text(viewModel.premiumNumber(number, for: part)).font(.body.monospaced())
@@ -146,6 +152,166 @@ struct PartDetailView: View {
                 ar: viewModel.wishlist.contains(part.partNumber) ? "إزالة من قائمة الرغبات" : "إضافة إلى قائمة الرغبات",
                 en: viewModel.wishlist.contains(part.partNumber) ? "Remove from wishlist" : "Add to wishlist"
             ))
+        }
+        .sheet(item: $selectedSmartIndicator) { indicator in
+            SmartPartIndicatorDetailView(indicator: indicator, viewModel: viewModel)
+                .presentationDetents([.medium, .large])
+        }
+    }
+}
+
+private struct SmartPartIndicatorsSection: View {
+    let part: Part
+    @Bindable var viewModel: CatalogViewModel
+    @Binding var selectedIndicator: SmartPartIndicator?
+
+    private var columns: [GridItem] {
+        [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    }
+
+    var body: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.text(ar: "المؤشرات الذكية", en: "Smart indicators"))
+                        .font(.headline)
+                    Text(viewModel.text(
+                        ar: "اضغط على أي مؤشر لفتح سبب النتيجة والخطوة المناسبة.",
+                        en: "Tap any indicator to see the reason and recommended next step."
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+
+                LazyVGrid(columns: columns, spacing: 12) {
+                    ForEach(viewModel.smartIndicators(for: part)) { indicator in
+                        SmartPartIndicatorButton(indicator: indicator, viewModel: viewModel) {
+                            AppHaptics.lightImpact()
+                            selectedIndicator = indicator
+                        }
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+        }
+    }
+}
+
+private struct SmartPartIndicatorButton: View {
+    let indicator: SmartPartIndicator
+    @Bindable var viewModel: CatalogViewModel
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Image(systemName: indicator.kind.symbol)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(indicatorColor)
+                    Spacer()
+                    Image(systemName: "chevron.left")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Text(indicator.kind.title(viewModel.language))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                Text(indicator.value)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.78)
+            }
+            .frame(maxWidth: .infinity, minHeight: 118, alignment: .leading)
+            .padding(14)
+            .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: BatalDesign.cardRadius)
+                    .stroke(indicatorColor.opacity(0.28), lineWidth: 1)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("smartIndicator.\(indicator.kind.rawValue)")
+        .accessibilityLabel("\(indicator.kind.title(viewModel.language)): \(indicator.value)")
+        .accessibilityHint(viewModel.text(ar: "يفتح تفاصيل هذا المؤشر.", en: "Opens details for this indicator."))
+    }
+
+    private var indicatorColor: Color {
+        switch indicator.systemColorName {
+        case "green": .green
+        case "orange": .orange
+        case "red": .red
+        default: .secondary
+        }
+    }
+}
+
+private struct SmartPartIndicatorDetailView: View {
+    let indicator: SmartPartIndicator
+    @Bindable var viewModel: CatalogViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label(indicator.kind.title(viewModel.language), systemImage: indicator.kind.symbol)
+                            .font(.title3.weight(.bold))
+                        Text(indicator.value)
+                            .font(.largeTitle.monospacedDigit().bold())
+                            .foregroundStyle(BatalDesign.brand)
+                        Text(indicator.summary)
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 4)
+                }
+
+                Section(viewModel.text(ar: "لماذا ظهرت هذه النتيجة؟", en: "Why this result appears")) {
+                    ForEach(Array(indicator.details.enumerated()), id: \.offset) { _, detail in
+                        Label(detail, systemImage: "checkmark.circle")
+                    }
+                }
+
+                Section(viewModel.text(ar: "الخطوة المناسبة", en: "Recommended next step")) {
+                    Text(nextStepText)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle(indicator.kind.title(viewModel.language))
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(viewModel.text(ar: "تم", en: "Done")) { dismiss() }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(BatalDesign.canvas)
+        }
+    }
+
+    private var nextStepText: String {
+        switch indicator.kind {
+        case .priceScore, .priceFairness:
+            viewModel.text(
+                ar: "اجمع عرضين أو أكثر من المتاجر الموثقة أو جهّز طلب قطعة، ثم قارن السعر بعد توفر مصادر كافية.",
+                en: "Collect two or more verified store quotes or prepare a part request, then compare once enough sources exist."
+            )
+        case .fitmentMatch:
+            viewModel.text(
+                ar: "أكمل ملف السيارة من تبويب الأدوات: الجيل، السنة، المحرك، والقير، ثم أعد فتح نتيجة القطعة.",
+                en: "Complete your vehicle profile from Tools: generation, year, engine, and transmission, then reopen the part result."
+            )
+        case .confidence:
+            viewModel.text(
+                ar: "راجع الأدلة أسفل صفحة القطعة. كلما زادت المصادر وتطابقت السنوات والمحركات زادت موثوقية النتيجة.",
+                en: "Review the evidence below the part page. More matching sources, years, and engines increase reliability."
+            )
         }
     }
 }

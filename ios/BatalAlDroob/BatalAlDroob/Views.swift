@@ -22,12 +22,12 @@ struct RootView: View {
                 DashboardView(viewModel: viewModel) { tab in
                     selectedTab = tab
                 }
-                    .tabItem { Label(
-                        viewModel.text(ar: "الرئيسية", en: "Home"),
-                        systemImage: "gauge.with.dots.needle.bottom.50percent"
-                    ) }
-                    .accessibilityIdentifier("tab.home")
-                    .tag(AppTab.dashboard)
+                .tabItem { Label(
+                    viewModel.text(ar: "الرئيسية", en: "Home"),
+                    systemImage: "gauge.with.dots.needle.bottom.50percent"
+                ) }
+                .accessibilityIdentifier("tab.home")
+                .tag(AppTab.dashboard)
                 CatalogView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "الكتالوج", en: "Catalog"), systemImage: "magnifyingglass") }
                     .accessibilityIdentifier("tab.catalog")
@@ -35,9 +35,9 @@ struct RootView: View {
                 AIAssistantView(viewModel: viewModel) {
                     selectedTab = .dashboard
                 }
-                    .tabItem { Label(viewModel.text(ar: "المساعد", en: "Assistant"), systemImage: "sparkles") }
-                    .accessibilityIdentifier("tab.assistant")
-                    .tag(AppTab.assistant)
+                .tabItem { Label(viewModel.text(ar: "المساعد", en: "Assistant"), systemImage: "sparkles") }
+                .accessibilityIdentifier("tab.assistant")
+                .tag(AppTab.assistant)
                 RequestView(viewModel: viewModel)
                     .tabItem { Label(viewModel.text(ar: "طلب قطعة", en: "Request"), systemImage: "cart.badge.plus") }
                     .accessibilityIdentifier("tab.request")
@@ -63,8 +63,20 @@ struct RootView: View {
         .tint(BatalDesign.brand)
         .background(BatalDesign.canvas)
         .onAppear {
+            #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-resetPermissionOnboardingForUITests") {
+                    viewModel.customerProfile = CustomerProfile()
+                    hasCompletedInitialPermissionOnboarding = false
+                }
+            #endif
             if ProcessInfo.processInfo.arguments.contains("-skipPermissionOnboardingForUITests") {
                 hasCompletedInitialPermissionOnboarding = true
+                return
+            }
+            let hasRequiredSignIn = viewModel.customerProfile.hasCompletedSignInChoice
+                && viewModel.isValidCustomerEmail(viewModel.customerProfile.email)
+            if !hasRequiredSignIn {
+                hasCompletedInitialPermissionOnboarding = false
             }
             guard !hasCompletedInitialPermissionOnboarding else { return }
             isPermissionOnboardingPresented = true
@@ -137,7 +149,10 @@ struct DashboardView: View {
 
                     DashboardSectionTitle(
                         title: viewModel.text(ar: "ابدأ بسرعة", en: "Start quickly"),
-                        subtitle: viewModel.text(ar: "اختصر أكثر المسارات استخدامًا.", en: "Jump into the most-used workflows.")
+                        subtitle: viewModel.text(
+                            ar: "اختصر أكثر المسارات استخدامًا.",
+                            en: "Jump into the most-used workflows."
+                        )
                     )
                     VStack(spacing: 10) {
                         quickAction(
@@ -184,7 +199,10 @@ struct DashboardView: View {
 
                     DashboardSectionTitle(
                         title: viewModel.text(ar: "لوحة الكتالوج المحلي", en: "Native catalog dashboard"),
-                        subtitle: viewModel.text(ar: "أرقام سريعة من قاعدة البيانات المدمجة.", en: "Fast signals from the bundled database.")
+                        subtitle: viewModel.text(
+                            ar: "أرقام سريعة من قاعدة البيانات المدمجة.",
+                            en: "Fast signals from the bundled database."
+                        )
                     )
                     VStack(spacing: 12) {
                         StatsHeader(viewModel: viewModel, openTab: openTab)
@@ -193,7 +211,10 @@ struct DashboardView: View {
 
                     DashboardSectionTitle(
                         title: viewModel.text(ar: "عينات مدققة قابلة للفتح", en: "Verified native records"),
-                        subtitle: viewModel.text(ar: "نتائج جاهزة للفحص والتجربة.", en: "Review-ready records for quick inspection.")
+                        subtitle: viewModel.text(
+                            ar: "نتائج جاهزة للفحص والتجربة.",
+                            en: "Review-ready records for quick inspection."
+                        )
                     )
                     VStack(spacing: 10) {
                         ForEach(viewModel.reviewReadyParts) { part in
@@ -206,7 +227,10 @@ struct DashboardView: View {
 
                     DashboardSectionTitle(
                         title: viewModel.text(ar: "تحقق سريع من التوافق", en: "Quick fitment check"),
-                        subtitle: viewModel.text(ar: "اختبر رقم قطعة قبل تجهيز الطلب.", en: "Check a part number before preparing a request.")
+                        subtitle: viewModel.text(
+                            ar: "اختبر رقم قطعة قبل تجهيز الطلب.",
+                            en: "Check a part number before preparing a request."
+                        )
                     )
                     VStack(alignment: .leading, spacing: 12) {
                         TextField(
@@ -240,9 +264,11 @@ struct DashboardView: View {
                     .premiumPanel()
                 }
                 .padding(BatalDesign.screenPadding)
+                .padding(.top, 8)
             }
             .background(BatalDesign.canvas)
             .navigationTitle(viewModel.text(ar: "الرئيسية", en: "Home"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar { LanguageMenu(viewModel: viewModel) }
             .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
             .onAppear {
@@ -283,39 +309,27 @@ struct DashboardHero: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ZStack(alignment: .bottomLeading) {
-                heroImage
-                    .frame(height: 220)
-                    .frame(maxWidth: .infinity)
-                    .clipped()
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "car.side.fill")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(BatalDesign.brand)
+                    .frame(width: 46, height: 46)
+                    .background(BatalDesign.brand.opacity(0.13), in: RoundedRectangle(cornerRadius: AppRadius.control))
 
-                LinearGradient(
-                    colors: [.black.opacity(0.72), .black.opacity(0.24), .black.opacity(0.04)],
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(viewModel.text(ar: "مرحبًا في بطل الدروب", en: "Welcome to Batal Al-Droob"))
-                        .font(AppTypography.hero)
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.72)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.text(ar: "لوحة بطل الدروب", en: "Batal Al-Droob dashboard"))
+                        .font(.headline.weight(.bold))
                     Text(viewModel.text(
-                        ar: "كتالوج باترول عملي يجمع الصور، الأجيال، أرقام القطع، التوافق، والطلبات في مكان واحد.",
-                        en: "A Patrol workbench for generation visuals, part numbers, fitment, requests, and catalog lookup."
+                        ar: "ابحث في أرقام القطع والتوافق حسب جيل سيارتك.",
+                        en: "Search part numbers and fitment for your vehicle generation."
                     ))
-                    .font(.callout.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.88))
-                    .fixedSize(horizontal: false, vertical: true)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
                 }
-                .padding(18)
             }
-            .clipShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
-                    .stroke(.white.opacity(0.16))
-            )
+            .accessibilityElement(children: .combine)
 
             HStack(spacing: 8) {
                 HeroMetric(
@@ -336,10 +350,10 @@ struct DashboardHero: View {
                 HeroGenerationPill(title: "Y60", subtitle: "1988-1997", isActive: true) {
                     openGeneration("Y60")
                 }
-                HeroGenerationPill(title: "Y61", subtitle: "1997-2010", isActive: false) {
+                HeroGenerationPill(title: "Y61", subtitle: "1997-2025", isActive: false) {
                     openGeneration("Y61")
                 }
-                HeroGenerationPill(title: "Y62", subtitle: "2010-2024", isActive: false) {
+                HeroGenerationPill(title: "Y62", subtitle: "2010-2025", isActive: false) {
                     openGeneration("Y62")
                 }
                 HeroGenerationPill(
@@ -476,11 +490,11 @@ struct PatrolGenerationsSection: View {
             titleEn: "Classic generation",
             yearsAr: "1988-1997",
             yearsEn: "1988-1997",
-            summaryAr: "صور وبيانات الجيل الكلاسيكي مرتبطة ببحث الكتالوج لتسهيل الوصول إلى القطع المناسبة.",
-            summaryEn: "Classic generation visuals and data are linked to catalog search for faster part discovery.",
+            summaryAr: "كتالوجات الفئة الكلاسيكية للبحث عن القطع والتوافق ضمن موديلات 1988-1997.",
+            summaryEn: "Classic-generation catalogs for part and fitment search across 1988-1997 models.",
             badgeAr: "نشط",
             badgeEn: "Active",
-            catalogFileCount: 47,
+            catalogFileCount: 297,
             isActive: true
         ),
         PatrolGeneration(
@@ -488,13 +502,13 @@ struct PatrolGenerationsSection: View {
             imageName: "patrol-y61",
             titleAr: "جيل السفاري",
             titleEn: "Safari generation",
-            yearsAr: "1997-2010",
-            yearsEn: "1997-2010",
-            summaryAr: "كتالوجات السفاري محفوظة كملفات مرجعية، وتحتاج فهرسة تفصيلية لتحويل صفحاتها إلى أرقام قطع قابلة للبحث.",
-            summaryEn: "Safari catalogs are stored as reference files and need detailed indexing before their pages become searchable part records.",
+            yearsAr: "1997-2025",
+            yearsEn: "1997-2025",
+            summaryAr: "مراجع جيل السفاري للبحث في القطع والتوافق ضمن موديلات 1997-2025.",
+            summaryEn: "Safari-generation references for part and fitment search across 1997-2025 models.",
             badgeAr: "ملفات",
             badgeEn: "Files",
-            catalogFileCount: 19,
+            catalogFileCount: 143,
             isActive: false
         ),
         PatrolGeneration(
@@ -502,13 +516,13 @@ struct PatrolGenerationsSection: View {
             imageName: "patrol-y62",
             titleAr: "الجيل الفاخر",
             titleEn: "Luxury generation",
-            yearsAr: "2010-2024",
-            yearsEn: "2010-2024",
-            summaryAr: "جيل المنصة الحديثة مع صورة مستقلة وبطاقة واضحة داخل الرئيسية.",
-            summaryEn: "A modern-platform generation with its own visual card on the home screen.",
-            badgeAr: "قادم",
-            badgeEn: "Next",
-            catalogFileCount: 30,
+            yearsAr: "2010-2025",
+            yearsEn: "2010-2025",
+            summaryAr: "مراجع الجيل الفاخر للبحث في القطع والتوافق ضمن موديلات 2010-2025.",
+            summaryEn: "Luxury-generation references for part and fitment search across 2010-2025 models.",
+            badgeAr: "ملفات",
+            badgeEn: "Files",
+            catalogFileCount: 140,
             isActive: false
         ),
         PatrolGeneration(
@@ -600,7 +614,10 @@ private struct PatrolGenerationCard: View {
                         .fixedSize(horizontal: false, vertical: true)
 
                     let recordCount = viewModel.generationRecordCount(for: generation.id)
-                    Label(generationCoverageLabel(recordCount: recordCount), systemImage: "externaldrive.badge.checkmark")
+                    Label(
+                        generationCoverageLabel(recordCount: recordCount),
+                        systemImage: "externaldrive.badge.checkmark"
+                    )
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(BatalDesign.brand)
 
@@ -619,7 +636,8 @@ private struct PatrolGenerationCard: View {
         .background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
-                .stroke(generation.isActive ? BatalDesign.brand.opacity(colorScheme == .dark ? 0.45 : 0.30) : BatalDesign.border)
+                .stroke(generation.isActive ? BatalDesign.brand
+                    .opacity(colorScheme == .dark ? 0.45 : 0.30) : BatalDesign.border)
         )
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("home.generation.\(generation.id)")
@@ -678,7 +696,7 @@ private enum GenerationImageLoader {
         Bundle.main.url(forResource: name, withExtension: "jpg", subdirectory: "models")
             .flatMap { UIImage(contentsOfFile: $0.path) }
             ?? Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "models")
-                .flatMap { UIImage(contentsOfFile: $0.path) }
+            .flatMap { UIImage(contentsOfFile: $0.path) }
     }
 }
 
@@ -761,7 +779,10 @@ struct CatalogView: View {
                 }
                 Section {
                     TextField(
-                        viewModel.text(ar: "رقم القطعة، الاسم، القسم، أو VIN", en: "Part number, name, category, or VIN"),
+                        viewModel.text(
+                            ar: "رقم القطعة، الاسم، القسم، أو VIN",
+                            en: "Part number, name, category, or VIN"
+                        ),
                         text: $viewModel.searchText
                     )
                     .textInputAutocapitalization(.characters)
@@ -1012,8 +1033,7 @@ struct ConfidenceBadge: View {
 
 extension View {
     func premiumPanel() -> some View {
-        self
-            .background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
+        background(BatalDesign.surface, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
                     .stroke(BatalDesign.border)

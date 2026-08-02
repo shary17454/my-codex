@@ -3,7 +3,7 @@ import XCTest
 
 final class BatalCatalogResourceTests: XCTestCase {
     private var bundle: Bundle {
-        Bundle(for: Self.self)
+        Bundle.main
     }
 
     override func setUpWithError() throws {
@@ -82,8 +82,16 @@ final class BatalCatalogResourceTests: XCTestCase {
             ))
             let imageData = try Data(contentsOf: imageURL)
 
-            XCTAssertGreaterThan(imageData.count, 100_000, "\(imageName) should be a real optimized photo, not a placeholder.")
-            XCTAssertLessThan(imageData.count, 350_000, "\(imageName) should stay compressed enough for the app bundle.")
+            XCTAssertGreaterThan(
+                imageData.count,
+                100_000,
+                "\(imageName) should be a real optimized photo, not a placeholder."
+            )
+            XCTAssertLessThan(
+                imageData.count,
+                350_000,
+                "\(imageName) should stay compressed enough for the app bundle."
+            )
             XCTAssertTrue(documentedSources.contains("`\(imageName).jpg`"))
         }
 
@@ -137,7 +145,7 @@ final class BatalCatalogResourceTests: XCTestCase {
         let catalog = try JSONDecoder().decode(CatalogPayload.self, from: catalogData)
         let y61Parts = catalog.parts.filter { ($0.model ?? "").uppercased() == "Y61" }
 
-        XCTAssertGreaterThan(y61Parts.count, 5_000)
+        XCTAssertGreaterThan(y61Parts.count, 5000)
 
         let engineAssembly = try XCTUnwrap(y61Parts.first { $0.partNumber == "10102VB050" })
         XCTAssertEqual(engineAssembly.nameEn, "ENGINE ASSY-BARE")
@@ -148,7 +156,7 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
-    func testNaturalArabicSteeringArmSearchFindsCatalogParts() async throws {
+    func testNaturalArabicSteeringArmSearchFindsCatalogParts() async {
         let viewModel = CatalogViewModel(
             repository: BundledCatalogRepository(),
             store: TestPurchaseService()
@@ -182,7 +190,7 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
-    func testDialectPartSearchFindsBundledCatalogResults() async throws {
+    func testDialectPartSearchFindsBundledCatalogResults() async {
         let viewModel = CatalogViewModel(
             repository: BundledCatalogRepository(),
             store: TestPurchaseService()
@@ -372,7 +380,7 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 
     @MainActor
-    func testPurchaseActionStaysEnabledWhenProductsNeedRefresh() async throws {
+    func testPurchaseActionStaysEnabledWhenProductsNeedRefresh() async {
         let defaultsKey = "batalPaidUnlocks"
         UserDefaults.standard.removeObject(forKey: defaultsKey)
         defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
@@ -528,7 +536,7 @@ final class BatalCatalogResourceTests: XCTestCase {
         let debugResults = results.map { "\($0.partNumber): \(viewModel.title(for: $0))" }.joined(separator: " | ")
 
         XCTAssertEqual(results.first?.partNumber, "96935-TRIM", debugResults)
-        XCTAssertFalse(viewModel.title(for: try XCTUnwrap(results.first)).contains("صامولة"), debugResults)
+        XCTAssertFalse(try viewModel.title(for: XCTUnwrap(results.first)).contains("صامولة"), debugResults)
         XCTAssertFalse(results.prefix(2).contains { viewModel.title(for: $0).contains("صامولة") }, debugResults)
     }
 
@@ -612,7 +620,10 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertEqual(viewModel.customerProfile.displayName, "مالك التطبيق")
         XCTAssertEqual(viewModel.customerProfile.email, "owner@example.com")
         XCTAssertTrue(viewModel.customerProfile.hasCompletedSignInChoice)
-        XCTAssertFalse(viewModel.isFullCatalogUnlocked(), "Regular local customer email must not bypass StoreKit catalog access.")
+        XCTAssertFalse(
+            viewModel.isFullCatalogUnlocked(),
+            "Regular local customer email must not bypass StoreKit catalog access."
+        )
     }
 
     @MainActor
@@ -661,13 +672,13 @@ final class BatalCatalogResourceTests: XCTestCase {
         )
 
         XCTAssertFalse(viewModel.saveLocalCustomer(name: "Bad", email: "not-an-email"))
-        XCTAssertEqual(viewModel.customerProfile.accessMode, .guest)
+        XCTAssertEqual(viewModel.customerProfile.accessMode, .localEmail)
         XCTAssertEqual(viewModel.customerProfile.email, "")
         XCTAssertFalse(viewModel.customerProfile.hasCompletedSignInChoice)
     }
 
     @MainActor
-    func testContinueAsGuestClearsLocalCustomerEmail() {
+    func testValidLocalCustomerEmailCompletesRequiredSignInChoice() {
         let defaultsKey = "batalCustomerProfile"
         UserDefaults.standard.removeObject(forKey: defaultsKey)
         defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
@@ -678,16 +689,14 @@ final class BatalCatalogResourceTests: XCTestCase {
         )
 
         XCTAssertTrue(viewModel.saveLocalCustomer(name: "Owner", email: "owner@example.com"))
-        viewModel.continueAsGuest()
-
-        XCTAssertEqual(viewModel.customerProfile.accessMode, .guest)
-        XCTAssertEqual(viewModel.customerProfile.displayName, "")
-        XCTAssertEqual(viewModel.customerProfile.email, "")
+        XCTAssertEqual(viewModel.customerProfile.accessMode, .localEmail)
+        XCTAssertEqual(viewModel.customerProfile.displayName, "Owner")
+        XCTAssertEqual(viewModel.customerProfile.email, "owner@example.com")
         XCTAssertTrue(viewModel.customerProfile.hasCompletedSignInChoice)
     }
 
     @MainActor
-    func testLegacyFullCatalogEntitlementStillRestoresAccess() async throws {
+    func testLegacyFullCatalogEntitlementStillRestoresAccess() async {
         let defaultsKey = "batalPaidUnlocks"
         UserDefaults.standard.removeObject(forKey: defaultsKey)
         defer { UserDefaults.standard.removeObject(forKey: defaultsKey) }
@@ -758,7 +767,7 @@ final class BatalCatalogResourceTests: XCTestCase {
         ]
 
         let request = viewModel.assistantContextRequest(message: "هل تناسب؟")
-        let encoded = String(data: try JSONEncoder().encode(request), encoding: .utf8) ?? ""
+        let encoded = try String(data: JSONEncoder().encode(request), encoding: .utf8) ?? ""
 
         XCTAssertFalse(encoded.contains("JN8AZ2NF0E9555555"))
         XCTAssertFalse(encoded.contains("\"partNumber\":\"21082-4W000\""))
@@ -798,6 +807,111 @@ final class BatalCatalogResourceTests: XCTestCase {
 
         XCTAssertTrue(viewModel.aiMessages.isEmpty)
         XCTAssertNotNil(viewModel.aiErrorMessage)
+    }
+
+    func testCatalogArchiveIndexIsConsistentAndLocalBundleIsAllOrNone() throws {
+        let search = try loadJSONObject(named: "catalog_search_index", subdirectory: "catalog/search")
+        let entries = try XCTUnwrap(search["entries"] as? [[String: Any]])
+        let catalogEntries = entries.filter { entry in
+            (entry["type"] as? String) == "catalog_pdf"
+        }
+
+        let manifest = try loadJSONObject(named: "patrol_full_catalog_files", subdirectory: "data")
+        let files = try XCTUnwrap(manifest["files"] as? [[String: Any]])
+        let bundledFiles = files.filter { item in
+            (item["bundled"] as? Bool) == true && ((item["app_path"] as? String)?.hasSuffix(".pdf") == true)
+        }
+
+        XCTAssertEqual(files.count, 640)
+        XCTAssertEqual(catalogEntries.count, bundledFiles.count)
+        XCTAssertGreaterThanOrEqual(catalogEntries.count, 640)
+        XCTAssertGreaterThanOrEqual(catalogEntries.filter { ($0["model"] as? String) == "Y60" }.count, 297)
+        XCTAssertGreaterThanOrEqual(catalogEntries.filter { ($0["model"] as? String) == "Y61" }.count, 143)
+        XCTAssertGreaterThanOrEqual(catalogEntries.filter { ($0["model"] as? String) == "Y62" }.count, 140)
+        XCTAssertEqual(files.filter { ($0["generation"] as? String) == "Y60" }.count, 297)
+        XCTAssertEqual(files.filter { ($0["generation"] as? String) == "Y61" }.count, 143)
+        XCTAssertEqual(files.filter { ($0["generation"] as? String) == "Y62" }.count, 140)
+
+        var uniquePaths = Set<String>()
+        for item in bundledFiles {
+            let archivePath = try XCTUnwrap(item["app_path"] as? String)
+            let sha256 = try XCTUnwrap(item["sha256"] as? String)
+            let byteCount = (item["bundled_bytes"] as? Int) ?? (item["size_bytes"] as? Int) ?? 0
+
+            XCTAssertTrue(uniquePaths.insert(archivePath).inserted, "Duplicate catalog path: \(archivePath)")
+            XCTAssertNotNil(sha256.range(of: "^[0-9a-f]{64}$", options: .regularExpression))
+            XCTAssertGreaterThan(byteCount, 0)
+        }
+
+        let copiedPDFCount = catalogEntries.reduce(into: 0) { count, entry in
+            guard
+                let sourcePath = entry["sourcePdfPath"] as? String,
+                let resourceURL = bundle.resourceURL
+            else { return }
+            let catalogURL = resourceURL.appendingPathComponent(sourcePath)
+            if FileManager.default.fileExists(atPath: catalogURL.path) {
+                count += 1
+            }
+        }
+        XCTAssertTrue(
+            copiedPDFCount == 0 || copiedPDFCount == catalogEntries.count,
+            "Catalog PDFs must be copied completely or omitted completely for an index-only cloud build."
+        )
+
+        if copiedPDFCount > 0 {
+            XCTAssertEqual(copiedPDFCount, 640)
+        }
+
+        for entry in catalogEntries.prefix(3) {
+            let sourcePath = try XCTUnwrap(entry["sourcePdfPath"] as? String)
+            XCTAssertTrue(sourcePath.hasPrefix("catalog/patrol_full_unique/"))
+        }
+
+        let status = try XCTUnwrap(manifest["catalog_bundle_status"] as? [String: Any])
+        XCTAssertEqual(status["bundled_files"] as? Int, bundledFiles.count)
+        XCTAssertEqual(status["missing_files"] as? Int, 0)
+    }
+
+    @MainActor
+    func testSmartPartIndicatorsAreActionableAndExplained() throws {
+        let viewModel = CatalogViewModel(
+            repository: StaticCatalogRepository(),
+            store: TestPurchaseService()
+        )
+        let part = try JSONDecoder().decode(Part.self, from: Data("""
+        {
+          "part_number": "96935-TRIM",
+          "name_ar": "ديكور القير العنابي",
+          "name_en": "Burgundy Gear Shift Console Finisher",
+          "confidence": 70,
+          "source_count": 2,
+          "audit_status": "مدقق جزئيًا",
+          "category": "interior",
+          "model": "Y60",
+          "years": ["1992"],
+          "engines": ["TB42"],
+          "evidence": [
+            {
+              "source_id": "01_combined_catalog_1988_1997",
+              "year": "1992",
+              "reference": "969A",
+              "context": "Y60 console trim"
+            }
+          ]
+        }
+        """.utf8))
+
+        let indicators = viewModel.smartIndicators(for: part)
+
+        XCTAssertEqual(indicators.map(\.kind), SmartPartIndicatorKind.allCases)
+        XCTAssertEqual(indicators.count, 4)
+        for indicator in indicators {
+            XCTAssertFalse(indicator.value.isEmpty)
+            XCTAssertFalse(indicator.summary.isEmpty)
+            XCTAssertFalse(indicator.details.isEmpty)
+        }
+        XCTAssertEqual(indicators.first { $0.kind == .confidence }?.value, "70%")
+        XCTAssertEqual(indicators.first { $0.kind == .priceScore }?.value, "بيانات غير كافية")
     }
 
     private func loadJSONObject(named name: String, subdirectory: String) throws -> [String: Any] {
@@ -1143,7 +1257,9 @@ private final class OfferCodeTrackingPurchaseService: PurchaseService, @unchecke
 
 private struct FakeAIAssistantService: AIAssistantServicing {
     var answer = "AI answer"
-    var isRemoteAIConfigured: Bool { true }
+    var isRemoteAIConfigured: Bool {
+        true
+    }
 
     func answer(_: AIAssistantRequest) async throws -> AIAssistantResponse {
         AIAssistantResponse(

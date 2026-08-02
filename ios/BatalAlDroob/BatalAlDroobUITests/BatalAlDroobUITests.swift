@@ -97,8 +97,10 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Home"].waitForExistence(timeout: 20))
         XCTAssertTrue(reveal(app.staticTexts["Start quickly"], in: app, requireHittable: false))
         XCTAssertFalse(app.staticTexts["ylkciuq tratS"].exists)
-        XCTAssertTrue(tabItem(identifier: "tab.catalog", fallbackName: "Catalog", in: app).waitForExistence(timeout: 10))
-        XCTAssertTrue(tabItem(identifier: "tab.request", fallbackName: "Request", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.catalog", fallbackName: "Catalog", in: app)
+            .waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.request", fallbackName: "Request", in: app)
+            .waitForExistence(timeout: 10))
 
         let languageMenu = app.buttons["language.menu"]
         XCTAssertTrue(languageMenu.waitForExistence(timeout: 10))
@@ -109,8 +111,58 @@ final class BatalAlDroobUITests: XCTestCase {
         arabicOption.tap()
 
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 10))
-        XCTAssertTrue(tabItem(identifier: "tab.catalog", fallbackName: "الكتالوج", in: app).waitForExistence(timeout: 10))
-        XCTAssertTrue(tabItem(identifier: "tab.request", fallbackName: "طلب قطعة", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.catalog", fallbackName: "الكتالوج", in: app)
+            .waitForExistence(timeout: 10))
+        XCTAssertTrue(tabItem(identifier: "tab.request", fallbackName: "طلب قطعة", in: app)
+            .waitForExistence(timeout: 10))
+    }
+
+    @MainActor
+    func testFirstRunRequiresValidEmailAndOffersNoGuestEntry() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-AppleLanguages", "(ar)",
+            "-AppleLocale", "ar_SA",
+            "-batalLang", "ar",
+            "-resetPermissionOnboardingForUITests"
+        ]
+        app.launch()
+
+        XCTAssertTrue(app.navigationBars["مرحبًا"].waitForExistence(timeout: 20))
+        XCTAssertTrue(app.buttons["onboarding.customer.register"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["onboarding.customer.signin"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["onboarding.customer.guest"].exists)
+        XCTAssertFalse(app.buttons["متابعة كضيف"].exists)
+
+        let continueWithoutAlerts = app.buttons["permissions.skip"]
+        XCTAssertTrue(reveal(continueWithoutAlerts, in: app))
+        continueWithoutAlerts.tap()
+        XCTAssertTrue(app.staticTexts["اكتب بريدًا صحيحًا للمتابعة."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["مرحبًا"].exists)
+
+        let emailField = app.textFields["onboarding.customer.email"]
+        XCTAssertTrue(reveal(emailField, in: app))
+        emailField.tap()
+        emailField.typeText("customer@example.com")
+
+        let registerButton = app.buttons["onboarding.customer.register"]
+        XCTAssertTrue(reveal(registerButton, in: app))
+        registerButton.tap()
+        XCTAssertTrue(app.staticTexts["تم إنشاء الحساب المحلي."].waitForExistence(timeout: 5))
+
+        XCTAssertTrue(reveal(continueWithoutAlerts, in: app))
+        continueWithoutAlerts.tap()
+        XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
+
+        app.terminate()
+        app.launchArguments = [
+            "-AppleLanguages", "(ar)",
+            "-AppleLocale", "ar_SA",
+            "-batalLang", "ar"
+        ]
+        app.launch()
+        XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
+        XCTAssertFalse(app.navigationBars["مرحبًا"].exists)
     }
 
     @MainActor
@@ -134,7 +186,12 @@ final class BatalAlDroobUITests: XCTestCase {
     }
 
     @MainActor
-    private func reveal(_ element: XCUIElement, in app: XCUIApplication, maximumSwipes: Int = 8, requireHittable: Bool = true) -> Bool {
+    private func reveal(
+        _ element: XCUIElement,
+        in app: XCUIApplication,
+        maximumSwipes: Int = 8,
+        requireHittable: Bool = true
+    ) -> Bool {
         if element.waitForExistence(timeout: 2), !requireHittable || element.isHittable {
             return true
         }

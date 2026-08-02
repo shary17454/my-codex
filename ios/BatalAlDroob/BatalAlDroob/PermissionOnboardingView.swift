@@ -35,10 +35,10 @@ final class AppPermissionCoordinator: ObservableObject {
             let updatedSettings = await UNUserNotificationCenter.current().notificationSettings()
             notificationStatus = updatedSettings.authorizationStatus
         } catch {
-            BatalLog.persistence.error("Notification permission request failed: \(String(describing: error), privacy: .public)")
+            BatalLog.persistence
+                .error("Notification permission request failed: \(String(describing: error), privacy: .public)")
         }
     }
-
 }
 
 struct PermissionOnboardingView: View {
@@ -51,51 +51,99 @@ struct PermissionOnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    header
-                    customerAccess
-                    permissionCards
-                    footer
-                }
-                .frame(maxWidth: AppTheme.maximumContentWidth, alignment: .leading)
-                .padding(20)
-            }
-            .background(BatalDesign.canvas)
-            .navigationTitle(text(ar: "إعداد الأذونات", en: "Permissions"))
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(text(ar: "ليس الآن", en: "Not now")) {
-                        completeOnboarding()
+            GeometryReader { geometry in
+                let contentWidth = min(max(geometry.size.width - 40, 0), AppTheme.maximumContentWidth)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        header(width: contentWidth)
+                        customerAccess
+                        permissionCards
+                        footer
                     }
-                    .disabled(coordinator.isRequesting)
+                    .frame(
+                        width: contentWidth,
+                        alignment: .leading
+                    )
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: .infinity)
                 }
+                .background(BatalDesign.canvas)
             }
+            .navigationTitle(text(ar: "مرحبًا", en: "Welcome"))
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Image(systemName: "shield.lefthalf.filled")
-                .font(.system(size: 44, weight: .semibold))
-                .foregroundStyle(BatalDesign.brand)
-                .frame(width: 58, height: 58)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+    private func header(width: CGFloat) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            onboardingHeroImage
+                .frame(width: width, height: 252)
+                .clipped()
 
-            Text(text(ar: "فعّل بطل الدروب بكامل قدرته", en: "Enable Batal Al-Droob fully"))
-                .font(.largeTitle.bold())
+            LinearGradient(
+                colors: [.black.opacity(0.82), .black.opacity(0.38), .black.opacity(0.06)],
+                startPoint: .bottom,
+                endPoint: .top
+            )
+            .frame(width: width, height: 252)
+
+            VStack(alignment: .leading, spacing: 10) {
+                Label(text(ar: "بطل الدروب", en: "Batal Al-Droob"), systemImage: "car.side.fill")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(BatalDesign.brand)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(.ultraThinMaterial, in: Capsule())
+
+                Text(text(ar: "مرحبًا في بطل الدروب", en: "Welcome to Batal Al-Droob"))
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+
+                Text(text(
+                    ar: "ابدأ بملف بسيط لحسابك وسيارتك، ثم فعّل التنبيهات الاختيارية لطلبات القطع والصيانة.",
+                    en: "Start with a simple local profile, then enable optional alerts for part requests and maintenance."
+                ))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.9))
                 .lineLimit(3)
-                .minimumScaleFactor(0.72)
-
-            Text(text(
-                ar: "نطلب الأذونات مرة واحدة عند أول تشغيل حتى تعمل التنبيهات والمزايا القريبة والقياس الاختياري بوضوح. يمكنك رفض أي إذن وتغييره لاحقًا من إعدادات iOS.",
-                en: "We ask once on first launch so alerts, nearby features, and optional measurement are clear. You can deny any permission and change it later in iOS Settings."
-            ))
-            .font(.body)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
+                .minimumScaleFactor(0.78)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(18)
+            .frame(width: width, height: 252, alignment: .bottomLeading)
         }
+        .frame(width: width, height: 252)
+        .clipShape(RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: BatalDesign.cardRadius, style: .continuous)
+                .stroke(.white.opacity(0.14))
+        )
         .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private var onboardingHeroImage: some View {
+        if let image = bundledHeroImage(named: "patrol-y60") {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+        } else {
+            LinearGradient(
+                colors: [AppColors.brandDeep, AppColors.brand, AppColors.accent.opacity(0.72)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+
+    private func bundledHeroImage(named name: String) -> UIImage? {
+        Bundle.main.url(forResource: name, withExtension: "jpg", subdirectory: "models")
+            .flatMap { UIImage(contentsOfFile: $0.path) }
+            ?? Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "models")
+            .flatMap { UIImage(contentsOfFile: $0.path) }
     }
 
     private var customerAccess: some View {
@@ -104,8 +152,8 @@ struct PermissionOnboardingView: View {
                 .font(.headline)
 
             Text(text(
-                ar: "يمكنك البدء كضيف، أو حفظ بريدك محليًا على هذا الجهاز لتخصيص الطلبات لاحقًا. هذا ليس اشتراكًا ولا يفتح مشتريات الكتالوج.",
-                en: "Start as a guest, or save your email locally on this device for later request personalization. This is not a subscription and does not unlock catalog purchases."
+                ar: "سجل بريدك أو ادخل ببريد محفوظ على هذا الجهاز قبل استخدام التطبيق. هذا ليس اشتراكًا ولا يفتح مشتريات الكتالوج.",
+                en: "Register or sign in with an email saved on this device before using the app. This is not a subscription and does not unlock catalog purchases."
             ))
             .font(.subheadline)
             .foregroundStyle(.secondary)
@@ -115,11 +163,12 @@ struct PermissionOnboardingView: View {
                 .textFieldStyle(.roundedBorder)
                 .accessibilityIdentifier("onboarding.customer.name")
 
-            TextField(text(ar: "البريد الإلكتروني اختياري", en: "Email optional"), text: $customerEmail)
+            TextField(text(ar: "البريد الإلكتروني", en: "Email address"), text: $customerEmail)
                 .keyboardType(.emailAddress)
                 .textContentType(.emailAddress)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .submitLabel(.continue)
                 .textFieldStyle(.roundedBorder)
                 .accessibilityIdentifier("onboarding.customer.email")
 
@@ -131,27 +180,22 @@ struct PermissionOnboardingView: View {
 
             HStack(spacing: 10) {
                 Button {
-                    viewModel.continueAsGuest()
-                    accountMessage = text(ar: "تم اختيار الدخول كضيف.", en: "Guest access selected.")
+                    saveAccount(successMessage: text(ar: "تم إنشاء الحساب المحلي.", en: "Local account created."))
                 } label: {
-                    Label(text(ar: "متابعة كضيف", en: "Continue as guest"), systemImage: "person")
+                    Label(text(ar: "تسجيل جديد", en: "Register"), systemImage: "person.badge.plus")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.batalSecondary)
-                .accessibilityIdentifier("onboarding.customer.guest")
+                .accessibilityIdentifier("onboarding.customer.register")
 
                 Button {
-                    if viewModel.saveLocalCustomer(name: customerName, email: customerEmail) {
-                        accountMessage = text(ar: "تم حفظ البريد على هذا الجهاز.", en: "Email saved on this device.")
-                    } else {
-                        accountMessage = text(ar: "اكتب بريدًا صحيحًا أو تابع كضيف.", en: "Enter a valid email or continue as guest.")
-                    }
+                    saveAccount(successMessage: text(ar: "تم تسجيل الدخول محليًا.", en: "Signed in locally."))
                 } label: {
-                    Label(text(ar: "حفظ البريد", en: "Save email"), systemImage: "envelope")
+                    Label(text(ar: "تسجيل الدخول", en: "Sign in"), systemImage: "person.crop.circle.badge.checkmark")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.batalSecondary)
-                .accessibilityIdentifier("onboarding.customer.email.save")
+                .accessibilityIdentifier("onboarding.customer.signin")
             }
         }
         .padding(14)
@@ -200,8 +244,8 @@ struct PermissionOnboardingView: View {
         VStack(spacing: 10) {
             Button {
                 Task {
-                    if !viewModel.customerProfile.hasCompletedSignInChoice {
-                        viewModel.continueAsGuest()
+                    if !ensureSignedIn() {
+                        return
                     }
                     await coordinator.requestRecommendedPermissions()
                     completeOnboarding()
@@ -211,24 +255,29 @@ struct PermissionOnboardingView: View {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                 } else {
-                    Label(text(ar: "السماح والمتابعة", en: "Allow and continue"), systemImage: "checkmark.shield")
-                        .frame(maxWidth: .infinity)
+                    Label(
+                        text(ar: "تسجيل وتفعيل الإشعارات", en: "Sign in and enable alerts"),
+                        systemImage: "checkmark.shield"
+                    )
+                    .frame(maxWidth: .infinity)
                 }
             }
             .buttonStyle(.batalPrimary)
             .disabled(coordinator.isRequesting)
             .accessibilityIdentifier("permissions.allow.continue")
 
-            Button(text(ar: "المتابعة بدون تفعيل", en: "Continue without enabling")) {
-                completeOnboarding()
+            Button(text(ar: "تسجيل ومتابعة بدون إشعارات", en: "Sign in without alerts")) {
+                if ensureSignedIn() {
+                    completeOnboarding()
+                }
             }
             .buttonStyle(.batalSecondary)
             .disabled(coordinator.isRequesting)
             .accessibilityIdentifier("permissions.skip")
 
             Text(text(
-                ar: "نطلب الإشعارات فقط الآن. أي إذن إضافي يجب أن يكون مرتبطًا بميزة فعلية وواضحة داخل التطبيق.",
-                en: "We only request notifications now. Any additional permission must be tied to a real, clear in-app feature."
+                ar: "لا يمكن دخول التطبيق بدون تسجيل بريد صحيح. نطلب الإشعارات فقط الآن ويمكن رفضها.",
+                en: "A valid email is required to enter the app. We only request notifications now, and they can be denied."
             ))
             .font(.footnote)
             .foregroundStyle(.secondary)
@@ -250,10 +299,32 @@ struct PermissionOnboardingView: View {
         viewModel.language == .arabic ? ar : en
     }
 
-    private func completeOnboarding() {
-        if !viewModel.customerProfile.hasCompletedSignInChoice {
-            viewModel.continueAsGuest()
+    private func saveAccount(successMessage: String) {
+        if viewModel.saveLocalCustomer(name: customerName, email: customerEmail) {
+            accountMessage = successMessage
+        } else {
+            accountMessage = text(ar: "اكتب بريدًا صحيحًا للمتابعة.", en: "Enter a valid email to continue.")
         }
+    }
+
+    private func ensureSignedIn() -> Bool {
+        if
+            viewModel.customerProfile.hasCompletedSignInChoice,
+            viewModel.isValidCustomerEmail(viewModel.customerProfile.email)
+        {
+            return true
+        }
+        if viewModel.saveLocalCustomer(name: customerName, email: customerEmail) {
+            return true
+        }
+        accountMessage = text(ar: "اكتب بريدًا صحيحًا للمتابعة.", en: "Enter a valid email to continue.")
+        return false
+    }
+
+    private func completeOnboarding() {
+        guard
+            viewModel.customerProfile.hasCompletedSignInChoice,
+            viewModel.isValidCustomerEmail(viewModel.customerProfile.email) else { return }
         complete()
     }
 }

@@ -1,105 +1,78 @@
 # Batal Al-Droob Current Release Status
 
-Updated: 2026-07-31
-Decision: `PREPARING_2.2_BUILD_155`
+Updated: 2026-08-03
+Decision: `LOCAL_CANDIDATE_VERIFIED_DISTRIBUTION_BLOCKED`
 
-## App And Apple Review State
+## Identity
 
 | Item | Value |
 |---|---|
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| App Store version | `2.2` for the next code-carrying candidate |
-| Current project build | `155` local floor; Xcode Cloud synchronizes the archive to `CI_BUILD_NUMBER` |
-| Latest App Store-ready version | `2.1` |
-| Latest failed Xcode Cloud build | `153` from commit `7cdb573c61ef7740af6762aa4eea24835577dc0d` |
-| Latest successful Xcode Cloud build | `151` |
-| Latest pushed source commit | `7cdb573c61ef7740af6762aa4eea24835577dc0d` |
-| Latest App Review submission | `2.1` review completed and is eligible for distribution |
-| Required toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
-| Latest detailed App Review issue | Guideline 2.1(b), App Completeness |
-| Latest historical rejected submission ID | `0fd0e8d0-ea44-4fe4-8fad-2ef8ea35eff6` |
-| Current submitted submission ID | `00e306d9-8983-4df8-b284-6cbc1fff2c04` |
+| Marketing version | `2.4` |
+| Build | `172` |
+| Deployment target | iOS / iPadOS 17.0 |
+| Verified toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 
-App Store Connect completed review for `2.1`. Xcode Cloud build `152` then
-failed during "Prepare Build for App Store Connect" after the Y60 image change
-because new code-carrying uploads can no longer target the completed `2.1`
-train. The next valid binary must use `MARKETING_VERSION = 2.2` and build
-`155` or higher.
+No Bundle ID, Development Team, signing setting, entitlement, or capability was changed in this work.
 
-The latest Apple issue message says that the app references paid functionality,
-but the associated In-App Purchase was not included in the review submission.
-Apple requires the IAP, its App Review screenshot, and a new binary to be
-submitted together. No newer Batal Al-Droob rejection message was found after
-that issue; the newest Batal-specific mail confirms cloud build `110` succeeded.
+## Verified Product State
 
-## Permanent-IAP Correction
+- First launch requires a valid email through Register or Sign In. There is no guest entry point or guest access mode.
+- The welcome experience is a dedicated first-run screen. Its image, text, fields, and buttons were visually verified on iPhone 17 Pro in Arabic RTL.
+- The signed-in dashboard is compact and shows Y60 `1988-1997`, Y61 `1997-2025`, and Y62 `2010-2025`.
+- Natural Arabic and dialect search coverage includes steering terms such as `ذراع دركسون` and guards against ranking a nut for `ديكور القير العنابي`.
+- StoreKit remains the source of truth for customer paid access. The configured owner email is a local owner-access rule, not backend identity verification.
+- The AI backend client and server implementation exist, but the Release app currently has empty `AIAssistantBaseURL` and `AIAssistantClientToken` values. The app therefore uses its local catalog assistant and does not send requests to a hosted AI service.
 
-- The legacy product `batal.catalog.unlock` (Apple ID `6786440522`) was created
-  as a consumable. It is incompatible with the app's permanent and restorable
-  catalog entitlement and must not be attached to the corrected build.
-- The replacement product is `batal.catalog.permanent.unlock` (Apple ID
-  `6792436213`) and is configured as a non-consumable.
-- The app now references only the replacement identifier and rejects StoreKit
-  products whose runtime type is not non-consumable.
-- The replacement product is still `Prepare for Submission`. Price,
-  availability, localization, App Review screenshot, and review notes must be
-  completed in App Store Connect before submission.
+## Catalog Resources
 
-## Current Local Verification
+| Metric | Result |
+|---|---:|
+| Manifest entries | 640 |
+| Physical PDFs in official source | 640 |
+| Physical PDFs in complete archive | 640 |
+| Unique SHA-256 values | 612 |
+| Total size | 12.51 GiB |
+| Y60 files | 297 |
+| Y61 files | 143 |
+| Y62 files | 140 |
+| General / unknown files | 60 |
+
+Every manifest path, file size, and SHA-256 was verified in the official source, the complete archival copy, and the final unsigned Release app bundle.
+
+## Current Verification
 
 | Gate | Result |
 |---|---|
-| SwiftFormat | PASS: 0/14 files require formatting |
-| SwiftLint strict | PASS: 0 violations |
 | Release validator | PASS |
-| Release simulator build | PASS locally with Xcode 26.4.1 (`17E202`) and iPhoneOS Simulator SDK 26.4 |
-| Release device build without signing | PASS locally with Xcode 26.4.1 (`17E202`) and iPhoneOS SDK 26.4 |
-| Static analysis | PASS locally with Xcode 26.4.1 (`17E202`) |
-| Unit tests | PASS: 19/19 |
-| UI tests | PASS: 2/2 |
-| Total automated tests | PASS: 21/21 |
-| Fresh unsigned archive | PASS |
-| Actual archive metadata | PASS |
+| Catalog archive validator | PASS, 640/640 |
+| Full catalog SHA-256 verification | PASS |
+| Privacy and Info property lists | PASS |
+| SwiftFormat on changed Swift files | PASS, 0/4 |
+| Backend tests | PASS, 9/9 |
+| Unit tests | PASS, 45/45 |
+| UI tests | PASS, 3/3 |
+| Total iOS tests | PASS, 48/48 |
+| RTL visual review | PASS for first-run and home screens |
+| Release device build without signing | PASS with Xcode 26.6 / SDK 26.5 |
+| Built metadata | PASS: `2.4 (172)`, correct Bundle ID and minimum iOS 17.0 |
+| Built catalog payload | PASS, 640 PDFs and full SHA-256 |
+| SwiftLint strict | FAIL: 83 style/structure violations |
 
-Fresh local unsigned archive for the previous `2.0 (137)` candidate:
-`/tmp/BatalAlDroob-2.0-137.xcarchive`
+The Release build was an unsigned local engineering build. It was not uploaded to App Store Connect in this work.
 
-Verified app metadata inside that archive:
+## Distribution Blockers
 
-- `CFBundleIdentifier = com.batalaldroob.parts`
-- `CFBundleShortVersionString = 2.0`
-- `CFBundleVersion = 137`
-- `DTXcodeBuild = 17E202`
-- `DTSDKName = iphoneos26.4`
-- `MinimumOSVersion = 17.0`
-- no embedded app extensions or third-party frameworks
+1. The locally complete app bundle is approximately 13 GB. Apple documents a 4 GB maximum uncompressed iOS/iPadOS app size, so this payload cannot be submitted as one embedded bundle.
+2. The PDF directory is intentionally Git-ignored. Xcode Cloud cannot package files that are not present in its source checkout.
+3. Move catalog PDFs to Apple-hosted Background Assets or an authenticated remote catalog service, retain the manifest/search indexes in the app, and download files on demand with integrity verification.
+4. Configure and deploy the AI backend before claiming hosted AI. Keep the provider key only on the server and inject only the backend URL and a revocable client credential at build time.
+5. Resolve the 83 SwiftLint strict violations through scoped file splitting and line cleanup; do not weaken the lint policy to hide them.
+6. Re-run StoreKit Sandbox, VoiceOver, and performance tests on a physical device before submission.
+7. Re-check App Store Connect metadata, IAP review attachment, screenshots, privacy answers, and the selected build immediately before review submission.
 
-This local archive is an unsigned engineering validation artifact only. App
-Store submission must still use a fresh signed Xcode Cloud archive on Xcode
-26.6 (`17F113`) or a newer Apple-approved non-beta Xcode with iPhoneOS SDK
-26.5 or newer.
+## Remote State
 
-## Store Metadata State
-
-- The detailed manual review gate is documented in
-  `docs/APP_STORE_REVIEW_FIX_PLAN.md`.
-- Replacement promoted-IAP artwork is saved at
-  `docs/app-store-assets/iap-catalog-unlock-1024.png`.
-- The IAP App Review screenshot must show the purchase surface in the current
-  native app; promotional artwork does not replace that review screenshot.
-- App Store screenshots must show the current native app in use on every
-  required device class.
-
-## Remaining Release Gates
-
-1. Monitor App Review messages for submission
-   `00e306d9-8983-4df8-b284-6cbc1fff2c04`.
-2. If Apple rejects or requests metadata changes, fix the exact item and do not
-   resubmit the same build without addressing the root cause.
-3. Keep the obsolete draft consumable `batal.catalog.unlock` out of future
-   submissions; the shipping app uses the approved non-consumable
-   `batal.catalog.permanent.unlock`.
-4. Before the next code-bearing release, verify Xcode Cloud Next Build Number is
-   `155` or higher.
+This report does not claim a GitHub push, Xcode Cloud run, App Store Connect upload, or App Review submission. Those actions require a distribution-safe resource architecture and an explicit verified upload workflow.

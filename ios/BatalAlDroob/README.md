@@ -9,9 +9,11 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `2.4`
-- Project build: `171`
+- Project build: `172`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
+
+The complete local PDF archive is indexed under `BatalAlDroob/Web/catalog/` and audited by `scripts/validate_catalog_archive.py`. The PDF files are intentionally ignored by Git because the verified archive is 12.51 GiB and includes individual files larger than ordinary Git hosting limits. JSON search data remains tracked. A local build can include the complete archive, but a cloud/App Store archive must not be described as containing those PDFs until its produced `.xcarchive` is inspected; see `docs/CATALOG_RESOURCE_AUDIT_2026-08-03.md`.
 
 ## Requirements
 
@@ -120,7 +122,7 @@ Part requests are prepared and saved inside the app without a separate purchase 
 
 ## Customer Access
 
-First-run onboarding and the Tools account section let new customers either continue as a guest or save an optional name and email locally on the device. This lightweight profile is used to personalize local request preparation; it is not authentication and does not leave the device. The configured owner email `sharyalhwaid@gmail.com` receives local owner catalog access without StoreKit so the app owner can use the full app on his device. Other customers still use StoreKit current entitlements or App Store Connect offer codes for protected catalog access.
+First-run onboarding and the Tools account section require customers to register or sign in with a valid email before entering the app. Entry without an account is intentionally unavailable. The lightweight local profile is used to personalize local request preparation; it is not backend authentication and does not leave the device. The configured owner email `sharyalhwaid@gmail.com` receives local owner catalog access without StoreKit so the app owner can use the full app on his device. Other customers still use StoreKit current entitlements or App Store Connect offer codes for protected catalog access.
 
 The app also exposes Apple's official offer-code redemption sheet from locked
 catalog pages. Promotional customer access should be granted through App Store
@@ -131,7 +133,7 @@ If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/
 
 ## AI Assistant
 
-The app includes a Batal Al-Droob assistant tab for catalog questions, fitment guidance, and next-step suggestions. The iOS app never stores an OpenAI API key. When `AIAssistantBaseURL` and `AIAssistantClientToken` are empty, the assistant runs in safe local fallback mode and uses only on-device catalog context.
+The app includes a Batal Al-Droob assistant tab for catalog questions, fitment guidance, and next-step suggestions. The iOS app never stores an OpenAI API key. When `AIAssistantBaseURL` and `AIAssistantClientToken` are empty or unresolved build placeholders, the assistant runs in safe local fallback mode and uses only on-device catalog context.
 
 Optional backend setup:
 
@@ -143,7 +145,7 @@ npm test
 npm start
 ```
 
-Configure the iOS `Info.plist` keys only for an environment that has a real backend:
+Configure the iOS build settings only for an environment that has a real backend. `Info.plist` reads these values through build substitution and the app ignores unresolved placeholders:
 
 - `AIAssistantBaseURL`: HTTPS backend URL, or localhost for development.
 - `AIAssistantClientToken`: client token matching `BATAL_AI_CLIENT_TOKEN`.
@@ -156,7 +158,7 @@ Data sent to the AI backend is deliberately minimized:
 - short maintenance previews,
 - saved request count.
 
-The app does not send VIN, passwords, payment data, StoreKit transactions, API keys, or full locked part numbers. The backend uses OpenAI Responses API with `store: false`, validates input, requires a client token, rate-limits requests, redacts common secrets, and returns structured errors. Production deployment should replace the simple client token with stronger user/session authorization and App Attest or equivalent request integrity checks.
+The app does not send VIN, passwords, payment data, StoreKit transactions, API keys, or full locked part numbers. The backend uses OpenAI Responses API with `store: false`, validates input, requires a client token, rate-limits requests, redacts common secrets, and returns structured errors. Production deployment should replace the simple client token with stronger user/session authorization and App Attest or equivalent request integrity checks. See [`docs/AI_BACKEND_SETUP.md`](docs/AI_BACKEND_SETUP.md) for the operational setup.
 
 ## Supplier Partnerships
 

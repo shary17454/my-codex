@@ -10,6 +10,7 @@ const MAX_BODY_BYTES = 32 * 1024;
 const MAX_PARTS = 12;
 const RATE_WINDOW_MS = 60_000;
 const RATE_LIMIT = 20;
+const DEFAULT_AI_MODEL = "gpt-4.1-mini";
 
 export function loadLocalEnv(envPath = defaultEnvPath) {
   if (!fs.existsSync(envPath)) return;
@@ -113,7 +114,13 @@ async function readJSONBody(request) {
     }
     chunks.push(chunk);
   }
-  return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+  } catch {
+    const error = new Error("invalid_json");
+    error.statusCode = 400;
+    throw error;
+  }
 }
 
 function writeJSON(response, statusCode, payload) {
@@ -158,7 +165,7 @@ async function callOpenAI(context, fetchImpl, env) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: env.AI_MODEL || "gpt-5.6-luna",
+        model: env.AI_MODEL || DEFAULT_AI_MODEL,
         store: false,
         max_output_tokens: 600,
         input: [

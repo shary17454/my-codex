@@ -245,7 +245,7 @@ private struct CustomerAccountSection: View {
     var body: some View {
         Section(viewModel.text(ar: "الحساب", en: "Account")) {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: viewModel.customerProfile.accessMode == .guest ? "person" : "person.crop.circle.badge.checkmark")
+                Image(systemName: "person.crop.circle.badge.checkmark")
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(BatalDesign.brand)
                     .frame(width: 40, height: 40)
@@ -287,17 +287,6 @@ private struct CustomerAccountSection: View {
                 Label(viewModel.text(ar: "حفظ البريد على الجهاز", en: "Save email on device"), systemImage: "envelope.badge")
             }
             .accessibilityIdentifier("account.saveEmail")
-
-            Button(role: .destructive) {
-                AppHaptics.lightImpact()
-                viewModel.continueAsGuest()
-                name = ""
-                email = ""
-                statusMessage = viewModel.text(ar: "تم الرجوع لوضع الضيف.", en: "Returned to guest mode.")
-            } label: {
-                Label(viewModel.text(ar: "استخدام كضيف", en: "Use as guest"), systemImage: "person")
-            }
-            .accessibilityIdentifier("account.useGuest")
         }
         .onAppear {
             name = viewModel.customerProfile.displayName

@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.4 (172) - 2026-08-03
+
+### Customer Access
+
+- Made first-run registration or sign-in with a valid email mandatory and removed guest entry from the app surface and persisted access model.
+- Moved the large welcome image to first-run onboarding and kept the signed-in dashboard compact.
+- Constrained every hero layer to the available content width so Arabic RTL text and imagery no longer overflow the first-run screen.
+- Added UI regression coverage proving an empty email cannot dismiss onboarding and no guest control is exposed.
+
+### Catalog Resources
+
+- Verified all 640 local PDF archive files and matched every unique PDF found in the selected iCloud catalog sources; no iCloud source hash was missing locally.
+- Filled 28 missing SHA-256 values in the catalog manifest and added a reusable full archive integrity validator.
+- Removed the second 10 GB catalog copy from the unit-test target; tests now inspect the app resource bundle directly.
+- Documented the Xcode Cloud distribution gap for Git-ignored PDF files instead of claiming that a cloud archive contains resources that were not uploaded.
+
+### Quality
+
+- Expanded release validation to enforce catalog path/index parity, approved generation counts, valid resource hashes, mandatory account controls, and the continued absence of guest access.
+- Re-ran the complete suite after the final onboarding layout fix: 45 unit tests and 3 UI tests passed.
+- Built an unsigned full-resource Release with Xcode 26.6 / iPhoneOS SDK 26.5 and verified all 640 bundled PDFs by SHA-256.
+- Recorded the 13 GB payload as a distribution blocker because it exceeds Apple's 4 GB uncompressed iOS app limit; the PDFs must move to Background Assets or authenticated on-demand storage before upload.
+
 ## 2.4 (171) - 2026-07-31
 
 ### Release
@@ -41,8 +64,9 @@
 
 ### Customer Access
 
-- Added first-run customer access choices so new users can continue as guests or
-  save an optional local name/email for request personalization.
+- Updated first-run customer access so new users must register or sign in with
+  a valid email before entering the app; entry without an account is no longer
+  available.
 - Added the same local account controls to Tools without adding backend auth,
   secrets, Sign in with Apple capability, or any paid-access bypass.
 - Added regression tests proving local email storage does not unlock StoreKit

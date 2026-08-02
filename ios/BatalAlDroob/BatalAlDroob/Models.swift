@@ -220,6 +220,47 @@ struct Part: Decodable, Identifiable, Hashable {
     }
 }
 
+enum SmartPartIndicatorKind: String, CaseIterable, Identifiable {
+    case priceScore
+    case priceFairness
+    case fitmentMatch
+    case confidence
+
+    var id: String { rawValue }
+
+    func title(_ language: AppLanguage) -> String {
+        switch self {
+        case .priceScore:
+            language == .arabic ? "تقييم السعر" : "Price score"
+        case .priceFairness:
+            language == .arabic ? "عدالة السعر" : "Price fairness"
+        case .fitmentMatch:
+            language == .arabic ? "المطابقة" : "Fitment match"
+        case .confidence:
+            language == .arabic ? "الثقة" : "Confidence"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .priceScore: "gauge.with.dots.needle.33percent"
+        case .priceFairness: "questionmark.circle.fill"
+        case .fitmentMatch: "scope"
+        case .confidence: "checkmark.shield.fill"
+        }
+    }
+}
+
+struct SmartPartIndicator: Identifiable, Equatable {
+    let kind: SmartPartIndicatorKind
+    let value: String
+    let summary: String
+    let details: [String]
+    let systemColorName: String
+
+    var id: SmartPartIndicatorKind { kind }
+}
+
 struct Evidence: Decodable, Hashable {
     let sourceID: String?
     let year: String?
@@ -327,12 +368,11 @@ struct VehicleProfile: Codable, Hashable {
 }
 
 enum CustomerAccessMode: String, Codable, Hashable {
-    case guest
     case localEmail
 }
 
 struct CustomerProfile: Codable, Hashable {
-    var accessMode: CustomerAccessMode = .guest
+    var accessMode: CustomerAccessMode = .localEmail
     var displayName = ""
     var email = ""
     var hasCompletedSignInChoice = false

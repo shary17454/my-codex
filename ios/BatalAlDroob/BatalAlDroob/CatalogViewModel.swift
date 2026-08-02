@@ -301,6 +301,103 @@ extension CatalogViewModel {
         language == .arabic ? arabic : english
     }
 
+    func smartIndicators(for part: Part) -> [SmartPartIndicator] {
+        SmartPartIndicatorKind.allCases.map { smartIndicator(kind: $0, part: part) }
+    }
+
+    func smartIndicator(kind: SmartPartIndicatorKind, part: Part) -> SmartPartIndicator {
+        switch kind {
+        case .priceScore:
+            return SmartPartIndicator(
+                kind: kind,
+                value: text(ar: "بيانات غير كافية", en: "Insufficient data"),
+                summary: text(
+                    ar: "لا يوجد عدد كافٍ من أسعار السوق الموثقة داخل التطبيق لإصدار حكم سعري قوي.",
+                    en: "The app does not have enough verified market prices to make a strong pricing judgment."
+                ),
+                details: [
+                    text(
+                        ar: "تقييم السعر لا يعتمد على رقم عشوائي؛ يحتاج سعرًا موجودًا، متوسط سوق موثق، وحالة القطعة.",
+                        en: "The price score is not guessed; it requires the offered price, verified market averages, and part condition."
+                    ),
+                    text(
+                        ar: "عند توفر مصادر أسعار موثقة لنفس رقم القطعة ستظهر نتيجة أوضح بدل عبارة بيانات غير كافية.",
+                        en: "When verified prices exist for this exact part number, this card will show a clearer score."
+                    )
+                ],
+                systemColorName: "red"
+            )
+        case .priceFairness:
+            return SmartPartIndicator(
+                kind: kind,
+                value: text(ar: "تحتاج مصادر", en: "Needs sources"),
+                summary: text(
+                    ar: "عدالة السعر لا تُحتسب إلا عند وجود مقارنة حقيقية بين السعر المعروض ومصادر متعددة.",
+                    en: "Price fairness is calculated only when a real comparison exists across multiple sources."
+                ),
+                details: [
+                    text(
+                        ar: "القطعة قد تكون نادرة أو مستعملة أو أصلية جديدة؛ لذلك لا يصح الحكم دون مصادر كافية.",
+                        en: "A part may be rare, used, or new old stock, so the app should not judge without enough sources."
+                    ),
+                    text(
+                        ar: "افتح المتاجر الموثقة أو احفظ طلب قطعة لجمع عروض يمكن مقارنتها لاحقًا.",
+                        en: "Open verified stores or save a part request to collect quotes that can be compared later."
+                    )
+                ],
+                systemColorName: "gray"
+            )
+        case .fitmentMatch:
+            let hasProfile = isVehicleProfileMeaningful
+            let matchesProfile = hasProfile && matchesVehicleProfile(part)
+            let value = hasProfile
+                ? (matchesProfile ? text(ar: "مطابقة مناسبة", en: "Good match") : text(ar: "راجع التوافق", en: "Review fitment"))
+                : text(ar: "مطابقة غير كافية", en: "Insufficient match")
+            return SmartPartIndicator(
+                kind: kind,
+                value: value,
+                summary: hasProfile
+                    ? vehicleMatchSummary(for: part)
+                    : text(
+                        ar: "أضف الجيل والسنة والمحرك في ملف السيارة حتى تصبح المطابقة أدق.",
+                        en: "Add generation, year, and engine to your vehicle profile for a more accurate match."
+                    ),
+                details: [
+                    text(ar: "الموديل: \(part.model ?? "-")", en: "Model: \(part.model ?? "-")"),
+                    text(ar: "السنوات: \(short(part.years))", en: "Years: \(short(part.years))"),
+                    text(ar: "المحركات: \(short(part.engines))", en: "Engines: \(short(part.engines))")
+                ],
+                systemColorName: matchesProfile ? "green" : "orange"
+            )
+        case .confidence:
+            let confidence = part.confidence ?? 0
+            let value = confidence > 0 ? "\(confidence)%" : text(ar: "غير محددة", en: "Unknown")
+            return SmartPartIndicator(
+                kind: kind,
+                value: value,
+                summary: text(
+                    ar: "درجة الثقة مستقلة عن السعر، وتعتمد على عدد المصادر والأدلة وجودة مطابقة رقم القطعة.",
+                    en: "Confidence is separate from price and depends on sources, evidence, and part-number matching quality."
+                ),
+                details: [
+                    text(
+                        ar: "عدد المصادر: \((part.sourceCount ?? part.evidence.count).formatted())",
+                        en: "Source count: \((part.sourceCount ?? part.evidence.count).formatted())"
+                    ),
+                    text(
+                        ar: "عدد الأدلة: \(part.evidence.count.formatted())",
+                        en: "Evidence items: \(part.evidence.count.formatted())"
+                    ),
+                    text(
+                        ar: "حالة التدقيق: \(part.auditStatus ?? "-")",
+                        en: "Audit status: \(part.auditStatus ?? "-")"
+                    )
+                ],
+                systemColorName: confidence >= 80 ? "green" : confidence >= 55 ? "orange" : "red"
+            )
+        }
+    }
+
     func title(for part: Part) -> String {
         part.title(language: language)
     }
@@ -329,12 +426,10 @@ extension CatalogViewModel {
         if hasOwnerAccess {
             return text(ar: "المالك", en: "Owner")
         }
-        switch customerProfile.accessMode {
-        case .guest:
-            return text(ar: "ضيف", en: "Guest")
-        case .localEmail:
-            return customerProfile.displayName.isEmpty ? customerProfile.email : customerProfile.displayName
+        guard customerProfile.hasCompletedSignInChoice, isValidCustomerEmail(customerProfile.email) else {
+            return text(ar: "تسجيل مطلوب", en: "Sign-in required")
         }
+        return customerProfile.displayName.isEmpty ? customerProfile.email : customerProfile.displayName
     }
 
     var customerAccessSummary: String {
@@ -344,19 +439,16 @@ extension CatalogViewModel {
                 en: "Owner mode is active on this device. Catalog features are unlocked without a subscription."
             )
         }
-        switch customerProfile.accessMode {
-        case .guest:
-            return text(ar: "تستخدم التطبيق كضيف. لا يلزم تسجيل دخول للبحث والطلبات.", en: "Using the app as a guest. No sign-in is required for search and requests.")
-        case .localEmail:
+        if customerProfile.hasCompletedSignInChoice, isValidCustomerEmail(customerProfile.email) {
             return text(
                 ar: "البريد محفوظ على هذا الجهاز فقط ولا يفتح مشتريات الكتالوج.",
                 en: "Email is saved on this device only and does not unlock catalog purchases."
             )
         }
-    }
-
-    func continueAsGuest() {
-        customerProfile = CustomerProfile(accessMode: .guest, displayName: "", email: "", hasCompletedSignInChoice: true)
+        return text(
+            ar: "يجب تسجيل بريد صحيح قبل استخدام التطبيق.",
+            en: "A valid email is required before using the app."
+        )
     }
 
     func saveLocalCustomer(name: String, email: String) -> Bool {

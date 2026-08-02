@@ -41,6 +41,9 @@ struct BatalRemoteAIService: AIAssistantServicing {
         guard
             !trimmedURL.isEmpty,
             !trimmedToken.isEmpty,
+            !trimmedURL.contains("$("),
+            !trimmedToken.contains("$("),
+            trimmedToken.count >= 16,
             let url = URL(string: trimmedURL),
             url.scheme == "https" || url.host == "127.0.0.1" || url.host == "localhost"
         else { return nil }

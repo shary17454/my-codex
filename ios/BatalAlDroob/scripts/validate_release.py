@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 import plistlib
 import re
 import sys
@@ -15,6 +16,8 @@ PRIVACY_MANIFEST = APP_ROOT / "BatalAlDroob" / "PrivacyInfo.xcprivacy"
 APPLE_ENGINEERING_STANDARD = APP_ROOT / "docs" / "APPLE_ENGINEERING_STANDARD.md"
 SWIFT_ROOT = APP_ROOT / "BatalAlDroob"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
+CATALOG_MANIFEST = WEB_ROOT / "data" / "patrol_full_catalog_files.json"
+CATALOG_SEARCH_INDEX = WEB_ROOT / "catalog" / "search" / "catalog_search_index.json"
 
 EXPECTED_MARKETING_VERSION = "2.4"
 MIN_EXPECTED_BUILD = 171
@@ -30,6 +33,12 @@ ALLOWED_STOREKIT_PRODUCTS = {
     "batal.catalog.full.unlock",
     "batal.catalog.permanent.unlock",
 }
+EXPECTED_CATALOG_COUNTS = {
+    "Y60": 297,
+    "Y61": 143,
+    "Y62": 140,
+    "unknown": 60,
+}
 
 
 def fail(message: str) -> None:
@@ -39,6 +48,13 @@ def fail(message: str) -> None:
 
 def unique_setting_values(project_text: str, key: str) -> set[str]:
     return set(re.findall(rf"{re.escape(key)} = ([^;]+);", project_text))
+
+
+def read_json(path: Path) -> dict:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        fail(f"Unable to read valid JSON from {path.relative_to(APP_ROOT)}: {error}")
 
 
 def main() -> None:
@@ -53,6 +69,8 @@ def main() -> None:
         info = plistlib.load(stream)
     with PRIVACY_MANIFEST.open("rb") as stream:
         privacy = plistlib.load(stream)
+    catalog_manifest = read_json(CATALOG_MANIFEST)
+    catalog_search = read_json(CATALOG_SEARCH_INDEX)
     app_text = "\n".join(
         path.read_text(encoding="utf-8")
         for path in SWIFT_ROOT.rglob("*.swift")
@@ -87,6 +105,51 @@ def main() -> None:
         fail("Release settings must not hide linker metadata warnings with LM_FILTER_WARNINGS")
     if unique_setting_values(project_text, "EXTRACT_APP_INTENTS_METADATA") != {"NO"}:
         fail("The app target must disable unused App Intents metadata extraction explicitly")
+
+    test_resources = re.search(
+        r"107000000000000000000002 /\* Resources \*/ = \{.*?files = \((.*?)\);",
+        project_text,
+        flags=re.DOTALL,
+    )
+    if not test_resources or test_resources.group(1).strip():
+        fail("The unit-test target must reuse the app resources instead of copying the catalog a second time")
+
+    catalog_files = catalog_manifest.get("files")
+    if not isinstance(catalog_files, list) or len(catalog_files) != sum(EXPECTED_CATALOG_COUNTS.values()):
+        fail("Catalog manifest must contain exactly 640 archived PDF records")
+
+    manifest_paths: set[str] = set()
+    generation_counts = {generation: 0 for generation in EXPECTED_CATALOG_COUNTS}
+    for index, item in enumerate(catalog_files):
+        if not isinstance(item, dict):
+            fail(f"Catalog manifest item {index} must be an object")
+        app_path = item.get("app_path")
+        sha256 = item.get("sha256")
+        generation = item.get("generation", "unknown")
+        byte_count = item.get("bundled_bytes") or item.get("size_bytes")
+        if not isinstance(app_path, str) or not app_path.startswith("catalog/patrol_full_unique/") or not app_path.endswith(".pdf"):
+            fail(f"Catalog manifest item {index} has an invalid app_path")
+        if app_path in manifest_paths:
+            fail(f"Catalog manifest contains a duplicate app_path: {app_path}")
+        manifest_paths.add(app_path)
+        if not isinstance(sha256, str) or re.fullmatch(r"[0-9a-f]{64}", sha256) is None:
+            fail(f"Catalog manifest item {index} is missing a valid SHA-256: {app_path}")
+        if not isinstance(byte_count, int) or byte_count <= 0:
+            fail(f"Catalog manifest item {index} has an invalid byte count: {app_path}")
+        if item.get("bundled") is not True:
+            fail(f"Catalog manifest item {index} is not marked available: {app_path}")
+        generation_counts[generation if generation in generation_counts else "unknown"] += 1
+
+    if generation_counts != EXPECTED_CATALOG_COUNTS:
+        fail(f"Catalog generation counts differ from the approved inventory: {generation_counts}")
+
+    search_entries = catalog_search.get("entries")
+    if not isinstance(search_entries, list):
+        fail("Catalog search index must contain an entries array")
+    pdf_entries = [entry for entry in search_entries if isinstance(entry, dict) and entry.get("type") == "catalog_pdf"]
+    search_paths = {entry.get("sourcePdfPath") for entry in pdf_entries}
+    if len(pdf_entries) != len(catalog_files) or search_paths != manifest_paths:
+        fail("Catalog search PDF entries must match every manifest path exactly")
 
     if info.get("CFBundleIdentifier") != "$(PRODUCT_BUNDLE_IDENTIFIER)":
         fail("Info.plist must derive CFBundleIdentifier from PRODUCT_BUNDLE_IDENTIFIER")
@@ -178,7 +241,27 @@ def main() -> None:
         if term in app_text or term in web_text:
             fail(f"Forbidden paid request term still exists: {term}")
 
-    print("PASS: Batal Al-Droob release settings and StoreKit surface are valid.")
+    forbidden_guest_terms = [
+        "case guest",
+        ".guest",
+        "continueAsGuest",
+        "متابعة كضيف",
+        "Continue as guest",
+        "onboarding.customer.guest",
+    ]
+    for term in forbidden_guest_terms:
+        if term in app_text:
+            fail(f"Guest entry must not return to the app: {term}")
+
+    for required_identifier in [
+        "onboarding.customer.register",
+        "onboarding.customer.signin",
+        "permissions.skip",
+    ]:
+        if required_identifier not in app_text:
+            fail(f"Required onboarding control is missing: {required_identifier}")
+
+    print("PASS: Batal Al-Droob release, account, catalog, and StoreKit surfaces are valid.")
 
 
 if __name__ == "__main__":

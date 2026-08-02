@@ -20,9 +20,9 @@
 	<key>CFBundleName</key>
 	<string>BatalAlDroob</string>
 	<key>AIAssistantBaseURL</key>
-	<string></string>
+	<string>$(AIAssistantBaseURL)</string>
 	<key>AIAssistantClientToken</key>
-	<string></string>
+	<string>$(AIAssistantClientToken)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
