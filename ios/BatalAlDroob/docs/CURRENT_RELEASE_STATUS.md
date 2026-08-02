@@ -10,8 +10,8 @@ Decision: `LOCAL_CANDIDATE_VERIFIED_DISTRIBUTION_BLOCKED`
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| Marketing version | `2.4` |
-| Build | `172` |
+| Marketing version | `2.5` |
+| Build | `173` |
 | Deployment target | iOS / iPadOS 17.0 |
 | Verified toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 
@@ -57,11 +57,15 @@ Every manifest path, file size, and SHA-256 was verified in the official source,
 | Total iOS tests | PASS, 48/48 |
 | RTL visual review | PASS for first-run and home screens |
 | Release device build without signing | PASS with Xcode 26.6 / SDK 26.5 |
-| Built metadata | PASS: `2.4 (172)`, correct Bundle ID and minimum iOS 17.0 |
-| Built catalog payload | PASS, 640 PDFs and full SHA-256 |
+| Current Git candidate metadata | PASS: `2.5 (173)`, correct Bundle ID and minimum iOS 17.0 |
+| Current Git candidate payload | 104 MB and 0 PDFs because the archive is Git-ignored |
+| Prior full-resource archival build | PASS: `2.4 (172)`, 640 PDFs and full SHA-256 |
 | SwiftLint strict | FAIL: 83 style/structure violations |
 
-The Release build was an unsigned local engineering build. It was not uploaded to App Store Connect in this work.
+The current `2.5 (173)` Release build was an unsigned local engineering build
+from the same source state available to Git/Xcode Cloud. It compiled
+successfully but contains no catalog PDFs. It was not uploaded to App Store
+Connect in this work.
 
 ## Distribution Blockers
 

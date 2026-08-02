@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.5 (173) - 2026-08-03
+
+### Release Integration
+
+- Merged the verified onboarding, catalog search, StoreKit, AI safety, and
+  resource-audit work onto the latest `main` release train without changing the
+  Bundle ID, team, signing, entitlements, or capabilities.
+- Kept the newer App Store version and build introduced on `main` instead of
+  regressing the candidate to `2.4 (172)`.
+- Updated release validation and documentation to enforce `2.5 (173)`.
+- Re-ran 45 unit tests, 3 UI tests, and 9 backend tests on the merged source;
+  all passed, and an unsigned 104 MB Release device build succeeded.
+- Confirmed the Git/Xcode Cloud candidate contains no PDF archive because those
+  resources remain intentionally ignored pending Background Assets or secure
+  on-demand delivery.
+
 ## 2.4 (172) - 2026-08-03
 
 ### Customer Access
