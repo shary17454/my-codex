@@ -8,8 +8,8 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
-- App Store version: `2.5`
-- Project build: `173`
+- App Store version: `2.6`
+- Project build: `186`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -86,20 +86,19 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
-- verifies `MARKETING_VERSION = 2.5`,
-- verifies `CURRENT_PROJECT_VERSION >= 173`,
+- verifies `MARKETING_VERSION = 2.6`,
+- verifies `CURRENT_PROJECT_VERSION >= 186`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-App Store Connect has completed review for the `2.2` train and attached build
-`166`, so new code-carrying uploads must use a higher marketing version. Xcode
-Cloud builds `168`, `169`, and `170` succeeded, but App Store Connect rejected
-creating `2.3` because that version number had already been used. The current
-candidate uses release train `2.5` and build `173`. Do not reuse any uploaded
-build number.
+App Store Connect shows `2.5 (180)` as Ready for Distribution. Xcode Cloud
+build `185` completed archive creation but failed while preparing another build
+for App Store Connect on that released version train. The current candidate
+therefore uses release train `2.6` and project build `186`. Do not reuse any
+uploaded or attempted build number.
 
 ## In-App Purchase
 
@@ -176,7 +175,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `173` or higher on release train `2.5`,
+a fresh signed Xcode Cloud build `186` or higher on release train `2.6`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 

@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-08-03
-Decision: `LOCAL_CANDIDATE_VERIFIED_DISTRIBUTION_BLOCKED`
+Decision: `2_6_LOCAL_CANDIDATE_VERIFIED_RESOURCE_DELIVERY_BLOCKED`
 
 ## Identity
 
@@ -10,8 +10,9 @@ Decision: `LOCAL_CANDIDATE_VERIFIED_DISTRIBUTION_BLOCKED`
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| Marketing version | `2.5` |
-| Build | `173` |
+| Marketing version | `2.6` |
+| Project build | `186` |
+| Current App Store release | `2.5 (180)` - Ready for Distribution |
 | Deployment target | iOS / iPadOS 17.0 |
 | Verified toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 
@@ -57,15 +58,21 @@ Every manifest path, file size, and SHA-256 was verified in the official source,
 | Total iOS tests | PASS, 48/48 |
 | RTL visual review | PASS for first-run and home screens |
 | Release device build without signing | PASS with Xcode 26.6 / SDK 26.5 |
-| Current Git candidate metadata | PASS: `2.5 (173)`, correct Bundle ID and minimum iOS 17.0 |
+| Current candidate metadata | PASS: `2.6 (186)`, correct Bundle ID and minimum iOS 17.0 |
 | Current Git candidate payload | 104 MB and 0 PDFs because the archive is Git-ignored |
 | Prior full-resource archival build | PASS: `2.4 (172)`, 640 PDFs and full SHA-256 |
 | SwiftLint strict | FAIL: 83 style/structure violations |
 
-The current `2.5 (173)` Release build was an unsigned local engineering build
-from the same source state available to Git/Xcode Cloud. It compiled
-successfully but contains no catalog PDFs. It was not uploaded to App Store
-Connect in this work.
+The current `2.6 (186)` candidate produced an unsigned local xcarchive with
+Xcode 26.6. Its app metadata passed the same pre- and post-archive guards used
+by Xcode Cloud, and all 45 unit tests plus 3 UI tests passed. The archive is
+approximately 109 MB and contains no catalog PDFs because those files are
+Git-ignored pending an App Store-safe delivery architecture.
+
+App Store Connect already lists `2.5 (180)` as Ready for Distribution. Xcode
+Cloud build `185` archived successfully but failed during Prepare Build for App
+Store Connect because it targeted that already released version train. The next
+code-carrying candidate therefore uses `2.6` and does not reuse build `185`.
 
 ## Distribution Blockers
 
@@ -77,6 +84,10 @@ Connect in this work.
 6. Re-run StoreKit Sandbox, VoiceOver, and performance tests on a physical device before submission.
 7. Re-check App Store Connect metadata, IAP review attachment, screenshots, privacy answers, and the selected build immediately before review submission.
 
-## Remote State
+## Distribution Claim Boundary
 
-This report does not claim a GitHub push, Xcode Cloud run, App Store Connect upload, or App Review submission. Those actions require a distribution-safe resource architecture and an explicit verified upload workflow.
+Passing the local `2.6 (186)` archive proves source and metadata correctness,
+not an App Store upload. A signed Xcode Cloud result and App Store Connect
+processing state must be checked separately. The complete 640-PDF archive must
+not be claimed as present in an App Store build until an approved on-demand
+resource architecture is implemented and its downloaded files are verified.

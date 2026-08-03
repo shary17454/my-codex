@@ -19,8 +19,8 @@ WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 CATALOG_MANIFEST = WEB_ROOT / "data" / "patrol_full_catalog_files.json"
 CATALOG_SEARCH_INDEX = WEB_ROOT / "catalog" / "search" / "catalog_search_index.json"
 
-EXPECTED_MARKETING_VERSION = "2.5"
-MIN_EXPECTED_BUILD = 173
+EXPECTED_MARKETING_VERSION = "2.6"
+MIN_EXPECTED_BUILD = 186
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts",
