@@ -5,6 +5,9 @@ private struct CatalogSearchIntent {
     private let normalizedQuery: String
     private let wantsInteriorTrim: Bool
     private let wantsGearArea: Bool
+    private let wantsExplicitHardware: Bool
+    private let preferredConcepts: [String]
+    private let rejectedConcepts: [String]
     private let yearTokens: [String]
 
     init(query: String) {
@@ -22,6 +25,17 @@ private struct CatalogSearchIntent {
             normalized(query),
             ["قير", "جير", "فتيس", "جربكس", "جيربوكس", "ناقلحركة", "transmission", "gearbox", "shift", "selector"]
         )
+        wantsExplicitHardware = Self.containsAny(
+            normalized(query),
+            [
+                "صامولة", "صواميل", "مسمار", "مسامير", "برغي", "براغي", "واشر", "وردة",
+                "كلبسة", "كلبسات", "مشبك", "مشابك", "ربلة", "جلدة", "nut", "screw",
+                "bolt", "washer", "clip", "retainer", "grommet"
+            ]
+        )
+        let intentProfile = Self.intentProfile(for: normalized(query))
+        preferredConcepts = intentProfile.preferred
+        rejectedConcepts = intentProfile.rejected
         yearTokens = partNumberCandidates(in: query).isEmpty
             ? query.split(whereSeparator: { !$0.isNumber }).map(String.init).filter { $0.count == 4 }
             : []
@@ -47,6 +61,26 @@ private struct CatalogSearchIntent {
             }
         }
 
+        let preferredHits = preferredConcepts.filter { searchText.contains($0) }.count
+        if preferredHits > 0 {
+            score += min(260, preferredHits * 35)
+        }
+
+        let rejectedHits = rejectedConcepts.filter { searchText.contains($0) }.count
+        if rejectedHits > 0 {
+            score -= min(220, rejectedHits * 45)
+        }
+
+        if wantsExplicitHardware {
+            if isClearlyHardware(part) {
+                score += 280
+            } else if !preferredConcepts.isEmpty {
+                score -= 100
+            }
+        } else if isClearlyHardware(part), !preferredConcepts.isEmpty {
+            return nil
+        }
+
         for year in yearTokens where part.years.contains(year) || part.dateRanges.contains(where: { $0.contains(year) }) {
             score += 60
             break
@@ -57,6 +91,79 @@ private struct CatalogSearchIntent {
         }
 
         return score
+    }
+
+    private static func intentProfile(for query: String) -> (preferred: [String], rejected: [String]) {
+        let profiles: [(triggers: [String], preferred: [String], rejected: [String])] = [
+            (
+                ["ديكور", "دكور", "زينة", "زينه", "تلبيس", "تلبيسة", "كسوة", "حلية", "غطاء", "غطا", "كونسول", "طبلون", "تابلوه", "درجالقير", "داخلية", "داخلي", "عنابي", "خمري", "ماروني", "خشب", "خشبي", "trim", "finisher", "garnish", "bezel", "console", "interior"],
+                ["ديكور", "زينة", "تلبيس", "كسوة", "حلية", "غطاء", "كونسول", "طبلون", "تابلوه", "درجالقير", "داخلي", "عنابي", "خمري", "ماروني", "trim", "finisher", "garnish", "bezel", "console", "interior", "cover", "lid", "wood", "burgundy", "maroon"],
+                ["صامولة", "مسمار", "برغي", "واشر", "وردة", "كلبسة", "مشبك", "nut", "screw", "bolt", "washer", "clip", "grommet"]
+            ),
+            (
+                ["قير", "جير", "فتيس", "جربكس", "جيربوكس", "ناقلحركة", "عصاالقير", "ديكورالقير", "transmission", "gearbox"],
+                ["قير", "جير", "فتيس", "transmission", "gearbox", "shift", "selector", "lever", "knob", "boot", "case transfer", "console", "finisher"],
+                ["صدام", "رفرف", "نور", "فرامل", "مكيف", "bumper", "fender", "lamp", "brake", "air conditioner"]
+            ),
+            (
+                ["دركسون", "دريكسون", "دركسيون", "مقود", "طارة", "طاره", "توجيه", "ستيرنج", "دودة", "دوده", "علبةدركسون", "علبةدريكسون", "steering"],
+                ["دركسون", "مقود", "توجيه", "steering", "strg", "pitman", "drag link", "tie rod", "column", "wheel steering", "rod", "link", "arm"],
+                ["فرامل", "مكيف", "رديتر", "صدام", "brake", "air conditioner", "radiator", "bumper"]
+            ),
+            (
+                ["رديتر", "راديتر", "راديتور", "اديتر", "رديترماء", "راديترماء", "مبرد", "حرارة", "تبريد", "cooling", "radiator"],
+                ["radiator", "cooling", "cooler", "water", "fan", "shroud", "hose radiator", "cap radiator", "reservoir"],
+                ["ديكور", "قير", "فرامل", "صدام", "trim", "gearbox", "brake", "bumper"]
+            ),
+            (
+                ["طرمبةبنزين", "طمبةبنزين", "بمبةبنزين", "مضخةوقود", "طرمبهوقود", "بنزين", "وقود", "بخاخ", "بخاخات", "رشاش", "رشاشات", "تانكي", "fuel", "injector"],
+                ["fuel", "pump fuel", "fuel pump", "injector", "nozzle", "rail fuel", "tank fuel", "filter fuel", "strainer fuel"],
+                ["مكيف", "فرامل", "ديكور", "air conditioner", "brake", "trim"]
+            ),
+            (
+                ["فرامل", "بريك", "بريكات", "فحمات", "اقمشة", "أقمشة", "هوبات", "هوب", "ديسكفرامل", "brake"],
+                ["brake", "pad", "shoe", "disc", "rotor", "drum", "caliper", "booster", "master cylinder"],
+                ["ديكور", "مكيف", "قير", "trim", "air conditioner", "gearbox"]
+            ),
+            (
+                ["مساعد", "مساعدات", "ياي", "يايات", "سسته", "سبرنق", "سبرنج", "مقص", "مقصات", "جلدة", "تعليق", "suspension", "shock", "spring"],
+                ["suspension", "shock", "absorber", "spring", "coil", "arm", "control arm", "bushing", "stabilizer", "ball joint", "link"],
+                ["ديكور", "مكيف", "نور", "trim", "air conditioner", "lamp"]
+            ),
+            (
+                ["مكيف", "مكييف", "كمبروسر", "كومبروسر", "ثلاجة", "كوندنسر", "رديترمكيف", "فريون", "ac", "a/c", "airconditioner"],
+                ["air conditioner", "a/c", "compressor", "condenser", "evaporator", "cooler", "receiver drier", "hose air conditioner"],
+                ["فرامل", "قير", "دركسون", "brake", "gearbox", "steering"]
+            ),
+            (
+                ["نور", "انوار", "أنوار", "كشاف", "اسطب", "اصطب", "شمعة", "شمعةامامية", "شمعةخلفية", "فانوس", "لمبة", "lamp", "headlight", "taillight"],
+                ["lamp", "headlamp", "head light", "tail lamp", "combination lamp", "fog lamp", "lens", "bulb"],
+                ["فرامل", "قير", "مكيف", "brake", "gearbox", "air conditioner"]
+            ),
+            (
+                ["صدام", "دعامة", "دعامية", "نسافة", "نسافات", "رفرف", "رفارف", "كبوت", "غطاءمكينة", "باب", "بيبان", "شنطة", "هيكل", "body", "bumper", "fender", "hood", "door"],
+                ["body", "bumper", "fender", "hood", "bonnet", "door", "panel", "guard", "protector", "reinforcement", "bracket"],
+                ["مكيف", "فرامل", "قير", "air conditioner", "brake", "gearbox"]
+            ),
+            (
+                ["قزاز", "زجاج", "جام", "دريشة", "قزازة", "مساحات", "مساحة", "wiper", "glass", "window"],
+                ["glass", "window", "windshield", "wiper", "blade wiper", "arm wiper", "motor wiper", "washer", "nozzle washer"],
+                ["فرامل", "قير", "مكيف", "brake", "gearbox", "air conditioner"]
+            ),
+            (
+                ["حساس", "حساسات", "سنسر", "سينسور", "كهرباء", "فيش", "ظفيرة", "افياش", "ريليه", "كتاوت", "فيوز", "sensor", "switch", "relay", "harness"],
+                ["sensor", "switch", "sender", "temperature sensor", "pressure sensor", "relay", "harness", "wire", "fusible link", "control unit", "module"],
+                ["صدام", "فرامل", "ديكور", "bumper", "brake", "trim"]
+            )
+        ]
+
+        var preferred = [String]()
+        var rejected = [String]()
+        for profile in profiles where containsAny(query, profile.triggers) {
+            preferred.append(contentsOf: profile.preferred)
+            rejected.append(contentsOf: profile.rejected)
+        }
+        return (preferred.map(normalized).filter { !$0.isEmpty }.uniqued(), rejected.map(normalized).filter { !$0.isEmpty }.uniqued())
     }
 
     private func isClearlyHardware(_ part: Part) -> Bool {
