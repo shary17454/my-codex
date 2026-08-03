@@ -18,9 +18,10 @@ SWIFT_ROOT = APP_ROOT / "BatalAlDroob"
 WEB_ROOT = APP_ROOT / "BatalAlDroob" / "Web"
 CATALOG_MANIFEST = WEB_ROOT / "data" / "patrol_full_catalog_files.json"
 CATALOG_SEARCH_INDEX = WEB_ROOT / "catalog" / "search" / "catalog_search_index.json"
+STORE_DIRECTORY = WEB_ROOT / "data" / "store_directory.json"
 
 EXPECTED_MARKETING_VERSION = "2.6"
-MIN_EXPECTED_BUILD = 186
+MIN_EXPECTED_BUILD = 187
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 EXPECTED_PROJECT_BUNDLE_IDS = {
     "com.batalaldroob.parts",
@@ -71,6 +72,7 @@ def main() -> None:
         privacy = plistlib.load(stream)
     catalog_manifest = read_json(CATALOG_MANIFEST)
     catalog_search = read_json(CATALOG_SEARCH_INDEX)
+    store_directory = read_json(STORE_DIRECTORY)
     app_text = "\n".join(
         path.read_text(encoding="utf-8")
         for path in SWIFT_ROOT.rglob("*.swift")
@@ -142,6 +144,19 @@ def main() -> None:
 
     if generation_counts != EXPECTED_CATALOG_COUNTS:
         fail(f"Catalog generation counts differ from the approved inventory: {generation_counts}")
+
+    store_policy = store_directory.get("policy")
+    if not isinstance(store_policy, dict) or store_policy.get("removed_or_revoked_suppliers_are_excluded") is not True:
+        fail("Store policy must exclude removed or revoked suppliers")
+    serialized_store_directory = json.dumps(store_directory, ensure_ascii=False).lower()
+    for removed_supplier_term in (
+        "enhanced offroad solutions",
+        "enhancedoffroadsolutions.com.au",
+    ):
+        if removed_supplier_term in serialized_store_directory:
+            fail(f"Removed supplier must not return to the bundled directory: {removed_supplier_term}")
+    if '\"/api/stores\"' in web_text:
+        fail("The app must not replace the approved bundled store directory with a remote supplier list")
 
     search_entries = catalog_search.get("entries")
     if not isinstance(search_entries, list):

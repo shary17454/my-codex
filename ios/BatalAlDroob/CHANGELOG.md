@@ -1,14 +1,19 @@
 # Changelog
 
-## 2.6 (186) - 2026-08-03
+## 2.6 (187) - 2026-08-03
 
 ### Release Train
 
 - Moved the next code-carrying release to `2.6` after App Store Connect showed
   `2.5 (180)` as Ready for Distribution and rejected Xcode Cloud build `185`
   during Prepare Build for App Store Connect on that released train.
-- Raised every app and test target to project build `186` and aligned the local
+- Raised every app and test target to project build `187` and aligned the local
   validator plus the repository-level pre- and post-archive Xcode Cloud guards.
+- Removed Enhanced Offroad Solutions from the approved store surface and made
+  the app rely only on its reviewed bundled store directory so a remote list
+  cannot reintroduce a removed or revoked supplier.
+- Added automated release and unit-test guards that fail if the removed supplier
+  name or domain returns to the bundled directory.
 - Preserved the verified onboarding, account requirement, catalog search,
   StoreKit, AI safety, and 640-file catalog manifest without changing the Bundle
   ID, development team, signing, entitlements, or capabilities.

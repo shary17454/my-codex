@@ -1562,7 +1562,6 @@ async function loadPartRequestHistory() {
 async function loadServiceDirectories() {
   try {
     storeDirectory = await fetchFirstJson([
-      "/api/stores",
       "data/store_directory.json",
       "ios/BatalAlDroob/BatalAlDroob/Web/data/store_directory.json"
     ]);

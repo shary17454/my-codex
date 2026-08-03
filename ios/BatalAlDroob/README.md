@@ -9,7 +9,7 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `2.6`
-- Project build: `186`
+- Project build: `187`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -87,7 +87,7 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
 - verifies `MARKETING_VERSION = 2.6`,
-- verifies `CURRENT_PROJECT_VERSION >= 186`,
+- verifies `CURRENT_PROJECT_VERSION >= 187`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
@@ -97,7 +97,8 @@ In App Store Connect, set the Batal Al-Droob workflow environment to a productio
 App Store Connect shows `2.5 (180)` as Ready for Distribution. Xcode Cloud
 build `185` completed archive creation but failed while preparing another build
 for App Store Connect on that released version train. The current candidate
-therefore uses release train `2.6` and project build `186`. Do not reuse any
+therefore uses release train `2.6`; build `186` was uploaded successfully and
+the current source candidate uses project build `187`. Do not reuse any
 uploaded or attempted build number.
 
 ## In-App Purchase
@@ -175,7 +176,7 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 
 The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
 remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `186` or higher on release train `2.6`,
+a fresh signed Xcode Cloud build `187` or higher on release train `2.6`,
 completion and attachment of the permanent IAP in App Store Connect, current
 screenshots, privacy-label confirmation, and manual device checks.
 

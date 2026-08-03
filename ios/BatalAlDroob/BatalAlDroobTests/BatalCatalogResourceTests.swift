@@ -41,6 +41,18 @@ final class BatalCatalogResourceTests: XCTestCase {
         }
     }
 
+    func testRemovedSupplierCannotReturnInBundledDirectory() throws {
+        let directoryURL = try XCTUnwrap(bundle.url(
+            forResource: "store_directory",
+            withExtension: "json",
+            subdirectory: "data"
+        ))
+        let normalizedDirectory = try String(contentsOf: directoryURL, encoding: .utf8).lowercased()
+
+        XCTAssertFalse(normalizedDirectory.contains("enhanced offroad solutions"))
+        XCTAssertFalse(normalizedDirectory.contains("enhancedoffroadsolutions.com.au"))
+    }
+
     func testUAEOEMPartsApprovalIsBundledWithSafeLimitations() throws {
         let directory = try loadJSONObject(named: "store_directory", subdirectory: "data")
         let stores = try XCTUnwrap(directory["verified_stores"] as? [[String: Any]])
