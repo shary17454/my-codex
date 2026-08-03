@@ -1,0 +1,71 @@
+{
+  "assetPackID": "batal.catalog.y61.004",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y61/1999/TY61_09.1999_SAFARI_PICK_UP_PICKUP_TB45S_STD_209306.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/1999/TY61_09.1999_SAFARI_PICK_UP_PICKUP_TD42_STD_209480.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/1999/TY61_09.1999_SAFARI_PICK_UP_PICKUP_TD42_STD_209481.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0561__nissan_safari_hard_top_zd30ddti_wty61_s_sp_japan_y61_09_1999_vid202630_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0549__nissan_safari_hard_top_zd30ddti_wty61_s_sp_japan_y61_09_1999_vid202630_labeled_start_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0562__nissan_safari_hard_top_zd30ddti_wty61_s_sp_japan_y61_09_1999_vid202631_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0550__nissan_safari_hard_top_zd30ddti_wty61_s_sp_japan_y61_09_1999_vid202631_labeled_start_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0563__nissan_safari_van_td42t_vrgy61_gr_japan_y61_09_1999_vid210950_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0551__nissan_safari_van_td42t_vrgy61_gr_japan_y61_09_1999_vid210950_labeled_start_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0564__nissan_safari_van_td42t_vrgy61_gr_japan_y61_09_1999_vid210951_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0552__nissan_safari_van_td42t_vrgy61_gr_japan_y61_09_1999_vid210951_labeled_start_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0565__nissan_safari_van_td42t_vrgy61_grl_japan_y61_09_1999_vid210952_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0553__nissan_safari_van_td42t_vrgy61_grl_japan_y61_09_1999_vid210952_labeled_start_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0566__nissan_safari_van_td42t_vrgy61_grl_japan_y61_09_1999_vid210953_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0554__nissan_safari_van_td42t_vrgy61_grl_japan_y61_09_1999_vid210953_labeled_start_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0531__safari_hard_top_zd30ddti_wty61_s_sp_japan_y61_09_1999_vid202630_ar.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0532__safari_hard_top_zd30ddti_wty61_s_sp_japan_y61_09_1999_vid202631_ar.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0533__safari_van_td42t_vrgy61_gr_japan_y61_09_1999_vid210950_ar.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0534__safari_van_td42t_vrgy61_gr_japan_y61_09_1999_vid210951_ar.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y61/2026/patrol_catalog_0535__safari_van_td42t_vrgy61_grl_japan_y61_09_1999_vid210952_ar.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

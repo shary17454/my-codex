@@ -2,6 +2,7 @@
 set -euo pipefail
 
 BATAL_BUNDLE_ID="com.batalaldroob.parts"
+BATAL_ASSET_EXTENSION_ID="com.batalaldroob.parts.catalogassets"
 EXPECTED_MARKETING_VERSION="${EXPECTED_MARKETING_VERSION:-2.6}"
 EXPECTED_XCODE_CODE="${EXPECTED_XCODE_CODE:-2660}"
 EXPECTED_XCODE_BUILD="${EXPECTED_XCODE_BUILD:-17F113}"
@@ -97,6 +98,31 @@ assert_equal "${MAIN_XCODE_CODE}" "${EXPECTED_XCODE_CODE}" "DTXcode"
 assert_equal "${MAIN_XCODE_BUILD}" "${EXPECTED_XCODE_BUILD}" "DTXcodeBuild"
 assert_equal "${MAIN_SDK_NAME}" "${EXPECTED_SDK_NAME}" "DTSDKName"
 assert_equal "${MAIN_MINIMUM_OS}" "${EXPECTED_MINIMUM_OS}" "MinimumOSVersion"
+assert_equal "$(plist_value "${APP_INFO}" BAAppGroupID)" "group.com.batalaldroob.parts" "BAAppGroupID"
+assert_equal "$(plist_value "${APP_INFO}" BAHasManagedAssetPacks)" "true" "BAHasManagedAssetPacks"
+assert_equal "$(plist_value "${APP_INFO}" BAUsesAppleHosting)" "true" "BAUsesAppleHosting"
+
+CATALOG_DELIVERY_MANIFEST="${APP_PATH}/data/catalog_asset_delivery.json"
+if [ ! -f "${CATALOG_DELIVERY_MANIFEST}" ]; then
+  echo "error: Managed catalog delivery manifest is missing from the archived app." >&2
+  exit 1
+fi
+
+PDF_COUNT="$(find "${APP_PATH}" -type f -iname '*.pdf' | wc -l | tr -d ' ')"
+if [ "${PDF_COUNT}" != "0" ]; then
+  echo "error: Archived app must not embed catalog PDFs; found ${PDF_COUNT} PDF files." >&2
+  exit 1
+fi
+
+ASSET_EXTENSION_PATH="$(find "${APP_PATH}" -type d -name 'BatalCatalogAssetsExtension.appex' -print -quit)"
+if [ -z "${ASSET_EXTENSION_PATH}" ]; then
+  echo "error: BatalCatalogAssetsExtension.appex is missing from the archived app." >&2
+  exit 1
+fi
+ASSET_EXTENSION_INFO="${ASSET_EXTENSION_PATH}/Info.plist"
+assert_equal "$(plist_value "${ASSET_EXTENSION_INFO}" CFBundleIdentifier)" "${BATAL_ASSET_EXTENSION_ID}" "Asset extension CFBundleIdentifier"
+assert_equal "$(plist_value "${ASSET_EXTENSION_INFO}" MinimumOSVersion)" "26.0" "Asset extension MinimumOSVersion"
+assert_equal "$(plist_value "${ASSET_EXTENSION_INFO}" EXAppExtensionAttributes:EXExtensionPointIdentifier)" "com.apple.background-asset-downloader-extension" "Asset extension point"
 
 while IFS= read -r EMBEDDED_BUNDLE; do
   EMBEDDED_INFO="${EMBEDDED_BUNDLE}/Info.plist"

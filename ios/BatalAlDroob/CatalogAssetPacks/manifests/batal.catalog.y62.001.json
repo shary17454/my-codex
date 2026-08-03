@@ -1,0 +1,92 @@
+{
+  "assetPackID": "batal.catalog.y62.001",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y62/unknown/patrol_catalog_0080__partsouq_remaining_index_y62_unknown_vid189481_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2010/patrol_catalog_0051__Nissan_Patrol_Y62_2010_Middle_East_VK56DE_SE_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2010/patrol_catalog_0052__Nissan_Patrol_Y62_2010_Middle_East_VK56VD_SE_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2010/patrol_catalog_0053__partsouq_remaining_index_y62_2010_vid189475_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2010/patrol_catalog_0054__partsouq_remaining_index_y62_2010_vid189476_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2010/patrol_catalog_0055__partsouq_remaining_index_y62_2010_vid189482_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2010/patrol_catalog_0056__partsouq_remaining_index_y62_2010_vid189486_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2010/patrol_catalog_0057__partsouq_remaining_index_y62_2010_vid189492_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2026/patrol_catalog_0131__2010_Y62_General_Asia_LHD_PATROL_VK56DE_SE_General_Asia_LHD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2026/patrol_catalog_0273__2010_Y62_General_Asia_LHD_PATROL_VK56DE_SE_General_Asia_LHD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2011/patrol_catalog_0058__Nissan_Patrol_Y62_2011_Middle_East_VK56DE_SE_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2011/patrol_catalog_0059__Nissan_Patrol_Y62_2011_Middle_East_VK56DE_XE_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2011/patrol_catalog_0060__partsouq_remaining_index_y62_2011_vid189477_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2011/patrol_catalog_0061__partsouq_remaining_index_y62_2011_vid189488_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0066__generated_schematic_supplement_y62_2012_vid189481_first20_units_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0062__Nissan_Patrol_Y62_2012_GOM_VK56VD_SE_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0063__Nissan_Patrol_Y62_2012_Middle_East_VK56DE_LE_09-2012_to_10-2013_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0064__Nissan_Patrol_Y62_2012_Middle_East_VK56DE_LE_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0065__Nissan_Patrol_Y62_2012_Middle_East_VK56VD_PREMIUM_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0067__partsouq_remaining_index_y62_2012_vid189478_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0068__partsouq_remaining_index_y62_2012_vid189479_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0069__partsouq_remaining_index_y62_2012_vid189480_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0070__partsouq_remaining_index_y62_2012_vid189489_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2012/patrol_catalog_0071__partsouq_remaining_index_y62_2012_vid189494_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2026/patrol_catalog_0462__epc_style_supplement_y62_2012_vid189481_first20_units_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2026/patrol_catalog_0428__nissan_patrol_y62_2012_gom_first20_full_units_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y62/2026/patrol_catalog_0461__nissan_patrol_y62_2012_wiring_egi_full_sample_ar_en.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

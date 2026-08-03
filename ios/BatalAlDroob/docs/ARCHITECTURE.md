@@ -2,17 +2,18 @@
 
 ## Product Boundary
 
-Batal Al-Droob is a native iOS/iPadOS SwiftUI application for Nissan Patrol catalog lookup, fitment evidence, local request preparation, maintenance records, vehicle tools, location/compass assistance, and a StoreKit catalog unlock. The app target has no Flutter, Dart, CocoaPods, Swift Package Manager, or third-party runtime dependency.
+Batal Al-Droob is a native iOS/iPadOS SwiftUI application for Nissan Patrol catalog lookup, fitment evidence, local request preparation, maintenance records, vehicle tools, and StoreKit-protected catalog access. The app target has no Flutter, Dart, CocoaPods, Swift Package Manager, or third-party runtime dependency.
 
 ## Targets
 
 | Target | Purpose |
 |---|---|
 | `BatalAlDroob` | Native SwiftUI application |
+| `BatalCatalogAssetsExtension` | Apple-hosted managed Background Assets download policy for original catalog PDFs |
 | `BatalAlDroobTests` | Unit and bundled-resource regression tests |
 | `BatalAlDroobUITests` | Arabic/English launch, navigation, persistence, and iPhone/iPad smoke tests |
 
-There are no widgets, app clips, watch targets, share extensions, notification extensions, or embedded app extensions in the current project.
+There are no widgets, app clips, watch targets, share extensions, or notification extensions. The catalog downloader is the only embedded extension.
 
 ## Application Structure
 
@@ -23,6 +24,8 @@ There are no widgets, app clips, watch targets, share extensions, notification e
 - `Models.swift`: catalog, store, vehicle, maintenance, request, and API data models.
 - `Services.swift`: bundled-resource loading and StoreKit purchase service protocols/implementations.
 - `CatalogViewModel.swift`: catalog/search/filter state, local persistence, request workflows, StoreKit state, and privacy-filtered AI context building.
+- `CatalogAssetService.swift`: 640-document delivery manifest loading, safe path validation, Apple-hosted pack acquisition, size/SHA-256 verification, and local URL resolution.
+- `CatalogAssetViews.swift`: searchable original-catalog library, on-demand download state, protected evidence links, and PDFKit presentation.
 - The app intentionally has no map, compass, or location-tracking module. Parts lookup, fitment,
   maintenance, and supplier handoff are the supported product scope.
 - `Views.swift`: root tabs, dashboard, catalog, shared-fitment, and common state views.
@@ -35,7 +38,9 @@ Dependencies are injected at the application boundary through service protocols.
 
 ## Data And Persistence
 
-- Catalog and support data are read-only bundled JSON under `BatalAlDroob/Web/data/`.
+- Catalog and support indexes are read-only bundled JSON under `BatalAlDroob/Web/data/`.
+- The IPA contains no original catalog PDFs. The 640 originals are partitioned into 40 Apple-hosted asset packs and downloaded on demand on iOS 26 or later.
+- Downloaded PDFs are accepted only when their managed path is allow-listed and both byte size and SHA-256 match `catalog_asset_delivery.json`.
 - Language, vehicle profile, maintenance entries, saved requests, wishlist, optional local customer profile, and entitlement cache use `UserDefaults` with stable keys.
 - StoreKit current entitlements are the authority for paid access; cached values do not independently grant an entitlement.
 - The optional customer name/email profile is device-local only, used for request personalization, and never treated as authentication or an owner unlock.
@@ -53,9 +58,21 @@ the approved non-consumable product, so the same entitlement path unlocks the
 catalog whether the user purchased normally, restored a prior purchase, or
 redeemed a free App Store Connect offer code.
 
-### Location and compass
+### Original Catalog Assets
 
-Location updates begin only after the user taps the tracking control and grants when-in-use permission. Updates stop when the user stops tracking or leaves the screen. The application has no developer-operated location backend and does not send coordinates to Open-Meteo or another weather provider.
+The app embeds only `Web/catalog/search`, not `Web/catalog`. Apple-hosted
+managed Background Assets use the shared App Group
+`group.com.batalaldroob.parts` and the
+`BatalCatalogAssetsExtension` policy extension. The delivery manifest maps
+every catalog document to exactly one asset pack. The app requests a pack only
+after the relevant StoreKit or owner entitlement gate succeeds. Apple hosting
+is the transport boundary; the app still verifies the selected file against
+the locally bundled SHA-256 inventory before PDFKit opens it.
+
+The app deployment target remains iOS 17. The managed download API and
+extension require iOS 26, so older systems keep catalog search and indexed
+evidence but receive an explicit compatibility message when they request an
+original PDF.
 
 ### External Stores
 
@@ -73,12 +90,11 @@ The app must not send VIN, StoreKit transaction data, passwords, payment data, A
 
 Runtime permissions are limited to current feature needs:
 
-- location while in use for on-screen map, tracking, and compass tools,
 - camera for on-device OCR of part labels or stamped part numbers.
 
-No background location, microphone, contacts, tracking, notifications, Bluetooth, HealthKit, or other permission is requested. Photo/camera recognition is local through Vision; it does not upload images to the AI backend.
+No location, background location, microphone, contacts, tracking, notifications, Bluetooth, HealthKit, or other permission is requested. Photo/camera recognition is local through Vision; it does not upload images to the AI backend.
 
-No custom entitlement file or optional Apple capability is enabled. Signing remains automatic with the existing bundle identifier and development team.
+Signing remains automatic with the existing app bundle identifier and development team. The app and catalog extension have the required App Group entitlement only; no unrelated capability was added.
 
 ## Release Architecture
 

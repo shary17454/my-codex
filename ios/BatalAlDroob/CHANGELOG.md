@@ -1,5 +1,30 @@
 # Changelog
 
+## 2.6 (189) - 2026-08-03
+
+### Original Catalog Delivery
+
+- Added Apple-hosted managed Background Assets delivery for all 640 verified
+  Patrol catalog PDFs without placing the 12.51 GiB archive inside the IPA.
+- Partitioned the catalog inventory into 40 deterministic asset packs and
+  bundled the complete document-to-pack delivery index with the app.
+- Added a protected searchable catalog library, on-demand download progress,
+  evidence-to-PDF navigation, page targeting, PDFKit reading, and sharing.
+- Added safe-path, file-size, and SHA-256 validation before any downloaded PDF
+  is opened.
+- Added the required Background Assets extension and shared App Group while
+  preserving the existing app Bundle ID, development team, and automatic
+  signing.
+- Kept the app deployment target at iOS 17; original-PDF downloads require
+  iOS 26 or later while indexed search remains available on older systems.
+- Added release and unit-test guards for complete pack coverage, unique paths,
+  approved identifiers, checksums, resource exclusion, and modified-file
+  rejection.
+- Verified all 640 source PDFs by SHA-256 and successfully produced all 40
+  `.aar` archives with the production Xcode 26.6 packaging tool.
+- Added an Arabic catalog-delivery report that distinguishes local packaging
+  from App Store Connect upload and review status.
+
 ## 2.6 (187) - 2026-08-03
 
 ### Release Train

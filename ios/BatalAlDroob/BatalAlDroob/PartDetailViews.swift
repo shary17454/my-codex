@@ -14,7 +14,10 @@ struct PartDetailView: View {
                             .font(.title2.weight(.semibold))
                             .foregroundStyle(BatalDesign.brand)
                             .frame(width: 48, height: 48)
-                            .background(BatalDesign.brand.opacity(0.12), in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius))
+                            .background(
+                                BatalDesign.brand.opacity(0.12),
+                                in: RoundedRectangle(cornerRadius: BatalDesign.cardRadius)
+                            )
                         VStack(alignment: .leading, spacing: 5) {
                             Text(viewModel.title(for: part))
                                 .font(.title2.bold())
@@ -104,14 +107,7 @@ struct PartDetailView: View {
                     )
                 } else {
                     ForEach(Array(part.evidence.prefix(8).enumerated()), id: \.offset) { _, evidence in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text([evidence.sourceID, evidence.year, evidence.page.map { "p.\($0)" }, evidence.reference]
-                                .compactMap(\.self).joined(separator: " · "))
-                                .font(.subheadline.bold())
-                            if
-                                let context = evidence
-                                    .context { Text(context).font(.caption).foregroundStyle(.secondary).lineLimit(4) }
-                        }
+                        CatalogEvidenceRow(evidence: evidence, part: part, viewModel: viewModel)
                     }
                 }
             }
@@ -156,6 +152,9 @@ struct PartDetailView: View {
         .sheet(item: $selectedSmartIndicator) { indicator in
             SmartPartIndicatorDetailView(indicator: indicator, viewModel: viewModel)
                 .presentationDetents([.medium, .large])
+        }
+        .sheet(item: $viewModel.catalogPDFPresentation) { presentation in
+            CatalogPDFView(presentation: presentation, viewModel: viewModel)
         }
     }
 }
@@ -486,7 +485,10 @@ struct SharedFitmentContent: View {
         List {
             Section {
                 Label(
-                    viewModel.text(ar: "قطع تعمل على أكثر من إعداد موثق", en: "Parts with more than one verified fitment"),
+                    viewModel.text(
+                        ar: "قطع تعمل على أكثر من إعداد موثق",
+                        en: "Parts with more than one verified fitment"
+                    ),
                     systemImage: "point.3.connected.trianglepath.dotted"
                 )
                 .font(.headline)

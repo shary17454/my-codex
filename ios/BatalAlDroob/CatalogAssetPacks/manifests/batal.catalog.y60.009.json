@@ -1,0 +1,71 @@
+{
+  "assetPackID": "batal.catalog.y60.009",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0160__Y60_Australia_RHD_PICKUP_A-CHASSIS_TB42S_STD_51e204eaf15f.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0302__Y60_Australia_RHD_PICKUP_A-CHASSIS_TB42S_STD_51e204eaf15f.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0161__Y60_Australia_RHD_PICKUP_A-CHASSIS_TD42_STD_1a2cce93926e.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0303__Y60_Australia_RHD_PICKUP_A-CHASSIS_TD42_STD_1a2cce93926e.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0162__Y60_Australia_RHD_PICKUP_TB42S_STD_75473392c7ca.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0304__Y60_Australia_RHD_PICKUP_TB42S_STD_75473392c7ca.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0163__Y60_Australia_RHD_WAGON_RB30S_DX_3.0ST_1cc9750d3ef3.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0305__Y60_Australia_RHD_WAGON_RB30S_DX_3.0ST_1cc9750d3ef3.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0164__Y60_Australia_RHD_WAGON_RB30S_STD_b3d7b114a89a.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0306__Y60_Australia_RHD_WAGON_RB30S_STD_b3d7b114a89a.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0165__Y60_Australia_RHD_WAGON_TD42_STD_03c0edcc0762.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0307__Y60_Australia_RHD_WAGON_TD42_STD_03c0edcc0762.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0166__Y60_Australia_RHD_WAGON_TD42_STD_9454a4eac8ca.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0308__Y60_Australia_RHD_WAGON_TD42_STD_9454a4eac8ca.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0211__Y60_b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0353__Y60_b3d7b114a89a_Australia_RHD_WAGON_RB30S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0212__Y60_d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0354__Y60_d074a6710cf6_Australia_RHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0167__Y60_WGY60348567_General_Asia_LHD_WAGON_TB42S_SGL.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0309__Y60_WGY60348567_General_Asia_LHD_WAGON_TB42S_SGL.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

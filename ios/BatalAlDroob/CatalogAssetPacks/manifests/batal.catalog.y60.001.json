@@ -1,0 +1,32 @@
+{
+  "assetPackID": "batal.catalog.y60.001",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y60/unknown/patrol_catalog_0099__partsouq_nissan_patrol_safari_all_extracted_catalogs.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/unknown/patrol_catalog_0100__partsouq_nissan_patrol_safari_arabic_exact_layout.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/unknown/patrol_catalog_0101__patrol_wgy60_epc_original_verified_cropped_arabicكتالوج_السفاري_عربي_3.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/unknown/patrol_catalog_0102__patrol_y60_body_exterior_complete_card.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/unknown/patrol_catalog_0087__WGY60348567_General_Asia_LHD_WAGON_TB42S_SGL.reportlab.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/unknown/patrol_catalog_0098__Y60_1988-1997_all_11_catalogs_combined.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/unknown/patrol_catalog_0103__مرفق_ملف_PDF_شامل_لكل_ما_يخص_المكيف_والثلاجات_والهوايات_في_كتالوج_Patrol_Safari_Y60_حسب_رقم_الهيكل_WGY60-348567..pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

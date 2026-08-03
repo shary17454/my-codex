@@ -1,0 +1,17 @@
+{
+  "assetPackID": "batal.catalog.unknown.015",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0455__patrol_merged_42818_pages_part_12_pages_23552-24622.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0446__patrol_merged_42818_pages_part_12_pages_23552-25692.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

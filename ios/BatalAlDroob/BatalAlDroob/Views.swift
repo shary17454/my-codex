@@ -269,7 +269,20 @@ struct DashboardView: View {
             .background(BatalDesign.canvas)
             .navigationTitle(viewModel.text(ar: "الرئيسية", en: "Home"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { LanguageMenu(viewModel: viewModel) }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        CatalogLibraryView(viewModel: viewModel)
+                    } label: {
+                        Image(systemName: "books.vertical.fill")
+                    }
+                    .accessibilityIdentifier("catalog.library.open")
+                    .accessibilityLabel(viewModel.text(ar: "مكتبة الكتالوجات الأصلية", en: "Original catalog library"))
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    LanguageMenu(viewModel: viewModel)
+                }
+            }
             .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
             .onAppear {
                 if fitmentResult.isEmpty {

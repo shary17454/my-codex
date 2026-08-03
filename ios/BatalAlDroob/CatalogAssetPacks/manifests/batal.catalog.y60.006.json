@@ -1,0 +1,68 @@
+{
+  "assetPackID": "batal.catalog.y60.006",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0091__Y60_1991.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0415__Y60_1991.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0111__y60_1991.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0124__y60_1991.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1992/patrol_catalog_0092__Y60_1992.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0268__Y60_1992.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0421__Y60_1992.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0112__y60_1992.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0125__y60_1992.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1993/patrol_catalog_0022__nissan_safari_y60_1993_japan_wrgy60_td42t_ad_wagon_high_roof_vid215204_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1993/patrol_catalog_0023__nissan_safari_y60_1993_japan_wrgy60_td42t_ad_wagon_vid215227_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1993/patrol_catalog_0024__nissan_safari_y60_1993_japan_wrgy60_td42t_gr_wagon_high_roof_vid215205_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1993/patrol_catalog_0025__nissan_safari_y60_1993_japan_wrgy60_td42t_gr_wagon_vid215228_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1993/patrol_catalog_0026__nissan_safari_y60_1993_japan_wrgy60_td42t_kr_wagon_high_roof_vid215206_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1993/patrol_catalog_0027__nissan_safari_y60_1993_japan_wrgy60_td42t_kr_wagon_vid215229_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1993/patrol_catalog_0093__Y60_1993.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0416__Y60_1993.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0113__y60_1993.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0126__y60_1993.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

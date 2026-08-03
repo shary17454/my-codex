@@ -1,0 +1,20 @@
+{
+  "assetPackID": "batal.catalog.unknown.020",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0458__patrol_merged_42818_pages_part_22_pages_41750-42818.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0530__patrol_pdf_gap_report.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0120__‎⁨كتالوج_السفاري⁩.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

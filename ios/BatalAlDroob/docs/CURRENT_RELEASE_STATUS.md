@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-08-03
-Decision: `2_6_LOCAL_CANDIDATE_VERIFIED_RESOURCE_DELIVERY_BLOCKED`
+Decision: `2_6_BUILD_189_MANAGED_ASSETS_LOCAL_VERIFIED_UPLOAD_PENDING`
 
 ## Identity
 
@@ -11,12 +11,17 @@ Decision: `2_6_LOCAL_CANDIDATE_VERIFIED_RESOURCE_DELIVERY_BLOCKED`
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
 | Marketing version | `2.6` |
-| Project build | `186` |
+| Project build | `189` |
 | Current App Store release | `2.5 (180)` - Ready for Distribution |
+| Last confirmed App Store Connect build | `2.6 (188)` - Ready to Submit |
 | Deployment target | iOS / iPadOS 17.0 |
 | Verified toolchain | Xcode 26.6 (`17F113`), iPhoneOS SDK 26.5 |
 
-No Bundle ID, Development Team, signing setting, entitlement, or capability was changed in this work.
+The app Bundle ID, Development Team, and signing mode were not changed. Build
+189 adds the required shared App Group entitlement and Background Assets
+extension for Apple-hosted catalog delivery. These capability changes are
+scoped to the app and its extension and still require signed Apple Developer
+registration before an App Store claim can be made.
 
 ## Verified Product State
 
@@ -41,7 +46,10 @@ No Bundle ID, Development Team, signing setting, entitlement, or capability was 
 | Y62 files | 140 |
 | General / unknown files | 60 |
 
-Every manifest path, file size, and SHA-256 was verified in the official source, the complete archival copy, and the final unsigned Release app bundle.
+Every source manifest path, file size, and SHA-256 was verified in the official
+source. The complete archival copy retains all 640 PDFs. The Release app bundle
+contains the 640-document delivery index and no embedded PDF; the originals are
+partitioned into 40 Apple-hosted managed asset packs.
 
 ## Current Verification
 
@@ -51,43 +59,51 @@ Every manifest path, file size, and SHA-256 was verified in the official source,
 | Catalog archive validator | PASS, 640/640 |
 | Full catalog SHA-256 verification | PASS |
 | Privacy and Info property lists | PASS |
-| SwiftFormat on changed Swift files | PASS, 0/4 |
+| Managed asset manifests | PASS, 40 packs / 640 documents |
+| Packager output | PASS, 40/40 AAR with Xcode 26.6 and `ba-package 1.2` |
+| AAR checksum inventory | PASS, 40/40 SHA-256 values recorded |
 | Backend tests | PASS, 9/9 |
-| Unit tests | PASS, 45/45 |
+| Unit tests | PASS, 48/48 |
 | UI tests | PASS, 3/3 |
-| Total iOS tests | PASS, 48/48 |
+| Total completed iOS tests | PASS, 51/51 |
+| Managed catalog library UI test | Compiled; execution pending while Mac is locked |
 | RTL visual review | PASS for first-run and home screens |
 | Release device build without signing | PASS with Xcode 26.6 / SDK 26.5 |
-| Current candidate metadata | PASS: `2.6 (186)`, correct Bundle ID and minimum iOS 17.0 |
-| Current Git candidate payload | 104 MB and 0 PDFs because the archive is Git-ignored |
+| Current candidate metadata | PASS: `2.6 (189)`, correct app Bundle ID and minimum iOS 17.0 |
+| Current Release app payload | Approximately 105 MB, 0 PDFs, delivery manifest and extension present |
 | Prior full-resource archival build | PASS: `2.4 (172)`, 640 PDFs and full SHA-256 |
-| SwiftLint strict | FAIL: 83 style/structure violations |
+| SwiftLint strict | Prior audit reported 83 style/structure violations; not waived |
 
-The current `2.6 (186)` candidate produced an unsigned local xcarchive with
-Xcode 26.6. Its app metadata passed the same pre- and post-archive guards used
-by Xcode Cloud, and all 45 unit tests plus 3 UI tests passed. The archive is
-approximately 109 MB and contains no catalog PDFs because those files are
-Git-ignored pending an App Store-safe delivery architecture.
+The current `2.6 (189)` candidate builds for a generic iOS device without
+signing. Its app metadata passes the same pre- and post-build guards used by
+Xcode Cloud. The completed suite contains 48 unit tests and 3 UI tests. A fourth
+UI test for opening the 640-document managed library was added and compiles;
+its execution is pending because the locked Mac makes CoreSimulator
+unavailable. This is an external test-environment blocker, not a recorded
+functional failure.
 
 App Store Connect already lists `2.5 (180)` as Ready for Distribution. Xcode
-Cloud build `185` archived successfully but failed during Prepare Build for App
-Store Connect because it targeted that already released version train. The next
-code-carrying candidate therefore uses `2.6` and does not reuse build `185`.
+Cloud build `188` was processed and is Ready to Submit. It does not contain the
+new managed catalog delivery implementation. Build 189 is the next
+code-carrying candidate and must not be described as uploaded until a fresh
+signed Xcode Cloud build is processed in App Store Connect.
 
 ## Distribution Blockers
 
-1. The locally complete app bundle is approximately 13 GB. Apple documents a 4 GB maximum uncompressed iOS/iPadOS app size, so this payload cannot be submitted as one embedded bundle.
-2. The PDF directory is intentionally Git-ignored. Xcode Cloud cannot package files that are not present in its source checkout.
-3. Move catalog PDFs to Apple-hosted Background Assets or an authenticated remote catalog service, retain the manifest/search indexes in the app, and download files on demand with integrity verification.
-4. Configure and deploy the AI backend before claiming hosted AI. Keep the provider key only on the server and inject only the backend URL and a revocable client credential at build time.
-5. Resolve the 83 SwiftLint strict violations through scoped file splitting and line cleanup; do not weaken the lint policy to hide them.
-6. Re-run StoreKit Sandbox, VoiceOver, and performance tests on a physical device before submission.
-7. Re-check App Store Connect metadata, IAP review attachment, screenshots, privacy answers, and the selected build immediately before review submission.
+1. Register and sign the extension Bundle ID and shared App Group in the Apple Developer account, then produce a signed Xcode Cloud build 189.
+2. Upload all 40 generated AAR files to the Batal Al-Droob App Store Connect record and wait until every pack is processed without failure.
+3. Validate real downloads for Y60, Y61, Y62, and general catalogs through TestFlight on iOS 26 or later. Search remains supported on iOS 17-25, but managed original-PDF download requires iOS 26.
+4. Submit the 40 packs in four review batches because Apple currently accepts at most ten asset packs per review submission. Do not submit the app or packs for review without the owner's explicit instruction.
+5. Configure and deploy the AI backend before claiming hosted AI. Keep the provider key only on the server and inject only the backend URL and a revocable client credential at build time.
+6. Resolve the existing SwiftLint strict violations through scoped file splitting and line cleanup; do not weaken the lint policy to hide them.
+7. Re-run StoreKit Sandbox, VoiceOver, and performance tests on a physical device before submission.
+8. Re-check App Store Connect metadata, IAP review attachment, screenshots, privacy answers, and the selected build immediately before review submission.
 
 ## Distribution Claim Boundary
 
-Passing the local `2.6 (186)` archive proves source and metadata correctness,
-not an App Store upload. A signed Xcode Cloud result and App Store Connect
-processing state must be checked separately. The complete 640-PDF archive must
-not be claimed as present in an App Store build until an approved on-demand
-resource architecture is implemented and its downloaded files are verified.
+Passing the local `2.6 (189)` build proves source, metadata, index, packaging,
+and local integrity correctness; it does not prove an App Store upload. The
+managed delivery architecture is implemented and all 40 AAR files exist
+locally, but the complete 640-PDF catalog must not be claimed as available to
+customers until Apple processes the packs and a TestFlight device successfully
+downloads and verifies representative files.

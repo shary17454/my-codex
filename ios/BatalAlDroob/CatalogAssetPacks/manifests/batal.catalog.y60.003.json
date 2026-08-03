@@ -1,0 +1,212 @@
+{
+  "assetPackID": "batal.catalog.y60.003",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0181__Y60_1988_Y60_1988_201207_General_Asia_LHD_HIGH_ROOF_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0323__Y60_1988_Y60_1988_201207_General_Asia_LHD_HIGH_ROOF_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0182__Y60_1988_Y60_1988_201209_General_Asia_LHD_HIGH_ROOF_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0324__Y60_1988_Y60_1988_201209_General_Asia_LHD_HIGH_ROOF_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0136__Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0251__Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0278__Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0395__Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0137__Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0252__Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0279__Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0396__Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0138__Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0253__Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0280__Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0397__Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0139__Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0254__Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0281__Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0398__Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0140__Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0255__Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0282__Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0399__Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0141__Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0256__Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0283__Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0400__Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0142__Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0257__Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0284__Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0401__Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0143__Y60_1988_201356_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0285__Y60_1988_201356_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0144__Y60_1988_201358_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0286__Y60_1988_201358_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0183__Y60_1988_Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0325__Y60_1988_Y60_1988_201328_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0184__Y60_1988_Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0326__Y60_1988_Y60_1988_201330_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0185__Y60_1988_Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0327__Y60_1988_Y60_1988_201334_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0186__Y60_1988_Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0328__Y60_1988_Y60_1988_201335_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0187__Y60_1988_Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0329__Y60_1988_Y60_1988_201339_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0188__Y60_1988_Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0330__Y60_1988_Y60_1988_201340_General_Asia_LHD_HIGH_ROOF_WAGON_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0189__Y60_1988_Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0331__Y60_1988_Y60_1988_201350_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0190__Y60_1988_Y60_1988_201356_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0332__Y60_1988_Y60_1988_201356_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0191__Y60_1988_Y60_1988_201358_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0333__Y60_1988_Y60_1988_201358_General_Asia_LHD_HIGH_ROOF_WAGON_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0145__Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0258__Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0287__Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0402__Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0146__Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0259__Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0288__Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0403__Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0147__Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0260__Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0289__Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0404__Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0148__Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

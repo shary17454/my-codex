@@ -1,4 +1,5 @@
 @testable import BatalAlDroob
+import CryptoKit
 import XCTest
 
 final class BatalCatalogResourceTests: XCTestCase {
@@ -821,8 +822,8 @@ final class BatalCatalogResourceTests: XCTestCase {
         XCTAssertNotNil(viewModel.aiErrorMessage)
     }
 
-    func testCatalogArchiveIndexIsConsistentAndLocalBundleIsAllOrNone() throws {
-        let search = try loadJSONObject(named: "catalog_search_index", subdirectory: "catalog/search")
+    func testCatalogArchiveIndexAndManagedAssetDeliveryAreComplete() throws {
+        let search = try loadJSONObject(named: "catalog_search_index", subdirectory: "search")
         let entries = try XCTUnwrap(search["entries"] as? [[String: Any]])
         let catalogEntries = entries.filter { entry in
             (entry["type"] as? String) == "catalog_pdf"
@@ -833,18 +834,30 @@ final class BatalCatalogResourceTests: XCTestCase {
         let bundledFiles = files.filter { item in
             (item["bundled"] as? Bool) == true && ((item["app_path"] as? String)?.hasSuffix(".pdf") == true)
         }
+        let delivery = try loadJSONObject(named: "catalog_asset_delivery", subdirectory: "data")
+        let deliveryDocuments = try XCTUnwrap(delivery["documents"] as? [[String: Any]])
+        let deliveryPacks = try XCTUnwrap(delivery["packs"] as? [[String: Any]])
 
         XCTAssertEqual(files.count, 640)
         XCTAssertEqual(catalogEntries.count, bundledFiles.count)
-        XCTAssertGreaterThanOrEqual(catalogEntries.count, 640)
-        XCTAssertGreaterThanOrEqual(catalogEntries.filter { ($0["model"] as? String) == "Y60" }.count, 297)
-        XCTAssertGreaterThanOrEqual(catalogEntries.filter { ($0["model"] as? String) == "Y61" }.count, 143)
-        XCTAssertGreaterThanOrEqual(catalogEntries.filter { ($0["model"] as? String) == "Y62" }.count, 140)
+        XCTAssertEqual(catalogEntries.count, 640)
+        XCTAssertEqual(catalogEntries.filter { ($0["model"] as? String) == "Y60" }.count, 297)
+        XCTAssertEqual(catalogEntries.filter { ($0["model"] as? String) == "Y61" }.count, 143)
+        XCTAssertEqual(catalogEntries.filter { ($0["model"] as? String) == "Y62" }.count, 140)
         XCTAssertEqual(files.filter { ($0["generation"] as? String) == "Y60" }.count, 297)
         XCTAssertEqual(files.filter { ($0["generation"] as? String) == "Y61" }.count, 143)
         XCTAssertEqual(files.filter { ($0["generation"] as? String) == "Y62" }.count, 140)
+        XCTAssertEqual(delivery["schemaVersion"] as? Int, 1)
+        XCTAssertEqual(delivery["delivery"] as? String, "apple_hosted_background_assets")
+        XCTAssertEqual(delivery["minimumManagedOS"] as? String, "iOS 26.0")
+        XCTAssertEqual(delivery["totalFiles"] as? Int, 640)
+        XCTAssertEqual(delivery["packCount"] as? Int, deliveryPacks.count)
+        XCTAssertEqual(deliveryPacks.count, 40)
+        XCTAssertLessThanOrEqual(deliveryPacks.count, 200)
+        XCTAssertEqual(deliveryDocuments.count, 640)
 
         var uniquePaths = Set<String>()
+        var sourceByPath: [String: [String: Any]] = [:]
         for item in bundledFiles {
             let archivePath = try XCTUnwrap(item["app_path"] as? String)
             let sha256 = try XCTUnwrap(item["sha256"] as? String)
@@ -853,7 +866,33 @@ final class BatalCatalogResourceTests: XCTestCase {
             XCTAssertTrue(uniquePaths.insert(archivePath).inserted, "Duplicate catalog path: \(archivePath)")
             XCTAssertNotNil(sha256.range(of: "^[0-9a-f]{64}$", options: .regularExpression))
             XCTAssertGreaterThan(byteCount, 0)
+            sourceByPath[archivePath] = item
         }
+
+        var deliveredPaths = Set<String>()
+        var deliveredBytes: Int64 = 0
+        let packIDs = Set(deliveryPacks.compactMap { $0["id"] as? String })
+        XCTAssertEqual(packIDs.count, deliveryPacks.count)
+        for document in deliveryDocuments {
+            let assetPath = try XCTUnwrap(document["assetPath"] as? String)
+            let assetPackID = try XCTUnwrap(document["assetPackID"] as? String)
+            let sha256 = try XCTUnwrap(document["sha256"] as? String)
+            let sizeBytes = try XCTUnwrap((document["sizeBytes"] as? NSNumber)?.int64Value)
+            let source = try XCTUnwrap(sourceByPath[assetPath], "Missing source record for \(assetPath)")
+
+            XCTAssertTrue(deliveredPaths.insert(assetPath).inserted, "Duplicate delivered path: \(assetPath)")
+            XCTAssertTrue(assetPath.hasPrefix("catalog/patrol_full_unique/"))
+            XCTAssertFalse(assetPath.split(separator: "/").contains(".."))
+            XCTAssertTrue(packIDs.contains(assetPackID))
+            XCTAssertEqual(sha256, source["sha256"] as? String)
+            XCTAssertEqual(
+                sizeBytes,
+                ((source["bundled_bytes"] as? NSNumber) ?? (source["size_bytes"] as? NSNumber))?.int64Value
+            )
+            deliveredBytes += sizeBytes
+        }
+        XCTAssertEqual(deliveredPaths, uniquePaths)
+        XCTAssertEqual(deliveredBytes, (delivery["totalBytes"] as? NSNumber)?.int64Value)
 
         let copiedPDFCount = catalogEntries.reduce(into: 0) { count, entry in
             guard
@@ -865,14 +904,11 @@ final class BatalCatalogResourceTests: XCTestCase {
                 count += 1
             }
         }
-        XCTAssertTrue(
-            copiedPDFCount == 0 || copiedPDFCount == catalogEntries.count,
-            "Catalog PDFs must be copied completely or omitted completely for an index-only cloud build."
+        XCTAssertEqual(
+            copiedPDFCount,
+            0,
+            "Catalog PDFs must be delivered as Apple-hosted asset packs, not copied into the IPA."
         )
-
-        if copiedPDFCount > 0 {
-            XCTAssertEqual(copiedPDFCount, 640)
-        }
 
         for entry in catalogEntries.prefix(3) {
             let sourcePath = try XCTUnwrap(entry["sourcePdfPath"] as? String)
@@ -882,6 +918,64 @@ final class BatalCatalogResourceTests: XCTestCase {
         let status = try XCTUnwrap(manifest["catalog_bundle_status"] as? [String: Any])
         XCTAssertEqual(status["bundled_files"] as? Int, bundledFiles.count)
         XCTAssertEqual(status["missing_files"] as? Int, 0)
+    }
+
+    func testManagedCatalogServiceLoadsEveryIndexedDocument() async throws {
+        let service = CatalogAssetService(resourceURL: bundle.resourceURL, localArchiveRoot: nil)
+
+        let documents = try await service.loadDocuments()
+
+        XCTAssertEqual(documents.count, 640)
+        XCTAssertEqual(documents.filter { $0.generation == "Y60" }.count, 297)
+        XCTAssertEqual(documents.filter { $0.generation == "Y61" }.count, 143)
+        XCTAssertEqual(documents.filter { $0.generation == "Y62" }.count, 140)
+        XCTAssertEqual(Set(documents.map(\.assetPackID)).count, 40)
+    }
+
+    func testManagedCatalogServiceVerifiesLocalPDFChecksum() async throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("BatalCatalogAssetTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let relativePath = "catalog/patrol_full_unique/Y60/1992/test.pdf"
+        let fileURL = root.appendingPathComponent(relativePath)
+        try FileManager.default.createDirectory(
+            at: fileURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        let validData = Data("verified catalog payload".utf8)
+        try validData.write(to: fileURL)
+        let checksum = SHA256.hash(data: validData).map { String(format: "%02x", $0) }.joined()
+        let document = CatalogDocument(
+            id: "checksum-test",
+            fileName: "test.pdf",
+            generation: "Y60",
+            years: ["1992"],
+            engines: ["TB42"],
+            modelCodes: ["Y60"],
+            markets: [],
+            sourceKind: "test",
+            pageCount: 1,
+            sizeBytes: Int64(validData.count),
+            sha256: checksum,
+            assetPackID: "batal.catalog.y60.001",
+            assetPath: relativePath,
+            sourceRelativePath: "test.pdf"
+        )
+        let validService = CatalogAssetService(resourceURL: nil, localArchiveRoot: root)
+
+        let resolvedURL = try await validService.localURL(for: document)
+        XCTAssertEqual(resolvedURL, fileURL)
+
+        try Data(repeating: 0x41, count: validData.count).write(to: fileURL)
+        let invalidService = CatalogAssetService(resourceURL: nil, localArchiveRoot: root)
+        do {
+            _ = try await invalidService.localURL(for: document)
+            XCTFail("A modified PDF must not pass integrity verification.")
+        } catch CatalogAssetError.invalidChecksum {
+            // Expected.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
 
     @MainActor

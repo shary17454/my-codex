@@ -166,6 +166,37 @@ final class BatalAlDroobUITests: XCTestCase {
     }
 
     @MainActor
+    func testManagedCatalogLibraryLoadsAllIndexedDocuments() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-AppleLanguages", "(ar)",
+            "-AppleLocale", "ar_SA",
+            "-batalLang", "ar",
+            "-skipPermissionOnboardingForUITests"
+        ]
+        app.launch()
+
+        XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
+        let libraryButton = app.buttons["catalog.library.open"]
+        XCTAssertTrue(libraryButton.waitForExistence(timeout: 10))
+        libraryButton.tap()
+
+        XCTAssertTrue(app.navigationBars["مكتبة الكتالوجات"].waitForExistence(timeout: 10))
+        let indexedCount = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS %@", "640")
+        ).firstMatch
+        XCTAssertTrue(indexedCount.waitForExistence(timeout: 10))
+        XCTAssertTrue(
+            app.descendants(matching: .any)["catalogLibrary.generationPicker"]
+                .waitForExistence(timeout: 10)
+        )
+        XCTAssertTrue(
+            app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "catalogLibrary.document."))
+                .firstMatch.waitForExistence(timeout: 10)
+        )
+    }
+
+    @MainActor
     private func tabItem(identifier: String, fallbackName: String, in app: XCUIApplication) -> XCUIElement {
         let identifiedTab = app.tabBars.buttons[identifier]
         if identifiedTab.exists {

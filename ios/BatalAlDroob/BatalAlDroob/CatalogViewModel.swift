@@ -14,9 +14,11 @@ final class CatalogViewModel {
     private let ownerAccess: OwnerAccessAuthorizing
     private let photoTextRecognizer: any PhotoTextRecognizing
     private let aiService: AIAssistantServicing
+    private let catalogAssetService: any CatalogAssetServing
     private let catalogUnlockToken = "__catalog_unlock__"
     private var hasLoadedCatalog = false
     private var hasLoadedStores = false
+    private var hasLoadedCatalogDocuments = false
 
     var language: AppLanguage = .init(rawValue: UserDefaults.standard.string(forKey: "batalLang") ?? "ar") ?? .arabic {
         didSet { UserDefaults.standard.set(language.rawValue, forKey: "batalLang") }
@@ -39,6 +41,8 @@ final class CatalogViewModel {
     var selectedPhotoName: String?
     var isAnalyzingPhoto = false
     var isLoadingPurchases = false
+    var catalogDownloadID: String?
+    var catalogPDFPresentation: CatalogPDFPresentation?
     var availableProductIDs = Set<String>()
     var isVehicleFilterEnabled = UserDefaults.standard.object(forKey: "batalVehicleFilterEnabled") as? Bool ?? false {
         didSet { UserDefaults.standard.set(isVehicleFilterEnabled, forKey: "batalVehicleFilterEnabled") }
@@ -47,6 +51,7 @@ final class CatalogViewModel {
     private(set) var parts: [Part] = []
     private(set) var sources: [CatalogSource] = []
     private(set) var stores: [VerifiedStore] = []
+    private(set) var catalogDocuments: [CatalogDocument] = []
     private(set) var generatedAt = ""
     private(set) var recordCount = 0
     private(set) var sourceCount = 0
@@ -76,7 +81,10 @@ final class CatalogViewModel {
         didSet { UserDefaults.standard.set(Array(paidUnlocks), forKey: "batalPaidUnlocks") }
     }
 
-    var customerProfile = UserDefaults.standard.codable(CustomerProfile.self, forKey: "batalCustomerProfile") ?? CustomerProfile() {
+    var customerProfile = (
+        UserDefaults.standard.codable(CustomerProfile.self, forKey: "batalCustomerProfile")
+            ?? CustomerProfile()
+    ) {
         didSet { UserDefaults.standard.setCodable(customerProfile, forKey: "batalCustomerProfile") }
     }
 
@@ -112,13 +120,15 @@ final class CatalogViewModel {
         store: PurchaseService,
         ownerAccess: OwnerAccessAuthorizing = DefaultOwnerAccessAuthorizer(),
         photoTextRecognizer: any PhotoTextRecognizing = VisionPhotoTextRecognizer(),
-        aiService: AIAssistantServicing = CompositeAIAssistantService(remote: BatalRemoteAIService())
+        aiService: AIAssistantServicing = CompositeAIAssistantService(remote: BatalRemoteAIService()),
+        catalogAssetService: any CatalogAssetServing = CatalogAssetService()
     ) {
         self.repository = repository
         self.store = store
         self.ownerAccess = ownerAccess
         self.photoTextRecognizer = photoTextRecognizer
         self.aiService = aiService
+        self.catalogAssetService = catalogAssetService
     }
 }
 
@@ -158,6 +168,16 @@ extension CatalogViewModel {
                 BatalLog.catalog.error("Store directory load failed: \(String(describing: error), privacy: .public)")
                 loadErrors.append(text(ar: "تعذر تحميل دليل المتاجر.", en: "The store directory could not be loaded."))
             }
+        }
+
+        do {
+            try await loadCatalogDocumentsIfNeeded()
+        } catch {
+            BatalLog.catalog.error("Catalog asset manifest load failed: \(String(describing: error), privacy: .public)")
+            loadErrors.append(text(
+                ar: "تعذر تحميل فهرس الكتالوجات الأصلية.",
+                en: "The original catalog index could not be loaded."
+            ))
         }
 
         await refreshPurchaseProducts()
@@ -238,7 +258,8 @@ extension CatalogViewModel {
             nonEmpty(profile.engine),
             nonEmpty(profile.transmission)
         ].compactMap(\.self)
-        return values.isEmpty ? text(ar: "لم يتم تحديد سيارة بعد.", en: "No vehicle selected yet.") : values.joined(separator: " · ")
+        return values.isEmpty ? text(ar: "لم يتم تحديد سيارة بعد.", en: "No vehicle selected yet.") : values
+            .joined(separator: " · ")
     }
 
     var isRemoteAIConfigured: Bool {
@@ -256,7 +277,10 @@ extension CatalogViewModel {
     }
 
     func photoCandidateSummary(for part: Part) -> String {
-        let confidenceText = (part.confidence ?? 0) > 0 ? "\((part.confidence ?? 0).formatted())%" : text(ar: "غير محددة", en: "Unknown")
+        let confidenceText = (part.confidence ?? 0) > 0 ? "\((part.confidence ?? 0).formatted())%" : text(
+            ar: "غير محددة",
+            en: "Unknown"
+        )
         return text(
             ar: "سبب الترشيح: قراءة رقم/نص من الصورة · الثقة: \(confidenceText) · \(vehicleMatchSummary(for: part))",
             en: "Reason: number/text read from image · Confidence: \(confidenceText) · \(vehicleMatchSummary(for: part))"
@@ -351,7 +375,10 @@ extension CatalogViewModel {
             let hasProfile = isVehicleProfileMeaningful
             let matchesProfile = hasProfile && matchesVehicleProfile(part)
             let value = hasProfile
-                ? (matchesProfile ? text(ar: "مطابقة مناسبة", en: "Good match") : text(ar: "راجع التوافق", en: "Review fitment"))
+                ? (matchesProfile ? text(ar: "مطابقة مناسبة", en: "Good match") : text(
+                    ar: "راجع التوافق",
+                    en: "Review fitment"
+                ))
                 : text(ar: "مطابقة غير كافية", en: "Insufficient match")
             return SmartPartIndicator(
                 kind: kind,
@@ -400,6 +427,82 @@ extension CatalogViewModel {
 
     func title(for part: Part) -> String {
         part.title(language: language)
+    }
+
+    func loadCatalogDocumentsIfNeeded() async throws {
+        guard !hasLoadedCatalogDocuments else { return }
+        let documents = try await catalogAssetService.loadDocuments()
+        guard documents.count == 640 else { throw CatalogAssetError.invalidManifest }
+        catalogDocuments = documents
+        hasLoadedCatalogDocuments = true
+    }
+
+    func catalogDocuments(search: String, generation: String) -> [CatalogDocument] {
+        let query = normalized(search)
+        return catalogDocuments.filter { document in
+            let generationMatches = generation == "ALL" || document.generation == generation
+            let searchMatches = query.isEmpty || document.searchText.contains(query)
+            return generationMatches && searchMatches
+        }
+    }
+
+    func catalogDocument(matching sourceID: String?) -> CatalogDocument? {
+        guard let sourceID else { return nil }
+        let source = normalized(sourceID)
+        guard source.count >= 5 else { return nil }
+        return catalogDocuments.first { document in
+            document.sourceAliases.contains { alias in
+                alias == source || (alias.count >= 8 && (alias.contains(source) || source.contains(alias)))
+            }
+        }
+    }
+
+    func purchaseFullCatalogAccess() async {
+        guard let part = selectedPart ?? parts.first else {
+            errorMessage = text(
+                ar: "تعذر بدء الشراء قبل تحميل قاعدة القطع.",
+                en: "The purchase cannot start before the parts database loads."
+            )
+            return
+        }
+        await unlock(part, level: .fullCatalog)
+    }
+
+    func openCatalogDocument(_ document: CatalogDocument, page: Int? = nil, for part: Part? = nil) async {
+        let hasDocumentAccess = part.map(isUnlocked) ?? isFullCatalogUnlocked()
+        guard hasDocumentAccess else {
+            paymentMessage = text(
+                ar: part == nil
+                    ? "افتح المكتبة الكاملة لقراءة الكتالوجات الأصلية."
+                    : "افتح صفحة هذه القطعة أولًا لقراءة مرجع الكتالوج الأصلي.",
+                en: part == nil
+                    ? "Unlock the full library to read the original catalogs."
+                    : "Unlock this part page first to read its original catalog reference."
+            )
+            return
+        }
+        guard catalogDownloadID == nil else { return }
+        catalogDownloadID = document.id
+        defer { catalogDownloadID = nil }
+        do {
+            let url = try await catalogAssetService.localURL(for: document)
+            catalogPDFPresentation = CatalogPDFPresentation(
+                url: url,
+                title: document.title,
+                page: page
+            )
+        } catch CatalogAssetError.unsupportedSystem {
+            errorMessage = text(
+                ar: "تنزيل الكتالوجات الأصلية من Apple يتطلب iOS 26 أو أحدث. البحث والبيانات المفهرسة تعمل على جهازك الحالي.",
+                en: "Downloading original catalogs from Apple requires iOS 26 or later. Indexed search and catalog data still work on this device."
+            )
+        } catch {
+            BatalLog.catalog.error("Catalog asset open failed: \(String(describing: error), privacy: .public)")
+            errorMessage = text(
+                ar: "تعذر تنزيل الكتالوج أو التحقق منه. تأكد من الاتصال ثم أعد المحاولة.",
+                en: "The catalog could not be downloaded or verified. Check your connection and try again."
+            )
+        }
     }
 
     var hasOwnerAccess: Bool {
@@ -590,12 +693,18 @@ extension CatalogViewModel {
     }
 
     func redeemOfferCode() async {
-        paymentMessage = text(ar: "افتح ورقة استرداد كود Apple وأدخل الكود.", en: "Open Apple's offer code sheet and enter the code.")
+        paymentMessage = text(
+            ar: "افتح ورقة استرداد كود Apple وأدخل الكود.",
+            en: "Open Apple's offer code sheet and enter the code."
+        )
         do {
             try await store.presentOfferCodeRedemption()
             await synchronizeCurrentEntitlements()
             if isFullCatalogUnlocked() {
-                paymentMessage = text(ar: "تم استرداد الكود وفتح الكتالوج.", en: "Offer code redeemed. Catalog unlocked.")
+                paymentMessage = text(
+                    ar: "تم استرداد الكود وفتح الكتالوج.",
+                    en: "Offer code redeemed. Catalog unlocked."
+                )
             } else {
                 paymentMessage = text(
                     ar: "إذا أكملت الاسترداد، استخدم استعادة المشتريات أو أعد فتح القطعة بعد لحظات.",

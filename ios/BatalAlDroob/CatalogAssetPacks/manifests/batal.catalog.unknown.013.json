@@ -1,0 +1,23 @@
+{
+  "assetPackID": "batal.catalog.unknown.013",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0439__patrol_merged_42818_pages_part_05_pages_8565-10705.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0440__patrol_merged_42818_pages_part_06_pages_10706-12846.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0441__patrol_merged_42818_pages_part_07_pages_12847-14987.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/unknown/2026/patrol_catalog_0442__patrol_merged_42818_pages_part_08_pages_14988-17128.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

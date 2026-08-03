@@ -1,0 +1,197 @@
+{
+  "assetPackID": "batal.catalog.y60.004",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0261__Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0290__Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0405__Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0149__Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0262__Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0291__Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0406__Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0150__Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0263__Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0292__Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0407__Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0192__Y60_1988_Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0334__Y60_1988_Y60_1988_202145_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0193__Y60_1988_Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0335__Y60_1988_Y60_1988_202148_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0194__Y60_1988_Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0336__Y60_1988_Y60_1988_202149_General_Asia_LHD_HARDTOP_TB42S_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0195__Y60_1988_Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0337__Y60_1988_Y60_1988_202169_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0196__Y60_1988_Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0338__Y60_1988_Y60_1988_202174_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0197__Y60_1988_Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0339__Y60_1988_Y60_1988_202175_General_Asia_LHD_HARDTOP_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0151__Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0264__Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0293__Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0408__Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0152__Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0265__Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0294__Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0409__Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0198__Y60_1988_Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0340__Y60_1988_Y60_1988_202354_General_Asia_LHD_HARDTOP_TD42_DX.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0199__Y60_1988_Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0341__Y60_1988_Y60_1988_202365_General_Asia_LHD_HARDTOP_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0412__Y60_1988.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0108__y60_1988.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0121__y60_1988.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0153__Y60_1988_209840_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0295__Y60_1988_209840_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0154__Y60_1988_209843_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0296__Y60_1988_209843_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0155__Y60_1988_209846_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0297__Y60_1988_209846_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0156__Y60_1988_209849_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0298__Y60_1988_209849_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0200__Y60_1988_Y60_1988_209840_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0342__Y60_1988_Y60_1988_209840_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0201__Y60_1988_Y60_1988_209843_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0343__Y60_1988_Y60_1988_209843_General_Asia_LHD_PICKUP_A-CHASSIS_TB42S_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0202__Y60_1988_Y60_1988_209846_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0344__Y60_1988_Y60_1988_209846_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0203__Y60_1988_Y60_1988_209849_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0345__Y60_1988_Y60_1988_209849_General_Asia_LHD_PICKUP_A-CHASSIS_TD42_STD.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1989/patrol_catalog_0089__Y60_1989.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0413__Y60_1989.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0109__y60_1989.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0122__y60_1989.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1990/patrol_catalog_0090__Y60_1990.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0414__Y60_1990.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0110__y60_1990.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/2026/patrol_catalog_0123__y60_1990.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}

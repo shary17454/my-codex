@@ -9,17 +9,18 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
 - App Store version: `2.6`
-- Project build: `187`
+- Project build: `189`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
-The complete local PDF archive is indexed under `BatalAlDroob/Web/catalog/` and audited by `scripts/validate_catalog_archive.py`. The PDF files are intentionally ignored by Git because the verified archive is 12.51 GiB and includes individual files larger than ordinary Git hosting limits. JSON search data remains tracked. A local build can include the complete archive, but a cloud/App Store archive must not be described as containing those PDFs until its produced `.xcarchive` is inspected; see `docs/CATALOG_RESOURCE_AUDIT_2026-08-03.md`.
+The complete local PDF archive is indexed under `BatalAlDroob/Web/catalog/` and audited by `scripts/validate_catalog_archive.py`. The 12.51 GiB archive is intentionally excluded from the IPA and Git. Build 189 uses Apple-hosted managed Background Assets: the app ships the complete 640-file delivery index, downloads protected PDF packs on demand, validates file size and SHA-256, and opens the requested page through PDFKit. Original-PDF downloads require iOS 26 or later; indexed catalog search continues to work on iOS 17 and later. See `CatalogAssetPacks/README.md`, `docs/CATALOG_RESOURCE_AUDIT_2026-08-03.md`, and `docs/CATALOG_ASSET_DELIVERY_REPORT_2026-08-03.md`.
 
 ## Requirements
 
 - Xcode 26.6 stable, build `17F113`
 - Swift 6
 - iOS deployment target 17.0
+- iOS 26.0 or later for Apple-hosted original-PDF downloads
 - No CocoaPods, Swift Package Manager, or third-party dependency install step
 
 For App Store archives, keep signing managed by Xcode/Xcode Cloud and use Xcode 26.6 build 17F113 or a newer non-beta Xcode accepted by Apple.
@@ -87,19 +88,18 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
 - verifies `MARKETING_VERSION = 2.6`,
-- verifies `CURRENT_PROJECT_VERSION >= 187`,
+- verifies `CURRENT_PROJECT_VERSION >= 189`,
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-App Store Connect shows `2.5 (180)` as Ready for Distribution. Xcode Cloud
-build `185` completed archive creation but failed while preparing another build
-for App Store Connect on that released version train. The current candidate
-therefore uses release train `2.6`; build `186` was uploaded successfully and
-the current source candidate uses project build `187`. Do not reuse any
-uploaded or attempted build number.
+App Store Connect shows `2.5 (180)` as Ready for Distribution and build `188`
+on release train `2.6` as Ready to Submit. The current source candidate uses
+build `189` for managed catalog delivery. Build 189 and its hosted asset packs
+must not be described as uploaded until Xcode Cloud and App Store Connect both
+confirm them. Do not reuse any uploaded or attempted build number.
 
 ## In-App Purchase
 
@@ -129,7 +129,23 @@ catalog pages. Promotional customer access should be granted through App Store
 Connect offer codes for `batal.catalog.permanent.unlock`, then restored and
 validated through StoreKit current entitlements.
 
-If you update the bundled catalog data, keep the files inside `BatalAlDroob/Web/data/` and run the regression tests before archiving.
+If you update catalog data, keep the source PDFs under `BatalAlDroob/Web/catalog/patrol_full_unique/`, regenerate the delivery index and pack manifests, and run the full validators before archiving:
+
+```sh
+python3 scripts/generate_catalog_asset_packs.py
+python3 scripts/validate_catalog_archive.py --full-hash
+python3 scripts/validate_release.py
+```
+
+Package one Apple-hosted asset pack from the `BatalAlDroob/Web` root mapping:
+
+```sh
+python3 scripts/generate_catalog_asset_packs.py \
+  --package batal.catalog.y60.001 \
+  --output-directory /tmp/BatalCatalogAssetPacks
+```
+
+Generated `.aar` archives are release artifacts and must not be committed.
 
 ## AI Assistant
 
@@ -174,11 +190,11 @@ Supplier and outreach research for Nissan Patrol parts providers is tracked in `
 - Latest executed verification: [`docs/FINAL_EXECUTION_REPORT.md`](docs/FINAL_EXECUTION_REPORT.md)
 - Arabic status summary: [`docs/FINAL_STATUS_AR.md`](docs/FINAL_STATUS_AR.md)
 
-The latest verification status is `READY_WITH_EXTERNAL_REQUIREMENTS`. The
-remaining requirements are deliberately kept visible in the execution report:
-a fresh signed Xcode Cloud build `187` or higher on release train `2.6`,
-completion and attachment of the permanent IAP in App Store Connect, current
-screenshots, privacy-label confirmation, and manual device checks.
+The latest source status is `MANAGED_ASSET_DELIVERY_IMPLEMENTED_PENDING_SIGNED_UPLOAD`.
+The remaining requirements are deliberately kept visible in the execution
+report: a fresh signed Xcode Cloud build 189, upload and processing of all
+Apple-hosted asset packs, StoreKit attachment, current screenshots,
+privacy-label confirmation, and physical-device download checks.
 
 `docs/APPLE_ENGINEERING_STANDARD.md` is enforced as a release input by
 `scripts/validate_release.py`; do not remove or bypass it for app, QA,

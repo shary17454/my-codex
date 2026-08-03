@@ -1,0 +1,53 @@
+{
+  "assetPackID": "batal.catalog.y60.005",
+  "downloadPolicy": {
+    "onDemand": {}
+  },
+  "fileSelectors": [
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0008__nissan_safari_y60_1991_japan_wgy60_tb42e_gr_wagon_high_roof_vid215197_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0009__nissan_safari_y60_1991_japan_wgy60_tb42e_gr_wagon_high_roof_vid215198_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0010__nissan_safari_y60_1991_japan_wgy60_tb42e_gr_wagon_vid215211_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0011__nissan_safari_y60_1991_japan_wgy60_tb42e_gr_wagon_vid215212_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0012__nissan_safari_y60_1991_japan_wgy60_tb42e_kr_wagon_high_roof_vid215199_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0013__nissan_safari_y60_1991_japan_wgy60_tb42e_kr_wagon_high_roof_vid215200_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0014__nissan_safari_y60_1991_japan_wgy60_tb42e_kr_wagon_vid215213_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0015__nissan_safari_y60_1991_japan_wgy60_tb42e_kr_wagon_vid215214_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0016__nissan_safari_y60_1991_japan_wrgy60_td42_ad_wagon_high_roof_vid215201_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0017__nissan_safari_y60_1991_japan_wrgy60_td42_ad_wagon_vid215218_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0018__nissan_safari_y60_1991_japan_wrgy60_td42_gr_wagon_high_roof_vid215202_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0019__nissan_safari_y60_1991_japan_wrgy60_td42_gr_wagon_vid215219_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0020__nissan_safari_y60_1991_japan_wrgy60_td42_kr_wagon_high_roof_vid215203_full_catalog_ar_en.pdf"
+    },
+    {
+      "file": "catalog/patrol_full_unique/Y60/1991/patrol_catalog_0021__nissan_safari_y60_1991_japan_wrgy60_td42_kr_wagon_vid215220_full_catalog_ar_en.pdf"
+    }
+  ],
+  "platforms": [
+    "iOS"
+  ]
+}
