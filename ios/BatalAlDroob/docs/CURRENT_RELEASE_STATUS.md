@@ -64,9 +64,9 @@ partitioned into 40 Apple-hosted managed asset packs.
 | AAR checksum inventory | PASS, 40/40 SHA-256 values recorded |
 | Backend tests | PASS, 9/9 |
 | Unit tests | PASS, 48/48 |
-| UI tests | PASS, 3/3 |
-| Total completed iOS tests | PASS, 51/51 |
-| Managed catalog library UI test | Compiled; execution pending while Mac is locked |
+| UI tests | PASS, 4/4 |
+| Total completed iOS tests | PASS, 52/52 |
+| Managed catalog library UI test | PASS: opens the library and verifies the 640-document index |
 | RTL visual review | PASS for first-run and home screens |
 | Release device build without signing | PASS with Xcode 26.6 / SDK 26.5 |
 | Current candidate metadata | PASS: `2.6 (189)`, correct app Bundle ID and minimum iOS 17.0 |
@@ -76,11 +76,10 @@ partitioned into 40 Apple-hosted managed asset packs.
 
 The current `2.6 (189)` candidate builds for a generic iOS device without
 signing. Its app metadata passes the same pre- and post-build guards used by
-Xcode Cloud. The completed suite contains 48 unit tests and 3 UI tests. A fourth
-UI test for opening the 640-document managed library was added and compiles;
-its execution is pending because the locked Mac makes CoreSimulator
-unavailable. This is an external test-environment blocker, not a recorded
-functional failure.
+Xcode Cloud. The completed suite contains 48 unit tests and 4 UI tests. The
+managed-library test opens the dedicated screen and verifies the 640-document
+index, generation picker, and first indexed document. All tests passed serially
+on iPhone 17 Pro / iOS 26.5.
 
 App Store Connect already lists `2.5 (180)` as Ready for Distribution. Xcode
 Cloud build `188` was processed and is Ready to Submit. It does not contain the

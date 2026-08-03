@@ -113,6 +113,7 @@ struct DashboardView: View {
     @State private var fitmentQuery = "21082-4W000"
     @State private var fitmentResult = ""
     @State private var fitmentMatches: [Part] = []
+    @State private var isCatalogLibraryPresented = false
 
     private func quickAction(
         tab: AppTab,
@@ -158,7 +159,7 @@ struct DashboardView: View {
                         quickAction(
                             tab: .catalog,
                             identifier: "home.quick.catalog",
-                            symbol: "magnifyingglass.square.fill",
+                            symbol: "magnifyingglass.circle.fill",
                             title: viewModel.text(ar: "ابحث في الكتالوج", en: "Search the catalog"),
                             detail: viewModel.text(
                                 ar: "افتح البحث المحلي برقم القطعة أو الاسم أو القسم.",
@@ -271,8 +272,9 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    NavigationLink {
-                        CatalogLibraryView(viewModel: viewModel)
+                    Button {
+                        AppHaptics.lightImpact()
+                        isCatalogLibraryPresented = true
                     } label: {
                         Image(systemName: "books.vertical.fill")
                     }
@@ -284,6 +286,9 @@ struct DashboardView: View {
                 }
             }
             .navigationDestination(for: Part.self) { PartDetailView(part: $0, viewModel: viewModel) }
+            .navigationDestination(isPresented: $isCatalogLibraryPresented) {
+                CatalogLibraryView(viewModel: viewModel)
+            }
             .onAppear {
                 if fitmentResult.isEmpty {
                     fitmentResult = viewModel.fitmentSummary(for: fitmentQuery)
@@ -887,8 +892,12 @@ private struct CatalogVehicleProfileSection: View {
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(2)
                     Text(viewModel.text(
-                        ar: "النتائج الحالية: \(viewModel.filteredParts.count.formatted()) من \(viewModel.parts.count.formatted())",
-                        en: "Current results: \(viewModel.filteredParts.count.formatted()) of \(viewModel.parts.count.formatted())"
+                        ar: "النتائج الحالية: "
+                            + "\(viewModel.filteredParts.count.formatted()) من "
+                            + viewModel.parts.count.formatted(),
+                        en: "Current results: "
+                            + "\(viewModel.filteredParts.count.formatted()) of "
+                            + viewModel.parts.count.formatted()
                     ))
                     .font(.caption)
                     .foregroundStyle(.secondary)

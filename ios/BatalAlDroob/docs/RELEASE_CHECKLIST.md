@@ -27,8 +27,8 @@ Use this list for every App Store candidate. A checked item must have current ev
 - [x] Debug build succeeds as part of the verified test action.
 - [x] Release device build succeeds locally without signing using Xcode 26.6 (`17F113`) and iPhoneOS SDK 26.5.
 - [x] Unit tests pass on iPhone 17 Pro / iOS 26.5: 48/48.
-- [x] iPhone UI tests pass: 3/3, including required first-run account access, navigation, search, and RTL/language switching.
-- [ ] The fourth UI test opens the managed catalog library and confirms all 640 indexed files. It compiles, but execution must be rerun after unlocking Mac and restoring CoreSimulator.
+- [x] iPhone UI tests pass: 4/4, including required first-run account access, navigation, search, RTL/language switching, and opening the 640-document managed catalog library.
+- [x] The managed catalog library opens from the dashboard and exposes the 640-document count, generation picker, and indexed document list.
 - [ ] Relevant tests pass on a physical iPhone.
 - [ ] Confirm the removed map, location tracking, and compass surfaces do not appear in the submitted build.
 - [ ] StoreKit purchase, cancel, pending, failure, current entitlement, and restore are checked in Sandbox.
