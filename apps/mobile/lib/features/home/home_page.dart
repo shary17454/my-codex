@@ -24,6 +24,14 @@ class _HomePageState extends State<HomePage> {
     return const ['الشعر', 'القصص', 'الكتب والمراجع'];
   }
 
+  String? _sectionRoute(String section) {
+    if (section.contains('قصائد') || section.contains('شعر')) return '/poems';
+    if (section.contains('شاع')) return '/poets';
+    if (section.contains('قصص')) return '/stories';
+    if (section.contains('كتب') || section.contains('مراجع')) return '/books';
+    return '/search';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                       .map(
                         (section) => ActionChip(
                           label: Text(section),
-                          onPressed: () => context.go('/search'),
+                          onPressed: () => context.go(_sectionRoute(section) ?? '/search'),
                         ),
                       )
                       .toList(),

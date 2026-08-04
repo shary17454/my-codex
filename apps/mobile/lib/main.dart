@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'features/home/home_page.dart';
 import 'features/search/search_page.dart';
 import 'features/auth/auth_page.dart';
+import 'features/poems/poems_page.dart';
+import 'features/poems/poem_detail_page.dart';
+import 'features/poets/poets_page.dart';
 import 'screens/placeholder_page.dart';
 
 void main() {
@@ -71,8 +74,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/home', name: 'home', builder: (context, state) => const HomePage()),
       GoRoute(path: '/search', name: 'search', builder: (context, state) => const SearchPage()),
       GoRoute(path: '/auth', name: 'auth', builder: (context, state) => const AuthPage()),
+      GoRoute(
+        path: '/poems',
+        name: 'poems',
+        builder: (context, state) => const PoemsPage(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            name: 'poem-detail',
+            builder: (context, state) => PoemDetailPage(poemId: state.pathParameters['id']!),
+          ),
+        ],
+      ),
+      GoRoute(path: '/poetry', name: 'poetry', builder: (context, state) => const PoemsPage()),
+      GoRoute(path: '/poets', name: 'poets', builder: (context, state) => const PoetsPage()),
       ...RawayaRoutes.list
-          .where((path) => !['/home', '/search', '/auth'].contains(path))
+          .where((path) => !['/home', '/search', '/auth', '/poems', '/poetry', '/poets'].contains(path))
           .map(
             (path) => GoRoute(
               path: path,
