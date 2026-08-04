@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 
 @Injectable()
@@ -18,11 +19,11 @@ export class SearchService {
   async suggest(query: string, type = 'general') {
     const norm = this.normalize(query);
 
-    const where = norm
+    const where: Prisma.PoemWhereInput = norm
       ? {
           OR: [
-            { title: { contains: norm, mode: 'insensitive' } },
-            { summary: { contains: norm, mode: 'insensitive' } },
+            { title: { contains: norm, mode: Prisma.QueryMode.insensitive } },
+            { summary: { contains: norm, mode: Prisma.QueryMode.insensitive } },
           ],
         }
       : {};

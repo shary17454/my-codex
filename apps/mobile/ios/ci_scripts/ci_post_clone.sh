@@ -9,5 +9,8 @@ if ! command -v flutter >/dev/null 2>&1; then
 fi
 
 flutter --version
+if command -v xattr >/dev/null 2>&1; then
+  xattr -cr . || true
+fi
 flutter pub get
 flutter test

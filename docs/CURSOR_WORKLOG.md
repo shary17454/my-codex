@@ -38,7 +38,7 @@
 |---------|-------|-------|---------|
 | 2026-08-04 | `cursor/continue-mvp` | إنشاء هذا السجل وإطار التعاون | `docs/CURSOR_WORKLOG.md` |
 | 2026-08-04 | `cursor/continue-mvp` | شاشات Flutter للقصائد والشعراء | `apps/mobile/lib/features/poems/*`, `apps/mobile/lib/features/poets/poets_page.dart`, `apps/mobile/lib/main.dart`, `apps/mobile/lib/features/home/home_page.dart` |
-| 2026-08-04 | `cursor/continue-mvp` | إصلاح flutter_lints في pubspec | `apps/mobile/pubspec.yaml` |
+| 2026-08-04 | `cursor/continue-mvp` | إصلاح علاقات Prisma + CI | `apps/api/prisma/schema.prisma`, `content.service.ts`, `suggestions.service.ts`, `ci_post_clone.sh` |
 
 ---
 

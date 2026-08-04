@@ -79,6 +79,11 @@ model User {
   userRoles     UserRole[]
   refreshTokens RefreshToken[]
   subscriptions Subscription[]
+  commentReports  CommentReport[]
+  contentReports  ContentReport[]
+  payments        Payment[]
+  moderationLogs  ModerationLog[]
+  auditLogs       AuditLog[]
 }
 
 model Profile {
@@ -202,12 +207,6 @@ model Poem {
   ratingAverage Float? @default(0)
 
   poet          Poet @relation(fields: [poetId], references: [id], onDelete: Cascade)
-  tags          ContentTag[]
-  sources       ContentSource[]
-  comments      Comment[]
-  revisions     ContentRevision[]
-  audioTracks   AudioTrack[]
-  videos        Video[]
 }
 
 model Story {
@@ -233,10 +232,8 @@ model Story {
   publishedBy String?
   viewCount  Int @default(0)
   saveCount  Int @default(0)
-
-  tags       ContentTag[]
-  sources    ContentSource[]
-  comments   Comment[]
+  poetId     String?
+  poet       Poet? @relation(fields: [poetId], references: [id], onDelete: SetNull)
 }
 
 model HistoricalEvent {
@@ -258,7 +255,6 @@ model HistoricalEvent {
   reviewedBy      String?
   publishedBy     String?
 
-  sources         ContentSource[]
 }
 
 model Tribe {
@@ -280,7 +276,6 @@ model Tribe {
   reviewedBy      String?
   publishedBy     String?
 
-  sources         ContentSource[]
 }
 
 model Place {
@@ -301,7 +296,6 @@ model Place {
   reviewedBy      String?
   publishedBy     String?
 
-  sources         ContentSource[]
 }
 
 model Book {
@@ -329,8 +323,6 @@ model Book {
   isbn          String?
   rights        String?
   purchaseUrl   String?
-
-  sources       ContentSource[]
 }
 
 model Manuscript {
@@ -365,7 +357,6 @@ model Proverb {
   createdBy String?
   reviewedBy String?
   publishedBy String?
-  sources ContentSource[]
 }
 
 model VocabularyTerm {
@@ -388,7 +379,6 @@ model VocabularyTerm {
   createdBy String?
   reviewedBy String?
   publishedBy String?
-  sources   ContentSource[]
 }
 
 model Horse {
@@ -420,7 +410,6 @@ model HorseBreed {
   photos         String?
 
   horse Horse @relation(fields: [horseId], references: [id], onDelete: Cascade)
-  sources ContentSource[]
 }
 
 model Camel {
@@ -452,7 +441,6 @@ model CamelBreed {
   photos       String?
 
   camel Camel @relation(fields: [camelId], references: [id], onDelete: Cascade)
-  sources ContentSource[]
 }
 
 model Falcon {
@@ -543,7 +531,6 @@ model Category {
   isVisible   Boolean @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  contentTags ContentTag[]
 }
 
 model Tag {
@@ -702,6 +689,7 @@ model Question {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   answers     Answer[]
+  author      User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 }
 
 model Answer {
