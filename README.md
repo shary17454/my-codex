@@ -19,6 +19,7 @@ npm run docker:dev
 - API: `http://localhost:4000/api`
 - واجهة الويب: `http://localhost:3001`
 - لوحة الإدارة: `http://localhost:3002`
+- Swagger: `http://localhost:4000/api/docs`
 
 ## المتغيرات
 - `DATABASE_URL`
@@ -38,6 +39,25 @@ npm run docker:dev
 - `npm run build`
 - `npm run test`
 - `npm run docker:prod`
+- `cd apps/mobile && flutter test`
+- `cd apps/mobile && flutter build ios --release --no-codesign`
+
+## GitHub و Xcode Cloud
+
+المشروع مجهز للرفع داخل مستودع GitHub كمجلد مستقل باسم `rawayah/` حتى لا يتداخل مع مشاريع أخرى.
+
+ملفات Xcode Cloud موجودة في:
+
+- `apps/mobile/ios/ci_scripts/ci_post_clone.sh`
+- `apps/mobile/ios/ci_scripts/ci_pre_xcodebuild.sh`
+
+إعداد Xcode Cloud المقترح:
+
+- Product: تطبيق Flutter iOS داخل `apps/mobile/ios/Runner.xcworkspace`
+- Scheme: `Runner`
+- Branch: `main`
+- Workflow: تشغيل `ci_post_clone.sh` ثم بناء iOS Release
+- Signing: عبر حساب Apple Developer في App Store Connect
 
 ## قواعد البيانات الأولية في MVP
 - المستخدمون والصلاحيات
