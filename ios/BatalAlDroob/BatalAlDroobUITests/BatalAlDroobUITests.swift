@@ -21,8 +21,12 @@ final class BatalAlDroobUITests: XCTestCase {
         let heroY60 = app.buttons["home.hero.generation.Y60"]
         XCTAssertTrue(heroY60.waitForExistence(timeout: 10))
         heroY60.tap()
+        // Tapping a generation focuses the Catalog tab. Wait for that tab to settle
+        // (its navigation bar) before asserting on the inline search field, otherwise
+        // the tab switch can race the field lookup on a busy simulator.
+        XCTAssertTrue(app.navigationBars["بطل الدروب"].waitForExistence(timeout: 15))
         let focusedCatalogSearch = app.textFields["catalog.search.inline"]
-        XCTAssertTrue(focusedCatalogSearch.waitForExistence(timeout: 10))
+        XCTAssertTrue(focusedCatalogSearch.waitForExistence(timeout: 15))
         XCTAssertEqual(focusedCatalogSearch.value as? String, "Y60")
 
         let homeTab = tabItem(identifier: "tab.home", fallbackName: "الرئيسية", in: app)
@@ -56,8 +60,20 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertTrue(reveal(saveButton, in: app))
         saveButton.tap()
         XCTAssertTrue(app.staticTexts["تم تجهيز طلب القطعة وحفظه."].waitForExistence(timeout: 10))
+    }
 
-        app.terminate()
+    // Split out of the critical-flow test: a mid-test terminate/relaunch made that
+    // test long and flaky (the second launch could race the automation session).
+    // This is an independent cold-launch check of the Tools tab navigation.
+    @MainActor
+    func testToolsTabNavigationFromColdLaunch() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-AppleLanguages", "(ar)",
+            "-AppleLocale", "ar_SA",
+            "-batalLang", "ar",
+            "-skipPermissionOnboardingForUITests"
+        ]
         app.launch()
         XCTAssertTrue(app.navigationBars["الرئيسية"].waitForExistence(timeout: 20))
 

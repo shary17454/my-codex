@@ -67,7 +67,6 @@ struct VisionPhotoTextRecognizer: PhotoTextRecognizing {
     }
 }
 
-
 protocol OwnerAccessAuthorizing: Sendable {
     func grantsOwnerAccess(to profile: CustomerProfile) -> Bool
 }
