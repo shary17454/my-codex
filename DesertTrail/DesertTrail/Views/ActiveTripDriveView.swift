@@ -229,6 +229,7 @@ struct ActiveTripDriveView: View {
                         .foregroundStyle(DrivePalette.goldGradient)
                         .opacity(headingDegrees == nil ? 0.32 : 1)
                         .rotationEffect(.degrees(northNeedleRotation))
+                        .animation(.easeOut(duration: 0.16), value: appState.locationManager.continuousHeadingDegrees)
                     VStack {
                         Text("N")
                         Spacer()
@@ -448,8 +449,10 @@ struct ActiveTripDriveView: View {
     }
 
     private var northNeedleRotation: Double {
-        guard let headingDegrees else { return 0 }
-        return -headingDegrees
+        // Rotate by the continuous (unwrapped) heading so the needle animates the
+        // short way across the 0°/360° boundary instead of spinning back.
+        guard appState.locationManager.continuousHeadingDegrees != nil else { return 0 }
+        return -(appState.locationManager.continuousHeadingDegrees ?? 0)
     }
 
     private var weatherIcon: String {

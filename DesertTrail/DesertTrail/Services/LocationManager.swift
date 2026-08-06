@@ -29,10 +29,16 @@ final class LocationManager: NSObject {
         CLLocationManager.headingAvailable()
     }
 
-    /// Smoothed heading consumed by the UI. Updated from the sensor/GPS callbacks
-    /// through a circular low-pass filter (see `updateResolvedHeading`) so the
-    /// compass needle stops jittering without introducing 0°/360° wrap artifacts.
+    /// Smoothed heading consumed by the UI for *text* (normalized to 0..<360).
+    /// Updated from the sensor/GPS callbacks through a circular low-pass filter
+    /// (see `updateResolvedHeading`) so the readout stops jittering.
     private(set) var resolvedHeadingDegrees: CLLocationDirection?
+
+    /// Same smoothed heading but kept *continuous* (never wrapped to 0..<360).
+    /// The compass needle rotates by this value so a 359°→1° change animates the
+    /// short way (+2°) instead of spinning ~358° backwards. Text uses
+    /// `resolvedHeadingDegrees`; rotation uses this.
+    private(set) var continuousHeadingDegrees: CLLocationDirection?
 
     @ObservationIgnored
     private var smoothedHeadingState: Double?
@@ -62,16 +68,23 @@ final class LocationManager: NSObject {
         guard let target = rawHeadingDegrees else {
             smoothedHeadingState = nil
             resolvedHeadingDegrees = nil
+            continuousHeadingDegrees = nil
             return
         }
+        let resolved: Double
         if let current = smoothedHeadingState {
             // Blend along the shortest arc so a 359° → 1° change moves +2°, not -358°.
             let delta = ((target - current + 540).truncatingRemainder(dividingBy: 360)) - 180
-            smoothedHeadingState = (current + delta * Self.headingSmoothingFactor + 360).truncatingRemainder(dividingBy: 360)
+            // Accumulate continuously (do NOT re-wrap) so the UI needle can animate
+            // across the north boundary without a full spin-back.
+            resolved = current + delta * Self.headingSmoothingFactor
         } else {
-            smoothedHeadingState = target
+            resolved = target
         }
-        resolvedHeadingDegrees = smoothedHeadingState
+        smoothedHeadingState = resolved
+        continuousHeadingDegrees = resolved
+        let normalized = resolved.truncatingRemainder(dividingBy: 360)
+        resolvedHeadingDegrees = normalized < 0 ? normalized + 360 : normalized
     }
 
     var speedKPH: Double? {
