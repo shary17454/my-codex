@@ -89,8 +89,10 @@ struct HomeDashboardView: View {
             }
         }
         .task {
-            appState.locationManager.requestNavigationAccessAndStart(userInitiated: false)
-            await appState.refreshEnvironmentReport()
+            // Wait briefly for a real GPS fix before fetching weather so the
+            // report reflects the user's actual location instead of falling back
+            // to the default trip destination.
+            await appState.startLocationAndRefreshEnvironment(userInitiated: false)
             if appState.locationManager.isTracking {
                 centerMapOnCurrentLocation()
             }
@@ -98,6 +100,12 @@ struct HomeDashboardView: View {
         .onChange(of: appState.locationManager.currentLocation?.timestamp) { _, _ in
             guard appState.locationManager.isTracking else { return }
             centerMapOnCurrentLocation()
+            // The first weather fetch may have run before GPS had a fix (so it
+            // used the trip-destination fallback). Re-fetch for the real
+            // location as soon as it becomes available.
+            if !appState.environmentReportIsForCurrentLocation {
+                Task { await appState.refreshEnvironmentReport() }
+            }
         }
     }
 

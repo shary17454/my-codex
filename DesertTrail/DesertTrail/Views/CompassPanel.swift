@@ -65,24 +65,26 @@ struct CompassPanel: View {
                                 )
                             }
 
-                            compassNeedle(
-                                systemImage: "wind",
-                                color: appState.environmentalReport.isLiveData ? .orange : .secondary,
+                            flowNeedle(
+                                glyph: "wind",
+                                tint: [Color.trailAmber, Color.desertCopper],
                                 rotation: windFlowNeedleRotation,
                                 size: 30,
-                                offset: 50,
+                                offset: 52,
                                 label: "اتجاه حركة الرياح",
-                                pointer: .wind
+                                pointer: .wind,
+                                isActive: appState.environmentalReport.isLiveData
                             )
 
-                            compassNeedle(
-                                systemImage: "cloud.fill",
-                                color: appState.environmentalReport.isLiveData ? .blue : .secondary,
+                            flowNeedle(
+                                glyph: "cloud.fill",
+                                tint: [Color(red: 0.36, green: 0.68, blue: 0.98), Color(red: 0.16, green: 0.44, blue: 0.86)],
                                 rotation: cloudDriftNeedleRotation,
                                 size: 26,
-                                offset: 70,
+                                offset: 72,
                                 label: "اتجاه حركة السحب",
-                                pointer: .clouds
+                                pointer: .clouds,
+                                isActive: appState.environmentalReport.isLiveData
                             )
 
                             if let courseDegrees {
@@ -305,6 +307,58 @@ struct CompassPanel: View {
         }
         .buttonStyle(.plain)
         .shadow(color: color.opacity(0.26), radius: 8, y: 3)
+        .offset(y: offset)
+        .rotationEffect(.degrees(rotation))
+        .accessibilityLabel(label)
+        .accessibilityHint("اضغط لعرض التفاصيل والإجراء المرتبط بهذا المؤشر")
+    }
+
+    /// Premium directional marker for wind / cloud flow: a tapered gradient arrow
+    /// that points precisely along the flow direction, with an upright icon badge
+    /// at its tail so the meaning stays readable at any rotation. Falls back to a
+    /// muted style when live weather data is unavailable.
+    private func flowNeedle(
+        glyph: String,
+        tint: [Color],
+        rotation: Double,
+        size: CGFloat,
+        offset: CGFloat,
+        label: String,
+        pointer: CompassPointer,
+        isActive: Bool
+    ) -> some View {
+        let arrowFill: [Color] = isActive ? tint : [Color.secondary.opacity(0.55), Color.secondary.opacity(0.3)]
+        let badgeColor = isActive ? (tint.first ?? .gray) : .gray
+        return Button {
+            triggerHaptic()
+            selectedPointer = pointer
+            if !appState.environmentalReport.isLiveData {
+                refreshWeather()
+            }
+        } label: {
+            ZStack {
+                FlowArrowShape()
+                    .fill(LinearGradient(colors: arrowFill, startPoint: .top, endPoint: .bottom))
+                    .overlay(
+                        FlowArrowShape().stroke(Color.white.opacity(0.6), lineWidth: 0.8)
+                    )
+                    .frame(width: size * 0.66, height: size * 1.4)
+                    .shadow(color: (isActive ? (tint.first ?? .clear) : .clear).opacity(0.55), radius: 5, y: 2)
+
+                Image(systemName: glyph)
+                    .font(.system(size: size * 0.4, weight: .black))
+                    .foregroundStyle(.white)
+                    .padding(size * 0.16)
+                    .background(Circle().fill(badgeColor.gradient))
+                    .overlay(Circle().strokeBorder(Color.white.opacity(0.75), lineWidth: 1))
+                    .offset(y: size * 0.66)
+                    .rotationEffect(.degrees(-rotation))
+                    .shadow(radius: 2, y: 1)
+            }
+            .frame(width: max(size + 18, 44), height: max(size + 18, 44))
+            .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
         .offset(y: offset)
         .rotationEffect(.degrees(rotation))
         .accessibilityLabel(label)
@@ -1000,5 +1054,27 @@ struct CompassPanel: View {
             case .gpx: return appState.text(.gpxReady)
             }
         }
+    }
+}
+
+/// A tapered arrow (arrowhead + stem) pointing toward the top of its frame,
+/// used for the compass wind and cloud flow markers.
+private struct FlowArrowShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let width = rect.width
+        let height = rect.height
+        let headHeight = height * 0.5
+        let stemHalf = width * 0.22
+
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))                       // tip
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + headHeight))       // right barb
+        path.addLine(to: CGPoint(x: rect.midX + stemHalf, y: rect.minY + headHeight))
+        path.addLine(to: CGPoint(x: rect.midX + stemHalf, y: rect.maxY))         // stem bottom-right
+        path.addLine(to: CGPoint(x: rect.midX - stemHalf, y: rect.maxY))         // stem bottom-left
+        path.addLine(to: CGPoint(x: rect.midX - stemHalf, y: rect.minY + headHeight))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + headHeight))       // left barb
+        path.closeSubpath()
+        return path
     }
 }

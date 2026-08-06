@@ -29,10 +29,26 @@ final class LocationManager: NSObject {
         CLLocationManager.headingAvailable()
     }
 
-    var resolvedHeadingDegrees: CLLocationDirection? {
+    /// Smoothed heading consumed by the UI. Updated from the sensor/GPS callbacks
+    /// through a circular low-pass filter (see `updateResolvedHeading`) so the
+    /// compass needle stops jittering without introducing 0°/360° wrap artifacts.
+    private(set) var resolvedHeadingDegrees: CLLocationDirection?
+
+    @ObservationIgnored
+    private var smoothedHeadingState: Double?
+
+    /// Reject compass readings worse than this (degrees). 50° was lenient enough
+    /// to show badly-miscalibrated headings; 40° keeps responsiveness while
+    /// dropping the worst readings to the GPS-course fallback.
+    private static let maxUsableHeadingAccuracy: CLLocationDirection = 40
+    private static let headingSmoothingFactor: Double = 0.25
+
+    /// Best heading before smoothing: a well-calibrated compass reading, else the
+    /// GPS course, else the course inferred from movement.
+    private var rawHeadingDegrees: CLLocationDirection? {
         if let heading {
             let sensorHeading = heading.trueHeading >= 0 ? heading.trueHeading : heading.magneticHeading
-            if sensorHeading >= 0, heading.headingAccuracy >= 0, heading.headingAccuracy <= 50 {
+            if sensorHeading >= 0, heading.headingAccuracy >= 0, heading.headingAccuracy <= Self.maxUsableHeadingAccuracy {
                 return sensorHeading
             }
         }
@@ -40,6 +56,22 @@ final class LocationManager: NSObject {
             return course
         }
         return inferredCourse
+    }
+
+    private func updateResolvedHeading() {
+        guard let target = rawHeadingDegrees else {
+            smoothedHeadingState = nil
+            resolvedHeadingDegrees = nil
+            return
+        }
+        if let current = smoothedHeadingState {
+            // Blend along the shortest arc so a 359° → 1° change moves +2°, not -358°.
+            let delta = ((target - current + 540).truncatingRemainder(dividingBy: 360)) - 180
+            smoothedHeadingState = (current + delta * Self.headingSmoothingFactor + 360).truncatingRemainder(dividingBy: 360)
+        } else {
+            smoothedHeadingState = target
+        }
+        resolvedHeadingDegrees = smoothedHeadingState
     }
 
     var speedKPH: Double? {
@@ -87,7 +119,7 @@ final class LocationManager: NSObject {
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         manager.distanceFilter = 10
-        manager.headingFilter = 2
+        manager.headingFilter = 1
         manager.headingOrientation = .portrait
         manager.activityType = .otherNavigation
         authorizationStatus = manager.authorizationStatus
@@ -337,6 +369,7 @@ extension LocationManager: CLLocationManagerDelegate {
             }
             previousLocation = location
             currentLocation = location
+            updateResolvedHeading()
             locationErrorMessage = nil
         }
     }
@@ -356,6 +389,7 @@ extension LocationManager: CLLocationManagerDelegate {
             } else {
                 headingErrorMessage = nil
             }
+            updateResolvedHeading()
         }
     }
 

@@ -17,6 +17,10 @@ final class AppState {
     var environmentalReport: EnvironmentalReport = .placeholder
     var isEnvironmentRefreshing = false
     var environmentErrorMessage: String?
+    /// `true` only when the current report was fetched for the device's real GPS
+    /// location. When `false` the report is a fallback for the trip destination,
+    /// so the UI can re-fetch once a real location fix arrives.
+    private(set) var environmentReportIsForCurrentLocation = false
     var consentedToTripSharing = false {
         didSet { UserDefaults.standard.set(consentedToTripSharing, forKey: AppStorageKey.tripSharingConsent) }
     }
@@ -83,12 +87,16 @@ final class AppState {
 
     func refreshEnvironmentReport() async {
         let coordinate: CLLocationCoordinate2D?
+        let usingCurrentLocation: Bool
         if let currentCoordinate = locationManager.currentLocation?.coordinate {
             coordinate = currentCoordinate
+            usingCurrentLocation = true
         } else if hasSelectedTrip {
             coordinate = selectedTrip.meetingPoint
+            usingCurrentLocation = false
         } else {
             coordinate = nil
+            usingCurrentLocation = false
         }
 
         guard let coordinate else {
@@ -100,6 +108,7 @@ final class AppState {
         defer { isEnvironmentRefreshing = false }
         do {
             environmentalReport = try await weatherService.fetchReport(for: coordinate)
+            environmentReportIsForCurrentLocation = usingCurrentLocation
             environmentErrorMessage = nil
         } catch {
             environmentErrorMessage = error.localizedDescription
