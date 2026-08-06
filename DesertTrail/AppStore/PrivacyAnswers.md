@@ -1,6 +1,6 @@
 # App Store Privacy Answers
 
-Use these answers for the App Store Connect privacy form for DesertTrail.
+Use these answers for the App Store Connect privacy form for Kharayem.
 
 ## Data Not Used for Tracking
 

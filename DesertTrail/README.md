@@ -4,11 +4,11 @@
 
 ## التشغيل
 
-1. افتح `DesertTrail.xcodeproj` في Xcode.
-2. اختر Target باسم `DesertTrail`.
+1. افتح `Kharayem.xcodeproj` في Xcode.
+2. اختر Target باسم `Kharayem`.
 3. ضع `DEVELOPMENT_TEAM` المناسب لحساب Apple Developer.
 4. فعّل iCloud وCloudKit للحاوية:
-   `iCloud.com.codex.DesertTrail`
+   `iCloud.com.codex.Kharayem`
 5. شغل التطبيق على جهاز حقيقي لاختبار GPS والبوصلة والخلفية بدقة.
 
 ## API
@@ -28,7 +28,7 @@ npm run dev
 http://127.0.0.1:8787/health
 ```
 
-لربط التطبيق بالخدمة أثناء التطوير، حدّث قيمة `RafiqAPIBaseURL` في `DesertTrail/DesertTrail/Info.plist` إلى عنوان الخادم المتاح من الجهاز.
+لربط التطبيق بالخدمة أثناء التطوير، حدّث قيمة `RafiqAPIBaseURL` في `Kharayem/Kharayem/Info.plist` إلى عنوان الخادم المتاح من الجهاز.
 
 ## الميزات المنفذة
 
@@ -56,4 +56,4 @@ http://127.0.0.1:8787/health
 
 ## مصادر خرائط العجاجي
 
-ملفات PDF الحالية مولدة من الصور المرفقة أثناء التطوير. عند توفر ملفات PDF رسمية، يمكن إدخالها من داخل التطبيق عبر `إدارة مصدر PDF` باستيراد ملف من تطبيق الملفات أو تنزيل رابط PDF مباشر، أو استبدال الملفات داخل `DesertTrail/Resources` بنفس الأسماء الموضحة في `AjajiMapSources.md`.
+ملفات PDF الحالية مولدة من الصور المرفقة أثناء التطوير. عند توفر ملفات PDF رسمية، يمكن إدخالها من داخل التطبيق عبر `إدارة مصدر PDF` باستيراد ملف من تطبيق الملفات أو تنزيل رابط PDF مباشر، أو استبدال الملفات داخل `Kharayem/Resources` بنفس الأسماء الموضحة في `AjajiMapSources.md`.

@@ -3,7 +3,7 @@ import CoreLocation
 import Foundation
 
 actor WeatherService {
-    static let backgroundTaskIdentifier = "com.codex.DesertTrail.environment.refresh"
+    static let backgroundTaskIdentifier = "com.codex.Kharayem.environment.refresh"
     private let weatherEndpoint = "https://api.open-meteo.com/v1/forecast"
     private let airQualityEndpoint = "https://air-quality-api.open-meteo.com/v1/air-quality"
     private let session: URLSession

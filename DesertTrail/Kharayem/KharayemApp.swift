@@ -2,7 +2,7 @@ import SwiftUI
 import BackgroundTasks
 
 @main
-struct DesertTrailApp: App {
+struct KharayemApp: App {
     @State private var appState = AppState()
 
     init() {

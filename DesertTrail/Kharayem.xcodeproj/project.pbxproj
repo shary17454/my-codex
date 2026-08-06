@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0A1000100000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000100000000000000001 /* Assets.xcassets */; };
-		0A1000010000000000000001 /* DesertTrailApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000010000000000000001 /* DesertTrailApp.swift */; };
+		0A1000010000000000000001 /* KharayemApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000010000000000000001 /* KharayemApp.swift */; };
 		0A1000020000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000020000000000000001 /* ContentView.swift */; };
 		0A1000030000000000000001 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000030000000000000001 /* AppState.swift */; };
 		0A1000040000000000000001 /* TripModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000040000000000000001 /* TripModels.swift */; };
@@ -54,7 +54,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0A2000010000000000000001 /* DesertTrailApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesertTrailApp.swift; sourceTree = "<group>"; };
+		0A2000010000000000000001 /* KharayemApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KharayemApp.swift; sourceTree = "<group>"; };
 		0A2000020000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0A2000030000000000000001 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		0A2000040000000000000001 /* TripModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripModels.swift; sourceTree = "<group>"; };
@@ -99,8 +99,8 @@
 		0A20002E0000000000000001 /* CoordinateNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateNavigationView.swift; sourceTree = "<group>"; };
 		0A20002F0000000000000001 /* TrailAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrailAIService.swift; sourceTree = "<group>"; };
 		0A2000120000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0A2000130000000000000001 /* DesertTrail.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DesertTrail.entitlements; sourceTree = "<group>"; };
-		0A2000140000000000000001 /* DesertTrail.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DesertTrail.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A2000130000000000000001 /* Kharayem.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Kharayem.entitlements; sourceTree = "<group>"; };
+		0A2000140000000000000001 /* Kharayem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kharayem.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,15 +117,15 @@
 		0A4000010000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				0A4000020000000000000001 /* DesertTrail */,
+				0A4000020000000000000001 /* Kharayem */,
 				0A4000030000000000000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		0A4000020000000000000001 /* DesertTrail */ = {
+		0A4000020000000000000001 /* Kharayem */ = {
 			isa = PBXGroup;
 			children = (
-				0A2000010000000000000001 /* DesertTrailApp.swift */,
+				0A2000010000000000000001 /* KharayemApp.swift */,
 				0A2000020000000000000001 /* ContentView.swift */,
 				0A2000030000000000000001 /* AppState.swift */,
 				0A4000040000000000000001 /* Models */,
@@ -134,16 +134,16 @@
 				0A4000070000000000000001 /* Resources */,
 				0A2000100000000000000001 /* Assets.xcassets */,
 				0A2000120000000000000001 /* Info.plist */,
-				0A2000130000000000000001 /* DesertTrail.entitlements */,
+				0A2000130000000000000001 /* Kharayem.entitlements */,
 				0A2000220000000000000001 /* PrivacyInfo.xcprivacy */,
 			);
-			path = DesertTrail;
+			path = Kharayem;
 			sourceTree = "<group>";
 		};
 		0A4000030000000000000001 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0A2000140000000000000001 /* DesertTrail.app */,
+				0A2000140000000000000001 /* Kharayem.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -218,9 +218,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0A5000010000000000000001 /* DesertTrail */ = {
+		0A5000010000000000000001 /* Kharayem */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0A9000020000000000000001 /* Build configuration list for PBXNativeTarget "DesertTrail" */;
+			buildConfigurationList = 0A9000020000000000000001 /* Build configuration list for PBXNativeTarget "Kharayem" */;
 			buildPhases = (
 				0A6000010000000000000001 /* Sources */,
 				0A3000010000000000000001 /* Frameworks */,
@@ -230,9 +230,9 @@
 			);
 			dependencies = (
 			);
-			name = DesertTrail;
-			productName = DesertTrail;
-			productReference = 0A2000140000000000000001 /* DesertTrail.app */;
+			name = Kharayem;
+			productName = Kharayem;
+			productReference = 0A2000140000000000000001 /* Kharayem.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -250,7 +250,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 0A9000010000000000000001 /* Build configuration list for PBXProject "DesertTrail" */;
+			buildConfigurationList = 0A9000010000000000000001 /* Build configuration list for PBXProject "Kharayem" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = ar;
 			hasScannedForEncodings = 0;
@@ -264,7 +264,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0A5000010000000000000001 /* DesertTrail */,
+				0A5000010000000000000001 /* Kharayem */,
 			);
 		};
 /* End PBXProject section */
@@ -292,7 +292,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A1000010000000000000001 /* DesertTrailApp.swift in Sources */,
+				0A1000010000000000000001 /* KharayemApp.swift in Sources */,
 				0A1000020000000000000001 /* ContentView.swift in Sources */,
 				0A1000030000000000000001 /* AppState.swift in Sources */,
 				0A1000040000000000000001 /* TripModels.swift in Sources */,
@@ -446,12 +446,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Kharayem/Kharayem.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 158;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = DesertTrail/Info.plist;
+				INFOPLIST_FILE = Kharayem/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "خرايم";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -471,12 +471,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = DesertTrail/DesertTrail.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Kharayem/Kharayem.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 158;
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = DesertTrail/Info.plist;
+				INFOPLIST_FILE = Kharayem/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "خرايم";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -494,7 +494,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0A9000010000000000000001 /* Build configuration list for PBXProject "DesertTrail" */ = {
+		0A9000010000000000000001 /* Build configuration list for PBXProject "Kharayem" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0A9000030000000000000001 /* Debug */,
@@ -503,7 +503,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0A9000020000000000000001 /* Build configuration list for PBXNativeTarget "DesertTrail" */ = {
+		0A9000020000000000000001 /* Build configuration list for PBXNativeTarget "Kharayem" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0A9000050000000000000001 /* Debug */,

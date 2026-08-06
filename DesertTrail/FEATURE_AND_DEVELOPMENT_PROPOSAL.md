@@ -1,8 +1,8 @@
-# مقترح الميزات والتطوير لتطبيق الدروب
+# مقترح الميزات والتطوير لتطبيق خرايم
 
 ## 1. الملخص التنفيذي
 
-تم فحص تطبيق `الدروب` داخل مجلد `DesertTrail/` فقط. التطبيق الحالي هو تطبيق iOS أصلي مكتوب بـ Swift وSwiftUI، موجه للرحلات البرية والملاحة الميدانية، ويعتمد على MapKit وCoreLocation وWeatherService محلي، مع دعم خرائط محفوظة، رحلات، بوصلة، مواقع مخفية، مجتمع، وأدوات متقدمة.
+تم فحص تطبيق `خرايم` داخل مجلد `Kharayem/` فقط. التطبيق الحالي هو تطبيق iOS أصلي مكتوب بـ Swift وSwiftUI، موجه للرحلات البرية والملاحة الميدانية، ويعتمد على MapKit وCoreLocation وWeatherService محلي، مع دعم خرائط محفوظة، رحلات، بوصلة، مواقع مخفية، مجتمع، وأدوات متقدمة.
 
 التطبيق يملك أساسًا قويًا، لكنه يحتاج إلى تحويل التجربة من مجموعة أدوات متفرقة إلى تجربة رحلة مترابطة: يبدأ المستخدم رحلة، يحدد وجهة، يرى المسار والطرق الترابية والطقس والرياح والتنبيهات والمعالم على خريطة واحدة، ثم يحصل على إرشاد واضح عبر البوصلة ولوحة القيادة. أعلى أولوية هي إصلاح تجربة بدء الرحلة والتفاعل مع الأزرار والخرائط والبوصلة لأنها أكثر ما يؤثر على الثقة والاستخدام اليومي.
 
@@ -12,7 +12,7 @@
 
 ### الغرض
 
-`الدروب` تطبيق رحلات وملاحة برية للمستخدمين في السعودية والخليج، يركز على:
+`خرايم` تطبيق رحلات وملاحة برية للمستخدمين في السعودية والخليج، يركز على:
 
 - حفظ واكتشاف المواقع البرية.
 - الملاحة بالإحداثيات وGPS والبوصلة.
@@ -60,7 +60,7 @@
 - مساعد محلي عبر `TrailAIService` دون مفاتيح خارجية.
 - Privacy Manifest موجود ويعلن الموقع والصور ومحتوى المستخدم دون تتبع.
 - إصدار المشروع الحالي في إعدادات Xcode: `MARKETING_VERSION = 2.1` و`CURRENT_PROJECT_VERSION = 105`.
-- Bundle ID الحالي: `com.codex.DesertTrail`.
+- Bundle ID الحالي: `com.codex.Kharayem`.
 
 ## 4. الحالة التقنية الحالية
 
@@ -75,8 +75,8 @@
 - الطقس: Open-Meteo عبر URLSession.
 - التخزين المحلي: UserDefaults وملفات محلية للخرائط المحفوظة.
 - السحابة: CloudKit ظاهر في الخدمات والـ entitlements.
-- المشروع: `DesertTrail/DesertTrail.xcodeproj`.
-- Scheme المتوقع: `DesertTrail`.
+- المشروع: `Kharayem/Kharayem.xcodeproj`.
+- Scheme المتوقع: `Kharayem`.
 
 ### نقاط قوة تقنية
 
@@ -106,7 +106,7 @@
 - البوصلة جيدة كفكرة، لكنها تحتاج تفسير بصري واضح لكل سهم.
 - الخرائط بلا إنترنت تحفظ صورة، ولا تشرح للمستخدم حدودها مقارنة بملاحة offline كاملة.
 - دليل الحياة الفطرية يحتاج توسعًا منظمًا وصورًا مرخصة ومعلومات أوضح.
-- أسماء التطبيق يجب أن تكون موحدة على `الدروب` في كل الواجهات والميتاداتا.
+- أسماء التطبيق يجب أن تكون موحدة على `خرايم` في كل الواجهات والميتاداتا.
 - المستخدم يحتاج طبقات معالم محلية: أودية، جبال، نفود، خدمات، مخاطر، نقاط تخييم.
 
 ### فرص كبيرة
@@ -125,7 +125,7 @@
 | P0 | مركز بدء الرحلة الميدانية | High | Medium | يعالج مشكلة الرحلة الجديدة والأزرار غير الواضحة |
 | P0 | بوصلة متعددة الأسهم بتفسير واضح | High | Medium | مطلب مباشر ويزيد الثقة في الملاحة |
 | P0 | تدقيق كل الأزرار التفاعلية وحالاتها | High | Medium | يزيل شعور “الأزرار لا تعمل” |
-| P0 | توحيد اسم التطبيق إلى الدروب | High | Low | يمنع تضارب الهوية |
+| P0 | توحيد اسم التطبيق إلى خرايم | High | Low | يمنع تضارب الهوية |
 | P0 | أذونات وشروط أول تشغيل محسنة | High | Low | مهم للثقة وApp Store والوظائف |
 | P0 | حزم خرائط ومعالم offline منظمة | High | Medium | مطلب مباشر ويضيف قيمة ميدانية |
 | P1 | دليل حياة فطرية موسع مع صور مرخصة | Medium | High | يرفع قيمة السلامة والمحتوى |
@@ -140,7 +140,7 @@
 
 ### 7.1 مركز بدء الرحلة الميدانية
 
-- **لماذا يناسب التطبيق:** الدروب تطبيق رحلة، وليس مجرد أدوات منفصلة.
+- **لماذا يناسب التطبيق:** خرايم تطبيق رحلة، وليس مجرد أدوات منفصلة.
 - **المشكلة:** المستخدم يضغط أزرارًا كثيرة ولا يعرف ما يعمل وما لا يعمل.
 - **فائدة المستخدم:** يبدأ رحلة من مكان واحد: وجهة، خريطة، GPS، طقس، سلامة.
 - **فائدة المنتج:** يزيد الاحتفاظ والاستخدام المتكرر.
@@ -210,9 +210,9 @@
 - **معايير القبول:** البحث عن واد/جبل يعمل offline ويظهر على الخريطة.
 - **اختبارات:** Unit للبحث المحلي وSnapshot لحالة لا اتصال.
 
-### 7.5 توحيد الاسم إلى الدروب
+### 7.5 توحيد الاسم إلى خرايم
 
-- **لماذا يناسب التطبيق:** الهوية الحالية متذبذبة بين الدرب والدروب في السياق.
+- **لماذا يناسب التطبيق:** الهوية الحالية متذبذبة بين الدرب وخرايم في السياق.
 - **المشكلة:** تضارب الاسم يضعف الثقة ويؤثر على App Store metadata.
 - **فائدة المستخدم:** هوية واحدة واضحة.
 - **المكان:** Info.plist، النصوص، README، App Store notes، الواجهات.
@@ -220,7 +220,7 @@
 - **الصعوبة:** Low.
 - **الأثر:** High.
 - **الأولوية:** P0.
-- **معايير القبول:** لا تظهر كلمة `الدرب` عندما المقصود اسم التطبيق، بل `الدروب`.
+- **معايير القبول:** لا تظهر كلمة `الدرب` عندما المقصود اسم التطبيق، بل `خرايم`.
 - **اختبارات:** `rg` للنصوص وBuild.
 
 ### 7.6 أذونات وشروط أول تشغيل محسنة
@@ -267,7 +267,7 @@
 - **الأولوية:** P1.
 - **اختبارات:** Unit للعتبات ومنع التكرار.
 
-### 7.9 مساعد الدروب الذكي المحلي
+### 7.9 مساعد خرايم الذكي المحلي
 
 - **لماذا يناسب التطبيق:** موجود `TrailAIService` ويمكن تقويته دون مفاتيح خارجية.
 - **المشكلة:** AI الحالي مفيد لكنه يحتاج دخولًا أوضح وربطًا بنتائج قابلة للفعل.
@@ -283,7 +283,7 @@
 
 ### 7.10 توجيه الطرق الترابية الذكي
 
-- **لماذا يناسب التطبيق:** جوهر الدروب هو المسارات البرية.
+- **لماذا يناسب التطبيق:** جوهر خرايم هو المسارات البرية.
 - **المشكلة:** MapKit لا يوفر routing ترابي متخصص افتراضيًا.
 - **فائدة المستخدم:** اقتراح أقرب مسار ترابي آمن أو بديل.
 - **المكان:** الخريطة عند اختيار وجهة.
@@ -364,7 +364,7 @@
 
 **الميزات:**
 
-- توحيد اسم التطبيق إلى `الدروب`.
+- توحيد اسم التطبيق إلى `خرايم`.
 - مركز بدء الرحلة الميدانية.
 - بوصلة متعددة الأسهم مع legend تفاعلي.
 - تدقيق أزرار Home/Map/Compass/Trips/Tools.
@@ -407,7 +407,7 @@
 
 ### Phase 3: التوجيه الذكي والنمو
 
-**الهدف:** جعل الدروب منصة ملاحة برية ذكية.
+**الهدف:** جعل خرايم منصة ملاحة برية ذكية.
 
 **الميزات:**
 
@@ -463,7 +463,7 @@
 ## 13. توصيات جاهزية الإصدار
 
 - تحديث Screenshots بعد أي redesign جذري.
-- التحقق من `CFBundleDisplayName = الدروب`.
+- التحقق من `CFBundleDisplayName = خرايم`.
 - عدم رفع Build من Xcode Beta.
 - رفع build جديد برقم غير مستخدم.
 - مراجعة Privacy Manifest وApp Store Privacy Labels.
@@ -499,19 +499,19 @@
 
 ```text
 ROLE
-أنت Senior iOS Engineer + Product Designer + QA Engineer تعمل فقط على تطبيق الدروب داخل DesertTrail/.
+أنت Senior iOS Engineer + Product Designer + QA Engineer تعمل فقط على تطبيق خرايم داخل Kharayem/.
 
 TASK
 نفّذ Phase 1 من تقرير FEATURE_AND_DEVELOPMENT_PROPOSAL.md فقط، بدون لمس أي تطبيق آخر.
 
 SCOPE
-- اعمل فقط داخل DesertTrail/.
+- اعمل فقط داخل Kharayem/.
 - لا تعدل StudyVaultApp أو ios/BatalAlDroob أو أي مجلد تطبيق آخر.
 - حافظ على Bundle ID وSigning وTeam وEntitlements.
 - لا ترفع إلى App Store.
 
 REQUIREMENTS
-1. وحّد اسم التطبيق إلى "الدروب" في الواجهات والميتاداتا والنصوص المرتبطة باسم التطبيق.
+1. وحّد اسم التطبيق إلى "خرايم" في الواجهات والميتاداتا والنصوص المرتبطة باسم التطبيق.
 2. أنشئ تجربة "مركز بدء الرحلة" من الصفحة الرئيسية:
    - اختيار/إنشاء رحلة.
    - تحديد وجهة.
@@ -545,20 +545,20 @@ REQUIREMENTS
 7. أضف اختبارات مناسبة لحسابات البوصلة والاتجاه والبحث المحلي إن كان ذلك ممكنًا ضمن بنية المشروع.
 
 FILES TO INSPECT
-- DesertTrail/README.md
-- DesertTrail/DesertTrail/ContentView.swift
-- DesertTrail/DesertTrail/AppState.swift
-- DesertTrail/DesertTrail/Services/LocationManager.swift
-- DesertTrail/DesertTrail/Services/WeatherService.swift
-- DesertTrail/DesertTrail/Services/OfflineMapStore.swift
-- DesertTrail/DesertTrail/Views/HomeDashboardView.swift
-- DesertTrail/DesertTrail/Views/DesertMapView.swift
-- DesertTrail/DesertTrail/Views/CompassPanel.swift
-- DesertTrail/DesertTrail/Views/PlannerView.swift
-- DesertTrail/DesertTrail/Views/AdvancedToolsView.swift
-- DesertTrail/DesertTrail/Views/OfflineMapsView.swift
-- DesertTrail/DesertTrail/Info.plist
-- DesertTrail/DesertTrail/PrivacyInfo.xcprivacy
+- Kharayem/README.md
+- Kharayem/Kharayem/ContentView.swift
+- Kharayem/Kharayem/AppState.swift
+- Kharayem/Kharayem/Services/LocationManager.swift
+- Kharayem/Kharayem/Services/WeatherService.swift
+- Kharayem/Kharayem/Services/OfflineMapStore.swift
+- Kharayem/Kharayem/Views/HomeDashboardView.swift
+- Kharayem/Kharayem/Views/DesertMapView.swift
+- Kharayem/Kharayem/Views/CompassPanel.swift
+- Kharayem/Kharayem/Views/PlannerView.swift
+- Kharayem/Kharayem/Views/AdvancedToolsView.swift
+- Kharayem/Kharayem/Views/OfflineMapsView.swift
+- Kharayem/Kharayem/Info.plist
+- Kharayem/Kharayem/PrivacyInfo.xcprivacy
 
 DO NOT CHANGE
 - Bundle ID.
@@ -567,12 +567,12 @@ DO NOT CHANGE
 - Certificates.
 - Provisioning profiles.
 - Entitlements unless required and explained.
-- Other apps outside DesertTrail/.
+- Other apps outside Kharayem/.
 - User data schema destructively.
 
 ACCEPTANCE CRITERIA
 - التطبيق يبني بنجاح.
-- لا يظهر اسم غير "الدروب" كاسم للتطبيق.
+- لا يظهر اسم غير "خرايم" كاسم للتطبيق.
 - كل زر في الشاشات الأساسية يعطي تفاعلًا واضحًا أو سبب تعطيل.
 - البوصلة تعرض الأسهم المتعددة وتشرحها.
 - إنشاء رحلة وتشغيل GPS وفتح الخريطة والبوصلة يعمل كتدفق واضح.
@@ -581,9 +581,9 @@ ACCEPTANCE CRITERIA
 - لا يوجد تداخل واضح في النصوص في الشاشات الأساسية.
 
 VALIDATION COMMANDS
-- xcodebuild -project DesertTrail/DesertTrail.xcodeproj -scheme DesertTrail -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/DesertTrailPhase1Debug build
-- xcodebuild -project DesertTrail/DesertTrail.xcodeproj -scheme DesertTrail -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/DesertTrailPhase1Release build
-- rg -n "الدرب|رفيق|البيد|رفيق الخلا" DesertTrail
+- xcodebuild -project Kharayem/Kharayem.xcodeproj -scheme Kharayem -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/KharayemPhase1Debug build
+- xcodebuild -project Kharayem/Kharayem.xcodeproj -scheme Kharayem -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/KharayemPhase1Release build
+- rg -n "الدرب|رفيق|البيد|رفيق الخلا" Kharayem
 - git diff --check
 
 FINAL REPORT

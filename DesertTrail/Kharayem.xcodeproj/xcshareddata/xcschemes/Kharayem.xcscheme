@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0A5000010000000000000001"
-               BuildableName = "DesertTrail.app"
-               BlueprintName = "DesertTrail"
-               ReferencedContainer = "container:DesertTrail.xcodeproj">
+               BuildableName = "Kharayem.app"
+               BlueprintName = "Kharayem"
+               ReferencedContainer = "container:Kharayem.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0A5000010000000000000001"
-            BuildableName = "DesertTrail.app"
-            BlueprintName = "DesertTrail"
-            ReferencedContainer = "container:DesertTrail.xcodeproj">
+            BuildableName = "Kharayem.app"
+            BlueprintName = "Kharayem"
+            ReferencedContainer = "container:Kharayem.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -60,9 +60,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0A5000010000000000000001"
-            BuildableName = "DesertTrail.app"
-            BlueprintName = "DesertTrail"
-            ReferencedContainer = "container:DesertTrail.xcodeproj">
+            BuildableName = "Kharayem.app"
+            BlueprintName = "Kharayem"
+            ReferencedContainer = "container:Kharayem.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

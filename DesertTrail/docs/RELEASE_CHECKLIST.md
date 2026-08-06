@@ -3,7 +3,7 @@
 ## الإصدار الحالي
 
 - الاسم المعروض: `الدرب`
-- Bundle ID: `com.codex.DesertTrail`
+- Bundle ID: `com.codex.Kharayem`
 - الإصدار: `1.9.1`
 - البناء: `77`
 - Swift: `6.0`

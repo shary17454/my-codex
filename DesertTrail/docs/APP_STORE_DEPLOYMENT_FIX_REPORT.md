@@ -14,11 +14,11 @@
 |---|---|
 | اسم التطبيق من المشروع | الدرب |
 | Apple ID من سياق App Store Connect | 6787725503 |
-| Bundle Identifier | com.codex.DesertTrail |
+| Bundle Identifier | com.codex.Kharayem |
 | Development Team | 4HM66AD594 |
-| Xcode Project | DesertTrail/DesertTrail.xcodeproj |
-| Scheme | DesertTrail |
-| Targets المكتشفة | DesertTrail فقط |
+| Xcode Project | Kharayem/Kharayem.xcodeproj |
+| Scheme | Kharayem |
+| Targets المكتشفة | Kharayem فقط |
 | Extensions / Widgets | لا توجد في المشروع الحالي |
 
 ## رموز ITMS المستخرجة من السياق
@@ -59,7 +59,7 @@
    - `Archive - iOS`
 8. اجعل `Archive - iOS` يستخدم:
    - Platform: iOS
-   - Scheme: DesertTrail
+   - Scheme: Kharayem
    - Distribution Preparation: App Store Connect
 9. اضبط `Next Build Number` على `76` أو أعلى، مع عدم الرجوع لأي رقم مستخدم سابقًا.
 10. شغّل Build جديد من commit يحتوي هذا الإصلاح.
@@ -87,10 +87,10 @@
 
 | الفحص | النتيجة | ملاحظة |
 |---|---|---|
-| xcodebuild -list | نجح | Scheme: DesertTrail |
+| xcodebuild -list | نجح | Scheme: Kharayem |
 | Release showBuildSettings | نجح | 1.9.1 / 76، Bundle ID لم يتغير |
 | Release simulator build | نجح | BUILD SUCCEEDED |
-| Unit/UI tests | لم تُشغّل | Scheme DesertTrail غير مهيأ لـ test action |
+| Unit/UI tests | لم تُشغّل | Scheme Kharayem غير مهيأ لـ test action |
 | ci_post_clone.sh مع override محلي | نجح | تحقق من منطق الحارس والقيم |
 | ci_post_clone.sh بدون override | فشل كما هو متوقع | الجهاز المحلي يستخدم Xcode 26.4.1 وليس 26.6 |
 | git diff --check | نجح | لا توجد مشاكل whitespace |
@@ -102,7 +102,7 @@
 
 | المفتاح | القيمة |
 |---|---|
-| CFBundleIdentifier | com.codex.DesertTrail |
+| CFBundleIdentifier | com.codex.Kharayem |
 | CFBundleDisplayName | الدرب |
 | CFBundleShortVersionString | 1.9.1 |
 | CFBundleVersion | 76 |

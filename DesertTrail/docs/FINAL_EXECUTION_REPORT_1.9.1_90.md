@@ -2,7 +2,7 @@
 
 ## Discovery & Fixes
 
-- التطبيق المستهدف هو تطبيق iOS الأصلي `الدرب` داخل `DesertTrail/` فقط.
+- التطبيق المستهدف هو تطبيق iOS الأصلي `الدرب` داخل `Kharayem/` فقط.
 - المشروع Native Swift/SwiftUI ولا يحتوي على Flutter أو Dart داخل مسار التطبيق.
 - تم توحيد بقايا أسماء التطبيق القديمة داخل بيانات التطبيق وملاحظات الإصدار إلى `الدرب`.
 - تم رفع رقم البناء المحلي من `77` إلى `90` لتجاوز البناء السابق المرفوع إلى App Store Connect.
@@ -11,9 +11,9 @@
 
 ## File Manifest
 
-- `DesertTrail/DesertTrail/Models/TripModels.swift`: توحيد اسم المساهم الافتراضي إلى `الدرب`.
-- `DesertTrail/AppStore/ReleaseNotes.md`: تحديث ملاحظات الإصدار إلى `1.9.1 (90)` وتوثيق توحيد الاسم.
-- `DesertTrail/DesertTrail.xcodeproj/project.pbxproj`: رفع `CURRENT_PROJECT_VERSION` إلى `90` في Debug وRelease.
+- `Kharayem/Kharayem/Models/TripModels.swift`: توحيد اسم المساهم الافتراضي إلى `الدرب`.
+- `Kharayem/AppStore/ReleaseNotes.md`: تحديث ملاحظات الإصدار إلى `1.9.1 (90)` وتوثيق توحيد الاسم.
+- `Kharayem/Kharayem.xcodeproj/project.pbxproj`: رفع `CURRENT_PROJECT_VERSION` إلى `90` في Debug وRelease.
 - `ci_scripts/ci_post_clone.sh`: تحديث `EXPECTED_PROJECT_BUILD` إلى `90`.
 
 ## Capabilities & Permissions Log
@@ -27,7 +27,7 @@
 
 - Xcode المستخدم للتحقق: `Xcode 26.6 (17F113)`.
 - SDK داخل الأرشيف: `iphoneos26.5`.
-- Bundle Identifier: `com.codex.DesertTrail`.
+- Bundle Identifier: `com.codex.Kharayem`.
 - Display Name داخل الأرشيف: `الدرب`.
 - Marketing Version داخل الأرشيف: `1.9.1`.
 - Build Number داخل الأرشيف: `90`.
@@ -45,9 +45,9 @@
 - Debug simulator build: PASS.
 - Release simulator build: PASS.
 - Unsigned iPhoneOS archive: PASS.
-- `plutil -lint` لملفات `Info.plist` و`PrivacyInfo.xcprivacy` و`DesertTrail.entitlements`: PASS.
+- `plutil -lint` لملفات `Info.plist` و`PrivacyInfo.xcprivacy` و`Kharayem.entitlements`: PASS.
 - البحث عن الأسماء القديمة داخل مسارات التطبيق: PASS، لا توجد بقايا.
-- Test action: BLOCKED، لأن Scheme `DesertTrail` غير مهيأ لاختبارات `xcodebuild test`.
+- Test action: BLOCKED، لأن Scheme `Kharayem` غير مهيأ لاختبارات `xcodebuild test`.
 
 ## Manual Actions Required
 
