@@ -1,8 +1,12 @@
-Batal Al-Droob 2.0
+Batal Al-Droob 2.6
 
-Please verify the updated Tools experience:
-- Open the Tools tab and confirm the new premium layout is clear and stable.
-- Verify OEM number search, photo-based lookup entry points, tire calculator, wishlist, and supplier links.
+Please verify the original Patrol parts catalog and the Tools experience:
+- Open the catalog library and confirm on-demand PDF downloads with visible download progress.
+- Try catalog search and confirm a result jumps directly to the targeted PDF page.
+- Confirm PDFs open in the PDFKit reader and that sharing works.
+- Open the Tools tab and verify OEM number search, photo-based lookup entry points, tire calculator, wishlist, and supplier links.
 - Confirm the map, compass, and location-tracking tools are no longer shown.
 - Test Arabic and English switching, right-to-left layout, Dynamic Type, Dark Mode, and offline/error states.
 - Confirm external supplier links open correctly without copying store pricing or inventory into the app.
+
+Note: Downloading the original PDFs requires iOS 26 or later, while indexed search remains available on older systems (minimum iOS 17).

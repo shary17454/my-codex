@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.6 (190) - 2026-08-06
+
+### Clean Release Build
+
+- Bumped the project build number to `190` across all targets for a fresh App
+  Store Connect / Xcode Cloud submission (build `189` may have been attempted).
+- No functional code changes over `2.6 (189)`; this is a verified rebuild of the
+  same reviewed feature set.
+- Re-verified the release: Xcode build succeeds with 0 errors and 0 warnings,
+  SwiftLint (including `--strict`) is green, `validate_release.py` passes,
+  partnership data validates (22 suppliers, 0 errors), and the Node AI backend
+  test suite passes 9/9.
+- Refreshed the TestFlight What-to-Test notes (ar-SA and en-US) to describe the
+  current 2.6 catalog-delivery experience instead of the older 2.0 tools note.
+
 ## 2.6 (189) - 2026-08-03
 
 ### Original Catalog Delivery
