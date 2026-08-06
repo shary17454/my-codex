@@ -1,12 +1,26 @@
-Batal Al-Droob 2.6
+Batal Al-Droob 2.7
 
-Please verify the original Patrol parts catalog and the Tools experience:
-- Open the catalog library and confirm on-demand PDF downloads with visible download progress.
-- Try catalog search and confirm a result jumps directly to the targeted PDF page.
-- Confirm PDFs open in the PDFKit reader and that sharing works.
-- Open the Tools tab and verify OEM number search, photo-based lookup entry points, tire calculator, wishlist, and supplier links.
-- Confirm the map, compass, and location-tracking tools are no longer shown.
-- Test Arabic and English switching, right-to-left layout, Dynamic Type, Dark Mode, and offline/error states.
-- Confirm external supplier links open correctly without copying store pricing or inventory into the app.
+New in this build: ten interface languages, explained search results, and a drivetrain category.
+
+Please test the languages:
+- Open the language menu and switch between Arabic, English, Spanish, French, German, Russian, Portuguese, Simplified Chinese, Turkish, and Hindi.
+- Confirm the layout is right-to-left only for Arabic and left-to-right for every other language.
+- Confirm any untranslated string falls back to English (never to Arabic or a raw key).
+- Note: catalog part names stay Arabic/English because the source catalogs are published that way.
+
+Please test search and fitment:
+- Search a full part number and confirm the top result shows a "Number match" badge.
+- Search by description (for example "brake pads") and confirm a "Description match" or "Synonym match" badge appears.
+- Enter your vehicle details, then search: matching parts should rank higher and show "Fits your vehicle".
+- Open the categories bar and confirm the "Drivetrain" category appears with its parts (these previously fell under "General").
+
+Please test part requests:
+- Try saving a request without a part number/name, or without a generation/year: it should be blocked with a checklist of what is missing.
+- Once complete, the request preview appears live and ends with a line asking the supplier to confirm availability and price.
+
+Please test the original catalog:
+- Open the catalog library and confirm on-demand PDF downloads with visible progress.
+- Confirm a search result jumps to the targeted PDF page and that sharing works.
+- Test Dynamic Type, Dark Mode, and offline/error states.
 
 Note: Downloading the original PDFs requires iOS 26 or later, while indexed search remains available on older systems (minimum iOS 17).

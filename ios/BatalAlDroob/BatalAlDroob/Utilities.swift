@@ -17,12 +17,54 @@ func partRequestDraft(for request: SavedPartRequest, plan: PartRequestPlan, lang
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : "\(label): \(trimmed)"
     }
-    return ([header] + lines).joined(separator: "\n")
+    // Closing line asks the supplier for availability/price and invites compatible
+    // alternatives, so a shared request reads as a professional inquiry, not a bare list.
+    let closing = language == .arabic
+        ? "الرجاء تأكيد التوفر والسعر، ويسعدنا قبول البدائل المتوافقة."
+        : "Please confirm availability and price; compatible alternatives are welcome."
+    return ([header] + lines + ["", closing]).joined(separator: "\n")
+}
+
+/// A required input the part request is still missing, used to block ambiguous
+/// requests and to tell the user exactly what to add.
+enum PartRequestRequirement: String, CaseIterable, Identifiable {
+    case partIdentity
+    case vehicleContext
+
+    var id: String { rawValue }
+
+    func message(_ language: AppLanguage) -> String {
+        switch self {
+        case .partIdentity:
+            language == .arabic
+                ? "أضف رقم القطعة أو اسمها."
+                : "Add a part number or a part name."
+        case .vehicleContext:
+            language == .arabic
+                ? "أضف جيل السيارة أو سنة الصنع."
+                : "Add the vehicle generation or model year."
+        }
+    }
+}
+
+/// Requirements the request has not met yet. Empty means the request is specific
+/// enough to send to a supplier without being ambiguous.
+func partRequestMissingRequirements(_ request: SavedPartRequest) -> [PartRequestRequirement] {
+    func hasText(_ value: String) -> Bool {
+        !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    var missing: [PartRequestRequirement] = []
+    if !(hasText(request.partNumber) || hasText(request.partName)) {
+        missing.append(.partIdentity)
+    }
+    if !(hasText(request.generation) || hasText(request.year)) {
+        missing.append(.vehicleContext)
+    }
+    return missing
 }
 
 func partRequestHasRequiredInput(_ request: SavedPartRequest) -> Bool {
-    !request.partNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        || !request.partName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    partRequestMissingRequirements(request).isEmpty
 }
 
 func partNumberCandidates(in text: String) -> [String] {

@@ -2,24 +2,74 @@ import Foundation
 
 // MARK: - Models
 
+/// Languages the interface can be shown in.
+///
+/// The set targets this app's real audience: Gulf Patrol owners plus the workshop
+/// and parts-trade workforce, which is largely South Asian and Filipino. Catalog
+/// part names themselves remain Arabic/English (that is how the source catalogs are
+/// published); only the interface is localized, and any untranslated string falls
+/// back to English.
 enum AppLanguage: String, CaseIterable, Identifiable {
     case arabic = "ar"
     case english = "en"
+    case spanish = "es"
+    case french = "fr"
+    case german = "de"
+    case russian = "ru"
+    case portuguese = "pt"
+    case chinese = "zh-Hans"
+    case turkish = "tr"
+    case hindi = "hi"
+
     var id: String {
         rawValue
     }
 
+    /// Endonym, so each language is recognizable to its own speakers in the picker.
     var title: String {
-        self == .arabic ? "العربية" : "English"
+        switch self {
+        case .arabic: "العربية"
+        case .english: "English"
+        case .spanish: "Español"
+        case .french: "Français"
+        case .german: "Deutsch"
+        case .russian: "Русский"
+        case .portuguese: "Português"
+        case .chinese: "中文"
+        case .turkish: "Türkçe"
+        case .hindi: "हिन्दी"
+        }
+    }
+
+    /// Right-to-left scripts. Drives the layout direction of the whole interface.
+    var isRTL: Bool {
+        switch self {
+        case .arabic: true
+        default: false
+        }
     }
 
     var locale: Locale {
-        Locale(identifier: self == .arabic ? "ar_SA" : "en_US")
+        switch self {
+        case .arabic: Locale(identifier: "ar_SA")
+        case .english: Locale(identifier: "en_US")
+        case .spanish: Locale(identifier: "es_ES")
+        case .french: Locale(identifier: "fr_FR")
+        case .german: Locale(identifier: "de_DE")
+        case .russian: Locale(identifier: "ru_RU")
+        case .portuguese: Locale(identifier: "pt_BR")
+        case .chinese: Locale(identifier: "zh_Hans")
+        case .turkish: Locale(identifier: "tr_TR")
+        case .hindi: Locale(identifier: "hi_IN")
+        }
     }
 }
 
 enum CatalogCategory: String, CaseIterable, Identifiable {
-    case all, engine, cooling, electrical, body, brake, suspension, interior, fuel, general
+    // Raw values must match the `category` field in the catalog data exactly.
+    // `drivetrain` covers transfer case / differential / propeller-shaft parts that
+    // previously fell through to `general` (see Part.categoryValue fallback).
+    case all, engine, cooling, electrical, body, brake, suspension, drivetrain, interior, fuel, general
     var id: String {
         rawValue
     }
@@ -33,6 +83,7 @@ enum CatalogCategory: String, CaseIterable, Identifiable {
         case .body: language == .arabic ? "هيكل" : "Body"
         case .brake: language == .arabic ? "فرامل" : "Brake"
         case .suspension: language == .arabic ? "تعليق" : "Suspension"
+        case .drivetrain: language == .arabic ? "نقل الحركة" : "Drivetrain"
         case .interior: language == .arabic ? "داخلية" : "Interior"
         case .fuel: language == .arabic ? "وقود" : "Fuel"
         case .general: language == .arabic ? "عام" : "General"
@@ -48,6 +99,7 @@ enum CatalogCategory: String, CaseIterable, Identifiable {
         case .body: "car.side"
         case .brake: "record.circle"
         case .suspension: "waveform.path.ecg"
+        case .drivetrain: "gearshape.2"
         case .interior: "seatbelt"
         case .fuel: "fuelpump"
         case .general: "wrench.and.screwdriver"
@@ -210,6 +262,9 @@ struct Part: Decodable, Identifiable, Hashable {
             .prefix(8))
     }
 
+    /// Maps the raw catalog `category` string to a known UI category.
+    /// Documented fallback: an unknown or missing category resolves to `.general`
+    /// rather than being dropped, so every part stays browsable.
     var categoryValue: CatalogCategory {
         guard let raw = category?.lowercased() else { return .general }
         return CatalogCategory(rawValue: raw) ?? .general
@@ -217,6 +272,52 @@ struct Part: Decodable, Identifiable, Hashable {
 
     var isSharedCandidate: Bool {
         years.count >= 5 || engines.count >= 2 || (sourceCount ?? 0) >= 4
+    }
+}
+
+/// Explains why a part appeared in the search results, so users can trust the ranking.
+/// Ordered from strongest (exact number) to weakest (plain browse) signal.
+enum PartMatchReason: String, CaseIterable, Identifiable {
+    case exactNumber
+    case alternateNumber
+    case partialNumber
+    case closeNumber
+    case description
+    case synonym
+    case browse
+
+    var id: String { rawValue }
+
+    func label(_ language: AppLanguage) -> String {
+        switch self {
+        case .exactNumber: language == .arabic ? "مطابقة رقم" : "Number match"
+        case .alternateNumber: language == .arabic ? "رقم بديل" : "Alternate number"
+        case .partialNumber: language == .arabic ? "رقم جزئي" : "Partial number"
+        case .closeNumber: language == .arabic ? "رقم قريب" : "Close number"
+        case .description: language == .arabic ? "مطابقة وصف" : "Description match"
+        case .synonym: language == .arabic ? "مرادف" : "Synonym match"
+        case .browse: language == .arabic ? "تصفح" : "Browse"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .exactNumber, .alternateNumber: "number"
+        case .partialNumber, .closeNumber: "number.circle"
+        case .description: "text.magnifyingglass"
+        case .synonym: "textformat.abc"
+        case .browse: "square.grid.2x2"
+        }
+    }
+
+    var systemColorName: String {
+        switch self {
+        case .exactNumber: "green"
+        case .alternateNumber, .partialNumber: "teal"
+        case .closeNumber: "orange"
+        case .description, .synonym: "blue"
+        case .browse: "gray"
+        }
     }
 }
 

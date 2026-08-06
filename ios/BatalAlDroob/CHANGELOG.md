@@ -1,5 +1,38 @@
 # Changelog
 
+## 2.7 (191) - 2026-08-06
+
+### Ten Interface Languages
+
+- Added eight interface languages beside Arabic and English: Spanish, French,
+  German, Russian, Portuguese, Simplified Chinese, Turkish, and Hindi.
+- Routed the existing inline Arabic/English string pairs through a translation
+  table keyed by the English text, so adding a language touches no view code and
+  any untranslated string falls back to English instead of showing a raw key.
+- Layout direction now follows `AppLanguage.isRTL` rather than an Arabic-only
+  check, and each language carries its own locale for dates and numbers.
+- Declared all ten languages in `CFBundleLocalizations` and `knownRegions`, with
+  per-language `InfoPlist.strings` for the display name.
+- Catalog part names remain Arabic/English: the source catalogs publish them that
+  way and OEM part numbers are language-neutral.
+
+### Search, Fitment, and Requests (roadmap Phase 1)
+
+- Search results now explain themselves: each row carries a reason badge (number
+  match, partial/close number, description, or synonym) derived from the ranking.
+- Parts that fit the saved vehicle profile are boosted in ranking and marked
+  "Fits your vehicle", so fitment helps even when the hard filter is off.
+- Added the `drivetrain` catalog category: ~706 transfer-case, differential, and
+  propeller-shaft parts that previously fell through to "General" are now
+  categorised correctly, and the `.general` fallback is documented.
+- Part requests are blocked while ambiguous: a request needs a part number or
+  name **and** a generation or year, with a live preview and a checklist of what
+  is missing, plus a supplier-facing closing line asking for availability/price.
+- Corrected an architecture-doc line that still listed a location/compass surface
+  in `MoreViews.swift`; the app has no map, compass, or location module.
+- Added a test file covering ranking reasons, drivetrain categorisation, the
+  fitment boost, request validation, and localization fallback.
+
 ## 2.6 (190) - 2026-08-06
 
 ### Clean Release Build

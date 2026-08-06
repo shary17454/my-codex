@@ -91,6 +91,11 @@ private struct FormContent: View {
                 saveRequest: saveRequest
             )
             VehicleDetailsSection(viewModel: viewModel, request: $request)
+            RequestPreviewSection(
+                viewModel: viewModel,
+                request: $request,
+                selectedPlan: selectedPlan
+            )
             SavedRequestsSection(viewModel: viewModel)
         }
     }
@@ -173,6 +178,44 @@ private struct VehicleDetailsSection: View {
                 .accessibilityIdentifier("request.engine")
             TextField(viewModel.text(ar: "القير", en: "Transmission"), text: $request.transmission)
                 .accessibilityIdentifier("request.transmission")
+        }
+    }
+}
+
+private struct RequestPreviewSection: View {
+    @Bindable var viewModel: CatalogViewModel
+    @Binding var request: SavedPartRequest
+    let selectedPlan: PartRequestPlan
+
+    private var missing: [PartRequestRequirement] {
+        partRequestMissingRequirements(request)
+    }
+
+    var body: some View {
+        Section(viewModel.text(ar: "معاينة الطلب", en: "Request preview")) {
+            if missing.isEmpty {
+                Text(viewModel.buildDraft(for: request, plan: selectedPlan))
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+                    .accessibilityIdentifier("request.preview")
+            } else {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label(
+                        viewModel.text(ar: "أكمل الحقول التالية لمنع طلب غامض:", en: "Complete these to avoid an ambiguous request:"),
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.orange)
+                    ForEach(missing) { requirement in
+                        Text("• \(requirement.message(viewModel.language))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 2)
+                .accessibilityIdentifier("request.preview.missing")
+            }
         }
     }
 }

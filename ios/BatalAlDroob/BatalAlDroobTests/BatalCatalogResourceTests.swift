@@ -1028,7 +1028,8 @@ final class BatalCatalogResourceTests: XCTestCase {
     }
 }
 
-private struct StaticCatalogRepository: CatalogRepository {
+// Shared with BatalPhase1AndLocalizationTests, so these stay internal to the test target.
+struct StaticCatalogRepository: CatalogRepository {
     func loadCatalog() async throws -> CatalogPayload {
         CatalogPayload(
             generatedAt: nil,
@@ -1217,7 +1218,7 @@ private actor RetryStoreDirectoryRepository: CatalogRepository {
     }
 }
 
-private struct TestPurchaseService: PurchaseService {
+struct TestPurchaseService: PurchaseService {
     var entitlements = Set<String>()
 
     func availableProductIDs(for productIDs: [String]) async throws -> Set<String> {

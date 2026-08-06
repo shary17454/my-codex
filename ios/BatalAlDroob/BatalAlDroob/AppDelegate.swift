@@ -15,7 +15,7 @@ struct BatalAlDroobApp: App {
         WindowGroup {
             RootView(viewModel: viewModel)
                 .id(viewModel.language.rawValue)
-                .environment(\.layoutDirection, viewModel.language == .arabic ? .rightToLeft : .leftToRight)
+                .environment(\.layoutDirection, viewModel.language.isRTL ? .rightToLeft : .leftToRight)
                 .environment(\.locale, viewModel.language.locale)
                 .task { await viewModel.load() }
                 .task { await viewModel.observePurchaseUpdates() }

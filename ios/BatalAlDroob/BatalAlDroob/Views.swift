@@ -86,7 +86,7 @@ struct RootView: View {
                 hasCompletedInitialPermissionOnboarding = true
                 isPermissionOnboardingPresented = false
             }
-            .environment(\.layoutDirection, viewModel.language == .arabic ? .rightToLeft : .leftToRight)
+            .environment(\.layoutDirection, viewModel.language.isRTL ? .rightToLeft : .leftToRight)
             .environment(\.locale, viewModel.language.locale)
         }
         .alert(
@@ -1033,12 +1033,54 @@ struct PartRow: View {
                 Text([part.model, part.categoryAr ?? part.category, part.years.prefix(3).joined(separator: ", ")]
                     .compactMap(\.self).filter { !$0.isEmpty }.joined(separator: " · "))
                     .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                if reason != nil || fitsVehicle {
+                    HStack(spacing: 6) {
+                        if let reason {
+                            MatchReasonBadge(
+                                text: reason.label(viewModel.language),
+                                symbol: reason.symbol,
+                                colorName: reason.systemColorName
+                            )
+                        }
+                        if fitsVehicle {
+                            MatchReasonBadge(
+                                text: viewModel.text(ar: "يناسب سيارتك", en: "Fits your vehicle"),
+                                symbol: "checkmark.seal.fill",
+                                colorName: "green"
+                            )
+                        }
+                    }
+                }
             }
             Spacer()
             if part.confidence != nil { ConfidenceBadge(value: part.confidence ?? 0) }
         }
         .contentShape(Rectangle())
         .accessibilityIdentifier("catalog.part.\(part.partNumber)")
+    }
+
+    private var reason: PartMatchReason? {
+        viewModel.currentMatchReason(for: part)
+    }
+
+    private var fitsVehicle: Bool {
+        viewModel.partFitsVehicleProfile(part)
+    }
+}
+
+/// Compact pill that explains why a search row appeared (number match, synonym, fitment…).
+struct MatchReasonBadge: View {
+    let text: String
+    let symbol: String
+    let colorName: String
+    var body: some View {
+        Label(text, systemImage: symbol)
+            .font(.caption2.weight(.semibold))
+            .lineLimit(1)
+            .padding(.horizontal, 7).padding(.vertical, 3)
+            .background(Color.named(colorName).opacity(0.16), in: Capsule())
+            .foregroundStyle(Color.named(colorName))
+            .accessibilityIdentifier("catalog.reason.\(text)")
     }
 }
 
@@ -1050,6 +1092,22 @@ struct ConfidenceBadge: View {
             .padding(.horizontal, 8).padding(.vertical, 4)
             .background(value >= 80 ? .green.opacity(0.18) : .orange.opacity(0.18), in: Capsule())
             .foregroundStyle(value >= 80 ? .green : .orange)
+    }
+}
+
+extension Color {
+    /// Maps the catalog's stable `systemColorName` strings to SwiftUI colors so badges
+    /// and indicators stay theme-aware in both light and dark mode.
+    static func named(_ name: String) -> Color {
+        switch name {
+        case "green": .green
+        case "orange": .orange
+        case "red": .red
+        case "teal": .teal
+        case "blue": .blue
+        case "gray": .gray
+        default: .secondary
+        }
     }
 }
 

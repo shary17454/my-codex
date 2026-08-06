@@ -253,52 +253,107 @@ extension CatalogViewModel {
     }
 
     func rankedCatalogMatches(for query: String, limit: Int) -> [Part] {
+        rankedCatalogMatchesDetailed(for: query, limit: limit).map(\.part)
+    }
+
+    /// A single ranked search hit together with why it matched and whether it fits the
+    /// saved vehicle. Powers both the ranked list and the per-row "why it appeared" badge.
+    struct RankedMatch {
+        let part: Part
+        let score: Int
+        let reason: PartMatchReason
+        let fitsVehicle: Bool
+    }
+
+    /// Ranks catalog parts for a query, recording the match reason for each hit and
+    /// boosting parts that fit the saved vehicle so they float to the top.
+    func rankedCatalogMatchesDetailed(for query: String, limit: Int) -> [RankedMatch] {
         let normalizedQuery = normalized(query)
         let shouldUseExpandedTerms = !isLikelyPartNumberLookup(query, normalizedQuery: normalizedQuery)
         let expandedTerms = shouldUseExpandedTerms ? expandedSearchTerms(for: query) : []
         let intent = CatalogSearchIntent(query: query)
-        return parts.compactMap { part -> (Part, Int)? in
+        return parts.compactMap { part -> RankedMatch? in
             let normalizedPrimary = normalized(part.partNumber)
             let normalizedNumbers = part.allNumbers.map(normalized)
             let searchText = self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)
             var score: Int
+            var reason: PartMatchReason
             if normalizedPrimary == normalizedQuery {
                 score = 400
+                reason = .exactNumber
             } else if normalizedNumbers.contains(normalizedQuery) {
                 score = 350
+                reason = .alternateNumber
             } else if normalizedPrimary.contains(normalizedQuery) {
                 score = 300
+                reason = .partialNumber
             } else if normalizedNumbers.contains(where: { $0.contains(normalizedQuery) }) {
                 score = 250
+                reason = .partialNumber
             } else if
                 isLikelyPartNumberLookup(query, normalizedQuery: normalizedQuery),
                 let distance = closestPartNumberDistance(normalizedNumbers, to: normalizedQuery) {
                 score = 180 - distance
+                reason = .closeNumber
             } else if searchText.contains(normalizedQuery) {
                 score = 100 + (part.confidence ?? 0)
+                reason = .description
             } else if let expandedScore = expandedSearchScore(in: searchText, terms: expandedTerms) {
                 score = expandedScore + (part.confidence ?? 0)
+                reason = .synonym
             } else {
                 return nil
             }
             guard let adjustedScore = intent.adjustedScore(score, for: part, searchText: searchText) else {
                 return nil
             }
-            score = adjustedScore
-            return (part, score)
+            let fitsVehicle = self.partFitsVehicleProfile(part)
+            score = adjustedScore + self.vehicleFitmentBonus(for: part)
+            return RankedMatch(part: part, score: score, reason: reason, fitsVehicle: fitsVehicle)
         }
         .sorted { lhs, rhs in
-            if lhs.1 == rhs.1 { return (lhs.0.confidence ?? 0) > (rhs.0.confidence ?? 0) }
-            return lhs.1 > rhs.1
+            if lhs.score == rhs.score { return (lhs.part.confidence ?? 0) > (rhs.part.confidence ?? 0) }
+            return lhs.score > rhs.score
         }
         .prefix(limit)
-        .map(\.0)
+        .map(\.self)
+    }
+
+    /// Derives the match reason for a single part against a query, mirroring the ranking
+    /// branches. Used by the search results UI to badge each row without re-ranking.
+    func matchReason(for part: Part, query rawQuery: String) -> PartMatchReason? {
+        let normalizedQuery = normalized(rawQuery)
+        guard !normalizedQuery.isEmpty else { return .browse }
+        let normalizedPrimary = normalized(part.partNumber)
+        let normalizedNumbers = part.allNumbers.map(normalized)
+        if normalizedPrimary == normalizedQuery { return .exactNumber }
+        if normalizedNumbers.contains(normalizedQuery) { return .alternateNumber }
+        if normalizedPrimary.contains(normalizedQuery) { return .partialNumber }
+        if normalizedNumbers.contains(where: { $0.contains(normalizedQuery) }) { return .partialNumber }
+        if isLikelyPartNumberLookup(rawQuery, normalizedQuery: normalizedQuery),
+           closestPartNumberDistance(normalizedNumbers, to: normalizedQuery) != nil {
+            return .closeNumber
+        }
+        let searchText = self.partSearchIndex[part.partNumber] ?? self.searchableText(for: part)
+        if searchText.contains(normalizedQuery) { return .description }
+        if expandedSearchScore(in: searchText, terms: expandedSearchTerms(for: rawQuery)) != nil {
+            return .synonym
+        }
+        return nil
     }
 
     func rankingDebugSummary(for query: String, limit: Int = 5) -> [String] {
         rankedCatalogMatches(for: query, limit: limit).map { part in
             "\(part.partNumber) | \(title(for: part)) | \(part.model ?? "-") | \(short(orderedModelYears(for: part.model, years: part.years), limit: 4))"
         }
+    }
+
+    /// Match reason for a part against the active search text, for row badges.
+    /// Returns nil while browsing (empty search) so no reason badge is shown.
+    func currentMatchReason(for part: Part) -> PartMatchReason? {
+        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        return matchReason(for: part, query: trimmed)
     }
 
     func searchableText(for part: Part) -> String {

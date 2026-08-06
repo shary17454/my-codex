@@ -31,7 +31,7 @@ There are no widgets, app clips, watch targets, share extensions, or notificatio
 - `Views.swift`: root tabs, dashboard, catalog, shared-fitment, and common state views.
 - `PartDetailViews.swift`: part details and store-link presentation.
 - `WorkflowViews.swift`: request and maintenance workflows.
-- `MoreViews.swift`: vehicle profile, location/compass, tools, policies, and secondary flows.
+- `MoreViews.swift`: vehicle profile, tools, policies, and secondary flows. It contains no map, compass, or location surface (see the product-scope note above).
 - `Utilities.swift`: formatting, validation, persistence helpers, logging categories, and shared UI helpers.
 
 Dependencies are injected at the application boundary through service protocols. UI-observable state is main-actor isolated, asynchronous work uses structured concurrency, and StoreKit transaction updates have a bounded lifecycle.

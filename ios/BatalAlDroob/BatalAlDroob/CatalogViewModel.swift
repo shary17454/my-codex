@@ -297,6 +297,20 @@ extension CatalogViewModel {
         return candidates.filter(matchesVehicleProfile)
     }
 
+    /// Internal accessors so the search extension (in another file) can factor the
+    /// saved vehicle into ranking without exposing the private matching internals.
+    var hasMeaningfulVehicleProfile: Bool { isVehicleProfileMeaningful }
+
+    func partFitsVehicleProfile(_ part: Part) -> Bool {
+        isVehicleProfileMeaningful && matchesVehicleProfile(part)
+    }
+
+    /// Ranking bonus applied to parts that fit the saved vehicle, so matching parts
+    /// float up even when the hard vehicle filter toggle is off. Zero when no profile.
+    func vehicleFitmentBonus(for part: Part) -> Int {
+        partFitsVehicleProfile(part) ? 140 : 0
+    }
+
     private func matchesVehicleProfile(_ part: Part) -> Bool {
         let generation = normalized(vehicleProfile.generation)
         let year = normalized(vehicleProfile.year)
@@ -321,8 +335,17 @@ extension CatalogViewModel {
 }
 
 extension CatalogViewModel {
+    /// Resolves a user-facing string for the active language.
+    ///
+    /// Call sites supply the Arabic/English pair inline; for any other language the
+    /// English text doubles as the lookup key into `BatalLocalization`, and an
+    /// untranslated string falls back to English rather than showing a raw key.
     func text(ar arabic: String, en english: String) -> String {
-        language == .arabic ? arabic : english
+        switch language {
+        case .arabic: arabic
+        case .english: english
+        default: BatalLocalization.translate(english, to: language) ?? english
+        }
     }
 
     func smartIndicators(for part: Part) -> [SmartPartIndicator] {
