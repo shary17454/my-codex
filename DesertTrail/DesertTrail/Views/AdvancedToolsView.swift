@@ -289,7 +289,7 @@ struct AdvancedToolsView: View {
     }
 
     private var platformVisionCard: some View {
-        featureCard(title: "منصة الدروب المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
+        featureCard(title: "منصة خرايم المتكاملة", icon: "square.stack.3d.up", color: .desertCopper) {
             Text("هذه الشاشة تجمع التخطيط، الملاحة، الخرائط دون اتصال، السلامة، المجتمع، الذكاء الاصطناعي، والتكامل مع أجهزة Apple في تجربة واحدة للرحلة البرية.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -1402,7 +1402,7 @@ struct AdvancedToolsView: View {
                 return
             }
             let content = UNMutableNotificationContent()
-            content.title = "تحذير الدروب"
+            content.title = "تحذير خرايم"
             content.body = "اقتربت من مسار رملي ناعم. تحقق من ضغط الإطارات قبل الدخول."
             content.sound = .default
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false)
@@ -1647,7 +1647,7 @@ struct SOSView: View {
 
     private var message: String {
         """
-        SOS الدروب
+        SOS خرايم
         آخر موقع معروف:
         \(coordinate.latitude), \(coordinate.longitude)
         الوقت: \(Date().formatted(date: .numeric, time: .shortened))
@@ -1894,7 +1894,7 @@ struct SmartAssistantView: View {
     private var smartSearchSection: some View {
         let matches = currentResponse.matches
         VStack(alignment: .leading, spacing: 10) {
-            SectionHeaderView(title: "نتائج البحث الذكي", subtitle: matches.isEmpty ? "لا توجد نتائج مطابقة" : "\(matches.count) نتائج من بيانات الدروب", icon: "magnifyingglass")
+            SectionHeaderView(title: "نتائج البحث الذكي", subtitle: matches.isEmpty ? "لا توجد نتائج مطابقة" : "\(matches.count) نتائج من بيانات خرايم", icon: "magnifyingglass")
 
             if matches.isEmpty {
                 EmptyStateView(title: "لا توجد نتائج", detail: "جرّب اسم وادي، جبل، منطقة، عائلات، رمل، أو دفع رباعي.", icon: "map")
@@ -2157,7 +2157,7 @@ struct TripReportView: View {
 
     private var report: String {
         """
-        تقرير رحلة الدروب
+        تقرير رحلة خرايم
         البداية: \(startedAt.formatted(date: .numeric, time: .shortened))
         النهاية: \(Date().formatted(date: .numeric, time: .shortened))
         المسافة المسجلة: \(String(format: "%.2f", distanceMeters / 1_000)) كم

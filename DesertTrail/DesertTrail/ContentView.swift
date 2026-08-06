@@ -180,7 +180,7 @@ private struct FirstLaunchConsentView: View {
                 .foregroundStyle(Color.trailAmber)
                 .accessibilityHidden(true)
 
-            Text("الدروب")
+            Text("خرايم")
                 .font(.largeTitle.bold())
                 .foregroundStyle(primaryText)
 
@@ -245,7 +245,7 @@ private struct FirstLaunchConsentView: View {
 
     private var privacyCard: some View {
         ConsentCard(title: "الخصوصية", icon: "lock.shield.fill") {
-            consentRow("لا يستخدم الدروب تتبعًا إعلانيًا عبر التطبيقات أو المواقع الأخرى.")
+            consentRow("لا يستخدم خرايم تتبعًا إعلانيًا عبر التطبيقات أو المواقع الأخرى.")
             consentRow("بيانات الرحلات والمواقع تُحفظ محليًا على الجهاز، ولا تُشارك إلا عند اختيارك المشاركة.")
             consentRow("يمكنك تغيير صلاحيات الموقع والإشعارات لاحقًا من إعدادات iOS.")
         }

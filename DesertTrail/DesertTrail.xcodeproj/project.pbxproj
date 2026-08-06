@@ -452,13 +452,13 @@
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "الدروب";
+				INFOPLIST_KEY_CFBundleDisplayName = "خرايم";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.DesertTrail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codex.Kharayem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
@@ -477,13 +477,13 @@
 				DEVELOPMENT_TEAM = 4HM66AD594;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DesertTrail/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "الدروب";
+				INFOPLIST_KEY_CFBundleDisplayName = "خرايم";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.DesertTrail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codex.Kharayem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;

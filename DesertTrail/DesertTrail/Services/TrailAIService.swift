@@ -82,7 +82,7 @@ struct TrailAIService {
                     id: "place-\(place.id.uuidString)",
                     title: place.name,
                     subtitle: "تقييم \(place.rating)/5 · \(place.notes)",
-                    reason: "تطابق مع طلبك ومناسب للبحث داخل مواقع الدروب.",
+                    reason: "تطابق مع طلبك ومناسب للبحث داخل مواقع خرايم.",
                     coordinate: place.coordinate
                 )
             }
@@ -272,7 +272,7 @@ struct TrailAIService {
         if prompt.contains("لخص") || prompt.contains("ملخص") { return "ملخص ذكي" }
         if prompt.contains("خطر") || prompt.contains("سلام") || prompt.contains("طقس") { return "تقييم سلامة" }
         if prompt.contains("وين") || prompt.contains("مكان") || prompt.contains("اقترح") { return "اقتراح وجهة" }
-        return "مساعد الدروب"
+        return "مساعد خرايم"
     }
 
     private func fallbackResults(context: TrailAIContext) -> [TrailAISearchResult] {

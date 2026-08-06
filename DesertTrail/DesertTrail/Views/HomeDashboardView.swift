@@ -536,7 +536,7 @@ struct HomeDashboardView: View {
                     VStack(alignment: .trailing, spacing: 3) {
                         Text("المجتمع")
                             .font(.headline)
-                        Text("شارك مواقعك وتجاربك مع رحالة الدروب")
+                        Text("شارك مواقعك وتجاربك مع رحالة خرايم")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -1147,7 +1147,7 @@ private enum DashboardCommunityDetail: String, Identifiable {
         switch self {
         case .participants:
             let count = Set(appState.trips.flatMap(\.participants)).count
-            return count == 0 ? "لا يوجد مشاركون محفوظون بعد." : "لديك \(count) مشاركين محفوظين في رحلات الدروب."
+            return count == 0 ? "لا يوجد مشاركون محفوظون بعد." : "لديك \(count) مشاركين محفوظين في رحلات خرايم."
         case .places:
             return "عدد المواقع البرية والمخفية المحفوظة في التطبيق."
         case .trips:

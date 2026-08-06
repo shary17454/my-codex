@@ -238,7 +238,7 @@ struct HiddenPlaceForm: View {
                 .map {
                     PlaceSearchResult(
                         name: $0.name,
-                        subtitle: "موقع محفوظ داخل الدروب",
+                        subtitle: "موقع محفوظ داخل خرايم",
                         coordinate: $0.coordinate
                     )
                 }
