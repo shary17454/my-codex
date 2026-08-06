@@ -14,39 +14,89 @@ struct CompassPanel: View {
         ScrollView {
             VStack(spacing: 16) {
                 ZStack {
+                    // Outer brushed-metal bezel
+                    Circle()
+                        .fill(
+                            AngularGradient(
+                                gradient: Gradient(colors: [
+                                    Color(white: 0.14), Color(white: 0.34), Color(white: 0.09),
+                                    Color(white: 0.30), Color(white: 0.12), Color(white: 0.33),
+                                    Color(white: 0.10), Color(white: 0.28), Color(white: 0.14)
+                                ]),
+                                center: .center
+                            )
+                        )
+                        .frame(width: 248, height: 248)
+                        .overlay(Circle().strokeBorder(Color.white.opacity(0.12), lineWidth: 1))
+                        .shadow(color: .black.opacity(0.5), radius: 22, y: 12)
+
+                    // Dark glass face with accent glow
                     Circle()
                         .fill(
                             RadialGradient(
-                                colors: [Color.desertSand.opacity(0.95), Color.desertSurface, Color.desertPanel.opacity(0.18)],
-                                center: .center,
-                                startRadius: 10,
+                                colors: [Color(red: 0.08, green: 0.12, blue: 0.14), Color(red: 0.02, green: 0.04, blue: 0.05)],
+                                center: UnitPoint(x: 0.42, y: 0.36),
+                                startRadius: 4,
                                 endRadius: 130
                             )
                         )
-                        .overlay(Circle().stroke(Color.desertCopper, lineWidth: 3))
-                        .shadow(radius: 8)
+                        .frame(width: 214, height: 214)
+                        .overlay(
+                            Circle().stroke(
+                                LinearGradient(
+                                    colors: [Color.trailSignal.opacity(0.7), Color.clear, Color.trailAmber.opacity(0.45)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1.4
+                            )
+                        )
+                        .overlay(
+                            Circle()
+                                .stroke(Color.trailSignal.opacity(0.22), lineWidth: 7)
+                                .blur(radius: 9)
+                        )
+                        .shadow(color: Color.trailSignal.opacity(0.28), radius: 16)
 
                     ZStack {
-                        ForEach(0..<12) { tick in
-                            Rectangle()
-                                .fill(tick % 3 == 0 ? Color.desertRock : Color.secondary)
-                                .frame(width: tick % 3 == 0 ? 4 : 2, height: tick % 3 == 0 ? 24 : 12)
-                                .offset(y: -122)
-                                .rotationEffect(.degrees(Double(tick) * 30))
+                        ForEach(0..<72) { tick in
+                            let isMajor = tick % 9 == 0
+                            Capsule()
+                                .fill(isMajor ? Color.trailSignal : Color.white.opacity(0.32))
+                                .frame(width: isMajor ? 3 : 1.4, height: isMajor ? 16 : 7)
+                                .offset(y: -98)
+                                .rotationEffect(.degrees(Double(tick) * 5))
                         }
 
-                        compassCardinal("N", y: -98)
-                        compassCardinal("S", y: 98)
-                        compassCardinal("E", x: 98)
-                        compassCardinal("W", x: -98)
+                        compassCardinal("N", y: -74, isNorth: true)
+                        compassCardinal("S", y: 74)
+                        compassCardinal("E", x: 74)
+                        compassCardinal("W", x: -74)
                     }
                     .environment(\.layoutDirection, .leftToRight)
 
                     VStack(spacing: 10) {
                         ZStack {
+                            // Premium central hub the needles pivot around
+                            Circle()
+                                .fill(
+                                    RadialGradient(
+                                        colors: [Color.trailMist.opacity(0.28), Color.clear],
+                                        center: .center,
+                                        startRadius: 0,
+                                        endRadius: 30
+                                    )
+                                )
+                                .frame(width: 60, height: 60)
+                            Circle()
+                                .fill(Color(white: 0.14))
+                                .frame(width: 14, height: 14)
+                                .overlay(Circle().stroke(Color.trailSignal.opacity(0.8), lineWidth: 1.4))
+                                .shadow(color: Color.trailSignal.opacity(0.6), radius: 4)
+
                             compassNeedle(
                                 systemImage: "location.north.fill",
-                                color: headingDegrees == nil ? .secondary : .oasisTeal,
+                                color: headingDegrees == nil ? Color.trailMist.opacity(0.4) : Color.trailSignal,
                                 rotation: northNeedleRotation,
                                 size: 66,
                                 label: "اتجاه الشمال",
@@ -65,25 +115,29 @@ struct CompassPanel: View {
                                 )
                             }
 
-                            compassNeedle(
-                                systemImage: "wind",
-                                color: appState.environmentalReport.isLiveData ? .orange : .secondary,
-                                rotation: windFlowNeedleRotation,
-                                size: 30,
-                                offset: 50,
-                                label: "اتجاه حركة الرياح",
-                                pointer: .wind
-                            )
+                            if appState.environmentalReport.isLiveData {
+                                flowNeedle(
+                                    glyph: "wind",
+                                    tint: [Color.trailAmber, Color.desertCopper],
+                                    rotation: windFlowNeedleRotation,
+                                    size: 30,
+                                    offset: 52,
+                                    label: "اتجاه حركة الرياح",
+                                    pointer: .wind,
+                                    isActive: true
+                                )
 
-                            compassNeedle(
-                                systemImage: "cloud.fill",
-                                color: appState.environmentalReport.isLiveData ? .blue : .secondary,
-                                rotation: cloudDriftNeedleRotation,
-                                size: 26,
-                                offset: 70,
-                                label: "اتجاه حركة السحب",
-                                pointer: .clouds
-                            )
+                                flowNeedle(
+                                    glyph: "cloud.fill",
+                                    tint: [Color(red: 0.36, green: 0.68, blue: 0.98), Color(red: 0.16, green: 0.44, blue: 0.86)],
+                                    rotation: cloudDriftNeedleRotation,
+                                    size: 26,
+                                    offset: 72,
+                                    label: "اتجاه حركة السحب",
+                                    pointer: .clouds,
+                                    isActive: true
+                                )
+                            }
 
                             if let courseDegrees {
                                 compassNeedle(
@@ -100,11 +154,22 @@ struct CompassPanel: View {
                         .frame(width: 92, height: 92)
                         .environment(\.layoutDirection, .leftToRight)
                         Text(headingDegrees.map { "\(Int($0.rounded()))°" } ?? "--°")
-                            .font(.system(.largeTitle, design: .rounded).monospacedDigit().weight(.bold))
-                            .foregroundStyle(.primary)
+                            .font(.system(size: 40, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color.trailMist, Color.trailSignal],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .shadow(color: Color.trailSignal.opacity(0.5), radius: 8)
                         Text(directionName)
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
+                            .font(.subheadline.weight(.bold))
+                            .tracking(1.5)
+                            .foregroundStyle(Color.trailMist.opacity(0.75))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                            .frame(maxWidth: 150)
                     }
                 }
                 .frame(width: 248, height: 248)
@@ -311,6 +376,58 @@ struct CompassPanel: View {
         .accessibilityHint("اضغط لعرض التفاصيل والإجراء المرتبط بهذا المؤشر")
     }
 
+    /// Premium directional marker for wind / cloud flow: a tapered gradient arrow
+    /// that points precisely along the flow direction, with an upright icon badge
+    /// at its tail so the meaning stays readable at any rotation. Falls back to a
+    /// muted style when live weather data is unavailable.
+    private func flowNeedle(
+        glyph: String,
+        tint: [Color],
+        rotation: Double,
+        size: CGFloat,
+        offset: CGFloat,
+        label: String,
+        pointer: CompassPointer,
+        isActive: Bool
+    ) -> some View {
+        let arrowFill: [Color] = isActive ? tint : [Color.secondary.opacity(0.55), Color.secondary.opacity(0.3)]
+        let badgeColor = isActive ? (tint.first ?? .gray) : .gray
+        return Button {
+            triggerHaptic()
+            selectedPointer = pointer
+            if !appState.environmentalReport.isLiveData {
+                refreshWeather()
+            }
+        } label: {
+            ZStack {
+                FlowArrowShape()
+                    .fill(LinearGradient(colors: arrowFill, startPoint: .top, endPoint: .bottom))
+                    .overlay(
+                        FlowArrowShape().stroke(Color.white.opacity(0.6), lineWidth: 0.8)
+                    )
+                    .frame(width: size * 0.66, height: size * 1.4)
+                    .shadow(color: (isActive ? (tint.first ?? .clear) : .clear).opacity(0.55), radius: 5, y: 2)
+
+                Image(systemName: glyph)
+                    .font(.system(size: size * 0.4, weight: .black))
+                    .foregroundStyle(.white)
+                    .padding(size * 0.16)
+                    .background(Circle().fill(badgeColor.gradient))
+                    .overlay(Circle().strokeBorder(Color.white.opacity(0.75), lineWidth: 1))
+                    .offset(y: size * 0.66)
+                    .rotationEffect(.degrees(-rotation))
+                    .shadow(radius: 2, y: 1)
+            }
+            .frame(width: max(size + 18, 44), height: max(size + 18, 44))
+            .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .offset(y: offset)
+        .rotationEffect(.degrees(rotation))
+        .accessibilityLabel(label)
+        .accessibilityHint("اضغط لعرض التفاصيل والإجراء المرتبط بهذا المؤشر")
+    }
+
     private func legendChip(_ title: String, color: Color, icon: String, value: String) -> some View {
         HStack(spacing: 7) {
             Image(systemName: icon)
@@ -331,16 +448,17 @@ struct CompassPanel: View {
         .background(Color.desertSurface, in: RoundedRectangle(cornerRadius: 8))
     }
 
-    private func compassCardinal(_ text: String, x: CGFloat = 0, y: CGFloat = 0) -> some View {
+    private func compassCardinal(_ text: String, x: CGFloat = 0, y: CGFloat = 0, isNorth: Bool = false) -> some View {
         Text(text)
-            .font(.headline.weight(.black))
-            .foregroundStyle(Color.desertRock)
+            .font(.system(size: isNorth ? 20 : 16, weight: .black, design: .rounded))
+            .foregroundStyle(isNorth ? Color.trailSignal : Color.trailMist.opacity(0.7))
+            .shadow(color: isNorth ? Color.trailSignal.opacity(0.7) : .clear, radius: 6)
             .offset(x: x, y: y)
     }
 
     private var directionName: String {
         guard let headingDegrees else {
-            return "بانتظار قراءة الاتجاه"
+            return "—"
         }
         let directions = [
             appState.text(.north),
@@ -1000,5 +1118,27 @@ struct CompassPanel: View {
             case .gpx: return appState.text(.gpxReady)
             }
         }
+    }
+}
+
+/// A tapered arrow (arrowhead + stem) pointing toward the top of its frame,
+/// used for the compass wind and cloud flow markers.
+private struct FlowArrowShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let width = rect.width
+        let height = rect.height
+        let headHeight = height * 0.5
+        let stemHalf = width * 0.22
+
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))                       // tip
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + headHeight))       // right barb
+        path.addLine(to: CGPoint(x: rect.midX + stemHalf, y: rect.minY + headHeight))
+        path.addLine(to: CGPoint(x: rect.midX + stemHalf, y: rect.maxY))         // stem bottom-right
+        path.addLine(to: CGPoint(x: rect.midX - stemHalf, y: rect.maxY))         // stem bottom-left
+        path.addLine(to: CGPoint(x: rect.midX - stemHalf, y: rect.minY + headHeight))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + headHeight))       // left barb
+        path.closeSubpath()
+        return path
     }
 }
