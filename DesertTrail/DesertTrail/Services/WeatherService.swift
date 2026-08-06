@@ -30,7 +30,10 @@ actor WeatherService {
         let report = EnvironmentalReport(
             temperatureCelsius: weatherResult.temperatureCelsius,
             airQualityIndex: airQualityIndex,
-            weatherSummary: weatherResult.temperatureCelsius > 40 ? "حار وجاف" : "مستقر",
+            weatherSummary: Self.summarize(
+                temperatureCelsius: weatherResult.temperatureCelsius,
+                windSpeedKPH: weatherResult.windSpeedKPH
+            ),
             windSpeedKPH: weatherResult.windSpeedKPH,
             windDirectionDegrees: weatherResult.windDirectionDegrees,
             updatedAt: .now,
@@ -110,6 +113,32 @@ actor WeatherService {
 
     private func cacheKey(for coordinate: CLLocationCoordinate2D) -> String {
         "\(Int(coordinate.latitude * 100)):\(Int(coordinate.longitude * 100))"
+    }
+
+    /// Human-readable Arabic weather summary derived from temperature and wind,
+    /// tuned for desert field use (heat and dust are what matter most).
+    static func summarize(temperatureCelsius: Double, windSpeedKPH: Double) -> String {
+        let heat: String
+        switch temperatureCelsius {
+        case ..<5: heat = "بارد"
+        case 5..<18: heat = "معتدل مائل للبرودة"
+        case 18..<28: heat = "معتدل"
+        case 28..<38: heat = "حار"
+        case 38..<44: heat = "حار جداً"
+        default: heat = "حر شديد"
+        }
+
+        let wind: String?
+        switch windSpeedKPH {
+        case ..<12: wind = nil
+        case 12..<25: wind = "نسيم خفيف"
+        case 25..<40: wind = "رياح نشطة"
+        case 40..<55: wind = "رياح قوية"
+        default: wind = "رياح شديدة وغبار محتمل"
+        }
+
+        guard let wind else { return heat }
+        return "\(heat) • \(wind)"
     }
 }
 

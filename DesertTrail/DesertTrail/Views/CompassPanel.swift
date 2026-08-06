@@ -107,7 +107,7 @@ struct CompassPanel: View {
                                 compassNeedle(
                                     systemImage: "arrow.up.circle.fill",
                                     color: .desertCopper,
-                                    rotation: tripBearingDegrees - (headingDegrees ?? 0),
+                                    rotation: tripBearingDegrees - rotationReferenceDegrees,
                                     size: 40,
                                     offset: -48,
                                     label: "اتجاه الوجهة",
@@ -143,7 +143,7 @@ struct CompassPanel: View {
                                 compassNeedle(
                                     systemImage: "car.fill",
                                     color: .green,
-                                    rotation: courseDegrees - (headingDegrees ?? 0),
+                                    rotation: courseDegrees - rotationReferenceDegrees,
                                     size: 28,
                                     offset: 84,
                                     label: "اتجاه الحركة",
@@ -153,6 +153,9 @@ struct CompassPanel: View {
                         }
                         .frame(width: 92, height: 92)
                         .environment(\.layoutDirection, .leftToRight)
+                        // Interpolate every needle's rotation smoothly. Driven by the
+                        // continuous heading so it never spins back across north.
+                        .animation(.easeOut(duration: 0.16), value: appState.locationManager.continuousHeadingDegrees)
                         Text(headingDegrees.map { "\(Int($0.rounded()))°" } ?? "--°")
                             .font(.system(size: 40, weight: .heavy, design: .rounded).monospacedDigit())
                             .foregroundStyle(
@@ -294,9 +297,16 @@ struct CompassPanel: View {
         appState.locationManager.resolvedHeadingDegrees
     }
 
+    /// Continuous (unwrapped) heading used only for needle rotation so animations
+    /// interpolate the short way across the 0°/360° boundary. Text still reads
+    /// `headingDegrees` (normalized).
+    private var rotationReferenceDegrees: Double {
+        appState.locationManager.continuousHeadingDegrees ?? 0
+    }
+
     private var northNeedleRotation: Double {
-        guard let headingDegrees else { return 0 }
-        return -headingDegrees
+        guard appState.locationManager.continuousHeadingDegrees != nil else { return 0 }
+        return -rotationReferenceDegrees
     }
 
     private var courseDegrees: Double? {
@@ -318,12 +328,12 @@ struct CompassPanel: View {
 
     private var windFlowNeedleRotation: Double {
         guard let windFlowDegrees else { return 0 }
-        return windFlowDegrees - (headingDegrees ?? 0)
+        return windFlowDegrees - rotationReferenceDegrees
     }
 
     private var cloudDriftNeedleRotation: Double {
         guard let cloudDriftDegrees else { return 0 }
-        return cloudDriftDegrees - (headingDegrees ?? 0)
+        return cloudDriftDegrees - rotationReferenceDegrees
     }
 
     private var tripBearingDegrees: Double? {

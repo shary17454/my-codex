@@ -137,6 +137,7 @@ struct CoordinateNavigationView: View {
                     .foregroundStyle(Color.oasisTeal)
                     .rotationEffect(.degrees(compassArrowRotation))
                     .environment(\.layoutDirection, .leftToRight)
+                    .animation(.easeOut(duration: 0.16), value: appState.locationManager.continuousHeadingDegrees)
                 VStack {
                     Spacer()
                     Text(bearingText)
@@ -465,7 +466,8 @@ struct CoordinateNavigationView: View {
     }
 
     private var compassArrowRotation: Double {
-        (bearingDegrees ?? 0) - (appState.locationManager.resolvedHeadingDegrees ?? 0)
+        // Continuous heading keeps the arrow's animation from spinning back at north.
+        (bearingDegrees ?? 0) - (appState.locationManager.continuousHeadingDegrees ?? 0)
     }
 
     private func coordinateText(_ coordinate: CLLocationCoordinate2D?) -> String {
