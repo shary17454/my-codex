@@ -20,6 +20,102 @@ enum MapDefaults {
     }
 }
 
+/// Reference facts for a named landmark (mountain, valley, lava field, dune sea).
+///
+/// Every figure is optional and every entry carries its `source`. A value is
+/// listed ONLY when it is traceable to a named reference — an unknown figure is
+/// left `nil` so the UI shows "غير متوفر" instead of an invented number. Field
+/// navigation decisions get made on these numbers, so guessing is not an option.
+struct GeoFacts: Hashable {
+    /// نوع التضاريس: جبل، وادي، حرة، نفود…
+    var landform: String?
+    /// المنطقة الإدارية
+    var region: String?
+    /// الارتفاع عن سطح البحر (متر)
+    var elevationMeters: Int?
+    /// الارتفاع عن السهل المحيط — الشموخ (متر)
+    var prominenceMeters: Int?
+    /// الطول (كم) — للأودية والسلاسل الجبلية
+    var lengthKm: Int?
+    /// العرض (كم) — نص لأنه غالبًا مدى وليس رقمًا واحدًا
+    var widthText: String?
+    /// المساحة (كم²) — للحرات والنفود
+    var areaKm2: Int?
+    /// ميزة بارزة تستحق الذكر
+    var highlight: String?
+    /// مصدر الأرقام
+    var source: String?
+
+    /// Verified figures keyed by landmark name.
+    ///
+    /// Coverage is deliberately partial: only landmarks whose figures were
+    /// confirmed against a named reference appear here. Add more as they get
+    /// sourced — never fill a gap with an estimate.
+    static let reference: [String: GeoFacts] = [
+        "وادي حنيفة": GeoFacts(
+            landform: "وادي",
+            region: "الرياض",
+            lengthKm: 160,
+            highlight: "أكبر أودية الرياض ويمر بوسط المدينة.",
+            source: "سعوديبيديا"
+        ),
+        "جبل طويق": GeoFacts(
+            landform: "سلسلة جبلية",
+            region: "نجد (الرياض والقصيم)",
+            lengthKm: 800,
+            widthText: "10 – 20 كم",
+            highlight: "حافة صخرية تمتد في وسط نجد، من أبرز معالم المملكة.",
+            source: "وكالة الأنباء السعودية"
+        ),
+        "حرة رهط": GeoFacts(
+            landform: "حرة بركانية",
+            region: "المدينة المنورة – مكة المكرمة",
+            areaKm2: 20_000,
+            highlight: "أكبر حقل حمم بركانية في السعودية، يمتد من المدينة حتى وادي فاطمة.",
+            source: "سعوديبيديا / ويكيبيديا"
+        ),
+        "السودة": GeoFacts(
+            landform: "جبل",
+            region: "عسير",
+            elevationMeters: 3_015,
+            highlight: "أعلى قمة في السعودية، وتبعد نحو 20 كم عن أبها.",
+            source: "هيئة المساحة الجيولوجية السعودية"
+        ),
+        "وادي الرمة": GeoFacts(
+            landform: "وادي",
+            region: "المدينة المنورة – القصيم – الحدود الشمالية",
+            lengthKm: 1_200,
+            highlight: "من أطول أودية الجزيرة العربية؛ ينبع من حرة خيبر ويمتد بامتداد وادي الباطن.",
+            source: "ويكيبيديا / سعوديبيديا"
+        ),
+        "وادي الرشاء": GeoFacts(
+            landform: "وادي",
+            region: "الرياض – القصيم",
+            lengthKm: 205,
+            highlight: "ينبع من جبل ثهلان ويصب في قاع الخرماء؛ متوسط انحداره 1.2 م/كم، ويمر بين عرجاء ونفي.",
+            source: "ويكيبيديا"
+        )
+    ]
+
+    /// Facts for a landmark, or `nil` when nothing has been sourced yet.
+    static func forPlace(named name: String) -> GeoFacts? {
+        reference[name.trimmingCharacters(in: .whitespaces)]
+    }
+
+    /// The populated figures as display rows, ready for a detail card.
+    var rows: [(label: String, value: String)] {
+        var result: [(String, String)] = []
+        if let landform { result.append(("نوع التضاريس", landform)) }
+        if let region { result.append(("المنطقة", region)) }
+        if let elevationMeters { result.append(("الارتفاع عن سطح البحر", "\(elevationMeters.formatted()) م")) }
+        if let prominenceMeters { result.append(("الارتفاع عن السهل المحيط", "\(prominenceMeters.formatted()) م")) }
+        if let lengthKm { result.append(("الطول", "\(lengthKm.formatted()) كم")) }
+        if let widthText { result.append(("العرض", widthText)) }
+        if let areaKm2 { result.append(("المساحة", "\(areaKm2.formatted()) كم²")) }
+        return result
+    }
+}
+
 struct TripPlan: Identifiable, Hashable {
     let id: UUID
     var title: String
@@ -161,6 +257,7 @@ struct HiddenPlace: Identifiable, Hashable {
         HiddenPlace(id: UUID(), name: "جبل القهر", coordinate: CLLocationCoordinate2D(latitude: 17.8700, longitude: 43.0800), rating: 5, imageSystemName: "mountain.2.fill", notes: "منحدرات وشعاب عالية، يحتاج المسار حذرًا وخبرة.", status: .approved, contributor: "خرايم", points: 590),
         HiddenPlace(id: UUID(), name: "يبرين", coordinate: CLLocationCoordinate2D(latitude: 23.2500, longitude: 49.0000), rating: 4, imageSystemName: "sun.horizon.fill", notes: "أطراف الربع الخالي؛ خطط للوقود والماء والاتصال مسبقًا.", status: .approved, contributor: "خرايم", points: 620),
         HiddenPlace(id: UUID(), name: "صحراء جبة", coordinate: CLLocationCoordinate2D(latitude: 28.0030, longitude: 40.9390), rating: 5, imageSystemName: "camera.macro", notes: "نفود وآثار ومعالم صحراوية شمال حائل.", status: .approved, contributor: "خرايم", points: 540),
+        HiddenPlace(id: UUID(), name: "وادي الرشاء", coordinate: CLLocationCoordinate2D(latitude: 24.0390, longitude: 44.4071), rating: 5, imageSystemName: "water.waves", notes: "الوادي بين عرجاء ونفي عند تقاطعه مع طريق نفي - الدوادمي؛ منطقة برية مفتوحة.", status: .approved, contributor: "خرايم", points: 480),
         HiddenPlace(id: UUID(), name: "العلا", coordinate: CLLocationCoordinate2D(latitude: 26.6085, longitude: 37.9232), rating: 5, imageSystemName: "photo.on.rectangle.angled", notes: "جبال وتكوينات صخرية ومواقع أثرية؛ التزم بالمسارات المسموحة.", status: .approved, contributor: "خرايم", points: 830)
     ]
 }
