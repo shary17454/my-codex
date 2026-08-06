@@ -74,6 +74,18 @@ struct CompassPanel: View {
                         compassCardinal("W", x: -74)
                     }
                     .environment(\.layoutDirection, .leftToRight)
+                    // Rotate the whole dial so N always points to true north
+                    // (rotating-bezel compass). The fixed amber index below marks
+                    // the direction the device is actually facing.
+                    .rotationEffect(.degrees(-rotationReferenceDegrees))
+                    .animation(.easeOut(duration: 0.16), value: appState.locationManager.continuousHeadingDegrees)
+
+                    // Fixed heading index (lubber line) pinned to the top of the bezel.
+                    Image(systemName: "arrowtriangle.down.fill")
+                        .font(.system(size: 15, weight: .black))
+                        .foregroundStyle(Color.trailAmber)
+                        .shadow(color: Color.trailAmber.opacity(0.6), radius: 5)
+                        .offset(y: -116)
 
                     VStack(spacing: 10) {
                         ZStack {
@@ -94,24 +106,16 @@ struct CompassPanel: View {
                                 .overlay(Circle().stroke(Color.trailSignal.opacity(0.8), lineWidth: 1.4))
                                 .shadow(color: Color.trailSignal.opacity(0.6), radius: 4)
 
-                            compassNeedle(
-                                systemImage: "location.north.fill",
-                                color: headingDegrees == nil ? Color.trailMist.opacity(0.4) : Color.trailSignal,
-                                rotation: northNeedleRotation,
-                                size: 66,
-                                label: "اتجاه الشمال",
-                                pointer: .north
-                            )
-
                             if let tripBearingDegrees {
-                                compassNeedle(
-                                    systemImage: "arrow.up.circle.fill",
-                                    color: .desertCopper,
+                                flowNeedle(
+                                    glyph: "mappin",
+                                    tint: [Color.desertCopper, Color(red: 0.82, green: 0.45, blue: 0.24)],
                                     rotation: tripBearingDegrees - rotationReferenceDegrees,
-                                    size: 40,
+                                    size: 24,
                                     offset: -48,
                                     label: "اتجاه الوجهة",
-                                    pointer: .destination
+                                    pointer: .destination,
+                                    isActive: true
                                 )
                             }
 
@@ -120,34 +124,24 @@ struct CompassPanel: View {
                                     glyph: "wind",
                                     tint: [Color.trailAmber, Color.desertCopper],
                                     rotation: windFlowNeedleRotation,
-                                    size: 30,
+                                    size: 22,
                                     offset: 52,
                                     label: "اتجاه حركة الرياح",
                                     pointer: .wind,
                                     isActive: true
                                 )
-
-                                flowNeedle(
-                                    glyph: "cloud.fill",
-                                    tint: [Color(red: 0.36, green: 0.68, blue: 0.98), Color(red: 0.16, green: 0.44, blue: 0.86)],
-                                    rotation: cloudDriftNeedleRotation,
-                                    size: 26,
-                                    offset: 72,
-                                    label: "اتجاه حركة السحب",
-                                    pointer: .clouds,
-                                    isActive: true
-                                )
                             }
 
                             if let courseDegrees {
-                                compassNeedle(
-                                    systemImage: "car.fill",
-                                    color: .green,
+                                flowNeedle(
+                                    glyph: "car.fill",
+                                    tint: [Color.green, Color(red: 0.15, green: 0.55, blue: 0.30)],
                                     rotation: courseDegrees - rotationReferenceDegrees,
-                                    size: 28,
+                                    size: 22,
                                     offset: 84,
                                     label: "اتجاه الحركة",
-                                    pointer: .course
+                                    pointer: .course,
+                                    isActive: true
                                 )
                             }
                         }
@@ -268,11 +262,11 @@ struct CompassPanel: View {
         .animation(.easeInOut(duration: 0.2), value: statusMessage)
         .sheet(item: $selectedReading) { reading in
             readingDetailSheet(for: reading)
-                .presentationDetents([.medium])
+                .presentationDetents([.medium, .large])
         }
         .sheet(item: $selectedPointer) { pointer in
             pointerDetailSheet(for: pointer)
-                .presentationDetents([.medium])
+                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showingCoordinateNavigation) {
             NavigationStack {
@@ -304,11 +298,6 @@ struct CompassPanel: View {
         appState.locationManager.continuousHeadingDegrees ?? 0
     }
 
-    private var northNeedleRotation: Double {
-        guard appState.locationManager.continuousHeadingDegrees != nil else { return 0 }
-        return -rotationReferenceDegrees
-    }
-
     private var courseDegrees: Double? {
         guard let course = appState.locationManager.currentLocation?.course, course >= 0 else {
             return nil
@@ -331,11 +320,6 @@ struct CompassPanel: View {
         return windFlowDegrees - rotationReferenceDegrees
     }
 
-    private var cloudDriftNeedleRotation: Double {
-        guard let cloudDriftDegrees else { return 0 }
-        return cloudDriftDegrees - rotationReferenceDegrees
-    }
-
     private var tripBearingDegrees: Double? {
         guard appState.hasSelectedTrip,
               let currentCoordinate = appState.locationManager.currentLocation?.coordinate else {
@@ -347,7 +331,7 @@ struct CompassPanel: View {
     private var compassLegend: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 116), spacing: 8)], spacing: 8) {
             legendChip("الشمال", color: .oasisTeal, icon: "location.north.fill", value: headingDegrees.map { "\(Int($0.rounded()))°" } ?? "--")
-            legendChip("الوجهة", color: .desertCopper, icon: "arrow.up.circle.fill", value: tripBearingDegrees.map { "\(Int($0.rounded()))°" } ?? "لا توجد")
+            legendChip("الوجهة", color: .desertCopper, icon: "mappin.and.ellipse", value: tripBearingDegrees.map { "\(Int($0.rounded()))°" } ?? "لا توجد")
             legendChip("الرياح", color: .orange, icon: "wind", value: appState.environmentalReport.isLiveData ? windFlowDirectionText : "--")
             legendChip("السحب", color: .blue, icon: "cloud.fill", value: appState.environmentalReport.isLiveData ? cloudDriftDirectionText : "--")
             legendChip("الحركة", color: .green, icon: "car.fill", value: courseDegrees.map { "\(Int($0.rounded()))°" } ?? "--")
@@ -355,35 +339,23 @@ struct CompassPanel: View {
         .accessibilityElement(children: .contain)
     }
 
-    private func compassNeedle(systemImage: String, color: Color, rotation: Double, size: CGFloat, offset: CGFloat = 0, label: String, pointer: CompassPointer) -> some View {
-        Button {
-            triggerHaptic()
-            selectedPointer = pointer
-            switch pointer {
-            case .north, .course:
-                startCompassAndLocation()
-            case .wind, .clouds:
-                if !appState.environmentalReport.isLiveData {
-                    refreshWeather()
-                }
-            case .destination:
-                if tripBearingDegrees == nil {
-                    startCompassAndLocation()
-                }
+    /// Shared tap handling for every dial marker: opens the pointer's detail
+    /// sheet and triggers the right action (location vs. weather refresh).
+    private func handlePointerTap(_ pointer: CompassPointer) {
+        triggerHaptic()
+        selectedPointer = pointer
+        switch pointer {
+        case .north, .course:
+            startCompassAndLocation()
+        case .wind, .clouds:
+            if !appState.environmentalReport.isLiveData {
+                refreshWeather()
             }
-        } label: {
-            Image(systemName: systemImage)
-                .font(.system(size: size, weight: .bold))
-                .foregroundStyle(color)
-                .frame(width: max(size + 18, 44), height: max(size + 18, 44))
-                .contentShape(Circle())
+        case .destination:
+            if tripBearingDegrees == nil {
+                startCompassAndLocation()
+            }
         }
-        .buttonStyle(.plain)
-        .shadow(color: color.opacity(0.26), radius: 8, y: 3)
-        .offset(y: offset)
-        .rotationEffect(.degrees(rotation))
-        .accessibilityLabel(label)
-        .accessibilityHint("اضغط لعرض التفاصيل والإجراء المرتبط بهذا المؤشر")
     }
 
     /// Premium directional marker for wind / cloud flow: a tapered gradient arrow
@@ -403,11 +375,7 @@ struct CompassPanel: View {
         let arrowFill: [Color] = isActive ? tint : [Color.secondary.opacity(0.55), Color.secondary.opacity(0.3)]
         let badgeColor = isActive ? (tint.first ?? .gray) : .gray
         return Button {
-            triggerHaptic()
-            selectedPointer = pointer
-            if !appState.environmentalReport.isLiveData {
-                refreshWeather()
-            }
+            handlePointerTap(pointer)
         } label: {
             ZStack {
                 FlowArrowShape()
@@ -739,6 +707,7 @@ struct CompassPanel: View {
     @ViewBuilder
     private func readingDetailSheet(for reading: CompassReading) -> some View {
         NavigationStack {
+            ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 Label(reading.title(appState: appState), systemImage: reading.icon)
                     .font(.title2.weight(.bold))
@@ -762,10 +731,10 @@ struct CompassPanel: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-
-                Spacer()
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
+            }
             .navigationTitle("تفاصيل القراءة")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -780,6 +749,7 @@ struct CompassPanel: View {
 
     private func pointerDetailSheet(for pointer: CompassPointer) -> some View {
         NavigationStack {
+            ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 Label(pointer.title, systemImage: pointer.icon)
                     .font(.title2.weight(.bold))
@@ -805,10 +775,10 @@ struct CompassPanel: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(pointer.color)
-
-                Spacer()
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
+            }
             .navigationTitle("تفاصيل المؤشر")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

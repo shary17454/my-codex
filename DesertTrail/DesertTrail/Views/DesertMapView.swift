@@ -1255,7 +1255,7 @@ struct MapCanvasView: UIViewRepresentable {
             mapView.addAnnotation(annotation)
         }
 
-        if let destination = route.last {
+        if route.count > 1, let destination = route.last {
             let annotation = MKPointAnnotation()
             annotation.title = "الوجهة"
             annotation.subtitle = "نقطة الوصول المحددة للرحلة"

@@ -664,7 +664,9 @@ struct HomeDashboardView: View {
     }
 
     private var dashboardRoute: [CLLocationCoordinate2D] {
-        guard appState.hasSelectedTrip else {
+        // Only draw a guidance line for a trip that is still planned or active.
+        // A completed (منتهية) trip must not keep showing the route line.
+        guard appState.hasSelectedTrip, appState.selectedTrip.status != .completed else {
             return appState.locationManager.currentLocation.map { [$0.coordinate] } ?? []
         }
         guard let current = appState.locationManager.currentLocation?.coordinate else {
