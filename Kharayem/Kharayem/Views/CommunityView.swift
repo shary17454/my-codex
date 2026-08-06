@@ -43,7 +43,8 @@ struct CommunityView: View {
                                         .foregroundStyle(place.status.tint)
                                 }
                                 .font(.caption2)
-                                if let facts = GeoFacts.forPlace(named: place.name) {
+                                let facts = GeoFacts.forPlace(named: place.name)
+                                if facts.hasSourcedData {
                                     Text(factsSummary(facts))
                                         .font(.caption2.weight(.semibold))
                                         .foregroundStyle(Color.oasisTeal)
@@ -79,9 +80,13 @@ struct CommunityView: View {
         }
     }
 
-    /// One-line teaser of the headline figures, shown under the place row.
+    /// One-line teaser of the verified figures, shown under the place row.
     private func factsSummary(_ facts: GeoFacts) -> String {
-        facts.rows.prefix(3).map { "\($0.label): \($0.value)" }.joined(separator: " • ")
+        facts.rows
+            .filter(\.isVerified)
+            .prefix(3)
+            .map { "\($0.label): \($0.value)" }
+            .joined(separator: " • ")
     }
 }
 
@@ -92,7 +97,7 @@ struct PlaceInfoSheet: View {
     @Environment(\.dismiss) private var dismiss
     let place: HiddenPlace
 
-    private var facts: GeoFacts? { GeoFacts.forPlace(named: place.name) }
+    private var facts: GeoFacts { GeoFacts.forPlace(named: place.name) }
 
     var body: some View {
         NavigationStack {
@@ -107,7 +112,7 @@ struct PlaceInfoSheet: View {
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    if let facts, let highlight = facts.highlight {
+                    if let highlight = facts.highlight {
                         Text(highlight)
                             .font(.subheadline.weight(.semibold))
                             .fixedSize(horizontal: false, vertical: true)
@@ -117,24 +122,23 @@ struct PlaceInfoSheet: View {
                     }
 
                     infoCard(title: "الإحداثيات", icon: "location.north.line") {
-                        factRow("عشري", decimalText)
-                        factRow("درجات ودقائق", dmsText)
+                        factRow(GeoFacts.Row(label: "عشري", value: decimalText, isVerified: true))
+                        factRow(GeoFacts.Row(label: "درجات ودقائق", value: dmsText, isVerified: true))
                     }
 
                     infoCard(title: "معلومات جغرافية", icon: "ruler") {
-                        if let facts, !facts.rows.isEmpty {
-                            ForEach(facts.rows, id: \.label) { row in
-                                factRow(row.label, row.value)
-                            }
-                        } else {
-                            Text("لم تُوثّق أرقام هذا الموقع بعد. لا تُعرض هنا أي قيمة غير مؤكدة.")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+                        ForEach(facts.rows, id: \.label) { row in
+                            factRow(row)
+                        }
+                        if facts.rows.contains(where: { !$0.isVerified }) {
+                            Text("القيمة المعلّمة بـ«غير موثّق» رقم مبدئي (00) ولم يُوثّق من مصدر — لا تعتمد عليها ميدانيًا.")
+                                .font(.caption2)
+                                .foregroundStyle(.orange)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                     }
 
-                    if let source = facts?.source {
+                    if let source = facts.source {
                         Label("مصدر الأرقام: \(source)", systemImage: "checkmark.seal")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -171,14 +175,23 @@ struct PlaceInfoSheet: View {
         .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
     }
 
-    private func factRow(_ label: String, _ value: String) -> some View {
+    private func factRow(_ row: GeoFacts.Row) -> some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(label)
+            Text(row.label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer(minLength: 12)
-            Text(value)
+            if !row.isVerified {
+                Text("غير موثّق")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.orange)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.orange.opacity(0.15), in: Capsule())
+            }
+            Text(row.value)
                 .font(.caption.weight(.bold))
+                .foregroundStyle(row.isVerified ? Color.primary : Color.secondary)
                 .multilineTextAlignment(.trailing)
         }
     }

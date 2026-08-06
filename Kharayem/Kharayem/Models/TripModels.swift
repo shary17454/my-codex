@@ -94,24 +94,138 @@ struct GeoFacts: Hashable {
             lengthKm: 205,
             highlight: "ينبع من جبل ثهلان ويصب في قاع الخرماء؛ متوسط انحداره 1.2 م/كم، ويمر بين عرجاء ونفي.",
             source: "ويكيبيديا"
+        ),
+        "جبال أجا": GeoFacts(
+            landform: "سلسلة جبلية جرانيتية",
+            region: "حائل",
+            elevationMeters: 1_544,
+            highlight: "أعلى قمم حائل؛ جرانيت وردي وأحمر شمال هضبة نجد.",
+            source: "أمانة منطقة حائل"
+        ),
+        "جبل شدا": GeoFacts(
+            landform: "جبل",
+            region: "الباحة",
+            elevationMeters: 2_202,
+            highlight: "شدا الأعلى شمال شرق المخواة؛ الوصول للقمة سيرًا يستغرق نحو 4 ساعات.",
+            source: "سعوديبيديا"
+        ),
+        "جبال فيفاء": GeoFacts(
+            landform: "سلسلة جبلية",
+            region: "جازان",
+            elevationMeters: 1_814,
+            highlight: "مدرجات زراعية وطرق متعرجة حادة.",
+            source: "ويكيبيديا"
+        ),
+        "جبل القهر": GeoFacts(
+            landform: "جبل",
+            region: "جازان",
+            elevationMeters: 2_041,
+            highlight: "تكوينات صخرية فريدة ومنحدرات حادة.",
+            source: "سعوديبيديا"
+        ),
+        "حافة العالم": GeoFacts(
+            landform: "مطل / جرف صخري",
+            region: "الرياض",
+            prominenceMeters: 300,
+            highlight: "جرف صخري ضمن حافة جبل طويق، يرتفع نحو 300 م عن السهل المحيط.",
+            source: "ويكيبيديا"
+        ),
+        "حرة خيبر": GeoFacts(
+            landform: "حرة بركانية",
+            region: "المدينة المنورة",
+            areaKm2: 14_600,
+            highlight: "ثاني أكبر حرة في السعودية بعد حرة رهط.",
+            source: "سعوديبيديا"
+        ),
+        "حرة كشب": GeoFacts(
+            landform: "حرة بركانية",
+            region: "مكة المكرمة",
+            areaKm2: 5_892,
+            highlight: "منطقة فوهات بركانية ومسارات وعرة.",
+            source: "سعوديبيديا / ويكيبيديا"
+        ),
+        "الدهناء": GeoFacts(
+            landform: "نفود رملي",
+            region: "الرياض – الشرقية – القصيم",
+            lengthKm: 1_200,
+            widthText: "‏75 كم (متوسط)",
+            highlight: "حزام رملي أحمر يمتد من جنوب شرق النفود الكبير حتى شمال الربع الخالي.",
+            source: "ويكيبيديا"
+        ),
+        "وادي الدواسر": GeoFacts(
+            landform: "وادي",
+            region: "الرياض",
+            lengthKm: 350,
+            highlight: "مساحات برية واسعة؛ خطط للوقود والماء قبل الانطلاق.",
+            source: "ويكيبيديا"
+        ),
+        "وادي بيشة": GeoFacts(
+            landform: "وادي",
+            region: "عسير",
+            lengthKm: 350,
+            highlight: "من المنبع إلى المصب، وقد يمتد نحو 100 كم إضافية داخل الرمال.",
+            source: "المعرفة"
+        ),
+        "وادي نجران": GeoFacts(
+            landform: "وادي",
+            region: "نجران",
+            lengthKm: 180,
+            highlight: "تختلف المصادر بين 150 و180 كم. منطقة سد ووادٍ؛ راقب تعليمات الجهات المحلية.",
+            source: "سعوديبيديا / جريدة المدينة"
+        ),
+        "وادي لجب": GeoFacts(
+            landform: "وادي / مضيق صخري",
+            region: "جازان",
+            lengthKm: 11,
+            highlight: "مضيق ضيق يمتد من الشمال إلى الجنوب؛ تجنب الدخول عند احتمالية الأمطار.",
+            source: "سعوديبيديا"
+        ),
+        "وادي الديسة": GeoFacts(
+            landform: "وادي جبلي",
+            region: "تبوك",
+            elevationMeters: 400,
+            highlight: "يبعد نحو 220 كم عن تبوك؛ مضيق جبلي بمياه عذبة وأشجار الدوم.",
+            source: "جريدة الجزيرة"
         )
     ]
 
-    /// Facts for a landmark, or `nil` when nothing has been sourced yet.
-    static func forPlace(named name: String) -> GeoFacts? {
-        reference[name.trimmingCharacters(in: .whitespaces)]
+    /// Facts for a landmark. Returns an empty record (not `nil`) when nothing has
+    /// been sourced, so the UI still renders the placeholder rows.
+    static func forPlace(named name: String) -> GeoFacts {
+        reference[name.trimmingCharacters(in: .whitespaces)] ?? GeoFacts()
     }
 
-    /// The populated figures as display rows, ready for a detail card.
-    var rows: [(label: String, value: String)] {
-        var result: [(String, String)] = []
-        if let landform { result.append(("نوع التضاريس", landform)) }
-        if let region { result.append(("المنطقة", region)) }
-        if let elevationMeters { result.append(("الارتفاع عن سطح البحر", "\(elevationMeters.formatted()) م")) }
-        if let prominenceMeters { result.append(("الارتفاع عن السهل المحيط", "\(prominenceMeters.formatted()) م")) }
-        if let lengthKm { result.append(("الطول", "\(lengthKm.formatted()) كم")) }
-        if let widthText { result.append(("العرض", widthText)) }
-        if let areaKm2 { result.append(("المساحة", "\(areaKm2.formatted()) كم²")) }
+    /// True when at least one figure came from a named source.
+    var hasSourcedData: Bool { source != nil }
+
+    /// A single display line. `isVerified == false` means the figure was never
+    /// sourced and is showing the "00" placeholder — the UI must mark it so a
+    /// placeholder is never mistaken for a real measurement.
+    struct Row: Hashable {
+        let label: String
+        let value: String
+        let isVerified: Bool
+    }
+
+    /// Display rows. Elevation is always present — with its real figure when
+    /// sourced, otherwise the "00" placeholder flagged as unverified.
+    var rows: [Row] {
+        var result: [Row] = []
+        if let landform { result.append(Row(label: "نوع التضاريس", value: landform, isVerified: true)) }
+        if let region { result.append(Row(label: "المنطقة", value: region, isVerified: true)) }
+
+        if let elevationMeters {
+            result.append(Row(label: "الارتفاع عن سطح البحر", value: "\(elevationMeters.formatted()) م", isVerified: true))
+        } else {
+            result.append(Row(label: "الارتفاع عن سطح البحر", value: "00", isVerified: false))
+        }
+
+        if let prominenceMeters {
+            result.append(Row(label: "الارتفاع عن السهل المحيط", value: "\(prominenceMeters.formatted()) م", isVerified: true))
+        }
+        if let lengthKm { result.append(Row(label: "الطول", value: "\(lengthKm.formatted()) كم", isVerified: true)) }
+        if let widthText { result.append(Row(label: "العرض", value: widthText, isVerified: true)) }
+        if let areaKm2 { result.append(Row(label: "المساحة", value: "\(areaKm2.formatted()) كم²", isVerified: true)) }
         return result
     }
 }
