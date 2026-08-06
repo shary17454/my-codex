@@ -16,7 +16,7 @@ struct HomeDashboardView: View {
     @State private var selectedAlertDetail: DashboardAlertDetail?
     @State private var selectedCommunityDetail: DashboardCommunityDetail?
     @State private var statusMessage: String?
-    @State private var dashboardRegion = MapDefaults.riyadhRegion
+    @State private var dashboardRegion = MapDefaults.defaultRegion
 
     var body: some View {
         ScrollView(showsIndicators: false) {

@@ -18,7 +18,7 @@ struct DesertMapView: View {
     @AppStorage("wildernessTileOverlayEnabled") private var wildernessTileOverlayEnabled = false
     @AppStorage("wildernessTileTemplate") private var wildernessTileTemplate = ""
     @AppStorage("wildernessTileOpacity") private var wildernessTileOpacity = 0.72
-    @State private var mapRegion = MapDefaults.riyadhRegion
+    @State private var mapRegion = MapDefaults.defaultRegion
 
     var body: some View {
         ZStack(alignment: .bottom) {

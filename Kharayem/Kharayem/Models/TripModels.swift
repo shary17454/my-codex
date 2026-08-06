@@ -4,17 +4,18 @@ import MapKit
 import SwiftUI
 
 /// Map defaults shown before the user's own location is available.
-/// Every map opens on Riyadh, then recenters on the device location once the
-/// user grants access and GPS returns a fix.
+/// Every map opens on وادي الرشاء, then recenters on the device location once
+/// the user grants access and GPS returns a fix.
 enum MapDefaults {
-    /// Riyadh city center.
-    static let riyadh = CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753)
+    /// وادي الرشاء between عرجاء and نفي — where the valley crosses the
+    /// نفي–الدوادمي road (24° 02.342' N, 44° 24.428' E).
+    static let wadiAlRisha = CLLocationCoordinate2D(latitude: 24.0390, longitude: 44.4071)
 
-    /// City-wide view used on first launch.
-    static var riyadhRegion: MKCoordinateRegion {
+    /// Valley-area view used on first launch.
+    static var defaultRegion: MKCoordinateRegion {
         MKCoordinateRegion(
-            center: riyadh,
-            span: MKCoordinateSpan(latitudeDelta: 0.28, longitudeDelta: 0.28)
+            center: wadiAlRisha,
+            span: MKCoordinateSpan(latitudeDelta: 0.22, longitudeDelta: 0.22)
         )
     }
 }

@@ -18,7 +18,7 @@ struct ActiveTripDriveView: View {
     @AppStorage("wildernessTileTemplate") private var wildernessTileTemplate = ""
     @AppStorage("wildernessTileOpacity") private var wildernessTileOpacity = 0.72
 
-    @State private var driveRegion = MapDefaults.riyadhRegion
+    @State private var driveRegion = MapDefaults.defaultRegion
 
     var body: some View {
         ZStack {
