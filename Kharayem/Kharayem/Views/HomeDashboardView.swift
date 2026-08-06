@@ -16,10 +16,7 @@ struct HomeDashboardView: View {
     @State private var selectedAlertDetail: DashboardAlertDetail?
     @State private var selectedCommunityDetail: DashboardCommunityDetail?
     @State private var statusMessage: String?
-    @State private var dashboardRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 24.6190, longitude: 46.5730),
-        span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
-    )
+    @State private var dashboardRegion = MapDefaults.riyadhRegion
 
     var body: some View {
         ScrollView(showsIndicators: false) {

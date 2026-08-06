@@ -679,7 +679,7 @@ enum LocalizedKey {
 
     private var englishValue: String {
         switch self {
-        case .appTitle: return "Al Droob"
+        case .appTitle: return "Kharayem"
         case .map: return "Map"
         case .compass: return "Compass"
         case .planner: return "Planner"
@@ -754,7 +754,7 @@ enum LocalizedKey {
 
     private var frenchValue: String {
         switch self {
-        case .appTitle: return "Al Droob"
+        case .appTitle: return "Kharayem"
         case .map: return "Carte"
         case .compass: return "Boussole"
         case .planner: return "Planificateur"
@@ -785,7 +785,7 @@ enum LocalizedKey {
 
     private var spanishValue: String {
         switch self {
-        case .appTitle: return "Al Droob"
+        case .appTitle: return "Kharayem"
         case .map: return "Mapa"
         case .compass: return "Brújula"
         case .planner: return "Planificador"
@@ -816,7 +816,7 @@ enum LocalizedKey {
 
     private var chineseValue: String {
         switch self {
-        case .appTitle: return "Al Droob"
+        case .appTitle: return "Kharayem"
         case .map: return "地图"
         case .compass: return "指南针"
         case .planner: return "行程"

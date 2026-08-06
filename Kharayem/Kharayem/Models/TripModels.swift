@@ -1,6 +1,23 @@
 import Foundation
 import CoreLocation
+import MapKit
 import SwiftUI
+
+/// Map defaults shown before the user's own location is available.
+/// Every map opens on Riyadh, then recenters on the device location once the
+/// user grants access and GPS returns a fix.
+enum MapDefaults {
+    /// Riyadh city center.
+    static let riyadh = CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753)
+
+    /// City-wide view used on first launch.
+    static var riyadhRegion: MKCoordinateRegion {
+        MKCoordinateRegion(
+            center: riyadh,
+            span: MKCoordinateSpan(latitudeDelta: 0.28, longitudeDelta: 0.28)
+        )
+    }
+}
 
 struct TripPlan: Identifiable, Hashable {
     let id: UUID
