@@ -3,6 +3,10 @@
   "targets" : [
     {
       "id" : "cfc41981-253f-4eab-857a-f24953895094",
+      "name" : "DesertTrail"
+    },
+    {
+      "id" : "cfc41981-253f-4eab-857a-f24953895094",
       "name" : "Kharayem"
     }
   ]
