@@ -33,6 +33,8 @@ struct GeoFacts: Hashable {
     var region: String?
     /// الارتفاع عن سطح البحر (متر)
     var elevationMeters: Int?
+    /// الارتفاع كنص — يُستخدم حين يكون الرقم مدى وليس قيمة واحدة
+    var elevationText: String?
     /// الارتفاع عن السهل المحيط — الشموخ (متر)
     var prominenceMeters: Int?
     /// الطول (كم) — للأودية والسلاسل الجبلية
@@ -186,6 +188,36 @@ struct GeoFacts: Hashable {
             elevationMeters: 400,
             highlight: "يبعد نحو 220 كم عن تبوك؛ مضيق جبلي بمياه عذبة وأشجار الدوم.",
             source: "جريدة الجزيرة"
+        ),
+        "جبل ورقان": GeoFacts(
+            landform: "جبل",
+            region: "المدينة المنورة",
+            elevationMeters: 2_393,
+            highlight: "يُعد من أعلى جبال الحجاز؛ يقع جنوب غرب المدينة على نحو 70 كم من طريق الهجرة السريع.",
+            source: "سعوديبيديا"
+        ),
+        "جبال حسمي": GeoFacts(
+            landform: "هضبة وتكوينات صخرية",
+            region: "تبوك",
+            elevationText: "800 – 1,700 م",
+            highlight: "هضبة تضم جبال السفينة والظهر والمحماش وغيرها؛ الارتفاع يتفاوت داخل الهضبة.",
+            source: "سعوديبيديا"
+        ),
+        "جبال سلمى": GeoFacts(
+            landform: "سلسلة جبلية",
+            region: "حائل",
+            elevationMeters: 1_300,
+            lengthKm: 60,
+            widthText: "‏12 كم",
+            highlight: "تبعد نحو 60 كم عن مدينة حائل؛ ضمن نطاق سلمى جيوبارك.",
+            source: "موسوعة كيوبيديا (نبذة جغرافية عن حائل)"
+        ),
+        "روضة خريم": GeoFacts(
+            landform: "روضة",
+            region: "الرياض",
+            areaKm2: 52,
+            highlight: "أكبر روضة في المملكة (نحو 52.3 كم²)، ضمن محمية الإمام عبدالعزيز بن محمد الملكية — تحقق من الأنظمة والتصاريح.",
+            source: "صحيفة سبق / الهيئة الملكية للمحميات"
         )
     ]
 
@@ -214,7 +246,9 @@ struct GeoFacts: Hashable {
         if let landform { result.append(Row(label: "نوع التضاريس", value: landform, isVerified: true)) }
         if let region { result.append(Row(label: "المنطقة", value: region, isVerified: true)) }
 
-        if let elevationMeters {
+        if let elevationText {
+            result.append(Row(label: "الارتفاع عن سطح البحر", value: elevationText, isVerified: true))
+        } else if let elevationMeters {
             result.append(Row(label: "الارتفاع عن سطح البحر", value: "\(elevationMeters.formatted()) م", isVerified: true))
         } else {
             result.append(Row(label: "الارتفاع عن سطح البحر", value: "00", isVerified: false))
