@@ -16,20 +16,24 @@ struct GeoImageBounds: Equatable {
             && (-180...180).contains(east) && (-180...180).contains(west)
     }
 
-    /// حدود أولية تقريبية لخريطة المملكة الشاملة من العجاجي.
-    /// ليست معايرة مساحية — تُضبط يدويًا من شاشة المعايرة حتى تنطبق المعالم.
-    static let ajajiSaudiDefault = GeoImageBounds(north: 33.5, south: 12.5, east: 57.5, west: 33.0)
+    /// حدود خريطة المملكة الشاملة، معايرة بثلاث نقاط تحكم (الرياض، جدة، الدمام):
+    /// حُدّدت مواضع المدن الفعلية على المسح بالبكسل ثم حُلّت الحدود بانحدار خطي.
+    /// البواقي بعد المعايرة ≤ ~6.5 كم عبر كامل المملكة.
+    static let ajajiSaudiDefault = GeoImageBounds(north: 32.2487, south: 16.3491, east: 57.6124, west: 33.0441)
 
-    /// حدود أولية تقريبية لكل مستند — كلها تحتاج ضبطًا يدويًا من شاشة المعايرة.
+    /// حدود أولية لكل مستند. خريطة المملكة معايرة بنقاط تحكم؛ الخريطتان
+    /// الأخريان تقديريتان وتحتاجان ضبطًا من شاشة المعايرة.
     static func defaultBounds(for document: PDFMapDocument) -> GeoImageBounds {
         switch document {
         case .ajajiSaudi:
             return .ajajiSaudiDefault
         case .ajajiRiyadhRegion:
-            // خريطة وسط وشرق المملكة (من الكويت شمالًا إلى وادي الدواسر جنوبًا)
-            return GeoImageBounds(north: 30.5, south: 18.5, east: 53.5, west: 40.5)
+            // وسط وشرق المملكة — معايرة بنقطتي تحكم (مطار الملك خالد، الخفجي):
+            // ‏718 بكسل/° طولًا و810 بكسل/° عرضًا. المسح فيه ميلان طفيف (~1°)
+            // يحدّ الدقة عند الأطراف؛ اضبط الحدود محليًا لمنطقة رحلتك.
+            return GeoImageBounds(north: 29.044, south: 23.446, east: 50.585, west: 41.636)
         case .ajajiMarkedPlans:
-            // خريطة مدينة الرياض
+            // خريطة مدينة الرياض — تقديرية، لم تُعاير بنقاط تحكم بعد.
             return GeoImageBounds(north: 25.15, south: 24.25, east: 47.15, west: 46.30)
         }
     }
