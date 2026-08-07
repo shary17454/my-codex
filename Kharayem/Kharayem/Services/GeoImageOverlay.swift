@@ -20,13 +20,27 @@ struct GeoImageBounds: Equatable {
     /// ليست معايرة مساحية — تُضبط يدويًا من شاشة المعايرة حتى تنطبق المعالم.
     static let ajajiSaudiDefault = GeoImageBounds(north: 33.5, south: 12.5, east: 57.5, west: 33.0)
 
+    /// حدود أولية تقريبية لكل مستند — كلها تحتاج ضبطًا يدويًا من شاشة المعايرة.
+    static func defaultBounds(for document: PDFMapDocument) -> GeoImageBounds {
+        switch document {
+        case .ajajiSaudi:
+            return .ajajiSaudiDefault
+        case .ajajiRiyadhRegion:
+            // خريطة وسط وشرق المملكة (من الكويت شمالًا إلى وادي الدواسر جنوبًا)
+            return GeoImageBounds(north: 30.5, south: 18.5, east: 53.5, west: 40.5)
+        case .ajajiMarkedPlans:
+            // خريطة مدينة الرياض
+            return GeoImageBounds(north: 25.15, south: 24.25, east: 47.15, west: 46.30)
+        }
+    }
+
     /// تخزين المعايرة لكل مستند.
     static func stored(for document: PDFMapDocument) -> GeoImageBounds {
         let d = UserDefaults.standard
         let key = storageKey(for: document)
         guard let dict = d.dictionary(forKey: key) as? [String: Double],
               let n = dict["n"], let s = dict["s"], let e = dict["e"], let w = dict["w"] else {
-            return .ajajiSaudiDefault
+            return defaultBounds(for: document)
         }
         return GeoImageBounds(north: n, south: s, east: e, west: w)
     }

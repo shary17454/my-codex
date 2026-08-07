@@ -228,6 +228,11 @@ struct DesertMapView: View {
                             }
                             .accessibilityLabel("شفافية طبقة العجاجي")
                         }
+
+                        Text("الخرائط الورقية: © خرائط العجاجي — مجموعة العجاجي العقارية (ajajimaps.com). تُعرض مع الإسناد ضمن تطبيق مجاني.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
 
