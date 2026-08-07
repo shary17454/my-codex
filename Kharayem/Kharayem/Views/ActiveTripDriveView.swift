@@ -147,6 +147,17 @@ struct ActiveTripDriveView: View {
             userInterfaceStyle: mapUserInterfaceStyle
         )
         .ignoresSafeArea(edges: .horizontal)
+        // Satellite imagery has no night variant — dim it in dark mode so the
+        // map doesn't glare against the dark drive UI.
+        .overlay {
+            if colorScheme == .dark {
+                Color.black
+                    .opacity(0.30)
+                    .blendMode(.multiply)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+        }
         .overlay {
             LinearGradient(
                 colors: [

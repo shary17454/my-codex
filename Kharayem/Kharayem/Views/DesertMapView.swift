@@ -63,11 +63,17 @@ struct DesertMapView: View {
             .ignoresSafeArea(edges: .bottom)
             .overlay {
                 if mapLayer == .satellite, colorScheme == .dark {
-                    Color.black
-                        .opacity(0.30)
-                        .blendMode(.multiply)
-                        .allowsHitTesting(false)
-                        .accessibilityHidden(true)
+                    // Satellite imagery has no night variant. Dim + cool it so it
+                    // sits with the dark chrome instead of glaring through it.
+                    ZStack {
+                        Color.black
+                            .opacity(0.45)
+                            .blendMode(.multiply)
+                        Color(red: 0.06, green: 0.10, blue: 0.11)
+                            .opacity(0.22)
+                    }
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
                 }
             }
 

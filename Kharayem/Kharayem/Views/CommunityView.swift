@@ -80,13 +80,15 @@ struct CommunityView: View {
         }
     }
 
-    /// One-line teaser of the verified figures, shown under the place row.
+    /// One-line teaser under the place row. Leads with the measurements
+    /// (elevation, length, area) rather than landform/region — the numbers are
+    /// what the row can't already convey, and only two fit on one line.
     private func factsSummary(_ facts: GeoFacts) -> String {
-        facts.rows
-            .filter(\.isVerified)
-            .prefix(3)
-            .map { "\($0.label): \($0.value)" }
-            .joined(separator: " • ")
+        let measurements = ["الارتفاع عن سطح البحر", "الارتفاع عن السهل المحيط", "الطول", "المساحة", "العرض"]
+        let verified = facts.rows.filter(\.isVerified)
+        let numbers = verified.filter { measurements.contains($0.label) }
+        let chosen = numbers.isEmpty ? Array(verified.prefix(2)) : Array(numbers.prefix(2))
+        return chosen.map { "\($0.label): \($0.value)" }.joined(separator: " • ")
     }
 }
 

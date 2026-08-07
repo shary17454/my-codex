@@ -229,6 +229,25 @@ struct HomeDashboardView: View {
                 onRegionChange: { dashboardRegion = $0 }
             )
             .frame(height: 218)
+            // Satellite imagery has no night variant, so dim it to match the
+            // dark dashboard instead of glaring white against it. The imagery is
+            // bright enough that a subtle veil is not sufficient — this level
+            // was tuned against the dashboard gradient.
+            .overlay {
+                Color.black
+                    .opacity(0.45)
+                    .blendMode(.multiply)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+            .overlay {
+                // Warm the dimmed imagery slightly so it reads as desert night
+                // rather than a flat grey wash.
+                Color(red: 0.06, green: 0.10, blue: 0.11)
+                    .opacity(0.22)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
             .clipShape(RoundedRectangle(cornerRadius: 22))
             .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color.trailSignal.opacity(0.18), lineWidth: 1))
 
@@ -688,9 +707,10 @@ struct HomeDashboardView: View {
         appState.locationManager.currentLocation == nil ? .orange : .green
     }
 
-    private var mapUserInterfaceStyle: UIUserInterfaceStyle {
-        colorScheme == .dark ? .dark : .light
-    }
+    /// The dashboard is always dark (see `homeBackground`), so its map must be
+    /// dark too regardless of the system appearance — otherwise a light map
+    /// sits inside a dark page.
+    private var mapUserInterfaceStyle: UIUserInterfaceStyle { .dark }
 
     private var homeBackground: some View {
         ZStack {

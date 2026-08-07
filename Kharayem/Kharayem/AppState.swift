@@ -8,7 +8,11 @@ final class AppState {
     var language: AppLanguage = .arabic {
         didSet { UserDefaults.standard.set(language.rawValue, forKey: AppStorageKey.language) }
     }
-    var appearance: AppAppearance = .system {
+    /// Dark by default: the whole design is a night field theme (the dashboard
+    /// background is dark unconditionally), so following a light system
+    /// appearance left every other screen white against it. Users can still
+    /// pick نهاري / حسب النظام from settings.
+    var appearance: AppAppearance = .dark {
         didSet { UserDefaults.standard.set(appearance.rawValue, forKey: AppStorageKey.appearance) }
     }
     var selectedTrip: TripPlan = TripPlan.draft

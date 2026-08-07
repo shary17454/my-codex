@@ -136,7 +136,7 @@ struct AdvancedToolsView: View {
             }
             .pickerStyle(.segmented)
 
-            Text("يمكن للدروب اتباع إعداد الجهاز أو استخدام المظهر النهاري أو الليلي دائمًا.")
+            Text("يمكن لخرايم اتباع إعداد الجهاز أو استخدام المظهر النهاري أو الليلي دائمًا.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
