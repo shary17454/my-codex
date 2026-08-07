@@ -103,7 +103,20 @@ struct TrailAIService {
                 )
             }
 
-        let combined = Array(placeMatches) + Array(routeMatches)
+        // قاعدة المعالم الكبيرة (GeoNames، ~18.5 ألف معلم): تكمّل مواقع خرايم
+        // المنسّقة يدويًا ولا تحل محلها — نتائجها تأتي بعدها مع إسناد المصدر.
+        let landmarkMatches = GeoLandmarkStore.shared.search(prompt, limit: 6)
+            .map { landmark in
+                TrailAISearchResult(
+                    id: "geonames-\(landmark.id)",
+                    title: landmark.name,
+                    subtitle: landmark.elevationMeters.map { "\(landmark.typeName) · ارتفاع تقريبي \($0) م" } ?? landmark.typeName,
+                    reason: GeoLandmarkStore.attribution,
+                    coordinate: landmark.coordinate
+                )
+            }
+
+        let combined = Array(placeMatches) + Array(routeMatches) + landmarkMatches
         if !combined.isEmpty {
             return combined
         }

@@ -12,6 +12,11 @@ struct CommunityView: View {
         return appState.hiddenPlaces.filter { $0.name.localizedCaseInsensitiveContains(query) || $0.notes.localizedCaseInsensitiveContains(query) }
     }
 
+    /// نتائج قاعدة المعالم الكبيرة (GeoNames) — تظهر فقط عند البحث.
+    var landmarkMatches: [GeoLandmark] {
+        query.isEmpty ? [] : GeoLandmarkStore.shared.search(query, limit: 15)
+    }
+
     var body: some View {
         List {
             Section {
@@ -59,6 +64,34 @@ struct CommunityView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                }
+            }
+
+            if !landmarkMatches.isEmpty {
+                Section {
+                    ForEach(landmarkMatches) { landmark in
+                        HStack(spacing: 12) {
+                            Image(systemName: "mountain.2")
+                                .foregroundStyle(Color.oasisTeal)
+                                .frame(width: 42, height: 42)
+                                .background(Color.oasisTeal.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(landmark.name)
+                                    .font(.headline)
+                                Text(landmark.elevationMeters.map { "\(landmark.typeName) · ارتفاع تقريبي \($0) م" } ?? landmark.typeName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(String(format: "%.5f, %.5f", landmark.coordinate.latitude, landmark.coordinate.longitude))
+                                    .font(.caption2.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                        }
+                    }
+                } header: {
+                    Text("قاعدة المعالم (\(landmarkMatches.count))")
+                } footer: {
+                    Text(GeoLandmarkStore.attribution + " — الارتفاعات من نموذج ارتفاعات رقمي وقد تكون تقريبية.")
                 }
             }
         }

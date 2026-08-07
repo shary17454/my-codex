@@ -16,6 +16,7 @@
 		0A1000060000000000000001 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000060000000000000001 /* WeatherService.swift */; };
 		0A1000070000000000000001 /* CloudKitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000070000000000000001 /* CloudKitStore.swift */; };
 		0A1000080000000000000001 /* GPXParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000080000000000000001 /* GPXParser.swift */; };
+		0A1000FE0000000000000001 /* GeoLandmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000FE0000000000000001 /* GeoLandmarkStore.swift */; };
 		0A1000090000000000000001 /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000090000000000000001 /* QRCodeGenerator.swift */; };
 		0A10000A0000000000000001 /* DesertMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000A0000000000000001 /* DesertMapView.swift */; };
 		0A10002A0000000000000001 /* HomeDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002A0000000000000001 /* HomeDashboardView.swift */; };
@@ -29,6 +30,7 @@
 		0A1000130000000000000001 /* OfflineMapsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000160000000000000001 /* OfflineMapsView.swift */; };
 		0A1000140000000000000001 /* ZoomableImageMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000170000000000000001 /* ZoomableImageMapView.swift */; };
 		0A1000110000000000000001 /* SampleRoute.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000110000000000000001 /* SampleRoute.gpx */; };
+		0A1000FF0000000000000001 /* landmarks_sa.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000FF0000000000000001 /* landmarks_sa.json */; };
 		0A1000150000000000000001 /* AjajiSaudi.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000180000000000000001 /* AjajiSaudi.jpg */; };
 		0A1000160000000000000001 /* AjajiRiyadhRegion.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */; };
 		0A1000170000000000000001 /* AjajiMarkedPlans.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A20001A0000000000000001 /* AjajiMarkedPlans.jpg */; };
@@ -62,6 +64,7 @@
 		0A2000060000000000000001 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		0A2000070000000000000001 /* CloudKitStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitStore.swift; sourceTree = "<group>"; };
 		0A2000080000000000000001 /* GPXParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXParser.swift; sourceTree = "<group>"; };
+		0A2000FE0000000000000001 /* GeoLandmarkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLandmarkStore.swift; sourceTree = "<group>"; };
 		0A2000090000000000000001 /* QRCodeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
 		0A20000A0000000000000001 /* DesertMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesertMapView.swift; sourceTree = "<group>"; };
 		0A20002A0000000000000001 /* HomeDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeDashboardView.swift; sourceTree = "<group>"; };
@@ -75,6 +78,7 @@
 		0A2000160000000000000001 /* OfflineMapsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineMapsView.swift; sourceTree = "<group>"; };
 		0A2000170000000000000001 /* ZoomableImageMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageMapView.swift; sourceTree = "<group>"; };
 		0A2000110000000000000001 /* SampleRoute.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleRoute.gpx; sourceTree = "<group>"; };
+		0A2000FF0000000000000001 /* landmarks_sa.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = landmarks_sa.json; sourceTree = "<group>"; };
 		0A2000100000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0A2000180000000000000001 /* AjajiSaudi.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiSaudi.jpg; sourceTree = "<group>"; };
 		0A2000190000000000000001 /* AjajiRiyadhRegion.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = AjajiRiyadhRegion.jpg; sourceTree = "<group>"; };
@@ -165,6 +169,7 @@
 				0A2000060000000000000001 /* WeatherService.swift */,
 				0A2000070000000000000001 /* CloudKitStore.swift */,
 				0A2000080000000000000001 /* GPXParser.swift */,
+				0A2000FE0000000000000001 /* GeoLandmarkStore.swift */,
 				0A2000090000000000000001 /* QRCodeGenerator.swift */,
 				0A2000150000000000000001 /* OfflineMapStore.swift */,
 				0A20001F0000000000000001 /* PDFMapStore.swift */,
@@ -200,6 +205,7 @@
 			isa = PBXGroup;
 			children = (
 				0A2000110000000000000001 /* SampleRoute.gpx */,
+				0A2000FF0000000000000001 /* landmarks_sa.json */,
 				0A2000230000000000000001 /* Icon-60@3x.png */,
 				0A2000240000000000000001 /* Icon-60@2x.png */,
 				0A2000250000000000000001 /* Icon-76@2x.png */,
@@ -276,6 +282,7 @@
 			files = (
 				0A1000100000000000000001 /* Assets.xcassets in Resources */,
 				0A1000110000000000000001 /* SampleRoute.gpx in Resources */,
+				0A1000FF0000000000000001 /* landmarks_sa.json in Resources */,
 				0A1000200000000000000001 /* Icon-60@3x.png in Resources */,
 				0A1000210000000000000001 /* Icon-60@2x.png in Resources */,
 				0A1000220000000000000001 /* Icon-76@2x.png in Resources */,
@@ -300,6 +307,7 @@
 				0A1000060000000000000001 /* WeatherService.swift in Sources */,
 				0A1000070000000000000001 /* CloudKitStore.swift in Sources */,
 				0A1000080000000000000001 /* GPXParser.swift in Sources */,
+				0A1000FE0000000000000001 /* GeoLandmarkStore.swift in Sources */,
 				0A1000090000000000000001 /* QRCodeGenerator.swift in Sources */,
 				0A10000A0000000000000001 /* DesertMapView.swift in Sources */,
 				0A10002A0000000000000001 /* HomeDashboardView.swift in Sources */,
