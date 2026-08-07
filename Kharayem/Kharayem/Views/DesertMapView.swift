@@ -18,6 +18,10 @@ struct DesertMapView: View {
     @AppStorage("wildernessTileOverlayEnabled") private var wildernessTileOverlayEnabled = false
     @AppStorage("wildernessTileTemplate") private var wildernessTileTemplate = ""
     @AppStorage("wildernessTileOpacity") private var wildernessTileOpacity = 0.72
+    /// وضع «قمر + العجاجي»: طبقة العجاجي فوق القمر الصناعي بدل العارض المسطح.
+    @AppStorage("ajajiOverlayMode") private var ajajiOverlayMode = true
+    @AppStorage("ajajiOverlayOpacity") private var ajajiOverlayOpacity = 0.65
+    @State private var ajajiGeoOverlay: GeoImageOverlay?
     @State private var mapRegion = MapDefaults.defaultRegion
 
     var body: some View {
@@ -44,6 +48,38 @@ struct DesertMapView: View {
                             actionTitle: appState.text(.managePDFSource),
                             action: { showingPDFSourceManager = true }
                         )
+                    } else if ajajiOverlayMode {
+                        // قمر صناعي + طبقة العجاجي المستوردة فوقه بمعايرة قابلة للتعديل
+                        ZStack(alignment: .top) {
+                            MapCanvasView(
+                                region: mapRegion,
+                                route: navigationRoute,
+                                dirtRoadRoutes: visibleDirtRoadRoutes,
+                                places: appState.hiddenPlaces.filter { $0.status == .approved },
+                                tileTemplateURL: nil,
+                                tileOpacity: wildernessTileOpacity,
+                                geoImageOverlay: ajajiGeoOverlay,
+                                geoImageOpacity: ajajiOverlayOpacity,
+                                showsUserLocation: appState.locationManager.isTracking,
+                                userInterfaceStyle: mapUserInterfaceStyle,
+                                onRegionChange: { mapRegion = $0 }
+                            )
+                            if ajajiGeoOverlay == nil {
+                                Text("جاري تجهيز طبقة العجاجي…")
+                                    .font(.caption.weight(.bold))
+                                    .padding(8)
+                                    .background(.ultraThinMaterial, in: Capsule())
+                                    .padding(.top, 12)
+                            } else {
+                                Text("مطابقة تقريبية — اضبط المعايرة من إدارة المصدر ولا تعتمد عليها للملاحة الدقيقة")
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(.orange)
+                                    .padding(8)
+                                    .background(.ultraThinMaterial, in: Capsule())
+                                    .padding(.top, 12)
+                            }
+                        }
+                        .task(id: ajajiOverlayTaskKey) { await prepareAjajiOverlay() }
                     } else {
                         PDFMapView(documentURLs: ajajiPDFURLs, selectedDocumentIndex: $ajajiImageIndex)
                     }
@@ -106,6 +142,36 @@ struct DesertMapView: View {
         [PDFMapDocument.ajajiSaudi, .ajajiRiyadhRegion].compactMap { pdfMapStore.url(for: $0) }
     }
 
+    /// المستند المعروض في وضع الطبقة (خريطة المملكة الشاملة أولًا).
+    private var ajajiOverlayDocument: PDFMapDocument {
+        ajajiImageIndex == 0 ? .ajajiSaudi : .ajajiRiyadhRegion
+    }
+
+    private var ajajiOverlayTaskKey: String {
+        "\(ajajiOverlayDocument.rawValue)-\(GeoImageBounds.stored(for: ajajiOverlayDocument))"
+    }
+
+    /// تجهيز طبقة العجاجي: تحميل الصورة من الملف المستورد وربطها بحدود المعايرة.
+    private func prepareAjajiOverlay() async {
+        guard let url = pdfMapStore.url(for: ajajiOverlayDocument) else {
+            ajajiGeoOverlay = nil
+            return
+        }
+        let bounds = GeoImageBounds.stored(for: ajajiOverlayDocument)
+        guard bounds.isValid else {
+            ajajiGeoOverlay = nil
+            return
+        }
+        let image = await Task.detached(priority: .userInitiated) {
+            GeoImageLoader.loadImage(from: url)
+        }.value
+        guard let image else {
+            ajajiGeoOverlay = nil
+            return
+        }
+        ajajiGeoOverlay = GeoImageOverlay(image: image, bounds: bounds)
+    }
+
     private var markedPlanPDFURLs: [URL] {
         [PDFMapDocument.ajajiMarkedPlans].compactMap { pdfMapStore.url(for: $0) }
     }
@@ -142,6 +208,27 @@ struct DesertMapView: View {
                         Text(appState.text(.ajajiRiyadh)).tag(1)
                     }
                     .pickerStyle(.segmented)
+
+                    if !ajajiPDFURLs.isEmpty {
+                        Picker("وضع العرض", selection: $ajajiOverlayMode) {
+                            Text("فوق القمر الصناعي").tag(true)
+                            Text("عرض مسطح").tag(false)
+                        }
+                        .pickerStyle(.segmented)
+
+                        if ajajiOverlayMode {
+                            HStack(spacing: 10) {
+                                Image(systemName: "circle.lefthalf.filled")
+                                    .foregroundStyle(.secondary)
+                                Slider(value: $ajajiOverlayOpacity, in: 0.2...1.0)
+                                Text("\(Int(ajajiOverlayOpacity * 100))٪")
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 40)
+                            }
+                            .accessibilityLabel("شفافية طبقة العجاجي")
+                        }
+                    }
                 }
 
                 mapSourceStatusRow
@@ -1176,6 +1263,9 @@ struct MapCanvasView: UIViewRepresentable {
     let places: [HiddenPlace]
     var tileTemplateURL: String?
     var tileOpacity: Double
+    /// طبقة صورة جغرافية (خريطة ممسوحة مثل العجاجي) تُرسم فوق القمر الصناعي.
+    var geoImageOverlay: GeoImageOverlay? = nil
+    var geoImageOpacity: Double = 0.7
     var showsUserLocation = false
     var userInterfaceStyle: UIUserInterfaceStyle = .unspecified
     var onRegionChange: ((MKCoordinateRegion) -> Void)? = nil
@@ -1211,13 +1301,15 @@ struct MapCanvasView: UIViewRepresentable {
             context.coordinator.regionRenderKey = nextRegionKey
         }
 
+        context.coordinator.geoImageOpacity = geoImageOpacity
+        let overlaySignature = geoImageOverlay.map { "geo-\(ObjectIdentifier($0).hashValue)-\(geoImageOpacity)" } ?? "geo-none"
         let nextSignature = context.coordinator.signature(
             route: route,
             dirtRoadRoutes: dirtRoadRoutes,
             places: places,
             tileTemplateURL: tileTemplateURL,
             tileOpacity: tileOpacity
-        )
+        ) + overlaySignature
         guard context.coordinator.renderSignature != nextSignature else {
             return
         }
@@ -1231,6 +1323,10 @@ struct MapCanvasView: UIViewRepresentable {
             overlay.minimumZ = 4
             overlay.maximumZ = 18
             mapView.addOverlay(overlay, level: .aboveLabels)
+        }
+
+        if let geoImageOverlay {
+            mapView.addOverlay(geoImageOverlay, level: .aboveLabels)
         }
 
         for dirtRoute in dirtRoadRoutes where dirtRoute.coordinates.count > 1 {
@@ -1273,6 +1369,7 @@ struct MapCanvasView: UIViewRepresentable {
 
     final class Coordinator: NSObject, MKMapViewDelegate {
         var tileOpacity: Double
+        var geoImageOpacity: Double = 0.7
         var regionRenderKey = ""
         var renderSignature = ""
         var onRegionChange: ((MKCoordinateRegion) -> Void)?
@@ -1324,6 +1421,11 @@ struct MapCanvasView: UIViewRepresentable {
             if let tileOverlay = overlay as? MKTileOverlay {
                 let renderer = MKTileOverlayRenderer(tileOverlay: tileOverlay)
                 renderer.alpha = CGFloat(tileOpacity)
+                return renderer
+            }
+            if let geoOverlay = overlay as? GeoImageOverlay {
+                let renderer = GeoImageOverlayRenderer(overlay: geoOverlay)
+                renderer.alpha = CGFloat(geoImageOpacity)
                 return renderer
             }
             if let polyline = overlay as? MKPolyline {

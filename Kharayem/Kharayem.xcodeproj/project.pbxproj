@@ -17,6 +17,7 @@
 		0A1000070000000000000001 /* CloudKitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000070000000000000001 /* CloudKitStore.swift */; };
 		0A1000080000000000000001 /* GPXParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000080000000000000001 /* GPXParser.swift */; };
 		0A1000FE0000000000000001 /* GeoLandmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000FE0000000000000001 /* GeoLandmarkStore.swift */; };
+		0A1000FD0000000000000001 /* GeoImageOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000FD0000000000000001 /* GeoImageOverlay.swift */; };
 		0A1000090000000000000001 /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000090000000000000001 /* QRCodeGenerator.swift */; };
 		0A10000A0000000000000001 /* DesertMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20000A0000000000000001 /* DesertMapView.swift */; };
 		0A10002A0000000000000001 /* HomeDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20002A0000000000000001 /* HomeDashboardView.swift */; };
@@ -65,6 +66,7 @@
 		0A2000070000000000000001 /* CloudKitStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitStore.swift; sourceTree = "<group>"; };
 		0A2000080000000000000001 /* GPXParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXParser.swift; sourceTree = "<group>"; };
 		0A2000FE0000000000000001 /* GeoLandmarkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLandmarkStore.swift; sourceTree = "<group>"; };
+		0A2000FD0000000000000001 /* GeoImageOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoImageOverlay.swift; sourceTree = "<group>"; };
 		0A2000090000000000000001 /* QRCodeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
 		0A20000A0000000000000001 /* DesertMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesertMapView.swift; sourceTree = "<group>"; };
 		0A20002A0000000000000001 /* HomeDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeDashboardView.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				0A2000070000000000000001 /* CloudKitStore.swift */,
 				0A2000080000000000000001 /* GPXParser.swift */,
 				0A2000FE0000000000000001 /* GeoLandmarkStore.swift */,
+				0A2000FD0000000000000001 /* GeoImageOverlay.swift */,
 				0A2000090000000000000001 /* QRCodeGenerator.swift */,
 				0A2000150000000000000001 /* OfflineMapStore.swift */,
 				0A20001F0000000000000001 /* PDFMapStore.swift */,
@@ -308,6 +311,7 @@
 				0A1000070000000000000001 /* CloudKitStore.swift in Sources */,
 				0A1000080000000000000001 /* GPXParser.swift in Sources */,
 				0A1000FE0000000000000001 /* GeoLandmarkStore.swift in Sources */,
+				0A1000FD0000000000000001 /* GeoImageOverlay.swift in Sources */,
 				0A1000090000000000000001 /* QRCodeGenerator.swift in Sources */,
 				0A10000A0000000000000001 /* DesertMapView.swift in Sources */,
 				0A10002A0000000000000001 /* HomeDashboardView.swift in Sources */,

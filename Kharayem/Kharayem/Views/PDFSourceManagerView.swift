@@ -10,6 +10,11 @@ struct PDFSourceManagerView: View {
     @State private var remoteURLText = ""
     @State private var isDownloading = false
     @State private var errorMessage: String?
+    @State private var boundsNorth = ""
+    @State private var boundsSouth = ""
+    @State private var boundsEast = ""
+    @State private var boundsWest = ""
+    @State private var boundsMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -38,6 +43,28 @@ struct PDFSourceManagerView: View {
                         Label(isDownloading ? "..." : appState.text(.download), systemImage: "arrow.down.doc")
                     }
                     .disabled(isDownloading || URL(string: remoteURLText) == nil)
+                }
+
+                Section {
+                    Text("حدود الخريطة الجغرافية لعرضها كطبقة فوق القمر الصناعي. القيم الأولية تقريبية — عدّلها حتى تنطبق المعالم (مثل السواحل والمدن) على صور القمر.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    calibrationField("شمال (خط عرض)", value: $boundsNorth)
+                    calibrationField("جنوب (خط عرض)", value: $boundsSouth)
+                    calibrationField("شرق (خط طول)", value: $boundsEast)
+                    calibrationField("غرب (خط طول)", value: $boundsWest)
+                    Button {
+                        saveBounds()
+                    } label: {
+                        Label("حفظ المعايرة", systemImage: "scope")
+                    }
+                    if let boundsMessage {
+                        Text(boundsMessage)
+                            .font(.caption)
+                            .foregroundStyle(boundsMessage.contains("تم") ? Color.green : Color.red)
+                    }
+                } header: {
+                    Text("معايرة الطبقة (تقريبية)")
                 }
 
                 Section {
@@ -80,7 +107,44 @@ struct PDFSourceManagerView: View {
                     }
                 }
             }
+            .onAppear(perform: loadBounds)
         }
+    }
+
+    private func calibrationField(_ title: String, value: Binding<String>) -> some View {
+        HStack {
+            Text(title)
+                .font(.caption)
+            Spacer()
+            TextField("0.0", text: value)
+                .keyboardType(.numbersAndPunctuation)
+                .multilineTextAlignment(.trailing)
+                .frame(width: 110)
+                .font(.body.monospacedDigit())
+        }
+    }
+
+    private func loadBounds() {
+        let bounds = GeoImageBounds.stored(for: document)
+        boundsNorth = String(format: "%.4f", bounds.north)
+        boundsSouth = String(format: "%.4f", bounds.south)
+        boundsEast = String(format: "%.4f", bounds.east)
+        boundsWest = String(format: "%.4f", bounds.west)
+    }
+
+    private func saveBounds() {
+        guard let n = Double(boundsNorth), let s = Double(boundsSouth),
+              let e = Double(boundsEast), let w = Double(boundsWest) else {
+            boundsMessage = "أدخل أرقامًا عشرية صحيحة (مثال: 24.7136)"
+            return
+        }
+        let bounds = GeoImageBounds(north: n, south: s, east: e, west: w)
+        guard bounds.isValid else {
+            boundsMessage = "الحدود غير منطقية: الشمال يجب أن يزيد عن الجنوب والشرق عن الغرب"
+            return
+        }
+        bounds.save(for: document)
+        boundsMessage = "تم حفظ المعايرة — أعد فتح طبقة العجاجي لتطبيقها"
     }
 
     private func downloadPDF() async {
