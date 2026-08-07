@@ -47,6 +47,8 @@ final class GeoLandmarkStore: @unchecked Sendable {
     static let attribution = "بيانات المعالم: GeoNames.org (CC-BY)"
 
     private var landmarks: [GeoLandmark] = []
+    /// مفتاح بحث مطبَّع لكل معلم، بنفس ترتيب `landmarks`.
+    private var searchKeys: [String] = []
     private var loaded = false
     private let lock = NSLock()
 
@@ -60,15 +62,38 @@ final class GeoLandmarkStore: @unchecked Sendable {
 
     /// بحث بالاسم (عربي أو لاتيني)، مرتب بطول الاسم فالأقصر أولاً
     /// حتى تتصدر المطابقات الأدق.
+    ///
+    /// المقارنة تجري على نص عربي مطبَّع: أسماء GeoNames كثيرًا ما تأتي
+    /// مُشكَّلة («الثُّويرات») بينما المستخدم يكتب بلا تشكيل («الثويرات»)،
+    /// فبدون التطبيع تضيع مطابقات موجودة فعلًا.
     func search(_ query: String, limit: Int = 30) -> [GeoLandmark] {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         guard trimmed.count >= 2 else { return [] }
         ensureLoaded()
-        let matches = landmarks.filter {
-            $0.name.localizedCaseInsensitiveContains(trimmed)
-                || $0.asciiName.localizedCaseInsensitiveContains(trimmed)
+        let needle = Self.normalizedArabic(trimmed)
+        let asciiNeedle = trimmed.lowercased()
+        let matches = landmarks.indices.filter { i in
+            searchKeys[i].contains(needle) || landmarks[i].asciiName.lowercased().contains(asciiNeedle)
         }
-        return Array(matches.sorted { $0.name.count < $1.name.count }.prefix(limit))
+        return Array(
+            matches
+                .map { landmarks[$0] }
+                .sorted { $0.name.count < $1.name.count }
+                .prefix(limit)
+        )
+    }
+
+    /// تطبيع عربي للبحث: إزالة التشكيل والتطويل، وتوحيد الهمزات والألف
+    /// المقصورة والتاء المربوطة.
+    static func normalizedArabic(_ text: String) -> String {
+        var s = text.lowercased()
+        // إزالة الحركات والتطويل
+        s = String(s.unicodeScalars.filter { scalar in
+            !(0x064B...0x065F).contains(Int(scalar.value)) && scalar.value != 0x0640 && scalar.value != 0x0670
+        })
+        // توحيد الأشكال الشائعة
+        let map: [Character: Character] = ["أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي", "ئ": "ي", "ؤ": "و", "ة": "ه"]
+        return String(s.map { map[$0] ?? $0 })
     }
 
     /// أقرب المعالم إلى إحداثية، ضمن نصف قطر بالكيلومتر.
@@ -112,5 +137,6 @@ final class GeoLandmarkStore: @unchecked Sendable {
                 elevationMeters: elevation
             )
         }
+        searchKeys = landmarks.map { Self.normalizedArabic($0.name) }
     }
 }
