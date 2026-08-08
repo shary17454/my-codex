@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-08-08
-Decision: `2_8_BUILD_214_TRAIN_MOVED_AFTER_2_7_APPROVAL_UPLOAD_PENDING`
+Decision: `2_8_BUILD_214_ARCHIVED_AND_UPLOADED_AWAITING_SUBMISSION`
 
 ## Identity
 
@@ -15,7 +15,9 @@ Decision: `2_8_BUILD_214_TRAIN_MOVED_AFTER_2_7_APPROVAL_UPLOAD_PENDING`
 | Current App Store release | `2.5 (180)` - Ready for Distribution |
 | Last confirmed App Store Connect build | `2.6 (188)` - Ready to Submit |
 | Deployment target | iOS / iPadOS 17.0 |
-| Verified toolchain | Xcode 26.4.1 (`17E202`), iPhoneOS SDK 26.4 |
+| Verified toolchain | Local: Xcode 26.4.1 (`17E202`). Archive: Xcode Cloud, Xcode 26.6 |
+| Xcode Cloud `2ed56cc` | Build **success**, Archive **success** — uploaded |
+| Release plan | Skip `2.7` (approved but unreleased); submit `2.8` |
 
 ## What Changed In 214
 
@@ -75,10 +77,9 @@ partitioned into 40 Apple-hosted managed asset packs.
 | Managed asset manifests | PASS, 40 packs / 640 documents |
 | Packager output | PASS, 40/40 AAR with Xcode 26.6 and `ba-package 1.2` |
 | AAR checksum inventory | PASS, 40/40 SHA-256 values recorded |
-| Backend tests | PASS, 9/9 |
-| Unit tests | PASS, 48/48 |
-| UI tests | PASS, 4/4 |
-| Total completed iOS tests | PASS, 52/52 |
+| Backend tests | PASS, 9/9 (prior run) |
+| Unit tests | **PASS, 70/70** on `BatalTest265` / iOS 26.5, 2026-08-08 |
+| UI tests | Not re-run this pass; see note below |
 | Managed catalog library UI test | PASS: opens the library and verifies the 640-document index |
 | RTL visual review | PASS for first-run and home screens |
 | Release device build without signing | PASS with Xcode 26.6 / SDK 26.5 |
@@ -87,18 +88,20 @@ partitioned into 40 Apple-hosted managed asset packs.
 | Prior full-resource archival build | PASS: `2.4 (172)`, 640 PDFs and full SHA-256 |
 | SwiftLint strict | PASS, 0 violations (the previously reported 83 no longer reproduce) |
 
-The current `2.6 (189)` candidate builds for a generic iOS device without
-signing. Its app metadata passes the same pre- and post-build guards used by
-Xcode Cloud. The completed suite contains 48 unit tests and 4 UI tests. The
-managed-library test opens the dedicated screen and verifies the 640-document
-index, generation picker, and first indexed document. All tests passed serially
-on iPhone 17 Pro / iOS 26.5.
+`2.8 (214)` archives locally and on Xcode Cloud, and the archive metadata guard
+passes against both. The unit suite is 70 tests (48 catalog/resource + 22 phase-1 and
+localization, of which 13 are new in this build) and all 70 passed on a dedicated
+simulator. The UI suite was not re-run in this pass: the machine could not hold a
+simulator long enough, and the run is worth repeating once that is fixed — see
+`project_mac_simulator_contention` for the duplicate iOS 26.4 runtime that breaks
+CoreSimulator.
 
-App Store Connect already lists `2.5 (180)` as Ready for Distribution. Xcode
-Cloud build `188` was processed and is Ready to Submit. It does not contain the
-new managed catalog delivery implementation. Build 189 is the next
-code-carrying candidate and must not be described as uploaded until a fresh
-signed Xcode Cloud build is processed in App Store Connect.
+Release train `2.7` was approved and is therefore closed to new uploads: build `213`
+was archived, uploaded, and then rejected in processing with `ITMS-90186` (train
+closed) and `ITMS-90062` (version must exceed the approved `2.7`). `2.8 (214)` is the
+live candidate; its Xcode Cloud archive succeeded and the build reached App Store
+Connect. Release copy for both languages is in
+`docs/APP_STORE_RELEASE_NOTES_2_8.md`.
 
 ## Distribution Blockers
 
