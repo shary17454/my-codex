@@ -17,16 +17,22 @@ The complete local PDF archive is indexed under `BatalAlDroob/Web/catalog/` and 
 
 ## Requirements
 
-- Xcode 26.4.1 (`17E202`) or newer, non-beta. Build `192` was verified with 26.4.1;
-  the previously documented 26.6 (`17F113`) also works. Any released Xcode Apple
-  currently accepts is fine — a **beta** Xcode is rejected at upload with
+- **Archives: Xcode 26.6 (`17F113`) with iPhoneOS SDK 26.5, exactly.** This is not a
+  minimum — `ci_scripts/ci_post_xcodebuild.sh` asserts `DTXcode = 2660`,
+  `DTXcodeBuild = 17F113`, `DTSDKName = iphoneos26.5`, and `DTPlatformVersion = 26.5`
+  on the archived app, and fails the Xcode Cloud archive on any other toolchain.
+  Change those pins in the guard first if you intend to move Xcode versions.
+- Local Debug/Release builds and tests: any released, **non-beta** Xcode works; `192`
+  was checked with 26.4.1 (`17E202`). A beta Xcode is rejected at upload with
   `ITMS-90111`.
 - Swift 6
 - iOS deployment target 17.0
 - iOS 26.0 or later for Apple-hosted original-PDF downloads
 - No CocoaPods, Swift Package Manager, or third-party dependency install step
 
-For App Store archives, keep signing managed by Xcode/Xcode Cloud and use Xcode 26.6 build 17F113 or a newer non-beta Xcode accepted by Apple.
+For App Store archives, keep signing managed by Xcode/Xcode Cloud and keep the Xcode
+Cloud workflow on Xcode 26.6 (`17F113`). A newer Xcode does not "also work" here: the
+archive guard compares the toolchain stamps exactly and fails the build.
 
 ## Build
 
