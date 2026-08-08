@@ -1266,18 +1266,49 @@ struct SavedDecisionCard: View {
     }
 }
 
+enum WeshNotificationPayloadKey {
+    /// Carries the comparison a notification refers to, so tapping it can open that comparison.
+    static let comparisonID = "weshComparisonID"
+}
+
 enum LocalNotificationScheduler {
-    static func scheduleDecisionReminder(for question: AskQuestion, after timeInterval: TimeInterval) async throws {
+    /// Whether a scheduling call may show the system permission prompt.
+    ///
+    /// Automatic scheduling (for example the follow-up queued right after a vote) must never
+    /// interrupt the user with an unexplained permission dialog, so it only proceeds when the
+    /// user has already granted the permission elsewhere.
+    enum AuthorizationPolicy {
+        /// Ask the system for permission when it has not been determined yet.
+        case requestIfNeeded
+        /// Never prompt; schedule only when permission is already granted.
+        case existingOnly
+    }
+
+    /// Resolves notification permission without prompting unless the policy allows it.
+    static func ensureAuthorization(_ policy: AuthorizationPolicy) async throws {
         let center = UNUserNotificationCenter.current()
-        let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
-        guard granted else {
+        let status = await center.notificationSettings().authorizationStatus
+
+        switch status {
+        case .authorized, .provisional, .ephemeral:
+            return
+        case .notDetermined where policy == .requestIfNeeded:
+            let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
+            guard granted else { throw AppError.forbidden }
+        default:
             throw AppError.forbidden
         }
+    }
+
+    static func scheduleDecisionReminder(for question: AskQuestion, after timeInterval: TimeInterval) async throws {
+        let center = UNUserNotificationCenter.current()
+        try await ensureAuthorization(.requestIfNeeded)
 
         let content = UNMutableNotificationContent()
         content.title = "وش الرأي"
         content.body = "راجع نتيجة: \(question.title)"
         content.sound = .default
+        content.userInfo = [WeshNotificationPayloadKey.comparisonID: question.id.uuidString]
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(60, timeInterval), repeats: false)
         let request = UNNotificationRequest(
@@ -1402,9 +1433,6 @@ private struct ComparisonShareSheet: View {
                         ShareActionRow(title: "بطاقة نتيجة كصورة", icon: "photo.on.rectangle.angled", color: WeshTheme.gold)
                     }
                     .buttonStyle(.plain)
-                    ShareLink(item: shareText) {
-                        ShareActionRow(title: "مشاركة في Instagram", icon: "camera", color: WeshTheme.goldBright)
-                    }
                     Button {
                         UIPasteboard.general.string = shareText
                         dismiss()

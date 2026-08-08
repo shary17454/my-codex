@@ -8,8 +8,8 @@
 - [x] Swift: 6.0.
 - [x] Deployment target: iOS 17.0.
 - [x] الأجهزة: iPhone وiPad.
-- [x] Marketing Version في المشروع: `2.2`.
-- [x] Build Number في المشروع: `116`.
+- [x] Marketing Version في المشروع: `2.3`.
+- [x] Build Number في المشروع: `126`.
 - [x] لم يتغير Team أو Signing أو Entitlements.
 
 ## البناء والاختبارات المحلية
@@ -17,8 +17,8 @@
 - [x] Debug build.
 - [x] Release simulator build.
 - [x] Static Analyzer.
-- [x] Unit Tests: 9/9.
-- [x] UI Smoke Test: 1/1.
+- [x] Unit Tests: 38/38.
+- [x] UI Smoke Tests: 3/3.
 - [x] Backend syntax check.
 - [x] Backend isolated smoke test.
 - [x] فحص JSON وInfo.plist.
@@ -65,7 +65,7 @@
 ## App Store Connect
 
 - [x] التأكد أن `2.2` أعلى من الإصدار المغلق `2.1`.
-- [x] التأكد أن Build `116` أعلى من آخر Build مرفوض `115`.
+- [x] التأكد أن Build `126` يطابق الحد الأدنى `MIN_PROJECT_BUILD` في `ci_post_clone.sh` (كان `125` وهو أقل من الحد فيفشل الحارس بالكود 26).
 - [ ] مراجعة App Privacy Labels يدويًا.
 - [ ] مراجعة Export Compliance.
 - [x] تحديث What’s New بالعربية والإنجليزية بما يطابق الوظائف المنفذة.

@@ -76,6 +76,26 @@ final class UserSession: ObservableObject {
         persistPublicState()
     }
 
+    /// Removes every trace of the signed-in identity from this device.
+    ///
+    /// The app keeps no server-side account, so deleting the locally stored identity and the
+    /// preferences tied to it *is* account deletion — which App Review requires any app offering
+    /// Sign in with Apple to provide.
+    func deleteAccountData() {
+        signOut()
+        for key in Self.accountScopedDefaultsKeys {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
+    private static let accountScopedDefaultsKeys = [
+        "user.isSignedIn",
+        "user.displayName",
+        "user.email",
+        "user.identifier",
+        "wash_alray_user_interests"
+    ]
+
     private func migrateLegacyCredentialsIfNeeded() {
         if secureStore.load(.email) == nil, !email.isEmpty {
             secureStore.save(email, for: .email)

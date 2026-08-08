@@ -9,6 +9,8 @@ final class WeshNotificationCenterStore: NSObject, ObservableObject, UNUserNotif
     @Published private(set) var items: [WeshNotificationItem] = []
     @Published private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
     @Published private(set) var lastRegistrationError: String?
+    /// Comparison the user asked to open by tapping a delivered notification.
+    @Published var pendingComparisonID: UUID?
 
     private let storageKey = "wesh.notifications.items"
     private let decoder = JSONDecoder()
@@ -100,6 +102,24 @@ final class WeshNotificationCenterStore: NSObject, ObservableObject, UNUserNotif
         [.banner, .sound, .badge]
     }
 
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+        let userInfo = response.notification.request.content.userInfo
+        guard let rawID = userInfo[WeshNotificationPayloadKey.comparisonID] as? String,
+              let comparisonID = UUID(uuidString: rawID) else {
+            return
+        }
+        await MainActor.run { pendingComparisonID = comparisonID }
+    }
+
+    /// Reads and clears the comparison queued by a notification tap.
+    func consumePendingComparisonID() -> UUID? {
+        defer { pendingComparisonID = nil }
+        return pendingComparisonID
+    }
+
     private func load() {
         guard let data = UserDefaults.standard.data(forKey: storageKey),
               let decoded = try? decoder.decode([WeshNotificationItem].self, from: data) else {
@@ -135,6 +155,9 @@ final class WeshNotificationAppDelegate: NSObject, UIApplicationDelegate {
         Task { @MainActor in
             WeshNotificationCenterStore.shared.addLocal(
                 WeshNotificationItem(
+                    // Stable ID so repeated registration failures collapse into one entry
+                    // instead of flooding the notification centre with duplicates.
+                    id: Self.pushRegistrationFailureID,
                     kind: .system,
                     title: "لم يتم تفعيل Push بعد",
                     body: "يلزم تفعيل Push Notifications وAPNs على حساب Apple لإرسال التنبيهات خارج التطبيق."
@@ -142,6 +165,8 @@ final class WeshNotificationAppDelegate: NSObject, UIApplicationDelegate {
             )
         }
     }
+
+    private static let pushRegistrationFailureID = UUID(uuidString: "1E4C1F92-4A3B-4F5E-9C2D-8B7A6D5E4F30") ?? UUID()
 }
 
 @MainActor
@@ -153,7 +178,10 @@ final class WeshNotificationBackendBridge {
 }
 
 extension LocalNotificationScheduler {
-    static func scheduleClosingReminderIfPossible(for question: AskQuestion) async throws {
+    static func scheduleClosingReminderIfPossible(
+        for question: AskQuestion,
+        authorization: AuthorizationPolicy = .existingOnly
+    ) async throws {
         guard let closesAt = question.closesAt else {
             throw AppError.invalidInput("لا يوجد وقت انتهاء لهذه المقارنة.")
         }
@@ -165,28 +193,45 @@ extension LocalNotificationScheduler {
             identifier: "wesh-closing-\(question.id.uuidString)",
             title: "اقترب انتهاء المقارنة",
             body: "راجع آخر نتيجة: \(question.title)",
-            date: reminderDate
+            date: reminderDate,
+            comparisonID: question.id,
+            authorization: authorization
         )
     }
 
-    static func scheduleOutcomeFollowUp(for question: AskQuestion, after timeInterval: TimeInterval = 604_800) async throws {
+    static func scheduleOutcomeFollowUp(
+        for question: AskQuestion,
+        after timeInterval: TimeInterval = 604_800,
+        authorization: AuthorizationPolicy = .existingOnly
+    ) async throws {
         try await schedule(
             identifier: "wesh-outcome-\(question.id.uuidString)",
             title: "وش اخترت بالنهاية؟",
             body: "سجّل تجربتك مع: \(question.title). هل أنت راضٍ عن القرار؟",
-            date: Date().addingTimeInterval(max(3_600, timeInterval))
+            date: Date().addingTimeInterval(max(3_600, timeInterval)),
+            comparisonID: question.id,
+            authorization: authorization
         )
     }
 
-    private static func schedule(identifier: String, title: String, body: String, date: Date) async throws {
+    private static func schedule(
+        identifier: String,
+        title: String,
+        body: String,
+        date: Date,
+        comparisonID: UUID?,
+        authorization: AuthorizationPolicy
+    ) async throws {
         let center = UNUserNotificationCenter.current()
-        let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
-        guard granted else { throw AppError.forbidden }
+        try await ensureAuthorization(authorization)
 
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
+        if let comparisonID {
+            content.userInfo = [WeshNotificationPayloadKey.comparisonID: comparisonID.uuidString]
+        }
 
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
         let request = UNNotificationRequest(

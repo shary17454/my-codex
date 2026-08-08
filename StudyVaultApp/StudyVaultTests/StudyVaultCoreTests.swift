@@ -659,6 +659,96 @@ final class StudyVaultCoreTests: XCTestCase {
         XCTAssertFalse(summary.communityNeedMatch.explanation.isEmpty)
     }
 
+    // MARK: - Regression coverage for the 2.3 hardening pass
+
+    /// The backend emits timestamps with `Date.prototype.toISOString()`, which *always* carries
+    /// milliseconds. The old per-call `ISO8601DateFormatter()` could not read that shape, so every
+    /// server timestamp silently degraded — `createdAt` collapsed to "now" and `closesAt` became
+    /// nil, quietly turning time-limited comparisons into open-ended ones.
+    func testISO8601ParserReadsBackendTimestampsWithMilliseconds() throws {
+        let whole = try XCTUnwrap(WeshISO8601.date(from: "2026-08-08T10:30:00Z"))
+        let backendShape = try XCTUnwrap(WeshISO8601.date(from: "2026-08-08T10:30:00.000Z"))
+        let fractional = try XCTUnwrap(WeshISO8601.date(from: "2026-08-08T10:30:00.250Z"))
+
+        XCTAssertEqual(backendShape, whole)
+        XCTAssertEqual(fractional.timeIntervalSince(whole), 0.25, accuracy: 0.001)
+        XCTAssertNil(WeshISO8601.date(from: "ليس تاريخًا"))
+    }
+
+    func testSavedQuestionsExposeBookmarkedComparisonsNewestFirst() async {
+        let older = makeQuestion(title: "مقارنة قديمة", votes: [1, 1])
+        var newer = makeQuestion(title: "مقارنة حديثة", votes: [2, 1])
+        newer.createdAt = older.createdAt.addingTimeInterval(120)
+        let unsaved = makeQuestion(title: "غير محفوظة", votes: [0, 0])
+
+        let container = try? WeshPersistenceStore.makeContainer(inMemory: true)
+        let store = container.map(WeshPersistenceStore.init(container:))
+        let viewModel = HomeViewModel(
+            questions: [older, newer, unsaved],
+            knowledgeItems: [],
+            persistence: store
+        )
+        try? store?.upsert(question: older)
+        try? store?.upsert(question: newer)
+
+        await viewModel.toggleSavedQuestion(questionID: older.id)
+        await viewModel.toggleSavedQuestion(questionID: newer.id)
+
+        XCTAssertEqual(viewModel.savedQuestions.map(\.title), ["مقارنة حديثة", "مقارنة قديمة"])
+        XCTAssertEqual(viewModel.dashboardStatistics.savedCount, 2)
+
+        await viewModel.toggleSavedQuestion(questionID: newer.id)
+        XCTAssertEqual(viewModel.savedQuestions.map(\.title), ["مقارنة قديمة"])
+    }
+
+    func testDeletingAccountClearsIdentityAndInterests() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "wesh.tests.accountDeletion"))
+        defaults.removePersistentDomain(forName: "wesh.tests.accountDeletion")
+        defaults.set(true, forKey: "user.isSignedIn")
+        defaults.set("خبير التقنية", forKey: "user.displayName")
+        defaults.set(["phones", "cars"], forKey: "wash_alray_user_interests")
+
+        let session = UserSession(defaults: defaults)
+        XCTAssertTrue(session.isSignedIn)
+
+        session.deleteAccountData()
+
+        XCTAssertFalse(session.isSignedIn)
+        XCTAssertEqual(session.publicName, "ضيف")
+        XCTAssertNil(defaults.stringArray(forKey: "wash_alray_user_interests"))
+        XCTAssertNil(defaults.string(forKey: "user.displayName"))
+        defaults.removePersistentDomain(forName: "wesh.tests.accountDeletion")
+    }
+
+    func testMalformedBackendURLIsRejectedWithGuidance() async {
+        let viewModel = HomeViewModel(questions: [], knowledgeItems: [])
+        viewModel.isBackendEnabled = true
+        viewModel.backendBaseURLText = "خادم-بدون-بروتوكول"
+
+        await viewModel.refreshAdminOverview()
+
+        let message = viewModel.appErrorMessage ?? ""
+        XCTAssertTrue(message.contains("غير صحيح"), "توقعنا رسالة عن عنوان غير صحيح، وجاء: \(message)")
+        XCTAssertNil(viewModel.adminOverview)
+    }
+
+    func testDraftLifecycleUsesSingleCurrentRecord() throws {
+        let container = try WeshPersistenceStore.makeContainer(inMemory: true)
+        let store = WeshPersistenceStore(container: container)
+
+        XCTAssertFalse(store.hasDraft())
+
+        try store.saveDraft(ComparisonDraft(title: "أول", options: [ComparisonOptionDraft(title: "أ")]))
+        try store.saveDraft(ComparisonDraft(title: "ثاني", options: [ComparisonOptionDraft(title: "ب")]))
+
+        XCTAssertTrue(store.hasDraft())
+        XCTAssertEqual(store.loadDraft()?.title, "ثاني")
+
+        try store.clearDraft()
+        XCTAssertFalse(store.hasDraft())
+        XCTAssertNil(store.loadDraft())
+    }
+
     private func makeQuestion(
         title: String = "أي خيار أفضل؟",
         category: AskCategory = .phones,

@@ -111,6 +111,16 @@ final class HomeViewModel {
         return sortedQuestions(filtered)
     }
 
+    /// Comparisons the user bookmarked, newest first.
+    ///
+    /// Bookmarks were previously written to storage and counted on the dashboard, but no screen
+    /// listed them, so a saved comparison could never be reopened.
+    var savedQuestions: [AskQuestion] {
+        questions
+            .filter { savedQuestionIDs.contains($0.id) }
+            .sorted { $0.createdAt > $1.createdAt }
+    }
+
     var filteredKnowledge: [KnowledgeItem] {
         KnowledgeSearchIndex.search(
             knowledgeItems,
@@ -572,15 +582,18 @@ final class HomeViewModel {
         }
 
         let comment = AskComment(author: authorName, text: cleanText, likes: 0, createdAt: Date())
-        questions[questionIndex].comments.insert(
-            comment,
-            at: 0
-        )
+        // Persist first: showing a comment that storage rejected (for example on a comparison
+        // with comments disabled) leaves the list and the store disagreeing until relaunch.
         do {
             try persistence?.addComment(comparisonID: questionID, comment: comment)
+        } catch AppError.forbidden {
+            appErrorMessage = "التعليقات مغلقة في هذه المقارنة."
+            return nil
         } catch {
             appErrorMessage = "تعذر حفظ التعليق محليًا."
+            return nil
         }
+        questions[questionIndex].comments.insert(comment, at: 0)
         pushCommentIfNeeded(questionID: questionID, text: cleanText, authorName: authorName)
         return questions[questionIndex]
     }
@@ -656,8 +669,21 @@ final class HomeViewModel {
     }
 
     private func makeBackendClient() -> WeshAlrayAPIClient? {
-        guard let url = URL(string: backendBaseURLText.trimmingCharacters(in: .whitespacesAndNewlines)) else {
-            appErrorMessage = "عنوان Backend غير صحيح."
+        let cleanBaseURL = backendBaseURLText.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Two things are wrong with accepting whatever `URL(string:)` returns: it happily parses
+        // scheme-less text like "example", which then fails deep inside URLSession with an opaque
+        // error, and it would let a Release build target plain HTTP. Release talks HTTPS only;
+        // HTTP stays available for the local development server, which is Debug-only anyway.
+        #if DEBUG
+        let allowedSchemes = ["http", "https"]
+        #else
+        let allowedSchemes = ["https"]
+        #endif
+        guard let url = URL(string: cleanBaseURL),
+              let scheme = url.scheme?.lowercased(),
+              allowedSchemes.contains(scheme),
+              url.host?.isEmpty == false else {
+            appErrorMessage = "عنوان Backend غير صحيح. استخدم عنوانًا كاملًا يبدأ بـ https://"
             return nil
         }
         let cleanToken = backendAPITokenText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -827,21 +853,23 @@ struct WeshAlrayAPIClient: Sendable {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
 
+    /// Shared session so the client can be recreated per request without spawning a new
+    /// connection pool (and leaking its resources) every time.
+    private static let sharedSession: URLSession = {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 15
+        configuration.timeoutIntervalForResource = 30
+        configuration.waitsForConnectivity = true
+        return URLSession(configuration: configuration)
+    }()
+
     init(baseURL: URL, apiToken: String?, session: URLSession? = nil) {
         self.baseURL = baseURL
         self.apiToken = apiToken
         decoder = JSONDecoder()
         encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        if let session {
-            self.session = session
-        } else {
-            let configuration = URLSessionConfiguration.default
-            configuration.timeoutIntervalForRequest = 15
-            configuration.timeoutIntervalForResource = 30
-            configuration.waitsForConnectivity = true
-            self.session = URLSession(configuration: configuration)
-        }
+        self.session = session ?? Self.sharedSession
     }
 
     func fetchComparisons(category: AskCategory?) async throws -> [AskQuestion] {
@@ -1070,14 +1098,34 @@ struct WeshAlrayAPIClient: Sendable {
 
 enum DeviceClientID {
     private static let key = "wash_alray_device_client_id"
+    // Serialises the read-then-write so two concurrent requests cannot mint (and persist)
+    // two different client identifiers for the same device.
+    private static let lock = NSLock()
 
     static var value: String {
+        lock.lock()
+        defer { lock.unlock() }
         if let existing = UserDefaults.standard.string(forKey: key) {
             return existing
         }
         let created = UUID().uuidString
         UserDefaults.standard.set(created, forKey: key)
         return created
+    }
+}
+
+/// Parses the ISO-8601 timestamps returned by the backend.
+///
+/// Replaces the previous per-value `ISO8601DateFormatter()` allocations, which were both costly
+/// inside list decoding and unable to read timestamps carrying fractional seconds — those silently
+/// fell back to `Date()` and showed wrong times.
+enum WeshISO8601 {
+    private static let fractionalSeconds = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
+    private static let wholeSeconds = Date.ISO8601FormatStyle()
+
+    static func date(from value: String) -> Date? {
+        if let parsed = try? wholeSeconds.parse(value) { return parsed }
+        return try? fractionalSeconds.parse(value)
     }
 }
 
@@ -1122,8 +1170,8 @@ private struct RemoteComparison: Decodable {
             timeAgo: "من الخادم",
             options: options.map { PollOption(id: $0.id, title: $0.title, votes: $0.votes) },
             comments: comments.map(\.askComment),
-            createdAt: ISO8601DateFormatter().date(from: createdAt) ?? Date(),
-            closesAt: expiresAt.flatMap { ISO8601DateFormatter().date(from: $0) },
+            createdAt: WeshISO8601.date(from: createdAt) ?? Date(),
+            closesAt: expiresAt.flatMap { WeshISO8601.date(from: $0) },
             isAnonymous: isAnonymous ?? false,
             allowsReasons: allowsVoteReasons ?? true,
             allowsComments: allowsComments ?? true,
@@ -1149,7 +1197,7 @@ private struct RemoteVoteTrend: Decodable {
             comparisonID: comparisonID,
             optionID: optionID,
             optionName: optionName,
-            createdAt: ISO8601DateFormatter().date(from: createdAt) ?? Date()
+            createdAt: WeshISO8601.date(from: createdAt) ?? Date()
         )
     }
 }
@@ -1181,7 +1229,7 @@ struct RemoteComment: Decodable {
             optionTitle: optionTitle,
             trustBadge: trustBadge,
             reasonCategory: reasonCategory,
-            createdAt: createdAt.flatMap { ISO8601DateFormatter().date(from: $0) } ?? Date()
+            createdAt: createdAt.flatMap { WeshISO8601.date(from: $0) } ?? Date()
         )
     }
 }
@@ -1316,8 +1364,8 @@ private struct RemoteNotification: Decodable {
             comparisonID: comparisonID,
             title: title,
             body: body,
-            createdAt: ISO8601DateFormatter().date(from: createdAt) ?? Date(),
-            deliverAt: deliverAt.flatMap { ISO8601DateFormatter().date(from: $0) },
+            createdAt: WeshISO8601.date(from: createdAt) ?? Date(),
+            deliverAt: deliverAt.flatMap { WeshISO8601.date(from: $0) },
             isRead: readAt != nil
         )
     }

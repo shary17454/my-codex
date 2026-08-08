@@ -16,6 +16,7 @@ struct AccountView: View {
     @State private var alias = ""
     @State private var selectedInterests: Set<AskCategory> = []
     @State private var savedAliasFeedback = false
+    @State private var showingDeleteAccountConfirmation = false
 
     private let interestsKey = "wash_alray_user_interests"
 
@@ -42,13 +43,29 @@ struct AccountView: View {
                 #endif
 
                 if userSession.isSignedIn {
-                    Button(role: .destructive) {
-                        userSession.signOut()
-                        alias = userSession.displayName
-                    } label: {
-                        Label("تسجيل الخروج", systemImage: "rectangle.portrait.and.arrow.right")
+                    VStack(spacing: 10) {
+                        Button(role: .destructive) {
+                            userSession.signOut()
+                            alias = userSession.displayName
+                        } label: {
+                            Label("تسجيل الخروج", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
+                        .buttonStyle(WeshSecondaryButtonStyle())
+
+                        Button(role: .destructive) {
+                            showingDeleteAccountConfirmation = true
+                        } label: {
+                            Label("حذف الحساب وبياناته", systemImage: "trash")
+                        }
+                        .buttonStyle(WeshSecondaryButtonStyle())
+                        .accessibilityIdentifier("account.deleteAccount")
+
+                        Text("يحذف هويتك وبريدك واسمك العام واهتماماتك من هذا الجهاز نهائيًا. المقارنات التي أنشأتها تبقى محفوظة محليًا ويمكنك حذف كل مقارنة من صفحتها.")
+                            .font(.caption)
+                            .foregroundStyle(WeshTheme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .buttonStyle(WeshSecondaryButtonStyle())
                 }
             }
             .padding(.horizontal, WeshTheme.horizontalPadding)
@@ -63,6 +80,20 @@ struct AccountView: View {
             loadInterests()
         }
         .sensoryFeedback(.success, trigger: savedAliasFeedback)
+        .confirmationDialog(
+            "حذف الحساب وبياناته؟",
+            isPresented: $showingDeleteAccountConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("حذف نهائيًا", role: .destructive) {
+                userSession.deleteAccountData()
+                alias = userSession.displayName
+                selectedInterests = []
+            }
+            Button("إلغاء", role: .cancel) {}
+        } message: {
+            Text("لا يمكن التراجع عن هذه الخطوة. سيُحذف معرّفك وبريدك واسمك العام واهتماماتك من هذا الجهاز.")
+        }
     }
 
     private var accountHero: some View {

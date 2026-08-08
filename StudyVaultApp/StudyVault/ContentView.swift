@@ -45,6 +45,9 @@ struct ContentView: View {
     @State private var showingAIAssistant = false
     @State private var composerTemplate: KnowledgeItem?
     @State private var pendingComposerTitle = ""
+    /// Cached because reading it hits SwiftData; recomputing it inside `body` would run a
+    /// fetch on every re-render.
+    @State private var hasSavedDraft = false
     let persistence: WeshPersistenceStore
 
     init(persistence: WeshPersistenceStore) {
@@ -52,8 +55,8 @@ struct ContentView: View {
         _homeViewModel = State(initialValue: HomeViewModel(persistence: persistence))
     }
 
-    private var hasSavedDraft: Bool {
-        persistence.hasDraft()
+    private func refreshDraftAvailability() {
+        hasSavedDraft = persistence.hasDraft()
     }
 
     private var compactTabs: [AppTab] {
@@ -159,17 +162,25 @@ struct ContentView: View {
             WeshNotificationBackendBridge.shared.clientProvider = { homeViewModel.optionalAIBackendClient() }
             await notificationStore.refreshAuthorizationStatus()
             homeViewModel.loadPersistentState()
+            refreshDraftAvailability()
             openPendingComparisonIntentIfNeeded()
+            openComparisonFromNotificationIfNeeded()
             await homeViewModel.refreshFromBackend()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
+            refreshDraftAvailability()
             openPendingComparisonIntentIfNeeded()
+            openComparisonFromNotificationIfNeeded()
+        }
+        .onChange(of: notificationStore.pendingComparisonID) { _, _ in
+            openComparisonFromNotificationIfNeeded()
         }
         .onChange(of: showingComposer) { _, isPresented in
             guard !isPresented else { return }
             composerTemplate = nil
             pendingComposerTitle = ""
+            refreshDraftAvailability()
         }
         .onOpenURL { url in
             if let question = homeViewModel.question(fromDeepLink: url) {
@@ -333,6 +344,7 @@ struct ContentView: View {
             NavigationStack {
                 KnowledgeLibraryView(
                     items: homeViewModel.filteredKnowledge,
+                    savedQuestions: homeViewModel.savedQuestions,
                     selectedCategory: $homeViewModel.selectedCategory,
                     searchText: $homeViewModel.searchText,
                     selectedItem: $selectedKnowledgeItem,
@@ -340,6 +352,8 @@ struct ContentView: View {
                         composerTemplate = item
                         showingComposer = true
                     },
+                    openSavedQuestion: { selectedQuestion = $0 },
+                    unsaveQuestion: toggleSavedQuestion,
                     openResearch: { showingResearchBrowser = true },
                     refresh: { await homeViewModel.refreshFromBackend() }
                 )
@@ -367,7 +381,11 @@ struct ContentView: View {
 
     private func vote(questionID: AskQuestion.ID, optionID: PollOption.ID) {
         Task {
-            selectedQuestion = await homeViewModel.vote(questionID: questionID, optionID: optionID)
+            // Keep the open sheet in place when the vote cannot be applied; assigning nil here
+            // would dismiss the comparison the user is still reading.
+            if let updated = await homeViewModel.vote(questionID: questionID, optionID: optionID) {
+                selectedQuestion = updated
+            }
         }
     }
 
@@ -389,7 +407,7 @@ struct ContentView: View {
         isVerifiedExperience: Bool
     ) {
         Task {
-            selectedQuestion = await homeViewModel.voteWithReason(
+            let updated = await homeViewModel.voteWithReason(
                 questionID: questionID,
                 optionID: optionID,
                 reason: reason,
@@ -397,15 +415,20 @@ struct ContentView: View {
                 reasonCategory: reasonCategory,
                 isVerifiedExperience: isVerifiedExperience
             )
+            if let updated {
+                selectedQuestion = updated
+            }
         }
     }
 
     private func addComment(questionID: AskQuestion.ID, text: String) {
-        selectedQuestion = homeViewModel.addComment(
+        if let updated = homeViewModel.addComment(
             questionID: questionID,
             text: text,
             authorName: userSession.publicName
-        )
+        ) {
+            selectedQuestion = updated
+        }
     }
 
     private func toggleSavedQuestion(questionID: AskQuestion.ID) {
@@ -426,9 +449,16 @@ struct ContentView: View {
         case .openDiscover:
             selectedTab = .questions
         case .openLibrary:
-            selectedTab = .account
+            selectedTab = .library
         case .openLatestResult:
             selectedQuestion = homeViewModel.questions.first
+        }
+    }
+
+    private func openComparisonFromNotificationIfNeeded() {
+        guard let comparisonID = notificationStore.consumePendingComparisonID() else { return }
+        if let question = homeViewModel.questions.first(where: { $0.id == comparisonID }) {
+            selectedQuestion = question
         }
     }
 }

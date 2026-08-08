@@ -247,11 +247,14 @@ final class SavedComparisonRecord {
 
 @Model
 final class ComparisonDraftRecord {
+    /// The app keeps a single in-progress draft, stored under this fixed key.
+    nonisolated static let currentKey = "current"
+
     @Attribute(.unique) var key: String
     var payload: Data
     var updatedAt: Date
 
-    init(key: String = "current", payload: Data, updatedAt: Date = Date()) {
+    init(key: String = ComparisonDraftRecord.currentKey, payload: Data, updatedAt: Date = Date()) {
         self.key = key
         self.payload = payload
         self.updatedAt = updatedAt
@@ -356,13 +359,28 @@ final class WeshPersistenceStore {
 
     func upsert(question: AskQuestion) throws {
         let context = ModelContext(container)
-        let records = try context.fetch(FetchDescriptor<ComparisonRecord>())
-        if let existing = records.first(where: { $0.id == question.id }) {
+        if let existing = try comparison(id: question.id, in: context) {
             update(existing, from: question, in: context)
         } else {
             context.insert(ComparisonRecord(question: question))
         }
         try context.save()
+    }
+
+    /// Fetches a single comparison by identifier instead of loading the whole table and
+    /// filtering it in memory.
+    private func comparison(id: UUID, in context: ModelContext) throws -> ComparisonRecord? {
+        var descriptor = FetchDescriptor<ComparisonRecord>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return try context.fetch(descriptor).first
+    }
+
+    private func hasVote(comparisonID: UUID, in context: ModelContext) throws -> Bool {
+        var descriptor = FetchDescriptor<LocalVoteRecord>(
+            predicate: #Predicate { $0.comparisonID == comparisonID }
+        )
+        descriptor.fetchLimit = 1
+        return try context.fetch(descriptor).isEmpty == false
     }
 
     func recordVote(
@@ -375,13 +393,11 @@ final class WeshPersistenceStore {
         isAnonymous: Bool
     ) throws {
         let context = ModelContext(container)
-        let votes = try context.fetch(FetchDescriptor<LocalVoteRecord>())
-        guard !votes.contains(where: { $0.comparisonID == comparisonID }) else {
+        guard try !hasVote(comparisonID: comparisonID, in: context) else {
             throw AppError.voteAlreadyExists
         }
 
-        let comparisons = try context.fetch(FetchDescriptor<ComparisonRecord>())
-        guard let comparison = comparisons.first(where: { $0.id == comparisonID }) else {
+        guard let comparison = try comparison(id: comparisonID, in: context) else {
             throw AppError.comparisonNotFound
         }
         guard comparison.closesAt.map({ $0 > Date() }) ?? true else {
@@ -442,11 +458,9 @@ final class WeshPersistenceStore {
         isAnonymous: Bool
     ) throws {
         let context = ModelContext(container)
-        let votes = try context.fetch(FetchDescriptor<LocalVoteRecord>())
-        guard !votes.contains(where: { $0.comparisonID == comparisonID }) else { return }
+        guard try !hasVote(comparisonID: comparisonID, in: context) else { return }
 
-        let comparisons = try context.fetch(FetchDescriptor<ComparisonRecord>())
-        guard let comparison = comparisons.first(where: { $0.id == comparisonID }) else {
+        guard let comparison = try comparison(id: comparisonID, in: context) else {
             throw AppError.comparisonNotFound
         }
         guard comparison.options.contains(where: { $0.id == optionID }) else {
@@ -467,8 +481,7 @@ final class WeshPersistenceStore {
 
     func addComment(comparisonID: UUID, comment: AskComment) throws {
         let context = ModelContext(container)
-        let records = try context.fetch(FetchDescriptor<ComparisonRecord>())
-        guard let comparison = records.first(where: { $0.id == comparisonID }) else {
+        guard let comparison = try comparison(id: comparisonID, in: context) else {
             throw AppError.comparisonNotFound
         }
         guard comparison.allowsComments else { throw AppError.forbidden }
@@ -490,35 +503,47 @@ final class WeshPersistenceStore {
 
     func setSaved(_ saved: Bool, comparisonID: UUID) throws {
         let context = ModelContext(container)
-        let records = try context.fetch(FetchDescriptor<SavedComparisonRecord>())
+        let existing = try savedRecord(comparisonID: comparisonID, in: context)
         if saved {
-            if !records.contains(where: { $0.comparisonID == comparisonID }) {
+            if existing == nil {
                 context.insert(SavedComparisonRecord(comparisonID: comparisonID))
             }
-        } else if let record = records.first(where: { $0.comparisonID == comparisonID }) {
-            context.delete(record)
+        } else if let existing {
+            context.delete(existing)
         }
         try context.save()
     }
 
+    private func savedRecord(comparisonID: UUID, in context: ModelContext) throws -> SavedComparisonRecord? {
+        var descriptor = FetchDescriptor<SavedComparisonRecord>(
+            predicate: #Predicate { $0.comparisonID == comparisonID }
+        )
+        descriptor.fetchLimit = 1
+        return try context.fetch(descriptor).first
+    }
+
+    private func currentDraftRecord(in context: ModelContext) throws -> ComparisonDraftRecord? {
+        let key = ComparisonDraftRecord.currentKey
+        var descriptor = FetchDescriptor<ComparisonDraftRecord>(predicate: #Predicate { $0.key == key })
+        descriptor.fetchLimit = 1
+        return try context.fetch(descriptor).first
+    }
+
     func hasDraft() -> Bool {
         let context = ModelContext(container)
-        return ((try? context.fetch(FetchDescriptor<ComparisonDraftRecord>())) ?? []).contains { $0.key == "current" }
+        return ((try? currentDraftRecord(in: context)) ?? nil) != nil
     }
 
     func loadDraft() -> ComparisonDraft? {
         let context = ModelContext(container)
-        guard let record = ((try? context.fetch(FetchDescriptor<ComparisonDraftRecord>())) ?? []).first(where: { $0.key == "current" }) else {
-            return nil
-        }
+        guard let record = (try? currentDraftRecord(in: context)) ?? nil else { return nil }
         return try? decoder.decode(ComparisonDraft.self, from: record.payload)
     }
 
     func saveDraft(_ draft: ComparisonDraft) throws {
         let payload = try encoder.encode(draft)
         let context = ModelContext(container)
-        let records = try context.fetch(FetchDescriptor<ComparisonDraftRecord>())
-        if let existing = records.first(where: { $0.key == "current" }) {
+        if let existing = try currentDraftRecord(in: context) {
             existing.payload = payload
             existing.updatedAt = Date()
         } else {
@@ -529,8 +554,9 @@ final class WeshPersistenceStore {
 
     func clearDraft() throws {
         let context = ModelContext(container)
-        let records = try context.fetch(FetchDescriptor<ComparisonDraftRecord>())
-        records.filter { $0.key == "current" }.forEach(context.delete)
+        if let existing = try currentDraftRecord(in: context) {
+            context.delete(existing)
+        }
         try context.save()
     }
 
@@ -594,18 +620,43 @@ final class WeshPersistenceStore {
         record.inviteCode = question.inviteCode
         record.hideResultsUntilVote = question.hideResultsUntilVote
 
-        record.options.forEach(context.delete)
-        record.comments.forEach(context.delete)
+        // Reconcile children in place. The previous implementation deleted every option and
+        // comment and re-inserted rows carrying the *same* `.unique` identifiers within one
+        // transaction, which needlessly churns the store and risks a uniqueness conflict.
+        var existingOptions = Dictionary(record.options.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         record.options = question.options.enumerated().map { index, option in
+            if let child = existingOptions.removeValue(forKey: option.id) {
+                child.name = option.title
+                child.sortIndex = index
+                child.voteCount = max(option.votes, 0)
+                child.comparison = record
+                return child
+            }
             let child = ComparisonOptionRecord(option: option, sortIndex: index)
             child.comparison = record
             return child
         }
+        existingOptions.values.forEach(context.delete)
+
+        var existingComments = Dictionary(record.comments.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         record.comments = question.comments.map { comment in
+            if let child = existingComments.removeValue(forKey: comment.id) {
+                child.author = comment.author
+                child.text = comment.text
+                child.likes = max(comment.likes, 0)
+                child.optionID = comment.optionID
+                child.optionTitle = comment.optionTitle
+                child.trustBadge = comment.trustBadge
+                child.reasonCategory = comment.reasonCategory
+                child.createdAt = comment.createdAt
+                child.comparison = record
+                return child
+            }
             let child = ComparisonCommentRecord(comment: comment)
             child.comparison = record
             return child
         }
+        existingComments.values.forEach(context.delete)
     }
 
     private func migrateLegacyData(in context: ModelContext) throws {
