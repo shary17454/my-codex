@@ -39,6 +39,12 @@ struct PlannerView: View {
 
                 if appState.hasSelectedTrip {
                     Section("حالة الرحلة") {
+                        if let statusMessage = appState.statusMessage {
+                            Label(statusMessage, systemImage: "checkmark.circle.fill")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(Color.oasisTeal)
+                        }
+
                         HStack(spacing: 10) {
                             Label(appState.selectedTrip.status.title, systemImage: appState.selectedTrip.status.icon)
                                 .font(.headline)
@@ -52,6 +58,7 @@ struct PlannerView: View {
                         HStack(spacing: 10) {
                             Button {
                                 appState.startSelectedTrip()
+                                syncEditableTrip()
                             } label: {
                                 Label("بدء الرحلة", systemImage: "play.circle.fill")
                                     .frame(maxWidth: .infinity)
@@ -62,6 +69,7 @@ struct PlannerView: View {
 
                             Button {
                                 appState.endSelectedTrip()
+                                syncEditableTrip()
                             } label: {
                                 Label("إنهاء الرحلة", systemImage: "stop.circle.fill")
                                     .frame(maxWidth: .infinity)

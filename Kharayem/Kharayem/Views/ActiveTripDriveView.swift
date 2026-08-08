@@ -6,7 +6,6 @@ import UIKit
 struct ActiveTripDriveView: View {
     @Environment(AppState.self) private var appState: AppState
     @Environment(\.colorScheme) private var colorScheme
-    @State private var isTripStarted = false
     @State private var followsUserLocation = true
     @State private var statusMessage: String?
     @State private var showingOfflineMaps = false
@@ -316,19 +315,21 @@ struct ActiveTripDriveView: View {
             Spacer()
             Button {
                 interactionFeedback()
-                isTripStarted.toggle()
-                if isTripStarted {
-                    startNavigationFromUserAction("بدأت الرحلة وتم تشغيل GPS")
+                if appState.selectedTrip.status == .active {
+                    appState.endSelectedTrip()
+                    appState.locationManager.stopNavigation()
+                    showStatus(appState.statusMessage ?? "تم إيقاف الرحلة")
+                } else {
+                    appState.startSelectedTrip()
                     followsUserLocation = true
                     updateVisibleRegion()
-                } else {
-                    appState.locationManager.stopNavigation()
+                    showStatus(appState.statusMessage ?? "بدأت الرحلة وتم تشغيل GPS")
                 }
             } label: {
                 VStack(spacing: 4) {
                     Image(systemName: "car.side.fill")
                         .font(.system(size: 34, weight: .bold))
-                    Text(isTripStarted ? "إيقاف الرحلة" : "بدء الرحلة")
+                    Text(appState.selectedTrip.status == .active ? "إيقاف الرحلة" : "بدء الرحلة")
                         .font(.headline.weight(.bold))
                 }
                 .foregroundStyle(Color.driveBlack)

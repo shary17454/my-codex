@@ -148,10 +148,11 @@ final class AppState {
     @discardableResult
     func createTrip(title: String, startDate: Date, endDate: Date, notes: String) -> TripPlan {
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fallbackTitle = "رحلة \(startDate.formatted(date: .numeric, time: .shortened))"
         let coordinate = locationManager.currentLocation?.coordinate ?? selectedTrip.meetingPoint
         let trip = TripPlan(
             id: UUID(),
-            title: cleanTitle.isEmpty ? "رحلة جديدة" : cleanTitle,
+            title: cleanTitle.isEmpty ? fallbackTitle : cleanTitle,
             startDate: startDate,
             endDate: max(endDate, startDate),
             meetingPoint: coordinate,
