@@ -5,6 +5,26 @@ import XCTest
 /// vehicle-profile fitment boost, part-request validation, and the ten-language
 /// interface localization.
 final class BatalPhase1AndLocalizationTests: XCTestCase {
+    /// `CatalogViewModel` mirrors these into `UserDefaults` through `didSet`, and the
+    /// whole suite shares one process. Without this reset an owner email or an unlock
+    /// left behind by one test would silently grant access inside the next one.
+    private static let mutatedDefaultsKeys = [
+        "batalCustomerProfile",
+        "batalPaidUnlocks",
+        "batalVehicleProfile",
+        "batalVehicleFilterEnabled"
+    ]
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        Self.mutatedDefaultsKeys.forEach(UserDefaults.standard.removeObject(forKey:))
+    }
+
+    override func tearDownWithError() throws {
+        Self.mutatedDefaultsKeys.forEach(UserDefaults.standard.removeObject(forKey:))
+        try super.tearDownWithError()
+    }
+
     // MARK: - Phase 1: search ranking reason, drivetrain category, vehicle fitment, request validation
 
     @MainActor
