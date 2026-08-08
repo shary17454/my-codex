@@ -23,6 +23,24 @@ enum BatalLocalization {
         table[englishKey]?[language]
     }
 
+    /// Resolves an inline Arabic/English pair for `language`.
+    ///
+    /// Every type that renders interface text calls this. Writing
+    /// `language == .arabic ? ar : en` at a call site instead silently opts that string
+    /// out of the table, which is how the search-reason badges, the category names, and
+    /// the request-validation messages stayed English in the eight non-Arabic languages
+    /// even though the table already carried their translations.
+    ///
+    /// Do **not** use this for catalog data — part names, store names, and OEM numbers
+    /// come from the source catalogs in Arabic/English only and are not interface text.
+    static func resolve(_ language: AppLanguage, ar arabic: String, en english: String) -> String {
+        switch language {
+        case .arabic: arabic
+        case .english: english
+        default: translate(english, to: language) ?? english
+        }
+    }
+
     /// Number of interface strings translated for each non-default language.
     static var translatedStringCount: Int { table.count }
 
@@ -46,28 +64,24 @@ enum BatalLocalization {
 private enum BatalNavigationStrings {
     static let entries: [String: [AppLanguage: String]] = [
         "Home": [
-            .spanish: "Inicio", .french: "Accueil", .german: "Startseite", .russian: "Главная",
-            .portuguese: "Início", .chinese: "首页", .turkish: "Ana Sayfa", .hindi: "होम"
+            .spanish: "Inicio", .french: "Accueil", .german: "Startseite", .russian: "Главная", .portuguese: "Início", .chinese: "首页", .turkish: "Ana Sayfa", .hindi: "होम"
         ],
         "Catalog": [
-            .spanish: "Catálogo", .french: "Catalogue", .german: "Katalog", .russian: "Каталог",
-            .portuguese: "Catálogo", .chinese: "目录", .turkish: "Katalog", .hindi: "कैटलॉग"
+            .spanish: "Catálogo", .french: "Catalogue", .german: "Katalog", .russian: "Каталог", .portuguese: "Catálogo", .chinese: "目录", .turkish: "Katalog", .hindi: "कैटलॉग"
         ],
         "Assistant": [
             .spanish: "Asistente", .french: "Assistant", .german: "Assistent", .russian: "Помощник",
             .portuguese: "Assistente", .chinese: "助手", .turkish: "Asistan", .hindi: "सहायक"
         ],
         "Request": [
-            .spanish: "Solicitud", .french: "Demande", .german: "Anfrage", .russian: "Запрос",
-            .portuguese: "Solicitação", .chinese: "请求", .turkish: "Talep", .hindi: "अनुरोध"
+            .spanish: "Solicitud", .french: "Demande", .german: "Anfrage", .russian: "Запрос", .portuguese: "Solicitação", .chinese: "请求", .turkish: "Talep", .hindi: "अनुरोध"
         ],
         "Tools": [
             .spanish: "Herramientas", .french: "Outils", .german: "Werkzeuge", .russian: "Инструменты",
             .portuguese: "Ferramentas", .chinese: "工具", .turkish: "Araçlar", .hindi: "उपकरण"
         ],
         "More": [
-            .spanish: "Más", .french: "Plus", .german: "Mehr", .russian: "Ещё",
-            .portuguese: "Mais", .chinese: "更多", .turkish: "Daha Fazla", .hindi: "और"
+            .spanish: "Más", .french: "Plus", .german: "Mehr", .russian: "Ещё", .portuguese: "Mais", .chinese: "更多", .turkish: "Daha Fazla", .hindi: "और"
         ],
         "Maintenance": [
             .spanish: "Mantenimiento", .french: "Entretien", .german: "Wartung", .russian: "Обслуживание",
@@ -75,161 +89,126 @@ private enum BatalNavigationStrings {
         ],
         "Maintenance log": [
             .spanish: "Registro de mantenimiento", .french: "Journal d'entretien", .german: "Wartungsprotokoll",
-            .russian: "Журнал обслуживания", .portuguese: "Registro de manutenção", .chinese: "保养记录",
-            .turkish: "Bakım kaydı", .hindi: "रखरखाव लॉग"
+            .russian: "Журнал обслуживания", .portuguese: "Registro de manutenção", .chinese: "保养记录", .turkish: "Bakım kaydı", .hindi: "रखरखाव लॉग"
         ],
         "Catalog library": [
             .spanish: "Biblioteca de catálogos", .french: "Bibliothèque du catalogue", .german: "Katalogbibliothek",
-            .russian: "Библиотека каталогов", .portuguese: "Biblioteca de catálogos", .chinese: "目录库",
-            .turkish: "Katalog kitaplığı", .hindi: "कैटलॉग लाइब्रेरी"
+            .russian: "Библиотека каталогов", .portuguese: "Biblioteca de catálogos", .chinese: "目录库", .turkish: "Katalog kitaplığı", .hindi: "कैटलॉग लाइब्रेरी"
         ],
         "Original catalogs": [
             .spanish: "Catálogos originales", .french: "Catalogues d'origine", .german: "Originalkataloge",
-            .russian: "Оригинальные каталоги", .portuguese: "Catálogos originais", .chinese: "原版目录",
-            .turkish: "Orijinal kataloglar", .hindi: "मूल कैटलॉग"
+            .russian: "Оригинальные каталоги", .portuguese: "Catálogos originais", .chinese: "原版目录", .turkish: "Orijinal kataloglar", .hindi: "मूल कैटलॉग"
         ],
         "Original catalog library": [
             .spanish: "Biblioteca de catálogos originales", .french: "Bibliothèque des catalogues d'origine",
-            .german: "Bibliothek der Originalkataloge", .russian: "Библиотека оригинальных каталогов",
-            .portuguese: "Biblioteca de catálogos originais", .chinese: "原版目录库",
+            .german: "Bibliothek der Originalkataloge", .russian: "Библиотека оригинальных каталогов", .portuguese: "Biblioteca de catálogos originais", .chinese: "原版目录库",
             .turkish: "Orijinal katalog kitaplığı", .hindi: "मूल कैटलॉग लाइब्रेरी"
         ],
         "Shared fitment": [
             .spanish: "Compatibilidad compartida", .french: "Compatibilité partagée", .german: "Gemeinsame Passform",
-            .russian: "Общая совместимость", .portuguese: "Compatibilidade compartilhada", .chinese: "通用适配",
-            .turkish: "Ortak uyum", .hindi: "साझा फिटमेंट"
+            .russian: "Общая совместимость", .portuguese: "Compatibilidade compartilhada", .chinese: "通用适配", .turkish: "Ortak uyum", .hindi: "साझा फिटमेंट"
         ],
         "Fitment check": [
-            .spanish: "Verificación de compatibilidad", .french: "Vérification de compatibilité",
-            .german: "Passform prüfen", .russian: "Проверка совместимости",
-            .portuguese: "Verificação de compatibilidade", .chinese: "适配检查",
-            .turkish: "Uyum kontrolü", .hindi: "फिटमेंट जांच"
+            .spanish: "Verificación de compatibilidad", .french: "Vérification de compatibilité", .german: "Passform prüfen", .russian: "Проверка совместимости",
+            .portuguese: "Verificação de compatibilidade", .chinese: "适配检查", .turkish: "Uyum kontrolü", .hindi: "फिटमेंट जांच"
         ],
         "Smart search": [
             .spanish: "Búsqueda inteligente", .french: "Recherche intelligente", .german: "Intelligente Suche",
-            .russian: "Умный поиск", .portuguese: "Busca inteligente", .chinese: "智能搜索",
-            .turkish: "Akıllı arama", .hindi: "स्मार्ट खोज"
+            .russian: "Умный поиск", .portuguese: "Busca inteligente", .chinese: "智能搜索", .turkish: "Akıllı arama", .hindi: "स्मार्ट खोज"
         ],
         "Part request": [
             .spanish: "Solicitud de pieza", .french: "Demande de pièce", .german: "Teileanfrage",
-            .russian: "Запрос детали", .portuguese: "Solicitação de peça", .chinese: "配件请求",
-            .turkish: "Parça talebi", .hindi: "पुर्जे का अनुरोध"
+            .russian: "Запрос детали", .portuguese: "Solicitação de peça", .chinese: "配件请求", .turkish: "Parça talebi", .hindi: "पुर्जे का अनुरोध"
         ],
         "Back to Home": [
             .spanish: "Volver al inicio", .french: "Retour à l'accueil", .german: "Zurück zur Startseite",
-            .russian: "Назад на главную", .portuguese: "Voltar ao início", .chinese: "返回首页",
-            .turkish: "Ana sayfaya dön", .hindi: "होम पर वापस"
+            .russian: "Назад на главную", .portuguese: "Voltar ao início", .chinese: "返回首页", .turkish: "Ana sayfaya dön", .hindi: "होम पर वापस"
         ],
         "Quick paths": [
-            .spanish: "Accesos rápidos", .french: "Accès rapides", .german: "Schnellzugriffe",
-            .russian: "Быстрые переходы", .portuguese: "Atalhos", .chinese: "快捷入口",
+            .spanish: "Accesos rápidos", .french: "Accès rapides", .german: "Schnellzugriffe", .russian: "Быстрые переходы", .portuguese: "Atalhos", .chinese: "快捷入口",
             .turkish: "Hızlı yollar", .hindi: "त्वरित रास्ते"
         ],
         "Action center": [
             .spanish: "Centro de acciones", .french: "Centre d'actions", .german: "Aktionszentrum",
-            .russian: "Центр действий", .portuguese: "Central de ações", .chinese: "操作中心",
-            .turkish: "İşlem merkezi", .hindi: "एक्शन सेंटर"
+            .russian: "Центр действий", .portuguese: "Central de ações", .chinese: "操作中心", .turkish: "İşlem merkezi", .hindi: "एक्शन सेंटर"
         ],
         "Start quickly": [
-            .spanish: "Empieza rápido", .french: "Démarrer rapidement", .german: "Schnell starten",
-            .russian: "Быстрый старт", .portuguese: "Comece rápido", .chinese: "快速开始",
+            .spanish: "Empieza rápido", .french: "Démarrer rapidement", .german: "Schnell starten", .russian: "Быстрый старт", .portuguese: "Comece rápido", .chinese: "快速开始",
             .turkish: "Hızlı başla", .hindi: "जल्दी शुरू करें"
         ],
 
         // MARK: - Common actions
 
         "OK": [
-            .spanish: "Aceptar", .french: "OK", .german: "OK", .russian: "ОК",
-            .portuguese: "OK", .chinese: "确定", .turkish: "Tamam", .hindi: "ठीक है"
+            .spanish: "Aceptar", .french: "OK", .german: "OK", .russian: "ОК", .portuguese: "OK", .chinese: "确定", .turkish: "Tamam", .hindi: "ठीक है"
         ],
         "Done": [
-            .spanish: "Listo", .french: "Terminé", .german: "Fertig", .russian: "Готово",
-            .portuguese: "Concluído", .chinese: "完成", .turkish: "Bitti", .hindi: "पूर्ण"
+            .spanish: "Listo", .french: "Terminé", .german: "Fertig", .russian: "Готово", .portuguese: "Concluído", .chinese: "完成", .turkish: "Bitti", .hindi: "पूर्ण"
         ],
         "Save": [
-            .spanish: "Guardar", .french: "Enregistrer", .german: "Sichern", .russian: "Сохранить",
-            .portuguese: "Salvar", .chinese: "保存", .turkish: "Kaydet", .hindi: "सहेजें"
+            .spanish: "Guardar", .french: "Enregistrer", .german: "Sichern", .russian: "Сохранить", .portuguese: "Salvar", .chinese: "保存", .turkish: "Kaydet", .hindi: "सहेजें"
         ],
         "Dismiss": [
-            .spanish: "Cerrar", .french: "Fermer", .german: "Schließen", .russian: "Закрыть",
-            .portuguese: "Fechar", .chinese: "关闭", .turkish: "Kapat", .hindi: "बंद करें"
+            .spanish: "Cerrar", .french: "Fermer", .german: "Schließen", .russian: "Закрыть", .portuguese: "Fechar", .chinese: "关闭", .turkish: "Kapat", .hindi: "बंद करें"
         ],
         "Retry": [
             .spanish: "Reintentar", .french: "Réessayer", .german: "Erneut versuchen", .russian: "Повторить",
             .portuguese: "Tentar novamente", .chinese: "重试", .turkish: "Tekrar Dene", .hindi: "पुनः प्रयास करें"
         ],
         "Notice": [
-            .spanish: "Aviso", .french: "Avis", .german: "Hinweis", .russian: "Уведомление",
-            .portuguese: "Aviso", .chinese: "提示", .turkish: "Bildirim", .hindi: "सूचना"
+            .spanish: "Aviso", .french: "Avis", .german: "Hinweis", .russian: "Уведомление", .portuguese: "Aviso", .chinese: "提示", .turkish: "Bildirim", .hindi: "सूचना"
         ],
         "Open catalog": [
             .spanish: "Abrir catálogo", .french: "Ouvrir le catalogue", .german: "Katalog öffnen",
-            .russian: "Открыть каталог", .portuguese: "Abrir catálogo", .chinese: "打开目录",
-            .turkish: "Kataloğu aç", .hindi: "कैटलॉग खोलें"
+            .russian: "Открыть каталог", .portuguese: "Abrir catálogo", .chinese: "打开目录", .turkish: "Kataloğu aç", .hindi: "कैटलॉग खोलें"
         ],
         "Open tools": [
             .spanish: "Abrir herramientas", .french: "Ouvrir les outils", .german: "Werkzeuge öffnen",
-            .russian: "Открыть инструменты", .portuguese: "Abrir ferramentas", .chinese: "打开工具",
-            .turkish: "Araçları aç", .hindi: "उपकरण खोलें"
+            .russian: "Открыть инструменты", .portuguese: "Abrir ferramentas", .chinese: "打开工具", .turkish: "Araçları aç", .hindi: "उपकरण खोलें"
         ],
         "Check now": [
             .spanish: "Comprobar ahora", .french: "Vérifier maintenant", .german: "Jetzt prüfen",
-            .russian: "Проверить сейчас", .portuguese: "Verificar agora", .chinese: "立即检查",
-            .turkish: "Şimdi kontrol et", .hindi: "अभी जांचें"
+            .russian: "Проверить сейчас", .portuguese: "Verificar agora", .chinese: "立即检查", .turkish: "Şimdi kontrol et", .hindi: "अभी जांचें"
         ],
         "Search the catalog": [
-            .spanish: "Buscar en el catálogo", .french: "Rechercher dans le catalogue",
-            .german: "Katalog durchsuchen", .russian: "Поиск в каталоге",
-            .portuguese: "Pesquisar no catálogo", .chinese: "搜索目录",
-            .turkish: "Katalogda ara", .hindi: "कैटलॉग में खोजें"
+            .spanish: "Buscar en el catálogo", .french: "Rechercher dans le catalogue", .german: "Katalog durchsuchen", .russian: "Поиск в каталоге",
+            .portuguese: "Pesquisar no catálogo", .chinese: "搜索目录", .turkish: "Katalogda ara", .hindi: "कैटलॉग में खोजें"
         ],
         "Search by description": [
-            .spanish: "Buscar por descripción", .french: "Rechercher par description",
-            .german: "Nach Beschreibung suchen", .russian: "Поиск по описанию",
-            .portuguese: "Buscar por descrição", .chinese: "按描述搜索",
-            .turkish: "Açıklamaya göre ara", .hindi: "विवरण से खोजें"
+            .spanish: "Buscar por descripción", .french: "Rechercher par description", .german: "Nach Beschreibung suchen", .russian: "Поиск по описанию",
+            .portuguese: "Buscar por descrição", .chinese: "按描述搜索", .turkish: "Açıklamaya göre ara", .hindi: "विवरण से खोजें"
         ],
         "Change language": [
-            .spanish: "Cambiar idioma", .french: "Changer de langue", .german: "Sprache ändern",
-            .russian: "Сменить язык", .portuguese: "Alterar idioma", .chinese: "更改语言",
+            .spanish: "Cambiar idioma", .french: "Changer de langue", .german: "Sprache ändern", .russian: "Сменить язык", .portuguese: "Alterar idioma", .chinese: "更改语言",
             .turkish: "Dili değiştir", .hindi: "भाषा बदलें"
         ],
         "Language": [
-            .spanish: "Idioma", .french: "Langue", .german: "Sprache", .russian: "Язык",
-            .portuguese: "Idioma", .chinese: "语言", .turkish: "Dil", .hindi: "भाषा"
+            .spanish: "Idioma", .french: "Langue", .german: "Sprache", .russian: "Язык", .portuguese: "Idioma", .chinese: "语言", .turkish: "Dil", .hindi: "भाषा"
         ],
         "Calculate difference": [
             .spanish: "Calcular diferencia", .french: "Calculer la différence", .german: "Differenz berechnen",
-            .russian: "Рассчитать разницу", .portuguese: "Calcular diferença", .chinese: "计算差值",
-            .turkish: "Farkı hesapla", .hindi: "अंतर की गणना करें"
+            .russian: "Рассчитать разницу", .portuguese: "Calcular diferença", .chinese: "计算差值", .turkish: "Farkı hesapla", .hindi: "अंतर की गणना करें"
         ],
         "Share file": [
             .spanish: "Compartir archivo", .french: "Partager le fichier", .german: "Datei teilen",
-            .russian: "Поделиться файлом", .portuguese: "Compartilhar arquivo", .chinese: "共享文件",
-            .turkish: "Dosyayı paylaş", .hindi: "फ़ाइल साझा करें"
+            .russian: "Поделиться файлом", .portuguese: "Compartilhar arquivo", .chinese: "共享文件", .turkish: "Dosyayı paylaş", .hindi: "फ़ाइल साझा करें"
         ],
         "Share part request": [
-            .spanish: "Compartir solicitud de pieza", .french: "Partager la demande de pièce",
-            .german: "Teileanfrage teilen", .russian: "Поделиться запросом детали",
-            .portuguese: "Compartilhar solicitação de peça", .chinese: "分享配件请求",
-            .turkish: "Parça talebini paylaş", .hindi: "पुर्जा अनुरोध साझा करें"
+            .spanish: "Compartir solicitud de pieza", .french: "Partager la demande de pièce", .german: "Teileanfrage teilen", .russian: "Поделиться запросом детали",
+            .portuguese: "Compartilhar solicitação de peça", .chinese: "分享配件请求", .turkish: "Parça talebini paylaş", .hindi: "पुर्जा अनुरोध साझा करें"
         ],
         "Send question": [
             .spanish: "Enviar pregunta", .french: "Envoyer la question", .german: "Frage senden",
-            .russian: "Отправить вопрос", .portuguese: "Enviar pergunta", .chinese: "发送问题",
-            .turkish: "Soruyu gönder", .hindi: "प्रश्न भेजें"
+            .russian: "Отправить вопрос", .portuguese: "Enviar pergunta", .chinese: "发送问题", .turkish: "Soruyu gönder", .hindi: "प्रश्न भेजें"
         ],
         "Capture part or number": [
             .spanish: "Fotografiar la pieza o el número", .french: "Photographier la pièce ou le numéro",
-            .german: "Teil oder Nummer aufnehmen", .russian: "Снять деталь или номер",
-            .portuguese: "Fotografar peça ou número", .chinese: "拍摄配件或编号",
+            .german: "Teil oder Nummer aufnehmen", .russian: "Снять деталь или номер", .portuguese: "Fotografar peça ou número", .chinese: "拍摄配件或编号",
             .turkish: "Parçayı veya numarayı çek", .hindi: "पुर्जा या नंबर कैप्चर करें"
         ],
         "Choose reference photo": [
-            .spanish: "Elegir foto de referencia", .french: "Choisir une photo de référence",
-            .german: "Referenzfoto wählen", .russian: "Выбрать образец фото",
-            .portuguese: "Escolher foto de referência", .chinese: "选择参考照片",
-            .turkish: "Referans fotoğraf seç", .hindi: "संदर्भ फ़ोटो चुनें"
+            .spanish: "Elegir foto de referencia", .french: "Choisir une photo de référence", .german: "Referenzfoto wählen", .russian: "Выбрать образец фото",
+            .portuguese: "Escolher foto de referência", .chinese: "选择参考照片", .turkish: "Referans fotoğraf seç", .hindi: "संदर्भ फ़ोटो चुनें"
         ]
     ]
 }
@@ -239,8 +218,7 @@ private enum BatalNavigationStrings {
 private enum BatalLabelAndSearchStrings {
     static let entries: [String: [AppLanguage: String]] = [
         "Parts": [
-            .spanish: "Piezas", .french: "Pièces", .german: "Teile", .russian: "Детали",
-            .portuguese: "Peças", .chinese: "配件", .turkish: "Parçalar", .hindi: "पुर्जे"
+            .spanish: "Piezas", .french: "Pièces", .german: "Teile", .russian: "Детали", .portuguese: "Peças", .chinese: "配件", .turkish: "Parçalar", .hindi: "पुर्जे"
         ],
         "Indexed parts": [
             .spanish: "Piezas indexadas", .french: "Pièces indexées", .german: "Indizierte Teile",
@@ -296,6 +274,70 @@ private enum BatalLabelAndSearchStrings {
         "General": [
             .spanish: "General", .french: "Général", .german: "Allgemein", .russian: "Общее",
             .portuguese: "Geral", .chinese: "通用", .turkish: "Genel", .hindi: "सामान्य"
+        ],
+        "Cooling": [
+            .spanish: "Refrigeración", .french: "Refroidissement", .german: "Kühlung", .russian: "Охлаждение",
+            .portuguese: "Arrefecimento", .chinese: "冷却", .turkish: "Soğutma", .hindi: "कूलिंग"
+        ],
+        "Electrical": [
+            .spanish: "Eléctrico", .french: "Électricité", .german: "Elektrik", .russian: "Электрика",
+            .portuguese: "Elétrica", .chinese: "电气", .turkish: "Elektrik", .hindi: "इलेक्ट्रिकल"
+        ],
+        "Body": [
+            .spanish: "Carrocería", .french: "Carrosserie", .german: "Karosserie", .russian: "Кузов",
+            .portuguese: "Carroceria", .chinese: "车身", .turkish: "Kaporta", .hindi: "बॉडी"
+        ],
+        "Brake": [
+            .spanish: "Frenos", .french: "Freins", .german: "Bremsen", .russian: "Тормоза",
+            .portuguese: "Freios", .chinese: "制动", .turkish: "Fren", .hindi: "ब्रेक"
+        ],
+        "Suspension": [
+            .spanish: "Suspensión", .french: "Suspension", .german: "Fahrwerk", .russian: "Подвеска",
+            .portuguese: "Suspensão", .chinese: "悬挂", .turkish: "Süspansiyon", .hindi: "सस्पेंशन"
+        ],
+        "Drivetrain": [
+            .spanish: "Transmisión", .french: "Transmission", .german: "Antriebsstrang",
+            .russian: "Трансмиссия", .portuguese: "Transmissão", .chinese: "传动",
+            .turkish: "Aktarma organları", .hindi: "ड्राइवट्रेन"
+        ],
+        "Interior": [
+            .spanish: "Interior", .french: "Intérieur", .german: "Innenraum", .russian: "Салон",
+            .portuguese: "Interior", .chinese: "内饰", .turkish: "İç donanım", .hindi: "इंटीरियर"
+        ],
+        "Fuel": [
+            .spanish: "Combustible", .french: "Carburant", .german: "Kraftstoff", .russian: "Топливо",
+            .portuguese: "Combustível", .chinese: "燃油", .turkish: "Yakıt", .hindi: "ईंधन"
+        ],
+        "Price score": [
+            .spanish: "Puntuación de precio", .french: "Évaluation du prix", .german: "Preisbewertung",
+            .russian: "Оценка цены", .portuguese: "Pontuação de preço", .chinese: "价格评分",
+            .turkish: "Fiyat puanı", .hindi: "मूल्य स्कोर"
+        ],
+        "Price fairness": [
+            .spanish: "Equidad del precio", .french: "Équité du prix", .german: "Preisfairness",
+            .russian: "Справедливость цены", .portuguese: "Justiça do preço", .chinese: "价格合理性",
+            .turkish: "Fiyat adaleti", .hindi: "मूल्य निष्पक्षता"
+        ],
+        "Fitment match": [
+            .spanish: "Compatibilidad", .french: "Compatibilité", .german: "Passform",
+            .russian: "Совместимость", .portuguese: "Compatibilidade", .chinese: "适配度",
+            .turkish: "Uyum", .hindi: "फिटमेंट"
+        ],
+        "Confidence": [
+            .spanish: "Confianza", .french: "Confiance", .german: "Verlässlichkeit", .russian: "Достоверность",
+            .portuguese: "Confiança", .chinese: "可信度", .turkish: "Güven", .hindi: "विश्वसनीयता"
+        ],
+        "Unlock one catalog page": [
+            .spanish: "Desbloquear una página del catálogo", .french: "Débloquer une page du catalogue",
+            .german: "Eine Katalogseite freischalten", .russian: "Открыть одну страницу каталога",
+            .portuguese: "Desbloquear uma página do catálogo", .chinese: "解锁一页目录",
+            .turkish: "Bir katalog sayfasını aç", .hindi: "एक कैटलॉग पृष्ठ अनलॉक करें"
+        ],
+        "Unlock full catalog": [
+            .spanish: "Desbloquear el catálogo completo", .french: "Débloquer tout le catalogue",
+            .german: "Vollständigen Katalog freischalten", .russian: "Открыть весь каталог",
+            .portuguese: "Desbloquear o catálogo completo", .chinese: "解锁完整目录",
+            .turkish: "Tüm kataloğu aç", .hindi: "पूरा कैटलॉग अनलॉक करें"
         ],
         "Category": [
             .spanish: "Categoría", .french: "Catégorie", .german: "Kategorie", .russian: "Категория",

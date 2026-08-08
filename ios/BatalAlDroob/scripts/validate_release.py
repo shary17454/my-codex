@@ -27,8 +27,8 @@ ASSET_EXTENSION_ENTITLEMENTS = (
     APP_ROOT / "BatalCatalogAssetsExtension" / "BatalCatalogAssetsExtension.entitlements"
 )
 
-EXPECTED_MARKETING_VERSION = "2.7"
-MIN_EXPECTED_BUILD = 191
+EXPECTED_MARKETING_VERSION = "2.8"
+MIN_EXPECTED_BUILD = 214
 EXPECTED_BUNDLE_ID = "com.batalaldroob.parts"
 EXPECTED_APP_GROUP = "group.com.batalaldroob.parts"
 EXPECTED_PROJECT_BUNDLE_IDS = {

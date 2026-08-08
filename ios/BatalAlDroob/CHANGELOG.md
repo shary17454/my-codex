@@ -1,5 +1,46 @@
 # Changelog
 
+## 2.8 (214) - 2026-08-08
+
+### Version train
+
+`2.7` was approved, which closes it to new builds. Build `213` was uploaded and
+rejected during App Store Connect processing:
+
+- `ITMS-90186` — the pre-release train `2.7` is closed for new build submissions.
+- `ITMS-90062` — `CFBundleShortVersionString` must be higher than the previously
+  approved `2.7`.
+
+This release moves the train to `2.8`. That requires **four** pins to advance
+together, not one; missing any of them fails the Xcode Cloud archive rather than the
+upload, which is a slower way to find out:
+
+1. `BatalAlDroob.xcodeproj` — `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`
+2. `scripts/validate_release.py` — `EXPECTED_MARKETING_VERSION`, `MIN_EXPECTED_BUILD`
+3. `ci_scripts/ci_post_clone.sh` — `BATAL_EXPECTED_MARKETING_VERSION`,
+   `BATAL_MIN_PROJECT_BUILD`
+4. `ci_scripts/ci_post_xcodebuild.sh` — `EXPECTED_MARKETING_VERSION`
+
+The build floor is `214` because Xcode Cloud had already consumed `213`.
+
+### Interface strings that bypassed the translation table
+
+The 2.7 table was keyed by the English string, but several types rendered interface
+text with an inline `language == .arabic ? ar : en`, which opts a string out of the
+table entirely. Those strings stayed English in all eight non-Arabic languages even
+where the table already carried a translation. `BatalLocalization.resolve(_:ar:en:)`
+is now the single resolver, and these call sites go through it:
+
+- Catalog category names — the picker and the dashboard grid (Engine, Cooling,
+  Electrical, Body, Brake, Suspension, Drivetrain, Interior, Fuel, General, All).
+- Search result reason badges (number / partial / close / description / synonym).
+- Smart indicator titles (price score, price fairness, fitment match, confidence).
+- The two in-app purchase titles.
+- Part-request validation messages.
+
+Catalog data deliberately still resolves as Arabic/English only: part names, store
+names, OEM numbers, and the supplier-facing request draft are not interface text.
+
 ## 2.7 (192) - 2026-08-08
 
 ### Search and dashboard responsiveness

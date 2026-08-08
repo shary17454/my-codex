@@ -76,17 +76,17 @@ enum CatalogCategory: String, CaseIterable, Identifiable {
 
     func title(_ language: AppLanguage) -> String {
         switch self {
-        case .all: language == .arabic ? "الكل" : "All"
-        case .engine: language == .arabic ? "محرك" : "Engine"
-        case .cooling: language == .arabic ? "تبريد" : "Cooling"
-        case .electrical: language == .arabic ? "كهرباء" : "Electrical"
-        case .body: language == .arabic ? "هيكل" : "Body"
-        case .brake: language == .arabic ? "فرامل" : "Brake"
-        case .suspension: language == .arabic ? "تعليق" : "Suspension"
-        case .drivetrain: language == .arabic ? "نقل الحركة" : "Drivetrain"
-        case .interior: language == .arabic ? "داخلية" : "Interior"
-        case .fuel: language == .arabic ? "وقود" : "Fuel"
-        case .general: language == .arabic ? "عام" : "General"
+        case .all: BatalLocalization.resolve(language, ar: "الكل", en: "All")
+        case .engine: BatalLocalization.resolve(language, ar: "محرك", en: "Engine")
+        case .cooling: BatalLocalization.resolve(language, ar: "تبريد", en: "Cooling")
+        case .electrical: BatalLocalization.resolve(language, ar: "كهرباء", en: "Electrical")
+        case .body: BatalLocalization.resolve(language, ar: "هيكل", en: "Body")
+        case .brake: BatalLocalization.resolve(language, ar: "فرامل", en: "Brake")
+        case .suspension: BatalLocalization.resolve(language, ar: "تعليق", en: "Suspension")
+        case .drivetrain: BatalLocalization.resolve(language, ar: "نقل الحركة", en: "Drivetrain")
+        case .interior: BatalLocalization.resolve(language, ar: "داخلية", en: "Interior")
+        case .fuel: BatalLocalization.resolve(language, ar: "وقود", en: "Fuel")
+        case .general: BatalLocalization.resolve(language, ar: "عام", en: "General")
         }
     }
 
@@ -156,9 +156,9 @@ enum CatalogAccessLevel: String, Identifiable, CaseIterable {
     func title(_ language: AppLanguage) -> String {
         switch self {
         case .singleUnlock:
-            language == .arabic ? "فتح صفحة كتالوج واحدة" : "Unlock one catalog page"
+            BatalLocalization.resolve(language, ar: "فتح صفحة كتالوج واحدة", en: "Unlock one catalog page")
         case .fullCatalog:
-            language == .arabic ? "فتح الكتالوج الكامل" : "Unlock full catalog"
+            BatalLocalization.resolve(language, ar: "فتح الكتالوج الكامل", en: "Unlock full catalog")
         }
     }
 
@@ -290,13 +290,13 @@ enum PartMatchReason: String, CaseIterable, Identifiable {
 
     func label(_ language: AppLanguage) -> String {
         switch self {
-        case .exactNumber: language == .arabic ? "مطابقة رقم" : "Number match"
-        case .alternateNumber: language == .arabic ? "رقم بديل" : "Alternate number"
-        case .partialNumber: language == .arabic ? "رقم جزئي" : "Partial number"
-        case .closeNumber: language == .arabic ? "رقم قريب" : "Close number"
-        case .description: language == .arabic ? "مطابقة وصف" : "Description match"
-        case .synonym: language == .arabic ? "مرادف" : "Synonym match"
-        case .browse: language == .arabic ? "تصفح" : "Browse"
+        case .exactNumber: BatalLocalization.resolve(language, ar: "مطابقة رقم", en: "Number match")
+        case .alternateNumber: BatalLocalization.resolve(language, ar: "رقم بديل", en: "Alternate number")
+        case .partialNumber: BatalLocalization.resolve(language, ar: "رقم جزئي", en: "Partial number")
+        case .closeNumber: BatalLocalization.resolve(language, ar: "رقم قريب", en: "Close number")
+        case .description: BatalLocalization.resolve(language, ar: "مطابقة وصف", en: "Description match")
+        case .synonym: BatalLocalization.resolve(language, ar: "مرادف", en: "Synonym match")
+        case .browse: BatalLocalization.resolve(language, ar: "تصفح", en: "Browse")
         }
     }
 
@@ -332,13 +332,13 @@ enum SmartPartIndicatorKind: String, CaseIterable, Identifiable {
     func title(_ language: AppLanguage) -> String {
         switch self {
         case .priceScore:
-            language == .arabic ? "تقييم السعر" : "Price score"
+            BatalLocalization.resolve(language, ar: "تقييم السعر", en: "Price score")
         case .priceFairness:
-            language == .arabic ? "عدالة السعر" : "Price fairness"
+            BatalLocalization.resolve(language, ar: "عدالة السعر", en: "Price fairness")
         case .fitmentMatch:
-            language == .arabic ? "المطابقة" : "Fitment match"
+            BatalLocalization.resolve(language, ar: "المطابقة", en: "Fitment match")
         case .confidence:
-            language == .arabic ? "الثقة" : "Confidence"
+            BatalLocalization.resolve(language, ar: "الثقة", en: "Confidence")
         }
     }
 

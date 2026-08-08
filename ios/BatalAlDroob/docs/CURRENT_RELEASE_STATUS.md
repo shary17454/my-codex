@@ -1,7 +1,7 @@
 # Batal Al-Droob Current Release Status
 
 Updated: 2026-08-08
-Decision: `2_7_BUILD_192_PERF_AND_LOCALIZATION_LOCAL_VERIFIED_UPLOAD_PENDING`
+Decision: `2_8_BUILD_214_TRAIN_MOVED_AFTER_2_7_APPROVAL_UPLOAD_PENDING`
 
 ## Identity
 
@@ -10,17 +10,18 @@ Decision: `2_7_BUILD_192_PERF_AND_LOCALIZATION_LOCAL_VERIFIED_UPLOAD_PENDING`
 | App | Batal Al-Droob / بطل الدروب |
 | Apple ID | `6786117376` |
 | Bundle ID | `com.batalaldroob.parts` |
-| Marketing version | `2.7` |
-| Project build | `192` |
+| Marketing version | `2.8` |
+| Project build | `214` |
 | Current App Store release | `2.5 (180)` - Ready for Distribution |
 | Last confirmed App Store Connect build | `2.6 (188)` - Ready to Submit |
 | Deployment target | iOS / iPadOS 17.0 |
 | Verified toolchain | Xcode 26.4.1 (`17E202`), iPhoneOS SDK 26.4 |
 
-## What Changed In 192
+## What Changed In 214
 
-Build 192 carries no new product surface. It is a correctness, performance, and
-localization pass over `2.7 (191)`; see `CHANGELOG.md` for the itemised list. Bundle
+Build 214 carries no new product surface. It is a correctness, performance, and
+localization pass over `2.7 (191)`, on the `2.8` train because `2.7` was approved and
+is closed to further uploads (`ITMS-90186` / `ITMS-90062` on build `213`); see `CHANGELOG.md` for the itemised list. Bundle
 ID, development team, signing mode, entitlements, App Group, capabilities, catalog
 data, and the managed asset-pack delivery are unchanged.
 

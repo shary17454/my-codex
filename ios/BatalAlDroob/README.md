@@ -8,8 +8,8 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
-- App Store version: `2.7`
-- Project build: `192`
+- App Store version: `2.8`
+- Project build: `214`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -23,7 +23,7 @@ The complete local PDF archive is indexed under `BatalAlDroob/Web/catalog/` and 
   on the archived app, and fails the Xcode Cloud archive on any other toolchain.
   Change those pins in the guard first if you intend to move Xcode versions.
 - Local Debug/Release builds and tests: any released, **non-beta** Xcode works; `192`
-  was checked with 26.4.1 (`17E202`). A beta Xcode is rejected at upload with
+  was checked with 26.4.1 (`17E202`), as was `214`. A beta Xcode is rejected at upload with
   `ITMS-90111`.
 - Swift 6
 - iOS deployment target 17.0
@@ -96,19 +96,24 @@ The repository-level `ci_scripts/ci_post_clone.sh` guards production builds for 
 
 - rejects beta Xcode builds,
 - verifies iPhoneOS SDK 26.x or newer,
-- verifies `MARKETING_VERSION = 2.6`,
-- verifies `CURRENT_PROJECT_VERSION >= 189`,
+- verifies `MARKETING_VERSION = 2.8` (`BATAL_EXPECTED_MARKETING_VERSION`),
+- verifies `CURRENT_PROJECT_VERSION >= 214` (`BATAL_MIN_PROJECT_BUILD`),
 - rejects beta Xcode and SDKs below iPhoneOS 26.5.
 
 After an archive, `ci_scripts/ci_post_xcodebuild.sh` reads the actual app metadata from the new `xcarchive` and rejects mismatched bundle identifiers, versions, build numbers, Xcode builds, SDKs, platforms, deployment targets, or embedded app extensions.
 
 In App Store Connect, set the Batal Al-Droob workflow environment to a production Xcode version. Do not use "Latest Beta" for App Store submission builds.
 
-App Store Connect shows `2.5 (180)` as Ready for Distribution and build `188`
-on release train `2.6` as Ready to Submit. The current source candidate uses
-build `189` for managed catalog delivery. Build 189 and its hosted asset packs
-must not be described as uploaded until Xcode Cloud and App Store Connect both
-confirm them. Do not reuse any uploaded or attempted build number.
+Release train `2.7` is closed: it was approved, so App Store Connect rejects any
+further `2.7` upload with `ITMS-90186` / `ITMS-90062`. The current source candidate is
+`2.8 (214)`; `213` was the last build Xcode Cloud consumed on the closed train.
+
+A version bump must advance **four** pins together — `MARKETING_VERSION` and
+`CURRENT_PROJECT_VERSION` in the project, `EXPECTED_MARKETING_VERSION` and
+`MIN_EXPECTED_BUILD` in `scripts/validate_release.py`, `BATAL_EXPECTED_MARKETING_VERSION`
+and `BATAL_MIN_PROJECT_BUILD` in `ci_scripts/ci_post_clone.sh`, and
+`EXPECTED_MARKETING_VERSION` in `ci_scripts/ci_post_xcodebuild.sh`. Missing one fails
+the archive rather than the upload. Do not reuse any uploaded or attempted build number.
 
 ## In-App Purchase
 

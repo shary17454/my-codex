@@ -36,13 +36,17 @@ enum PartRequestRequirement: String, CaseIterable, Identifiable {
     func message(_ language: AppLanguage) -> String {
         switch self {
         case .partIdentity:
-            language == .arabic
-                ? "أضف رقم القطعة أو اسمها."
-                : "Add a part number or a part name."
+            BatalLocalization.resolve(
+                language,
+                ar: "أضف رقم القطعة أو اسمها.",
+                en: "Add a part number or a part name."
+            )
         case .vehicleContext:
-            language == .arabic
-                ? "أضف جيل السيارة أو سنة الصنع."
-                : "Add the vehicle generation or model year."
+            BatalLocalization.resolve(
+                language,
+                ar: "أضف جيل السيارة أو سنة الصنع.",
+                en: "Add the vehicle generation or model year."
+            )
         }
     }
 }
