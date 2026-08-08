@@ -537,7 +537,7 @@ struct AdminOverview: Codable, Hashable {
         queuedNotifications = try container.decode(Int.self, forKey: .queuedNotifications)
         blockedClients = try container.decode(Int.self, forKey: .blockedClients)
         if let rawDate = try container.decodeIfPresent(String.self, forKey: .generatedAt) {
-            generatedAt = ISO8601DateFormatter().date(from: rawDate)
+            generatedAt = WeshISO8601.date(from: rawDate)
         } else {
             generatedAt = nil
         }

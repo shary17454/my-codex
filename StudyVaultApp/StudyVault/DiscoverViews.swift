@@ -335,10 +335,13 @@ private struct FilterChoice: View {
 
 struct KnowledgeLibraryView: View {
     let items: [KnowledgeItem]
+    let savedQuestions: [AskQuestion]
     @Binding var selectedCategory: AskCategory
     @Binding var searchText: String
     @Binding var selectedItem: KnowledgeItem?
     let useItem: (KnowledgeItem) -> Void
+    let openSavedQuestion: (AskQuestion) -> Void
+    let unsaveQuestion: (AskQuestion.ID) -> Void
     let openResearch: () -> Void
     let refresh: () async -> Void
 
@@ -361,6 +364,8 @@ struct KnowledgeLibraryView: View {
                         .foregroundStyle(WeshTheme.accent)
                         .padding(.top, 3)
                 }
+
+                savedComparisonsSection
 
                 CategoryScroller(selectedCategory: $selectedCategory)
 
@@ -404,6 +409,47 @@ struct KnowledgeLibraryView: View {
             }
         }
     }
+
+    @ViewBuilder
+    private var savedComparisonsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            WeshSectionHeader(
+                "المقارنات المحفوظة",
+                subtitle: savedQuestions.isEmpty
+                    ? "احفظ أي مقارنة من صفحتها لتجدها هنا."
+                    : "\(savedQuestions.count) مقارنة محفوظة على هذا الجهاز.",
+                systemImage: "bookmark.fill"
+            )
+
+            if savedQuestions.isEmpty {
+                Text("لم تحفظ أي مقارنة بعد. افتح أي مقارنة واضغط على أيقونة الحفظ لتظهر هنا.")
+                    .font(.footnote)
+                    .foregroundStyle(WeshTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 330), spacing: 14)],
+                    spacing: 14
+                ) {
+                    ForEach(savedQuestions) { question in
+                        DashboardQuestionCard(question: question) {
+                            openSavedQuestion(question)
+                        }
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                unsaveQuestion(question.id)
+                            } label: {
+                                Label("إزالة من المحفوظات", systemImage: "bookmark.slash")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .weshSurface()
+        .accessibilityIdentifier("library.savedComparisons")
+    }
 }
 
 private enum ResearchBrowserDefaults {
@@ -416,6 +462,8 @@ struct ResearchBrowserView: View {
     @State private var address = ResearchBrowserDefaults.searchURLString
     @State private var activeURL = ResearchBrowserDefaults.searchURL
     @State private var validationMessage: String?
+    @State private var isLoading = false
+    @State private var loadFailure: String?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -448,13 +496,30 @@ struct ResearchBrowserView: View {
                 if let validationMessage {
                     WeshStatusBanner(text: validationMessage, kind: .warning)
                 }
+                if let loadFailure {
+                    WeshStatusBanner(text: loadFailure, kind: .warning)
+                }
             }
             .padding(14)
             .background(WeshTheme.surface)
 
-            WebView(url: activeURL)
-                .clipShape(RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
-                .padding(12)
+            WebView(
+                url: activeURL,
+                isLoading: $isLoading,
+                loadFailure: $loadFailure
+            )
+            .clipShape(RoundedRectangle(cornerRadius: WeshTheme.controlRadius))
+            .padding(12)
+            .overlay(alignment: .top) {
+                if isLoading {
+                    ProgressView()
+                        .tint(WeshTheme.accent)
+                        .padding(10)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .padding(.top, 18)
+                        .accessibilityLabel("جاري تحميل الصفحة")
+                }
+            }
         }
         .navigationTitle("بحث المقارنة")
         .navigationBarTitleDisplayMode(.inline)
@@ -474,11 +539,22 @@ struct ResearchBrowserView: View {
 
     private func loadAddress() {
         let trimmed = address.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
+        guard !trimmed.isEmpty else {
+            validationMessage = "اكتب كلمة بحث أو رابطًا يبدأ بـ https://"
+            return
+        }
 
-        if let url = URL(string: trimmed), url.scheme?.lowercased() == "https" {
+        if let url = URL(string: trimmed), url.scheme?.lowercased() == "https", url.host?.isEmpty == false {
             validationMessage = nil
             activeURL = url
+            return
+        }
+
+        // An explicit non-HTTPS address is rejected rather than silently searched for it, so the
+        // user understands why their link did not open.
+        if let scheme = URL(string: trimmed)?.scheme?.lowercased(), scheme != "https" {
+            validationMessage = "نفتح الروابط الآمنة فقط (https). بحثنا عن النص بدلًا من ذلك."
+            openSearch(trimmed, keepingValidationMessage: true)
             return
         }
 
@@ -492,17 +568,26 @@ struct ResearchBrowserView: View {
         openSearch(trimmed)
     }
 
-    private func openSearch(_ query: String) {
-        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-        let urlString = "https://www.google.com/search?q=\(encoded)"
-        validationMessage = nil
-        address = urlString
-        activeURL = URL(string: urlString) ?? ResearchBrowserDefaults.searchURL
+    private func openSearch(_ query: String, keepingValidationMessage: Bool = false) {
+        var components = URLComponents(string: "https://www.google.com/search")
+        components?.queryItems = [URLQueryItem(name: "q", value: query)]
+        let url = components?.url ?? ResearchBrowserDefaults.searchURL
+        if !keepingValidationMessage {
+            validationMessage = nil
+        }
+        address = url.absoluteString
+        activeURL = url
     }
 }
 
 struct WebView: UIViewRepresentable {
     let url: URL
+    var isLoading: Binding<Bool>?
+    var loadFailure: Binding<String?>?
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(isLoading: isLoading, loadFailure: loadFailure)
+    }
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -510,13 +595,62 @@ struct WebView: UIViewRepresentable {
         configuration.websiteDataStore = .nonPersistent()
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.allowsBackForwardNavigationGestures = true
+        webView.navigationDelegate = context.coordinator
+        context.coordinator.requestedURL = url
         webView.load(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 30))
         return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        guard webView.url != url else { return }
+        context.coordinator.isLoading = isLoading
+        context.coordinator.loadFailure = loadFailure
+        // Compare against the URL this view last asked for, not the web view's current URL:
+        // once the user browses onwards those differ, and reloading here would yank them back
+        // to the starting page on every unrelated SwiftUI update.
+        guard context.coordinator.requestedURL != url else { return }
+        context.coordinator.requestedURL = url
         webView.load(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 30))
+    }
+
+    @MainActor
+    final class Coordinator: NSObject, WKNavigationDelegate {
+        var requestedURL: URL?
+        var isLoading: Binding<Bool>?
+        var loadFailure: Binding<String?>?
+
+        init(isLoading: Binding<Bool>?, loadFailure: Binding<String?>?) {
+            self.isLoading = isLoading
+            self.loadFailure = loadFailure
+        }
+
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            isLoading?.wrappedValue = true
+            loadFailure?.wrappedValue = nil
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            isLoading?.wrappedValue = false
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            finish(with: error)
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            didFailProvisionalNavigation navigation: WKNavigation!,
+            withError error: Error
+        ) {
+            finish(with: error)
+        }
+
+        private func finish(with error: Error) {
+            isLoading?.wrappedValue = false
+            // A cancelled load is what happens when the user navigates again mid-request; it is
+            // not a failure worth surfacing.
+            guard (error as? URLError)?.code != .cancelled else { return }
+            loadFailure?.wrappedValue = "تعذر فتح الصفحة. تحقق من الاتصال أو جرّب رابطًا آخر."
+        }
     }
 }
 
