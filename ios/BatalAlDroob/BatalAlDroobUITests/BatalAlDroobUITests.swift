@@ -197,7 +197,12 @@ final class BatalAlDroobUITests: XCTestCase {
         XCTAssertTrue(libraryButton.waitForExistence(timeout: 10))
         libraryButton.tap()
 
-        XCTAssertTrue(app.navigationBars["مكتبة الكتالوجات"].waitForExistence(timeout: 10))
+        // 20s, not 10s: this is a navigation-correctness assertion, not a performance
+        // budget. Pushing the library screen has to compete with whatever else the host
+        // is running, and a 10s budget flaked on a loaded machine while the same
+        // assertion passed in 32s total when re-run. Widening the wait keeps the
+        // assertion intact; the screen still has to appear.
+        XCTAssertTrue(app.navigationBars["مكتبة الكتالوجات"].waitForExistence(timeout: 20))
         let indexedCount = app.staticTexts.matching(
             NSPredicate(format: "label CONTAINS %@", "640")
         ).firstMatch
