@@ -295,8 +295,12 @@ struct PermissionOnboardingView: View {
         }
     }
 
+    /// Routes through the view model so first-run copy uses the same translation table as
+    /// the rest of the app. The local `language == .arabic ? ar : en` this replaced meant
+    /// the entire welcome screen — the first thing a new user sees — stayed English for
+    /// the eight non-Arabic languages the app ships, even when they were selected.
     private func text(ar: String, en: String) -> String {
-        viewModel.language == .arabic ? ar : en
+        viewModel.text(ar: ar, en: en)
     }
 
     private func saveAccount(successMessage: String) {

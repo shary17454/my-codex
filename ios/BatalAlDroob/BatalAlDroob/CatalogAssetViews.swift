@@ -158,7 +158,9 @@ private struct CatalogDocumentButton: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 4)
-                Image(systemName: "chevron.left")
+                // `forward` mirrors with the layout direction; the literal `left` it
+                // replaced pointed the wrong way in every left-to-right language.
+                Image(systemName: "chevron.forward")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(.tertiary)
             }
@@ -245,8 +247,13 @@ struct CatalogPDFView: View {
 
     var body: some View {
         NavigationStack {
-            PDFKitRepresentable(url: presentation.url, page: presentation.page)
-                .ignoresSafeArea(edges: .bottom)
+            CatalogPDFReader(
+                url: presentation.url,
+                page: presentation.page,
+                loadingLabel: viewModel.text(ar: "جاري فتح الكتالوج...", en: "Opening the catalog..."),
+                failureLabel: viewModel.text(ar: "تعذر فتح هذا الملف", en: "This file could not be opened")
+            )
+            .ignoresSafeArea(edges: .bottom)
                 .navigationTitle(presentation.title)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -264,8 +271,59 @@ struct CatalogPDFView: View {
     }
 }
 
-private struct PDFKitRepresentable: UIViewRepresentable {
+/// Hands a freshly parsed `PDFDocument` from the parsing task to the main actor.
+///
+/// `PDFDocument` is not `Sendable`, and it is not thread-safe in general. This box is
+/// sound for this one hop because the document is created inside the detached task, is
+/// never touched there afterwards, and no other reference to it exists: ownership moves
+/// to the main actor and stays there for the rest of the view's life.
+private struct ParsedPDFDocument: @unchecked Sendable {
+    let document: PDFDocument?
+}
+
+/// Reads a catalog PDF and shows it, opening on a requested page.
+///
+/// The document is parsed off the main actor. Catalog scans in this app run to tens of
+/// megabytes, and building `PDFDocument` on the main thread froze the sheet — including
+/// its Done button — for as long as the parse took.
+private struct CatalogPDFReader: View {
     let url: URL
+    let page: Int?
+    let loadingLabel: String
+    let failureLabel: String
+
+    @State private var document: PDFDocument?
+    @State private var didFailToOpen = false
+
+    var body: some View {
+        Group {
+            if let document {
+                PDFKitRepresentable(document: document, page: page)
+            } else if didFailToOpen {
+                EmptyStateView(
+                    symbol: "doc.questionmark",
+                    title: failureLabel,
+                    message: url.lastPathComponent
+                )
+            } else {
+                ProgressView(loadingLabel)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .task(id: url) {
+            let loadedURL = url
+            let loaded = await Task.detached(priority: .userInitiated) {
+                ParsedPDFDocument(document: PDFDocument(url: loadedURL))
+            }.value
+            guard !Task.isCancelled else { return }
+            document = loaded.document
+            didFailToOpen = loaded.document == nil
+        }
+    }
+}
+
+private struct PDFKitRepresentable: UIViewRepresentable {
+    let document: PDFDocument
     let page: Int?
 
     func makeUIView(context _: Context) -> PDFView {
@@ -274,10 +332,9 @@ private struct PDFKitRepresentable: UIViewRepresentable {
         view.displayMode = .singlePageContinuous
         view.displayDirection = .vertical
         view.usePageViewController(false)
-        view.document = PDFDocument(url: url)
+        view.document = document
         if
             let page,
-            let document = view.document,
             let destination = document.page(at: max(0, min(page - 1, document.pageCount - 1)))
         {
             view.go(to: destination)

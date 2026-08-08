@@ -251,8 +251,16 @@ private struct SavedRequestRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber)
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(saved.partNumber.isEmpty ? saved.partName : saved.partNumber)
+                        .font(.headline)
+                    // Saved requests accumulate up to 50 entries; without the recorded
+                    // date the user cannot tell an old quote request from today's.
+                    Text(saved.createdAt.formatted(.dateTime.year().month().day()
+                        .locale(viewModel.language.locale)))
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
                 ShareLink(item: saved.draft) {
                     Image(systemName: "square.and.arrow.up")
@@ -351,8 +359,15 @@ struct MaintenanceContent: View {
                     )
                 } else {
                     ForEach(viewModel.maintenanceItems) { item in
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 3) {
                             Text(item.title).font(.headline)
+                            // `MaintenanceItem.date` was recorded and persisted from the
+                            // start but never displayed, so a service log could not answer
+                            // the one question it exists for: when was this done.
+                            Text(item.date.formatted(.dateTime.year().month().day()
+                                .locale(viewModel.language.locale)))
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(BatalDesign.brand)
                             Text([item.odometer, item.notes].filter { !$0.isEmpty }.joined(separator: " · "))
                                 .font(.caption).foregroundStyle(.secondary)
                         }

@@ -1,5 +1,68 @@
 # Changelog
 
+## 2.7 (192) - 2026-08-08
+
+### Search and dashboard responsiveness
+
+The catalog holds 17,609 parts and several screens read the same derived value more
+than once per SwiftUI pass, so a single render repeated the whole scan. Measured on
+the render path, not micro-optimised:
+
+- `filteredParts` is memoized on the query, category, vehicle filter, and vehicle
+  profile. The catalog screen alone read it four times per body (result count, empty
+  check, `ForEach`, and the "current results" line), and the smart-search and
+  description-search screens read it again; each read re-scanned and re-sorted.
+- The part-number regexes are compiled once instead of on every call. They are
+  evaluated inside search ranking, so a single text query used to compile two
+  `NSRegularExpression`s per catalog record.
+- The part-number-lookup test is hoisted out of the ranking loop; it depends only on
+  the query.
+- Dialect/synonym expansion is memoized per query. Every result row asks for its match
+  reason, which rebuilt and re-normalized the whole expansion table per row per render.
+- Category counters, generation record counters, shared-fitment parts, and
+  review-ready parts are computed once per catalog load rather than per render. The
+  dashboard draws four generation cards and six category tiles, so one pass previously
+  scanned the catalog ten times.
+- Assistant redaction looks locked numbers up through a reverse index instead of
+  scanning all 17,609 parts per message.
+- Catalog PDFs are parsed off the main actor. Scans run to tens of megabytes and
+  building `PDFDocument` on the main thread froze the reader sheet, including its Done
+  button, while the file was parsed. The sheet now shows progress and a failure state.
+
+### Ten languages, actually translated
+
+- Expanded the interface translation table from 28 entries to full coverage of the
+  static interface: navigation, actions, fields, empty and error states, progress,
+  purchases, the assistant, requests, and onboarding.
+- The first-run welcome screen resolved its own text with a local
+  `language == .arabic ? ar : en`, so the first screen a new user saw stayed English
+  for all eight non-Arabic languages even when one was selected. It now routes through
+  the shared table.
+- The privacy shield (shown when the app is backgrounded) had the same problem and now
+  resolves through the table too.
+- The generation pills on the dashboard announced a hardcoded Arabic VoiceOver hint to
+  every user regardless of language.
+
+### Correctness and interface direction
+
+- `normalized()` folded with the device locale. The catalog index is built once and
+  queried everywhere, so a Turkish or Azeri device could fold `I`/`i` differently from
+  the index that was built against it — and the app now ships a Turkish interface. The
+  fold is locale-independent.
+- Two hardcoded `chevron.left` affordances pointed the wrong way in every
+  left-to-right language; they now mirror with the layout direction.
+- The maintenance log recorded and persisted a date but never showed it, so a service
+  log could not answer when work was done. Saved part requests now show their date too.
+- Removed an `isArabic ? x : x` ternary in the local assistant whose branches were
+  identical.
+
+### Tests
+
+- Added regression tests for the memo keys (repeated reads agree; a new query,
+  category, or vehicle filter invalidates), counter stability and partitioning,
+  locale-independent normalization, shared regex reuse, assistant redaction for locked
+  and unlocked parts, and translation coverage across all eight languages.
+
 ## 2.7 (191) - 2026-08-06
 
 ### Ten Interface Languages

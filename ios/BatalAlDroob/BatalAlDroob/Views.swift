@@ -325,6 +325,13 @@ struct DashboardHero: View {
     @Bindable var viewModel: CatalogViewModel
     let openGeneration: (String) -> Void
 
+    private func generationHint(_ generation: String) -> String {
+        viewModel.text(
+            ar: "يفتح الكتالوج على جيل \(generation)",
+            en: "Opens the catalog focused on \(generation)"
+        )
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center, spacing: 12) {
@@ -365,22 +372,30 @@ struct DashboardHero: View {
             }
 
             HStack(spacing: 8) {
-                HeroGenerationPill(title: "Y60", subtitle: "1988-1997", isActive: true) {
-                    openGeneration("Y60")
-                }
-                HeroGenerationPill(title: "Y61", subtitle: "1997-2025", isActive: false) {
-                    openGeneration("Y61")
-                }
-                HeroGenerationPill(title: "Y62", subtitle: "2010-2025", isActive: false) {
-                    openGeneration("Y62")
-                }
+                HeroGenerationPill(
+                    title: "Y60",
+                    subtitle: "1988-1997",
+                    isActive: true,
+                    hint: generationHint("Y60")
+                ) { openGeneration("Y60") }
+                HeroGenerationPill(
+                    title: "Y61",
+                    subtitle: "1997-2025",
+                    isActive: false,
+                    hint: generationHint("Y61")
+                ) { openGeneration("Y61") }
+                HeroGenerationPill(
+                    title: "Y62",
+                    subtitle: "2010-2025",
+                    isActive: false,
+                    hint: generationHint("Y62")
+                ) { openGeneration("Y62") }
                 HeroGenerationPill(
                     title: "Y63",
                     subtitle: viewModel.text(ar: "الأحدث", en: "Newest"),
-                    isActive: false
-                ) {
-                    openGeneration("Y63")
-                }
+                    isActive: false,
+                    hint: generationHint("Y63")
+                ) { openGeneration("Y63") }
             }
         }
         .padding(12)
@@ -445,6 +460,9 @@ struct HeroGenerationPill: View {
     let title: String
     let subtitle: String
     let isActive: Bool
+    /// Supplied by the caller so the VoiceOver hint follows the selected language. It was
+    /// previously a hardcoded Arabic string, which read as Arabic to every user.
+    let hint: String
     let action: () -> Void
 
     var body: some View {
@@ -477,7 +495,7 @@ struct HeroGenerationPill: View {
         )
         .accessibilityIdentifier("home.hero.generation.\(title)")
         .accessibilityLabel(title)
-        .accessibilityHint("يفتح الكتالوج على جيل \(title)")
+        .accessibilityHint(hint)
     }
 }
 

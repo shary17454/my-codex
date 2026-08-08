@@ -231,9 +231,14 @@ extension CatalogViewModel {
         return rankedCatalogMatches(for: trimmed, limit: 8)
     }
 
+    /// Records in a category. Memoized because the dashboard grid asks for six
+    /// categories on every pass and each answer used to scan the whole catalog.
     func categoryCount(_ category: CatalogCategory) -> Int {
         guard category != .all else { return parts.count }
-        return parts.lazy.filter { $0.categoryValue == category }.count
+        if let cached = cachedCategoryCount(category) { return cached }
+        let count = parts.lazy.filter { $0.categoryValue == category }.count
+        storeCategoryCount(count, for: category)
+        return count
     }
 
     func openStore(_ store: VerifiedStore, part: Part?) {
@@ -272,6 +277,9 @@ extension CatalogViewModel {
         let shouldUseExpandedTerms = !isLikelyPartNumberLookup(query, normalizedQuery: normalizedQuery)
         let expandedTerms = shouldUseExpandedTerms ? expandedSearchTerms(for: query) : []
         let intent = CatalogSearchIntent(query: query)
+        // Hoisted out of the per-part loop: it depends only on the query, and evaluating
+        // it inside the loop ran the part-number regexes once for every catalog record.
+        let isNumberLookup = !shouldUseExpandedTerms
         return parts.compactMap { part -> RankedMatch? in
             let normalizedPrimary = normalized(part.partNumber)
             let normalizedNumbers = part.allNumbers.map(normalized)
@@ -291,7 +299,7 @@ extension CatalogViewModel {
                 score = 250
                 reason = .partialNumber
             } else if
-                isLikelyPartNumberLookup(query, normalizedQuery: normalizedQuery),
+                isNumberLookup,
                 let distance = closestPartNumberDistance(normalizedNumbers, to: normalizedQuery) {
                 score = 180 - distance
                 reason = .closeNumber
@@ -378,7 +386,19 @@ extension CatalogViewModel {
         return searchText.contains(query) || expandedSearchScore(in: searchText, terms: expandedSearchTerms(for: rawQuery)) != nil
     }
 
+    /// Dialect/synonym expansion for a query.
+    ///
+    /// The expansion table below is a large literal, and every search row asks for its
+    /// match reason, so this used to rebuild and re-normalize hundreds of terms once per
+    /// visible row per render. The result is memoized on the raw query instead.
     func expandedSearchTerms(for query: String) -> [String] {
+        if let cached = cachedExpandedTerms(for: query) { return cached }
+        let terms = computeExpandedSearchTerms(for: query)
+        storeExpandedTerms(terms, for: query)
+        return terms
+    }
+
+    private func computeExpandedSearchTerms(for query: String) -> [String] {
         let normalizedQuery = normalized(query)
         guard !normalizedQuery.isEmpty else { return [] }
         var terms = [normalizedQuery]

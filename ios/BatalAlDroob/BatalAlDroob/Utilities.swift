@@ -67,16 +67,22 @@ func partRequestHasRequiredInput(_ request: SavedPartRequest) -> Bool {
     partRequestMissingRequirements(request).isEmpty
 }
 
+/// Compiled once. These patterns are evaluated inside search ranking, and rebuilding
+/// an `NSRegularExpression` per call made every catalog scan pay two regex compilations
+/// per record.
+private enum PartNumberPatterns {
+    static let separated = try? NSRegularExpression(
+        pattern: #"(?<![A-Z0-9])([A-Z0-9]{4,8})\s*[-–—_/]\s*([A-Z0-9]{3,8})(?![A-Z0-9])"#
+    )
+    static let compact = try? NSRegularExpression(pattern: #"(?<![A-Z0-9])[A-Z0-9]{8,14}(?![A-Z0-9])"#)
+}
+
 func partNumberCandidates(in text: String) -> [String] {
     let uppercased = text.uppercased()
     var candidates: [String] = []
     let fullRange = NSRange(uppercased.startIndex ..< uppercased.endIndex, in: uppercased)
 
-    if
-        let separated = try? NSRegularExpression(
-            pattern: #"(?<![A-Z0-9])([A-Z0-9]{4,8})\s*[-–—_/]\s*([A-Z0-9]{3,8})(?![A-Z0-9])"#
-        )
-    {
+    if let separated = PartNumberPatterns.separated {
         for match in separated.matches(in: uppercased, range: fullRange) where match.numberOfRanges == 3 {
             guard
                 let firstRange = Range(match.range(at: 1), in: uppercased),
@@ -85,7 +91,7 @@ func partNumberCandidates(in text: String) -> [String] {
         }
     }
 
-    if let compact = try? NSRegularExpression(pattern: #"(?<![A-Z0-9])[A-Z0-9]{8,14}(?![A-Z0-9])"#) {
+    if let compact = PartNumberPatterns.compact {
         for match in compact.matches(in: uppercased, range: fullRange) {
             guard let range = Range(match.range, in: uppercased) else { continue }
             let candidate = String(uppercased[range])
@@ -242,11 +248,18 @@ func fullYearListText(for model: String?, years: [String]) -> String {
     return orderedYears.isEmpty ? "-" : orderedYears.joined(separator: ", ")
 }
 
+/// Folds a catalog string into the stable form used for indexing and matching.
+///
+/// The fold is deliberately **locale-independent**: the bundled catalog is indexed
+/// once and queried on every device, so the same input must produce the same key
+/// regardless of the user's region. Passing `.current` here would let a Turkish or
+/// Azeri locale fold `I`/`i` differently from the locale that built the index, and
+/// the app now ships a Turkish interface.
 func normalized(_ value: String) -> String {
     value.lowercased()
         .replacingOccurrences(of: "-", with: "")
         .replacingOccurrences(of: " ", with: "")
-        .folding(options: [.diacriticInsensitive, .widthInsensitive], locale: .current)
+        .folding(options: [.diacriticInsensitive, .widthInsensitive], locale: nil)
 }
 
 extension Array where Element: Hashable {

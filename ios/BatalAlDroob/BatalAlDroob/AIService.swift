@@ -87,12 +87,13 @@ struct LocalCatalogAssistantService: AIAssistantServicing {
 
         let isArabic = request.language == "ar"
         let topParts = request.parts.prefix(3)
+        // Part numbers, names, years, and engines are language-neutral catalog data, so
+        // the summary line is identical in every language. (This used to be an
+        // `isArabic ? x : x` ternary with both branches spelled out the same.)
         let partsSummary = topParts.map { part in
             let engines = part.engines.isEmpty ? "-" : part.engines.prefix(3).joined(separator: ", ")
             let years = part.years.isEmpty ? "-" : part.years.prefix(4).joined(separator: ", ")
-            return isArabic
-                ? "\(part.protectedNumber): \(part.title) · \(years) · \(engines)"
-                : "\(part.protectedNumber): \(part.title) · \(years) · \(engines)"
+            return "\(part.protectedNumber): \(part.title) · \(years) · \(engines)"
         }.joined(separator: "\n")
 
         let answer: String
@@ -116,27 +117,51 @@ struct LocalCatalogAssistantService: AIAssistantServicing {
         )
     }
 
+    /// Resolves a suggestion string for the requesting language.
+    ///
+    /// Uses the same table and English fallback as the rest of the interface. The
+    /// `isArabic ? ar : en` form this replaced showed English suggestions to users on
+    /// the eight non-Arabic languages even when the surrounding screen was translated.
+    private func text(_ request: AIAssistantRequest, ar arabic: String, en english: String) -> String {
+        switch AppLanguage(rawValue: request.language) {
+        case .arabic: arabic
+        case .english, .none: english
+        case let .some(language): BatalLocalization.translate(english, to: language) ?? english
+        }
+    }
+
     private func localSuggestions(for request: AIAssistantRequest) -> [AISuggestion] {
-        let isArabic = request.language == "ar"
         var suggestions: [AISuggestion] = []
         if !request.parts.isEmpty {
             suggestions.append(.init(
                 id: "review-top-result",
-                title: isArabic ? "افتح أقرب نتيجة" : "Open the closest result",
-                reason: isArabic ? "النتيجة الأولى هي أفضل مرشح من البحث الحالي." : "The first result is the strongest current search candidate."
+                title: text(request, ar: "افتح أقرب نتيجة", en: "Open the closest result"),
+                reason: text(
+                    request,
+                    ar: "النتيجة الأولى هي أفضل مرشح من البحث الحالي.",
+                    en: "The first result is the strongest current search candidate."
+                )
             ))
         }
         if request.vehicleSummary.contains("لم يتم") || request.vehicleSummary.contains("No vehicle") {
             suggestions.append(.init(
                 id: "complete-vehicle",
-                title: isArabic ? "أكمل بيانات سيارتي" : "Complete My Vehicle",
-                reason: isArabic ? "بيانات السيارة تحسن ترتيب التوافق." : "Vehicle details improve fitment ranking."
+                title: text(request, ar: "أكمل بيانات سيارتي", en: "Complete My Vehicle"),
+                reason: text(
+                    request,
+                    ar: "بيانات السيارة تحسن ترتيب التوافق.",
+                    en: "Vehicle details improve fitment ranking."
+                )
             ))
         }
         suggestions.append(.init(
             id: "prepare-request",
-            title: isArabic ? "جهّز طلب قطعة" : "Prepare a part request",
-            reason: isArabic ? "الطلب المحفوظ يسهل إرساله للمورد بعد التحقق." : "A saved request is easier to send after verification."
+            title: text(request, ar: "جهّز طلب قطعة", en: "Prepare a part request"),
+            reason: text(
+                request,
+                ar: "الطلب المحفوظ يسهل إرساله للمورد بعد التحقق.",
+                en: "A saved request is easier to send after verification."
+            )
         ))
         return suggestions
     }

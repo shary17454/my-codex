@@ -148,4 +148,238 @@ final class BatalPhase1AndLocalizationTests: XCTestCase {
         viewModel.language = .english
         XCTAssertEqual(viewModel.text(ar: "الكتالوج", en: "Catalog"), "Catalog")
     }
+
+    // MARK: - Localization coverage
+    //
+    // The app declares ten languages in `CFBundleLocalizations`. These guard against the
+    // table silently regressing back toward "declared but not actually translated".
+
+    func testTranslationTableCoversTheWholeNavigationAndActionSurface() {
+        // Every tab, primary action, and status word a user meets in a normal session.
+        let coreInterface = [
+            "Home", "Catalog", "Assistant", "Request", "Tools", "More",
+            "Results", "No results", "Retry", "Dismiss", "Done", "Save", "OK",
+            "Welcome", "Sign in", "Register", "Email", "Account",
+            "Part number", "Part name", "Year", "Engine", "Transmission",
+            "Maintenance", "Wishlist", "Verified stores", "Language"
+        ]
+        for key in coreInterface {
+            for language in BatalLocalization.coveredLanguages {
+                XCTAssertNotNil(
+                    BatalLocalization.translate(key, to: language),
+                    "'\(key)' is not translated for \(language.rawValue)"
+                )
+            }
+        }
+    }
+
+    func testEveryTableEntryTranslatesIntoAllEightLanguages() {
+        // A partially filled entry would leave one language showing English while its
+        // neighbours are translated, which reads as a bug rather than a fallback.
+        for key in ["Home", "Welcome", "Content protected", "Restore Purchases", "Smart indicators"] {
+            let translations = BatalLocalization.coveredLanguages.compactMap {
+                BatalLocalization.translate(key, to: $0)
+            }
+            XCTAssertEqual(
+                translations.count,
+                BatalLocalization.coveredLanguages.count,
+                "'\(key)' is missing at least one language"
+            )
+            XCTAssertTrue(translations.allSatisfy { !$0.isEmpty })
+        }
+    }
+
+    func testTranslationCoverageStaysWellAboveTheOriginalSeed() {
+        // 2.7 shipped with 28 translated strings against ~337 inline pairs. This floor
+        // keeps the table from being trimmed back to that state.
+        XCTAssertGreaterThanOrEqual(BatalLocalization.translatedStringCount, 150)
+        XCTAssertEqual(BatalLocalization.coveredLanguages.count, 8)
+    }
+
+    @MainActor
+    func testPrivacyShieldTextIsLocalizedRatherThanArabicOrEnglishOnly() {
+        // `PrivacyShieldView` resolves its own copy because it is drawn without the view
+        // model; it must use the same table, not a bare `language == .arabic` ternary.
+        XCTAssertEqual(BatalLocalization.translate("Content protected", to: .turkish), "İçerik korunuyor")
+        XCTAssertNotNil(BatalLocalization.translate("Content protected", to: .hindi))
+    }
+
+    @MainActor
+    func testFirstRunOnboardingCopyResolvesThroughTheTranslationTable() {
+        // The onboarding screen used to resolve text locally, so a Spanish or Turkish user
+        // saw an English welcome. It now goes through `CatalogViewModel.text(ar:en:)`.
+        let viewModel = CatalogViewModel(repository: StaticCatalogRepository(), store: TestPurchaseService())
+        viewModel.language = .spanish
+        XCTAssertEqual(viewModel.text(ar: "مرحبًا", en: "Welcome"), "Bienvenido")
+        XCTAssertEqual(viewModel.text(ar: "تسجيل دخول", en: "Sign in"), "Iniciar sesión")
+        viewModel.language = .turkish
+        XCTAssertEqual(viewModel.text(ar: "مرحبًا", en: "Welcome"), "Hoş geldiniz")
+    }
+
+    // MARK: - Derived-state memoization
+    //
+    // `filteredParts`, the category counters, and the generation counters are read several
+    // times per SwiftUI `body`. They are now memoized; these tests pin the memo to the same
+    // answers an uncached scan gives, and prove it invalidates when an input changes.
+
+    @MainActor
+    func testRepeatedFilteredPartsReadsAgreeAndReflectQueryChanges() async {
+        let viewModel = CatalogViewModel(repository: BundledCatalogRepository(), store: TestPurchaseService())
+        await viewModel.load()
+
+        viewModel.searchText = "فحمات فرامل"
+        let first = viewModel.filteredParts
+        let second = viewModel.filteredParts
+        XCTAssertEqual(first.map(\.partNumber), second.map(\.partNumber), "Repeated reads must agree")
+
+        // Changing the query must change the answer, i.e. the memo key includes searchText.
+        viewModel.searchText = "رديتر"
+        let afterQueryChange = viewModel.filteredParts
+        XCTAssertNotEqual(
+            first.map(\.partNumber),
+            afterQueryChange.map(\.partNumber),
+            "A new query must not serve the previous cached result"
+        )
+
+        // Category is part of the key too.
+        viewModel.searchText = ""
+        viewModel.selectedCategory = .all
+        let allCategories = viewModel.filteredParts
+        viewModel.selectedCategory = .brake
+        let brakeOnly = viewModel.filteredParts
+        XCTAssertNotEqual(allCategories.map(\.partNumber), brakeOnly.map(\.partNumber))
+        XCTAssertTrue(brakeOnly.allSatisfy { $0.categoryValue == .brake })
+    }
+
+    @MainActor
+    func testVehicleFilterChangeInvalidatesTheSearchMemo() async {
+        let viewModel = CatalogViewModel(repository: BundledCatalogRepository(), store: TestPurchaseService())
+        await viewModel.load()
+        viewModel.searchText = ""
+        viewModel.selectedCategory = .all
+        viewModel.isVehicleFilterEnabled = false
+        let unfiltered = viewModel.filteredParts
+
+        viewModel.vehicleProfile = VehicleProfile(generation: "Y61", year: "", vin: "", engine: "", transmission: "")
+        viewModel.isVehicleFilterEnabled = true
+        let filtered = viewModel.filteredParts
+        XCTAssertLessThanOrEqual(filtered.count, unfiltered.count, "Enabling the filter cannot widen the result set")
+        XCTAssertTrue(filtered.allSatisfy { viewModel.partFitsVehicleProfile($0) })
+    }
+
+    @MainActor
+    func testCategoryAndGenerationCountersAreStableAcrossRepeatedReads() async {
+        let viewModel = CatalogViewModel(repository: BundledCatalogRepository(), store: TestPurchaseService())
+        await viewModel.load()
+
+        for category in CatalogCategory.allCases {
+            XCTAssertEqual(
+                viewModel.categoryCount(category),
+                viewModel.categoryCount(category),
+                "Cached \(category.rawValue) count must match the first answer"
+            )
+        }
+        // The counters must still partition the catalog: every part lands in exactly one
+        // category, so the non-`all` counts sum to the total.
+        let partitioned = CatalogCategory.allCases
+            .filter { $0 != .all }
+            .reduce(0) { $0 + viewModel.categoryCount($1) }
+        XCTAssertEqual(partitioned, viewModel.parts.count)
+
+        for generation in ["Y60", "Y61", "Y62", "Y63"] {
+            XCTAssertEqual(
+                viewModel.generationRecordCount(for: generation),
+                viewModel.generationRecordCount(for: generation)
+            )
+        }
+        XCTAssertGreaterThan(viewModel.generationRecordCount(for: "Y60"), 0)
+    }
+
+    @MainActor
+    func testExpandedSearchTermMemoReturnsTheSameTermsForTheSameQuery() async {
+        let viewModel = CatalogViewModel(repository: BundledCatalogRepository(), store: TestPurchaseService())
+        await viewModel.load()
+
+        let first = viewModel.expandedSearchTerms(for: "رديتر")
+        let second = viewModel.expandedSearchTerms(for: "رديتر")
+        XCTAssertEqual(first, second)
+        XCTAssertTrue(first.contains(normalized("radiator")), "Dialect expansion must survive memoization")
+
+        // A different query must not be served from the previous entry.
+        let brakes = viewModel.expandedSearchTerms(for: "فرامل")
+        XCTAssertNotEqual(first, brakes)
+        XCTAssertTrue(brakes.contains(normalized("brake")))
+    }
+
+    // MARK: - Locale-independent normalization
+
+    func testNormalizationDoesNotDependOnTheDeviceLocale() {
+        // The catalog index is built once and queried on every device. Folding with the
+        // current locale let a Turkish device fold `I`/`i` differently from the index.
+        XCTAssertEqual(normalized("RADIATOR"), "radiator")
+        XCTAssertEqual(normalized("Injector"), normalized("INJECTOR"))
+        XCTAssertEqual(normalized("21082-4W000"), "210824w000")
+        XCTAssertEqual(normalized("FILTER"), "filter")
+        XCTAssertEqual(normalized("IGNITION"), normalized("ignition"))
+    }
+
+    func testPartNumberCandidateDetectionStillWorksWithSharedRegexes() {
+        // The patterns are compiled once now instead of per call; behaviour must not move.
+        XCTAssertTrue(partNumberCandidates(in: "need 21082-4W000 please").contains("21082-4W000"))
+        XCTAssertTrue(partNumberCandidates(in: "part 1608253J00").contains("1608253J00"))
+        XCTAssertTrue(partNumberCandidates(in: "no numbers here").isEmpty)
+        // Repeated calls must agree, proving the shared compiled patterns are reusable.
+        XCTAssertEqual(
+            partNumberCandidates(in: "21082-4W000 and 1608253J00"),
+            partNumberCandidates(in: "21082-4W000 and 1608253J00")
+        )
+    }
+
+    // MARK: - Assistant redaction
+
+    @MainActor
+    func testLockedPartNumbersAreMaskedBeforeLeavingTheDevice() async {
+        let viewModel = CatalogViewModel(repository: BundledCatalogRepository(), store: TestPurchaseService())
+        await viewModel.load()
+        // No entitlement and a non-owner profile: every paid number must stay masked.
+        viewModel.paidUnlocks = []
+        viewModel.customerProfile = CustomerProfile(
+            accessMode: .localEmail,
+            displayName: "Tester",
+            email: "tester@example.com",
+            hasCompletedSignInChoice: true
+        )
+        XCTAssertFalse(viewModel.hasOwnerAccess)
+
+        guard let locked = viewModel.parts.first(where: { !viewModel.isUnlocked($0) && $0.partNumber.count > 4 }) else {
+            return XCTFail("Expected at least one locked part")
+        }
+
+        let request = viewModel.assistantContextRequest(message: "Do you have \(locked.partNumber) in stock?")
+        XCTAssertFalse(
+            request.message.contains(locked.partNumber),
+            "A locked part number must never be sent verbatim"
+        )
+        XCTAssertTrue(request.message.contains(masked(locked.partNumber)))
+    }
+
+    @MainActor
+    func testUnlockedPartNumbersAreNotMasked() async {
+        let viewModel = CatalogViewModel(repository: BundledCatalogRepository(), store: TestPurchaseService())
+        await viewModel.load()
+        // Owner access unlocks everything, so redaction must step aside.
+        viewModel.customerProfile = CustomerProfile(
+            accessMode: .localEmail,
+            displayName: "Owner",
+            email: "sharyalhwaid@gmail.com",
+            hasCompletedSignInChoice: true
+        )
+        XCTAssertTrue(viewModel.hasOwnerAccess)
+
+        guard let part = viewModel.parts.first(where: { $0.partNumber.count > 4 }) else {
+            return XCTFail("Bundled catalog has no numbered part")
+        }
+        let request = viewModel.assistantContextRequest(message: "Do you have \(part.partNumber) in stock?")
+        XCTAssertTrue(request.message.contains(part.partNumber))
+    }
 }

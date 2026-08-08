@@ -8,8 +8,8 @@ Native SwiftUI iOS/iPadOS app for Nissan Patrol catalog lookup, fitment evidence
 - Scheme: `BatalAlDroob`
 - Bundle ID: `com.batalaldroob.parts`
 - Minimum iOS: 17.0
-- App Store version: `2.6`
-- Project build: `189`
+- App Store version: `2.7`
+- Project build: `192`
 
 The app uses bundled JSON catalog data under `BatalAlDroob/Web/data/`. The old web app files remain in the repository for source data history, but the app UI is native SwiftUI.
 
@@ -17,7 +17,10 @@ The complete local PDF archive is indexed under `BatalAlDroob/Web/catalog/` and 
 
 ## Requirements
 
-- Xcode 26.6 stable, build `17F113`
+- Xcode 26.4.1 (`17E202`) or newer, non-beta. Build `192` was verified with 26.4.1;
+  the previously documented 26.6 (`17F113`) also works. Any released Xcode Apple
+  currently accepts is fine — a **beta** Xcode is rejected at upload with
+  `ITMS-90111`.
 - Swift 6
 - iOS deployment target 17.0
 - iOS 26.0 or later for Apple-hosted original-PDF downloads

@@ -209,7 +209,8 @@ private struct SmartPartIndicatorButton: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(indicatorColor)
                     Spacer()
-                    Image(systemName: "chevron.left")
+                    // Mirrors with the layout direction, unlike the literal `left`.
+                    Image(systemName: "chevron.forward")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
                 }

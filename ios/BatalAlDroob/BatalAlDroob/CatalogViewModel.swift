@@ -58,6 +58,84 @@ final class CatalogViewModel {
     private(set) var partCount = 0
     var partSearchIndex: [String: String] = [:]
 
+    // MARK: - Derived-state caches
+    //
+    // The catalog holds ~17.6k parts and SwiftUI re-evaluates a `body` many times per
+    // keystroke. Several screens read `filteredParts` two to four times in one body
+    // (result count, empty check, the `ForEach`), and each read used to run a full
+    // scan plus ranking and sort. These caches make the scan happen once per distinct
+    // query instead of once per read. They are `@ObservationIgnored` on purpose: they
+    // are memoization of already-observed state, so publishing them would re-enter the
+    // view update they are computed from.
+
+    @ObservationIgnored private var partsRevision = 0
+    @ObservationIgnored private var filteredPartsCache: (key: CatalogQueryKey, parts: [Part])?
+    @ObservationIgnored private var expandedTermsCache: (query: String, terms: [String])?
+    @ObservationIgnored private var categoryCountCache: [CatalogCategory: Int] = [:]
+    @ObservationIgnored private var generationRecordCountCache: [String: Int] = [:]
+    @ObservationIgnored private var sharedPartsCache: [Part]?
+    @ObservationIgnored private var reviewReadyPartsCache: [Part]?
+    /// Normalized part number -> index into `parts`. Stores indices rather than `Part`
+    /// values so the reverse index stays small next to a 17.6k-record catalog.
+    @ObservationIgnored private var partIndexByNormalizedNumber: [String: Int] = [:]
+
+    /// Identifies everything `filteredParts` depends on. A cache hit is only valid when
+    /// every input is unchanged, so the memo can never serve a stale result set.
+    struct CatalogQueryKey: Hashable {
+        let searchText: String
+        let category: CatalogCategory
+        let vehicleFilterEnabled: Bool
+        let vehicleProfile: VehicleProfile
+        let partsRevision: Int
+    }
+
+    private var currentQueryKey: CatalogQueryKey {
+        CatalogQueryKey(
+            searchText: searchText,
+            category: selectedCategory,
+            vehicleFilterEnabled: isVehicleFilterEnabled,
+            vehicleProfile: vehicleProfile,
+            partsRevision: partsRevision
+        )
+    }
+
+    // The caches stay private; the search and ranking code lives in `CatalogSearch.swift`
+    // and reaches them through these narrow accessors rather than owning its own store.
+
+    func cachedCategoryCount(_ category: CatalogCategory) -> Int? {
+        categoryCountCache[category]
+    }
+
+    func storeCategoryCount(_ count: Int, for category: CatalogCategory) {
+        categoryCountCache[category] = count
+    }
+
+    func cachedExpandedTerms(for query: String) -> [String]? {
+        guard let expandedTermsCache, expandedTermsCache.query == query else { return nil }
+        return expandedTermsCache.terms
+    }
+
+    func storeExpandedTerms(_ terms: [String], for query: String) {
+        expandedTermsCache = (query, terms)
+    }
+
+    /// Catalog part that publishes `number` under any of its numbers, or nil.
+    func part(publishingNormalizedNumber number: String) -> Part? {
+        guard let index = partIndexByNormalizedNumber[number], parts.indices.contains(index) else { return nil }
+        return parts[index]
+    }
+
+    /// Drops every derived cache. Called whenever the catalog itself is replaced.
+    private func invalidateDerivedCaches() {
+        partsRevision &+= 1
+        filteredPartsCache = nil
+        expandedTermsCache = nil
+        categoryCountCache = [:]
+        generationRecordCountCache = [:]
+        sharedPartsCache = nil
+        reviewReadyPartsCache = nil
+    }
+
     var vehicleProfile: VehicleProfile = UserDefaults.standard.codable(
         VehicleProfile.self,
         forKey: "batalVehicleProfile"
@@ -147,6 +225,15 @@ extension CatalogViewModel {
                 partSearchIndex = parts.reduce(into: [:]) { index, part in
                     index[part.partNumber] = searchableText(for: part)
                 }
+                // Reverse index from every normalized number a part publishes back to the
+                // part, so redacting locked numbers out of assistant text is a dictionary
+                // lookup per token instead of a scan over the whole catalog per message.
+                partIndexByNormalizedNumber = parts.enumerated().reduce(into: [:]) { index, entry in
+                    for number in entry.element.allNumbers {
+                        index[normalized(number)] = entry.offset
+                    }
+                }
+                invalidateDerivedCaches()
                 sources = catalog.sources
                 generatedAt = catalog.generatedAt ?? ""
                 recordCount = catalog.recordCount ?? parts.count
@@ -185,7 +272,19 @@ extension CatalogViewModel {
         errorMessage = loadErrors.isEmpty ? nil : loadErrors.joined(separator: "\n")
     }
 
+    /// Parts matching the active search, category, and vehicle filter.
+    ///
+    /// Memoized on `CatalogQueryKey`: several screens read this property more than once
+    /// inside a single `body`, and every read used to repeat a full catalog scan.
     var filteredParts: [Part] {
+        let key = currentQueryKey
+        if let cache = filteredPartsCache, cache.key == key { return cache.parts }
+        let computed = computeFilteredParts()
+        filteredPartsCache = (key, computed)
+        return computed
+    }
+
+    private func computeFilteredParts() -> [Part] {
         let rawQuery = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         let query = normalized(searchText)
         guard !query.isEmpty else {
@@ -219,8 +318,13 @@ extension CatalogViewModel {
         return applyVehicleFilter(to: Array(fitmentMatches(for: rawQuery).prefix(25)))
     }
 
+    /// Both of these depend only on the loaded catalog, but they are read from a `body`
+    /// that SwiftUI re-evaluates freely, so they are computed once per catalog load.
     var sharedParts: [Part] {
-        parts.filter(\.isSharedCandidate).prefix(80).map(\.self)
+        if let sharedPartsCache { return sharedPartsCache }
+        let computed = Array(parts.lazy.filter(\.isSharedCandidate).prefix(80))
+        sharedPartsCache = computed
+        return computed
     }
 
     var wishlistParts: [Part] {
@@ -228,20 +332,29 @@ extension CatalogViewModel {
     }
 
     var reviewReadyParts: [Part] {
-        parts
+        if let reviewReadyPartsCache { return reviewReadyPartsCache }
+        let computed = parts
             .filter { !$0.evidence.isEmpty && !$0.years.isEmpty && !$0.engines.isEmpty }
             .sorted { ($0.confidence ?? 0) > ($1.confidence ?? 0) }
             .prefix(8)
             .map(\.self)
+        reviewReadyPartsCache = computed
+        return computed
     }
 
+    /// Number of catalog records linked to a generation. The dashboard renders four
+    /// generation cards, so without the memo a single dashboard pass scanned the whole
+    /// catalog four times, normalizing every model, year, and evidence source ID.
     func generationRecordCount(for generationID: String) -> Int {
+        if let cached = generationRecordCountCache[generationID] { return cached }
         let target = normalized(generationID)
-        return parts.filter { part in
+        let count = parts.filter { part in
             normalized(part.model ?? "").contains(target)
                 || part.years.contains { normalized($0).contains(target) }
                 || part.evidence.contains { normalized($0.sourceID ?? "").contains(target) }
         }.count
+        generationRecordCountCache[generationID] = count
+        return count
     }
 
     func focusCatalog(onGeneration generationID: String) {
@@ -944,14 +1057,38 @@ extension CatalogViewModel {
         return String(trimmed.prefix(limit)) + "..."
     }
 
+    /// Masks any locked part number the user typed before the message leaves the device.
+    ///
+    /// This walks the tokens of the message against the reverse number index instead of
+    /// walking the whole catalog: the old form ran a case-insensitive replace for every
+    /// number of every one of ~17.6k parts on each assistant question, on the main actor.
     private func safeAIPreview(_ value: String, limit: Int) -> String {
-        let protected = parts.reduce(value) { partial, part in
-            guard !isUnlocked(part) else { return partial }
-            return part.allNumbers.reduce(partial) { text, number in
-                text.replacingOccurrences(of: number, with: protectedNumber(part), options: [.caseInsensitive])
-            }
+        var protected = value
+        for token in numberLikeTokens(in: value) {
+            guard
+                let part = part(publishingNormalizedNumber: normalized(token)),
+                !isUnlocked(part)
+            else { continue }
+            protected = protected.replacingOccurrences(
+                of: token,
+                with: protectedNumber(part),
+                options: [.caseInsensitive]
+            )
         }
         return safePreview(protected, limit: limit)
+    }
+
+    /// Message substrings that could be a part number: runs of letters, digits, and the
+    /// separators catalog numbers use. Splitting first keeps the lookup cost bound to the
+    /// length of the message rather than the size of the catalog.
+    private func numberLikeTokens(in value: String) -> [String] {
+        value
+            .split { character in
+                !character.isLetter && !character.isNumber && character != "-" && character != "/"
+            }
+            .map(String.init)
+            .filter { $0.contains(where: \.isNumber) }
+            .uniqued()
     }
 
     func addMaintenance(title: String, odometer: String, notes: String) {
