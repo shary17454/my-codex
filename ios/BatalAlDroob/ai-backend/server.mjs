@@ -264,10 +264,25 @@ export function createServer({ fetchImpl = globalThis.fetch, env = process.env }
   });
 }
 
+/// Interface to bind.
+///
+/// A managed host (Railway, Fly, Heroku) injects `PORT` and routes to the container
+/// from outside, so the socket has to accept connections on every interface —
+/// listening on loopback there makes the service reachable only from inside its own
+/// container, and the platform reports it as unhealthy.
+///
+/// Run bare on a laptop with no `PORT` set and it stays on loopback, which is the
+/// right default for a process holding an OpenAI key. `HOST` overrides either way.
+export function resolveListenHost(env = process.env) {
+  if (env.HOST) return env.HOST;
+  return env.PORT ? "0.0.0.0" : "127.0.0.1";
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   loadLocalEnv();
   const port = Number(process.env.PORT || 8787);
-  createServer().listen(port, "127.0.0.1", () => {
-    console.log(`Batal AI backend listening on http://127.0.0.1:${port}`);
+  const host = resolveListenHost();
+  createServer().listen(port, host, () => {
+    console.log(`Batal AI backend listening on http://${host}:${port}`);
   });
 }
