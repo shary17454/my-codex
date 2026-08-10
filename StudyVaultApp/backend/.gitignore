@@ -1,3 +1,0 @@
-data/*.json
-backend/data/*.json
-!.gitignore

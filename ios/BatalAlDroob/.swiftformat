@@ -1,9 +1,0 @@
---swiftversion 6
---maxwidth 120
---wraparguments before-first
---wrapparameters before-first
---wrapcollections before-first
---wrapconditions before-first
---wraptypealiases before-first
---trailingcommas never
---exclude build
