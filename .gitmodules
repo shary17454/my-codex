@@ -1,0 +1,3 @@
+[submodule "moroth"]
+	path = moroth
+	url = git@github.com:shary17454/moroth.git
